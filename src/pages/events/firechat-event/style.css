@@ -11,24 +11,23 @@
   font-style: normal;
 }
 
-html, body {
-  height: 100%;
-  min-height: 100vh;
-  width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  background-color: #FCFDFD;
+.firechat-event {
   font-family: 'CoreSansRegular', Arial, sans-serif;
   text-align: center;
   position: relative;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  background-color: #FCFDFD;
+  width: 100vw;
+  overflow-x: hidden;
 }
 
-.events-title-img {
+.firechat-event * {
+  box-sizing: border-box;
+}
+
+.firechat-event .events-title-img {
   width: 28vw;
   max-width: 90vw;
   margin-top: 3vw;
@@ -39,7 +38,7 @@ body {
   user-select: none;
 }
 
-.fireside-title-container {
+.firechat-event .fireside-title-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -49,7 +48,7 @@ body {
   transform: scale(0.75);
 }
 
-.register-btn {
+.firechat-event .register-btn {
   background-color: #EF400D;
   border: none;
   color: white;
@@ -63,7 +62,7 @@ body {
   position: relative; 
 }
 
-.chairs-container {
+.firechat-event .chairs-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -72,7 +71,8 @@ body {
   margin-top: -5vw;
 }
 
-.orangebg, .greenbg {
+.firechat-event .orangebg, 
+.firechat-event .greenbg {
   position: absolute;
   left: 0;
   width: 100vw;
@@ -80,20 +80,20 @@ body {
   z-index: 1; 
 }
 
-.orangebg {
+.firechat-event .orangebg {
   background: #EF400D;
   top: 88vw;   
   border-radius: 0;
 }
 
-.greenbg {
+.firechat-event .greenbg {
   background: #1E2824;
   width: 90vw;
   top: 89.5vw;   
   border-radius: 0;
 }
 
-h2 {
+.firechat-event h2 {
   color: #1E2824;
   font-family: 'CoreSansBold';
   font-size: 2vw;
@@ -102,7 +102,7 @@ h2 {
   text-align: center;
 }
 
-.event-countDown {
+.firechat-event .event-countDown {
   font-size: 9vw;
   color: #1E2824;
   margin: 3vw 0; 
@@ -112,14 +112,14 @@ h2 {
   user-select: none;
 }
 
-.event-date {
+.firechat-event .event-date {
   font-size: 2vw;
   color: #1E2824;
   margin: 1vw 0; 
   text-align: center;
 }
 
-h1 {
+.firechat-event h1 {
   font-family: 'CoreSansBold';
   font-size: 4vw;
   margin-top: 4vw;
@@ -128,7 +128,7 @@ h1 {
 }
 
 /* Speaker - left */
-.speaker-container {
+.firechat-event .speaker-container {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -136,19 +136,19 @@ h1 {
   margin-bottom: 6vw;
 }
 
-.speaker-img {
+.firechat-event .speaker-img {
   width: 28vw;
   height: auto;
   margin-left: 7vw;
 }
 
-.speaker-info {
+.firechat-event .speaker-info {
   display: flex;
   flex-direction: column; 
   justify-content: left; 
 }
 
-.speaker-name {
+.firechat-event .speaker-name {
   font-family: 'CoreSansBold';
   font-size: 2.5vw;
   color: #1E2824;
@@ -158,7 +158,7 @@ h1 {
   white-space: nowrap; 
 }
 
-.speaker-title {
+.firechat-event .speaker-title {
   color: #EF400D;
   font-family: 'CoreSansBold';
   font-size: 1.3vw;
@@ -167,7 +167,7 @@ h1 {
   margin-bottom: 0.5vw;
 }
 
-.speaker-bio {
+.firechat-event .speaker-bio {
   color: #1E2824;
   font-family: 'CoreSansRegular';
   font-size: 1.5vw;
@@ -177,12 +177,12 @@ h1 {
   text-align: justify;
 }
 
-.speaker-orange {
+.firechat-event .speaker-orange {
   color: #EF400D;
 }
 
 /* Speaker - right - FIXED VERSION */
-.speaker-container-right {
+.firechat-event .speaker-container-right {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -190,26 +190,26 @@ h1 {
   gap: 3vw;
 }
 
-.speaker-img-right {
+.firechat-event .speaker-img-right {
   width: 28vw;
   height: auto;
   order: 2; /* Image comes after text */
 }
 
-.speaker-info-right {
+.firechat-event .speaker-info-right {
   order: 1; /* Text comes before image */
   text-align: right;
   max-width: 45vw;
 }
 
-.speaker-name-right {
+.firechat-event .speaker-name-right {
   font-family: 'CoreSansBold';
   font-size: 2.5vw;
   color: #1E2824;
   margin: 0;
 }
 
-.speaker-title-right {
+.firechat-event .speaker-title-right {
   color: #EF400D;
   font-family: 'CoreSansBold';
   font-size: 1.3vw;
@@ -217,7 +217,7 @@ h1 {
   line-height: 1.3;
 }
 
-.speaker-bio-right {
+.firechat-event .speaker-bio-right {
   color: #1E2824;
   font-family: 'CoreSansRegular';
   font-size: 1.5vw;
@@ -226,19 +226,19 @@ h1 {
   margin: 0;
 }
 
-.speaker-orange-right {
+.firechat-event .speaker-orange-right {
   color: #EF400D;
 }
 
 /* Icons */
-.social-icon {
+.firechat-event .social-icon {
   transform: scale(0.5);
   pointer-events: none;
   user-select: none;
   display: inline-block;
 }
 
-.social-row {
+.firechat-event .social-row {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -249,14 +249,15 @@ h1 {
 }
 
 /* Chair Image */
-img {
+.firechat-event img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
 /* Divider */
-.divider, .divider2 {
+.firechat-event .divider, 
+.firechat-event .divider2 {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -267,20 +268,38 @@ img {
   margin-bottom: 8vw;
 }
 
-.circle {
+.firechat-event .circle {
   width: 1.5vw;
   height: 1.5vw;
   border-radius: 50%;
   background-color: red;
 }
 
-.opacity-16 { opacity: 0.16; }
-.opacity-40 { opacity: 0.40; }
-.opacity-77 { opacity: 0.77; }
+.firechat-event .opacity-16 { opacity: 0.16; }
+.firechat-event .opacity-40 { opacity: 0.40; }
+.firechat-event .opacity-77 { opacity: 0.77; }
 
-.center-bar {
+.firechat-event .center-bar {
   width: 10vw;
   height: 1.5vw;
   background-color: black;
   border-radius: 1.5vw;
+}
+
+/* Animation keyframes */
+@keyframes fancyBounce {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
