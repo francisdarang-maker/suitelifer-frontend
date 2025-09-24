@@ -286,6 +286,39 @@
   border-radius: 1.5vw;
 }
 
+.firechat-event .scroll-toggle-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #EF400D;
+  border: none;
+  border-radius: 50%;
+  padding: 14px;
+  cursor: pointer;
+  color: white;
+  z-index: 100;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  transition: transform 0.3s ease, background 0.3s ease;
+  animation: bounceUpDown 1.5s infinite ease-in-out;
+}
+
+.firechat-event .scroll-toggle-btn:hover {
+  transform: translateX(-50%) scale(1.1);
+  background: #d9360c;
+}
+
+/* 🔹 Bounce animation */
+@keyframes bounceUpDown {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+
 /* Animation keyframes */
 @keyframes fancyBounce {
   0% {
