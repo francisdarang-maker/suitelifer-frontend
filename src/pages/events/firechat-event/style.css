@@ -1,0 +1,293 @@
+@font-face {
+  font-family: 'CoreSansRegular';
+  src: url('../suitelife-events-page/source/font/CoreSansA45Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'CoreSansBold';
+  src: url('../suitelife-events-page/source/font/CoreSansA65Bold.otf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+html, body {
+  height: 100%;
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: #FCFDFD;
+  font-family: 'CoreSansRegular', Arial, sans-serif;
+  text-align: center;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.events-title-img {
+  width: 28vw;
+  max-width: 90vw;
+  margin-top: 3vw;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.fireside-title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: -2vw;
+  transform: scale(0.75);
+}
+
+.register-btn {
+  background-color: #EF400D;
+  border: none;
+  color: white;
+  font-family: 'CoreSansBold';
+  font-size: 2vw;
+  padding: 1vw 3vw;
+  border-radius: 1vw;
+  cursor: pointer;
+  margin-top: 3vw;
+  z-index: 10;         
+  position: relative; 
+}
+
+.chairs-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: -5vw;
+}
+
+.orangebg, .greenbg {
+  position: absolute;
+  left: 0;
+  width: 100vw;
+  height: 1.5vw;
+  z-index: 1; 
+}
+
+.orangebg {
+  background: #EF400D;
+  top: 88vw;   
+  border-radius: 0;
+}
+
+.greenbg {
+  background: #1E2824;
+  width: 90vw;
+  top: 89.5vw;   
+  border-radius: 0;
+}
+
+h2 {
+  color: #1E2824;
+  font-family: 'CoreSansBold';
+  font-size: 2vw;
+  margin: 1vw 0; 
+  letter-spacing: 0.6em;
+  text-align: center;
+}
+
+.event-countDown {
+  font-size: 9vw;
+  color: #1E2824;
+  margin: 3vw 0; 
+  font-family: 'CoreSansBold';
+  letter-spacing: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.event-date {
+  font-size: 2vw;
+  color: #1E2824;
+  margin: 1vw 0; 
+  text-align: center;
+}
+
+h1 {
+  font-family: 'CoreSansBold';
+  font-size: 4vw;
+  margin-top: 4vw;
+  text-align: center;
+  color: #1E2824;
+}
+
+/* Speaker - left */
+.speaker-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  margin-bottom: 6vw;
+}
+
+.speaker-img {
+  width: 28vw;
+  height: auto;
+  margin-left: 7vw;
+}
+
+.speaker-info {
+  display: flex;
+  flex-direction: column; 
+  justify-content: left; 
+}
+
+.speaker-name {
+  font-family: 'CoreSansBold';
+  font-size: 2.5vw;
+  color: #1E2824;
+  margin-top: 3vw;
+  margin-left: 3vw;
+  text-align: left;
+  white-space: nowrap; 
+}
+
+.speaker-title {
+  color: #EF400D;
+  font-family: 'CoreSansBold';
+  font-size: 1.3vw;
+  margin-top: 0vw;
+  margin-left: 3vw;
+  margin-bottom: 0.5vw;
+}
+
+.speaker-bio {
+  color: #1E2824;
+  font-family: 'CoreSansRegular';
+  font-size: 1.5vw;
+  width: 45vw; 
+  margin-top: 0.5vw;
+  margin-left: 3vw;
+  text-align: justify;
+}
+
+.speaker-orange {
+  color: #EF400D;
+}
+
+/* Speaker - right */
+.speaker-container-right {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-right: 8vw;
+  margin-bottom: 10vw;
+  align-items: center;
+  text-align: right;
+}
+
+.speaker-img-right {
+  width: 28vw;
+  height: auto;
+
+}
+
+.speaker-info-right {
+  display: flex;
+  flex-direction: row-reverse; 
+  justify-content: right; 
+}
+
+.speaker-name-right {
+  font-family: 'CoreSansBold';
+  font-size: 2.5vw;
+  color: #1E2824;
+  margin-top: -1vw;
+  margin-right: 3vw;
+  text-align: right;
+  white-space: nowrap; 
+}
+
+.speaker-title-right {
+  color: #EF400D;
+  font-family: 'CoreSansBold';
+  font-size: 1.1vw;
+  margin-right: -20vw;
+  margin-top: 3vw;
+  margin-bottom: 0.5vw;
+  white-space: normal;
+}
+
+.speaker-bio-right {
+  color: #1E2824;
+  font-family: 'CoreSansRegular';
+  font-size: 1.5vw;
+  width: 45vw; 
+  margin-top: 8vw;
+  margin-right: -30vw;
+  text-align: justify;
+}
+
+.speaker-orange-right {
+  color: #EF400D;
+}
+
+/* Icons */
+.social-icon {
+  transform: scale(0.5);
+  pointer-events: none;
+  user-select: none;
+  display: inline-block;
+}
+
+.social-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 5vw;
+  margin-top: 2vw;
+  margin-bottom: 5vw;
+}
+
+/* Chair Image */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Divider */
+
+.divider, .divider2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+  margin: 0 auto;
+  margin-top: 8vw;
+  transform: scale(0.8);
+  margin-bottom: 8vw;
+}
+.circle {
+  width: 1.5vw;
+  height: 1.5vw;
+  border-radius: 50%;
+  background-color: red;
+}
+.opacity-16 { opacity: 0.16; }
+.opacity-40 { opacity: 0.40; }
+.opacity-77 { opacity: 0.77; }
+.center-bar {
+  width: 10vw;
+  height: 1.5vw;
+  background-color: black;
+  border-radius: 1.5vw;
+}
+

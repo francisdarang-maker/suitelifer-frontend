@@ -78,7 +78,7 @@ import { Toaster } from "react-hot-toast";
 import ScrollToTop from "./components/buttons/ScrollToTop";
 import VerifyAccount from "./pages/auth/VerifyAccount";
 import DevelopersPage from "./pages/guest/Developers";
-import LaunchPodEventPage from "./pages/launchpod-event/LaunchPodEventPage";
+import LaunchPodEventPage from "./pages/events/launchpod-event/LaunchPodEventPage";
 
 
 
