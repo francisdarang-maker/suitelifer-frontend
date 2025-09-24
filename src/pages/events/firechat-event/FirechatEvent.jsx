@@ -184,7 +184,7 @@ const FirechatEvent = () => {
                         <div className="speaker-info-right">
                             <MotionUp delay={0.3}>
                                 <h3 className="speaker-name-right">
-                                    <span className="speaker-orange-right">Alex</span> Owen-Baird
+                                    <span className="speaker-orange-right">Alex</span> Owens-Baird
                                 </h3>
                             </MotionUp>
                             <MotionUp delay={0.3}>
