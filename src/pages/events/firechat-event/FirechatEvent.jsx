@@ -4,7 +4,7 @@ import "./style.css";
 // Import images
 import eventsTitle from "./img/events-title.png";
 import firesideTitle from "./img/fireside-title.png";
-import chairs from "./img/chairs.png";
+import chairs from "./img/Chairs.png";
 import drjerry from "./img/drjerry.png";
 import alex from "./img/alex.png";
 import fb from "./img/fb.png";
