@@ -25,6 +25,7 @@ import LinkedlnIcon from "../../assets/logos/Linkedln";
 import YouTubeEmbed from "../../components/home/YoutubeEmbed";
 import api from "../../utils/axios";
 import { useLocation } from "react-router-dom";
+import img_placeholder from "../../assets/images/img-placeholder.webp";
 
 const Home = () => {
   const location = useLocation();
@@ -82,7 +83,7 @@ const Home = () => {
 
   const [homeContent, setHomeContent] = useState({
     kickstartVideo: "",
-    getInTouchImage: "",
+    getInTouchImage: img_placeholder,
   });
 
   const fetchHomeContent = async () => {
@@ -155,7 +156,13 @@ const Home = () => {
       </section>
 
       {/* GOAL AND OPERATIONS */}
-      <HomeGoalsOperations getInTouchImage={homeContent.getInTouchImage} />
+   <HomeGoalsOperations
+  getInTouchImage={
+    homeContent?.getInTouchImage && homeContent.getInTouchImage.trim() !== ""
+      ? homeContent.getInTouchImage
+      : img_placeholder
+  }
+/>
 
       <section className="px-5 xl:px-17 pb-[5%]">
         <MotionUp>

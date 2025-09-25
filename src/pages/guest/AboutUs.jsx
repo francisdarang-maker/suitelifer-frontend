@@ -24,6 +24,7 @@ import MissionVision from "../../components/about-us/MissionVision";
 import Skeleton from "react-loading-skeleton";
 import useAboutContentStore from "../../store/stores/aboutContentStore";
 import { useLocation } from "react-router-dom";
+import img_placeholder from "../../assets/images/img-placeholder.webp";
 
 const AboutUs = () => {
   const { aboutContent, isLoading, setAboutContent } = useAboutContentStore();
@@ -38,7 +39,7 @@ const AboutUs = () => {
 
       setAboutContent(response.data.aboutContent);
     } catch (error) {
-      console.log("Unable to fetch Content",error);
+      console.log("Unable to fetch Content", error);
     }
   };
 
@@ -111,7 +112,12 @@ const AboutUs = () => {
             <MotionUp>
               <div className="relative w-full flex justify-center h-[100%] items-end mt-20">
                 <img
-                  src={aboutContent.aboutBackgroundImage}
+                  src={
+                    aboutContent?.aboutBackgroundImage &&
+                    aboutContent.aboutBackgroundImage.trim() !== ""
+                      ? aboutContent.aboutBackgroundImage
+                      : img_placeholder
+                  }
                   alt="background banner"
                   className="filter grayscale absolute bottom-0 lg:bottom-30 xl:bottom-5 w-full lg:w-[80%]  h-full md:h-[900px] object-cover object-top opacity-100 lg:h-[500px] lg:right-0 xl:h-[840px] 
 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,0.2),rgba(0,0,0,0))] [mask-size:100%_100%] pointer-events-none"
@@ -119,7 +125,8 @@ const AboutUs = () => {
 
                 <div className="relative z-10 flex flex-col items-center gap-30 lg:flex-row p-1 md:p-10 md:!pb-0 md:gap-5 lg:gap-10">
                   <p className="text-h3 md:text-3xl lg:text-3xl xl:text-5xl text-center font-avenir-black mb-4 lg:text-left px-2">
-                    {aboutContent.textBanner ? (
+                    {aboutContent?.textBanner &&
+                    aboutContent.textBanner.trim() !== "" ? (
                       aboutContent.textBanner.split(" ").map((word, index) => {
                         const match = word.match(/^(\W*)(\w+)(\W*)$/);
                         if (match) {
@@ -150,7 +157,12 @@ const AboutUs = () => {
                     )}
                   </p>
                   <img
-                    src={aboutContent.aboutHeroImage}
+                    src={
+                      aboutContent?.aboutHeroImage &&
+                      aboutContent.aboutHeroImage.trim() !== ""
+                        ? aboutContent.aboutHeroImage
+                        : img_placeholder
+                    }
                     alt="Fullsuite Employees"
                     className="w-auto max-h-[400px] p-1 md:max-h-[400px] lg:max-h-[450px] xl:max-h-[700px] pointer-events-none"
                   />{" "}
@@ -243,7 +255,12 @@ const AboutUs = () => {
                     <b>team player</b>
                   </p>
                 }
-                youtubeUrl={aboutContent.teamPlayerVideo}
+                youtubeUrl={
+                  aboutContent?.teamPlayerVideo &&
+                  aboutContent.teamPlayerVideo.trim() !== ""
+                    ? aboutContent.teamPlayerVideo
+                    : "https://www.youtube.com/embed/6bq0XVkpG9U?si=D9_9bE1oc5bgTEEK"
+                }
               />
 
               {/* 2 */}
@@ -261,7 +278,12 @@ const AboutUs = () => {
                     <b>understood</b>
                   </p>
                 }
-                youtubeUrl={aboutContent.understoodVideo}
+                youtubeUrl={
+                  aboutContent?.understoodVideo &&
+                  aboutContent.understoodVideo.trim() !== ""
+                    ? aboutContent.understoodVideo
+                    : "https://www.youtube.com/embed/6bq0XVkpG9U?si=D9_9bE1oc5bgTEEK"
+                }
               />
             </div>
             <div className="flex justify-center">
@@ -279,7 +301,12 @@ const AboutUs = () => {
                     <b>focused athlete</b>
                   </p>
                 }
-                youtubeUrl={aboutContent.focusedVideo}
+                youtubeUrl={
+                  aboutContent?.focusedVideo &&
+                  aboutContent.focusedVideo.trim() !== ""
+                    ? aboutContent.focusedVideo
+                    : "https://www.youtube.com/embed/6bq0XVkpG9U?si=D9_9bE1oc5bgTEEK"
+                }
               />
             </div>
             <div className="flex justify-evenly lg:gap-10">
@@ -293,7 +320,12 @@ const AboutUs = () => {
                   />
                 }
                 text={<b className="text-body">upholds</b>}
-                youtubeUrl={aboutContent.upholdsVideo}
+                youtubeUrl={
+                  aboutContent?.upholdsVideo &&
+                  aboutContent.upholdsVideo.trim() !== ""
+                    ? aboutContent.upholdsVideo
+                    : "https://www.youtube.com/embed/6bq0XVkpG9U?si=D9_9bE1oc5bgTEEK"
+                }
               />
               {/* 5 */}
               <CoreValueCard
@@ -308,7 +340,12 @@ const AboutUs = () => {
                     values <br /> work/life harmony
                   </b>
                 }
-                youtubeUrl={aboutContent.harmonyVideo}
+                youtubeUrl={
+                  aboutContent?.harmonyVideo &&
+                  aboutContent.harmonyVideo.trim() !== ""
+                    ? aboutContent.harmonyVideo
+                    : "https://www.youtube.com/embed/6bq0XVkpG9U?si=D9_9bE1oc5bgTEEK"
+                }
               />
             </div>
           </div>
@@ -322,14 +359,42 @@ const AboutUs = () => {
         <MotionUp>
           <section id="mission-vision">
             <MissionVision
-              imgMission={imgMission}
-              imgVision={imgVision}
-              missionSlogan={aboutContent.missionSlogan}
-              missionContent={aboutContent.mission}
-              missionVideoUrl={aboutContent.missionVideo}
-              visionSlogan={aboutContent.visionSlogan}
-              visionContent={aboutContent.vision}
-              visionVideoUrl={aboutContent.visionVideo}
+              imgMission={imgMission || ""}
+              imgVision={imgVision || ""}
+              missionSlogan={
+                aboutContent?.missionSlogan &&
+                aboutContent.missionSlogan.trim() !== ""
+                  ? aboutContent.missionSlogan
+                  : ""
+              }
+              missionContent={
+                aboutContent?.mission && aboutContent.mission.trim() !== ""
+                  ? aboutContent.mission
+                  : ""
+              }
+              missionVideoUrl={
+                aboutContent?.missionVideo &&
+                aboutContent.missionVideo.trim() !== ""
+                  ? aboutContent.missionVideo
+                  : "https://www.youtube.com/embed/6bq0XVkpG9U?si=D9_9bE1oc5bgTEEK"
+              }
+              visionSlogan={
+                aboutContent?.visionSlogan &&
+                aboutContent.visionSlogan.trim() !== ""
+                  ? aboutContent.visionSlogan
+                  : ""
+              }
+              visionContent={
+                aboutContent?.vision && aboutContent.vision.trim() !== ""
+                  ? aboutContent.vision
+                  : ""
+              }
+              visionVideoUrl={
+                aboutContent?.visionVideo &&
+                aboutContent.visionVideo.trim() !== ""
+                  ? aboutContent.visionVideo
+                  : "https://www.youtube.com/embed/6bq0XVkpG9U?si=D9_9bE1oc5bgTEEK"
+              }
             />
           </section>
         </MotionUp>
@@ -385,7 +450,9 @@ const AboutUs = () => {
               </p>
             </div>
             <div>
-              <p className="font-casablanca text-white text-h5 text-right mt-5 px-5 md:px-10">~ Maggie</p>
+              <p className="font-casablanca text-white text-h5 text-right mt-5 px-5 md:px-10">
+                ~ Maggie
+              </p>
             </div>
           </section>
         </MotionUp>
@@ -417,7 +484,14 @@ const AboutUs = () => {
               </div>
             </div>
             <div className="w-[80%] max-w-[1200px] pt-5 md:pt-20 mx-auto">
-              <YouTubeEmbed embedUrl={aboutContent.dayInPodUrl} />
+              <YouTubeEmbed
+                embedUrl={
+                  aboutContent?.dayInPodUrl &&
+                  aboutContent.dayInPodUrl.trim() !== ""
+                    ? aboutContent.dayInPodUrl
+                    : "https://www.youtube.com/embed/6bq0XVkpG9U?si=D9_9bE1oc5bgTEEK"
+                }
+              />
             </div>
 
             <section className="mt-10 md:mt-[5%] pb-[7%] lg:pb-[5%] px-[5%]">
