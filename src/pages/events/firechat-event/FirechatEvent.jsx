@@ -28,6 +28,40 @@ const FirechatEvent = () => {
 
     const sections = [topRef, countdownRef, speakersRef, socialRef];
 
+   useEffect(() => {
+    document.title = "Firechat Event | Suitelifer";
+    
+    const updateMetaTag = (name, content) => {
+        let metaTag = document.querySelector(`meta[${name.startsWith('og:') ? 'property' : 'name'}="${name}"]`);
+        if (!metaTag) {
+            metaTag = document.createElement('meta');
+            if (name.startsWith('og:')) {
+                metaTag.setAttribute('property', name);
+            } else {
+                metaTag.setAttribute('name', name);
+            }
+            document.head.appendChild(metaTag);
+        }
+        metaTag.setAttribute('content', content);
+    };
+
+    // Add timestamp to image URL to prevent caching
+    const timestamp = new Date().getTime();
+    const imageUrl = `https://www.suitelifer.com/images/suitelifer-link-preview.webp?t=${timestamp}`;
+    
+    updateMetaTag('og:title', 'Firechat Event | Suitelifer');
+    updateMetaTag('og:description', 'Join us for Firechat Event featuring industry leaders. Discover career opportunities at FullSuite.');
+    updateMetaTag('og:image', imageUrl);
+    updateMetaTag('og:url', `https://www.suitelifer.com/events?t=${timestamp}`);
+    updateMetaTag('og:type', 'website');
+    
+    updateMetaTag('twitter:card', 'summary_large_image');
+    updateMetaTag('twitter:title', 'Firechat Event | Suitelifer');
+    updateMetaTag('twitter:description', 'Join us for Firechat Event featuring industry leaders.');
+    updateMetaTag('twitter:image', imageUrl);
+
+}, []);
+
     useEffect(() => {
         const currentYear = new Date().getFullYear();
         const targetTime = new Date(`${currentYear}-10-10T16:00:00`).getTime();
@@ -198,7 +232,7 @@ const FirechatEvent = () => {
                                     Baird is a growth leader currently driving AI and operations at FullSuite,
                                     specializing in Human-in-the-Loop data services. He has strong experience in sales
                                     and digital private markets, with past roles at J.P. Morgan, Aumni, and Lumonic.
-                                    Baird’s background also includes venture capital and finance,
+                                    Baird's background also includes venture capital and finance,
                                     including leadership at EPIC Ventures and analyst roles at Wells Fargo.
                                 </p>
                             </MotionUp>
