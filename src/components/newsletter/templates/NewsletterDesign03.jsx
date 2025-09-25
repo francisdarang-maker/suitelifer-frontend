@@ -448,3 +448,16 @@
 // };
 
 // export default NewsletterDesign03;
+
+
+import React from 'react'
+
+function NewsletterDesign03() {
+  return (
+    <div>
+      NewsletterDesign03
+    </div>
+  )
+}
+
+export default NewsletterDesign03
