@@ -24,7 +24,7 @@ import MissionVision from "../../components/about-us/MissionVision";
 import Skeleton from "react-loading-skeleton";
 import useAboutContentStore from "../../store/stores/aboutContentStore";
 import { useLocation } from "react-router-dom";
-import img_placeholder from "../../assets/images/img-placeholder.webp";
+import img_placeholder from "../../assets/images/img-placeholder.svg";
 
 const AboutUs = () => {
   const { aboutContent, isLoading, setAboutContent } = useAboutContentStore();
