@@ -4,6 +4,7 @@ import DesktopNav from "../../components/home/DesktopNav";
 import Footer from "../../components/footer/Footer";
 import BackToTop from "../../components/buttons/BackToTop";
 
+import NewsletterDesign07 from "../../components/newsletter/templates/NewsletterDesign07";
 import NewsletterDesign01 from "../../components/newsletter/templates/NewsletterDesign01";
 import NewsletterDesign02 from "../../components/newsletter/templates/NewsletterDesign02";
 import NewsletterDesign03 from "../../components/newsletter/templates/NewsletterDesign03";
@@ -13,7 +14,10 @@ import NewsletterDesign06 from "../../components/newsletter/templates/Newsletter
 import NewsletterDesign07 from "../../components/newsletter/templates/NewsletterDesign07";
 
 import PageMeta from "../../components/layout/PageMeta";
+
 import { useLocation } from "react-router-dom";
+
+//added for conditional rendering
 import newsletterStore from "../../store/stores/newsletterStore";
 import NoNewsletter from "../../components/newsletter/NoNewsletter";
 
