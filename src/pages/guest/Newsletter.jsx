@@ -4,7 +4,6 @@ import DesktopNav from "../../components/home/DesktopNav";
 import Footer from "../../components/footer/Footer";
 import BackToTop from "../../components/buttons/BackToTop";
 
-import NewsletterDesign07 from "../../components/newsletter/templates/NewsletterDesign07";
 import NewsletterDesign01 from "../../components/newsletter/templates/NewsletterDesign01";
 import NewsletterDesign02 from "../../components/newsletter/templates/NewsletterDesign02";
 import NewsletterDesign03 from "../../components/newsletter/templates/NewsletterDesign03";

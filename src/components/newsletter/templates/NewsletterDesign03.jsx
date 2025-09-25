@@ -122,7 +122,7 @@ const NewsletterDesign03 = () => {
             </div>
           </section>
         </div>
-      ) : newsletterContent.currentIssue?.assigned >= 4 ? (
+      ) : newsletterContent.currentIssue?.assigned >= 3 ? (
         <section>
           <MotionUp>
             <NewsletterHeader
