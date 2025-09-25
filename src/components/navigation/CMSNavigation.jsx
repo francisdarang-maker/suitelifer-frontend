@@ -21,6 +21,7 @@ import {
   ChartBarIcon,
   HeartIcon,
   ShoppingBagIcon,
+  ClipboardDocumentIcon
 } from "@heroicons/react/20/solid";
 import TeamPlayerIcon from '../../assets/icons/TeamPlayerIcon.jsx';
 import {
@@ -44,7 +45,7 @@ const regularFeatures = [
   {
     feature_name: "Personality Test",
     path: "personality-test",
-    icon: (props) => <TeamPlayerIcon className={props.className} color="currentColor" />,
+    icon: ClipboardDocumentIcon,
   },
 ];
 
@@ -64,7 +65,7 @@ const adminFeatures = [
   {
     feature_name: "Personality Test",
     path: "personality-test",
-    icon: FaceSmileIcon,
+    icon: ClipboardDocumentIcon,
   },
   {
     feature_name: "Audit Logs",
