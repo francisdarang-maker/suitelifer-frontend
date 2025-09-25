@@ -847,7 +847,7 @@ function AdminNewsLetterToggle() {
             {prevClickedIssue.is_published === 0 ? (
               <button
                 onClick={() => setIsPublishModalOpen(true)}
-                disabled={selectedMonthlyIssue.assigned < 7}
+                // disabled={selectedMonthlyIssue.assigned < 7}
                 className={`flex gap-2   font-avenir-black p-2 px-3  items-center rounded-md transition ${
                   selectedMonthlyIssue.assigned === 7
                     ? "cursor-pointer bg-primary text-white hover:bg-primary/90"
