@@ -137,8 +137,8 @@ const NewsletterDesign02 = () => {
           {/* Contents */}
           {/* <section className="md:flex md:gap-10 md:px-[10%] xl:px-[10%] mb-10">
            */}
-          <section className="">
-            <div className="px-[5%] md:px-0 md:w-[66%] xl:w-[100%]">
+          <section className="mb-10  md:flex md:flex-col md:gap-30 md:px-[5%] md:items-center  xl:px-[10%] ">
+            <div className="px-[5%] md:px-0 md:w-[66%]">
               <MotionUp>
                 <div className="w-[100%]">
                   {/* MAIN */}
@@ -161,13 +161,14 @@ const NewsletterDesign02 = () => {
                     title={section1.title}
                     id={section1.newsletterId}
                   />
-                  <div className="md:mb-5"></div>
+                  {/* <div className="md:mb-1s"></div> */}
                 </div>
               </MotionUp>
             </div>
-            <div className="md:flex gap-10">
-              <div className="md:w-[50%]">
+            <div className="md:flex gap-10 md:justify-center">
+              <div className="md:w-[80%] px-[5%]">
                 <Divider />
+                <div className="mt-5"></div>
                 <ArticleViewDesign
                   title={section2.title}
                   author={section2.pseudonym}
