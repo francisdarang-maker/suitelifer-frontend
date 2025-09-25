@@ -1,156 +1,199 @@
 import NewsletterHeader from "../NewsletterHeader";
-import NewsletterQuote from "../NewsletterQuote";
 import LargeViewDesign01 from "../LargeViewDesign01";
-import ArticleViewDesign from "../ArticleViewDesign";
-import ColoredArticleViewDesign from "../ColoredArticleViewDesign";
 import ReadMoreBtn from "../../buttons/ReadMoreBtn";
-import NewsletterArticles from "../NewsletterArticles";
+import { useEffect } from "react";
+import api from "../../../utils/axios";
+import { readingTime } from "reading-time-estimator";
+import { removeHtmlTags } from "../../../utils/removeHTMLTags";
+import formatTimestamp from "../../../utils/formatTimestamp";
+import Skeleton from "react-loading-skeleton";
+import newsletterStore from "../../../store/stores/newsletterStore";
+import MotionUp from "../../animated/MotionUp";
 import Divider from "../Divider";
-
+import ArticleViewDesign from "../ArticleViewDesign";
 const NewsletterDesign02 = () => {
-  const articles = NewsletterArticles;
+  const { newsletterContent, setNewsletterContent, isLoading, setIsLoading } =
+    newsletterStore();
+
+  useEffect(() => {
+    const fetchIssueAndArticles = async () => {
+      try {
+        const issueRes = await api.get("api/issues/current");
+        const current = issueRes.data?.currentIssue ?? null;
+
+        console.log("Current Issue:", current);
+
+        if (!current) {
+          setNewsletterContent({ articles: [], currentIssue: null });
+          return;
+        }
+
+        const articlesRes = await api.get(
+          `/api/newsletter?issueId=${current.issueId}`
+        );
+
+        setNewsletterContent({
+          articles: articlesRes.data?.newsletters ?? [],
+          currentIssue: current,
+        });
+      } catch (error) {
+        console.error("Error fetching issue/articles:", error.message);
+        setNewsletterContent({ articles: [], currentIssue: null }); // fallback
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchIssueAndArticles();
+  }, [setNewsletterContent, setIsLoading]);
+
+  const getArticleBySection = (articles, sectionNumber) => {
+    return (
+      articles.find((article) => article.section === sectionNumber) || {
+        title: "Coming Soon",
+        article: "This section is being prepared. Stay tuned!",
+        pseudonym: "FullSuite Team",
+        createdAt: new Date().toISOString(),
+        newsletterId: "",
+        images: [],
+      }
+    );
+  };
+  const articles = newsletterContent.articles || [];
+  const currentIssue = newsletterContent.currentIssue || {};
+
+  const section1 = getArticleBySection(articles, 1);
+  const section2 = getArticleBySection(articles, 2);
+
   return (
-    <section>
-      <NewsletterHeader year={"2025"} issueNumber={"01"} />
-      <div className="pb-[4%]"></div>
-
-      {/* Contents */}
-      <section className="md:flex md:gap-10 px-[5%] md:px-[10%] xl:px-[15%]">
-        <div className="">
-          <ArticleViewDesign
-            title={articles[0].title}
-            author={articles[0].author}
-            readTime={articles[0].readTime}
-            datePublished={articles[0].datePublished}
-            article={articles[0].article}
-            lineclamp={"line-clamp-17"}
-          />
-          <div className="my-5"></div>
-          <ReadMoreBtn href={""} />
-          <div className="md:my-7"></div>
-          <Divider />
-          <ArticleViewDesign
-            title={articles[0].title}
-            author={articles[0].author}
-            readTime={articles[0].readTime}
-            datePublished={articles[0].datePublished}
-            article={articles[0].article}
-            lineclamp={"line-clamp-13 lg:line-clamp-18 xl:line-clamp-25"}
-          />
-          <div className="my-5"></div>
-          <ReadMoreBtn href={""} />
-          <div className="mt-5"></div>
-        </div>
-        <div className="">
-          <div className="">
-            <LargeViewDesign01
-              image={articles[0].image}
-              title={articles[0].title}
-              author={articles[0].author}
-              readTime={articles[0].readTime}
-              datePublished={articles[0].datePublished}
-              article={articles[0].article}
-            />
-            <div className="my-5 md:m-0"></div>
-            <ReadMoreBtn href={""} />
-            <div className="my-10"></div>
-          </div>
-          <div className="my-5"></div>
-          <div className="md:flex gap-10">
-            <div className="flex-1 md:px-0">
-              <NewsletterQuote
-                text={
-                  "True innovation begins where curiosity meets opportunity, and every collaboration has the potential to shape the future in ways we never imagined."
-                }
-              />
-            </div>
-            <div className="flex-1 md:mt-0">
-              <ArticleViewDesign
-                image={articles[0].image}
-                title={articles[0].title}
-                author={articles[0].author}
-                readTime={articles[0].readTime}
-                datePublished={articles[0].datePublished}
-                article={articles[0].article}
-                lineclamp={"line-clamp-9"}
-              />
-              <div className="mt-5"></div>
-              <ReadMoreBtn href={""} />
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="mt-[4%]">
-        <div className="px-[5%] md:px-[10%] xl:px-[15%]">
-          <div className="w-full h-full flex flex-col md:flex-row justify-end bg-primary/15 rounded-lg p-[5%] lg:p-[3%]">
-            <div className="flex flex-col md:flex-row gap-4 md:gap-10 xl:w-[60%]">
-              <img
-                className="size-[242px] hidden w-full xl:block aspect-video xl:aspect-square object-cover rounded-lg"
-                src={articles[0].image}
-                alt=""
-              />
-              <div className="">
-                <p className={`font-avenir-black text-h6 line-clamp-2`}>
-                  {articles[0].title}
-                </p>
-                <p className="text-small pb-3 pt-1">
-                  <span className={`text-primary`}>{articles[0].author}</span>
-                  <span className={`text-gray-400`}>&nbsp; |</span>
-                  <span className={`text-primary`}>
-                    &nbsp;&nbsp;{articles[0].readTime}
-                  </span>
-                  <span className={`text-gray-400`}>&nbsp; |</span>
-                  <span className={`text-primary`}>
-                    &nbsp;&nbsp;{articles[0].datePublished}
-                  </span>
-                </p>
-                <div
-                  className={`line-clamp-4 text-body text-justify text-gray-500`}
-                >
-                  <article>{articles[0].article}</article>
+    <div>
+      {isLoading ? (
+        <div>
+          {" "}
+          <NewsletterHeader />
+          <div className="pb-[4%]"></div>
+          <section className="px-[5%] md:px-[10%]">
+            <div className="md:flex md:gap-10 mb-10">
+              <div className="md:w-[66%]">
+                <Skeleton className="w-full aspect-video mb-4" />
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2 mb-1" />
+                <Skeleton className="h-4 w-full mb-4" />
+                <Skeleton className="h-10 w-24 mb-6" />
+                <div className="md:flex gap-10">
+                  <div className="md:w-[50%]">
+                    <Skeleton className="h-6 w-2/3 mb-2" />
+                    <Skeleton className="h-4 w-full mb-1" />
+                    <Skeleton className="h-4 w-full mb-1" />
+                    <Skeleton className="h-10 w-20 mt-4" />
+                  </div>
+                  <div className="mt-10 md:mt-0 md:w-[50%]">
+                    <Skeleton className="h-6 w-2/3 mb-2" />
+                    <Skeleton className="h-4 w-full mb-1" />
+                    <Skeleton className="h-4 w-full mb-1" />
+                    <Skeleton className="h-10 w-20 mt-4" />
+                  </div>
                 </div>
-                <div className="mt-5"></div>
-                <ReadMoreBtn href={""} />
+              </div>
+              <div className="md:w-[34%]">
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-10 w-20 mt-4" />
+                <div className="my-5" />
+                <Skeleton className="h-36 w-full rounded-lg" />
+                <Skeleton className="h-10 w-20 mt-4" />
+                <Skeleton className="h-150 w-full rounded-lg mt-10" />
               </div>
             </div>
-
-            <div className="md:hidden">
-              <Divider />
-            </div>
-            <div className="hidden md:block">
-              <div className="px-10 h-full flex flex-col items-center">
-                <div className="size-[1.3vh] bg-primary rounded-full"></div>
-                <div className="bg-primary h-full w-[0.25vh]"></div>
-                <div className="size-[1.3vh] bg-primary rounded-full"></div>
+            <div className="w-full bg-primary/10 rounded-lg p-5 flex flex-col md:flex-row gap-6">
+              <Skeleton className="w-[242px] h-[242px] rounded-lg hidden xl:block" />
+              <div className="flex-1">
+                <Skeleton className="h-6 w-2/3 mb-2" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-10 w-20 mt-4" />
+              </div>
+              <div className="hidden md:block h-full w-px bg-primary" />
+              <div className="flex-1">
+                <Skeleton className="h-6 w-2/3 mb-2" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <Skeleton className="h-10 w-20 mt-4" />
               </div>
             </div>
-            <div className="xl:w-[40%]">
-              <p className={`font-avenir-black text-h6 line-clamp-2`}>
-                {articles[0].title}
-              </p>
-              <p className="text-small pb-3 pt-1">
-                <span className={`text-primary`}>{articles[0].author}</span>
-                <span className={`text-gray-400`}>&nbsp; |</span>
-                <span className={`text-primary`}>
-                  &nbsp;&nbsp;{articles[0].readTime}
-                </span>
-                <span className={`text-gray-400`}>&nbsp; |</span>
-                <span className={`text-primary`}>
-                  &nbsp;&nbsp;{articles[0].datePublished}
-                </span>
-              </p>
-              <div
-                className={`line-clamp-4 text-body text-justify text-gray-500`}
-              >
-                <article>{articles[0].article}</article>
-              </div>
-              <div className="mt-5"></div>
-              <ReadMoreBtn href={""} />
-            </div>
-          </div>
+          </section>
         </div>
-      </section>
-    </section>
+      ) : newsletterContent.currentIssue?.assigned === 2 ? (
+        <section>
+          <MotionUp>
+            <NewsletterHeader
+              month={currentIssue.month}
+              year={currentIssue.year}
+            />
+          </MotionUp>
+          <div className="pb-[4%]"></div>
+
+          {/* Contents */}
+          {/* <section className="md:flex md:gap-10 md:px-[10%] xl:px-[10%] mb-10">
+           */}
+          <section className="">
+            <div className="px-[5%] md:px-0 md:w-[66%] xl:w-[100%]">
+              <MotionUp>
+                <div className="w-[100%]">
+                  {/* MAIN */}
+                  <LargeViewDesign01
+                    image={section1.images[0]}
+                    title={section1.title}
+                    author={section1.pseudonym}
+                    readTime={
+                      readingTime(
+                        removeHtmlTags(section1.article ?? "article"),
+                        238
+                      ).text
+                    }
+                    datePublished={formatTimestamp(section1.createdAt).fullDate}
+                    article={section1.article}
+                  />
+                  <div className="mt-5 md:m-0"></div>
+                  <ReadMoreBtn
+                    href={""}
+                    title={section1.title}
+                    id={section1.newsletterId}
+                  />
+                  <div className="md:mb-5"></div>
+                </div>
+              </MotionUp>
+            </div>
+            <div className="md:flex gap-10">
+              <div className="md:w-[50%]">
+                <Divider />
+                <ArticleViewDesign
+                  title={section2.title}
+                  author={section2.pseudonym}
+                  image={section2.images[0]}
+                  readTime={
+                    readingTime(
+                      removeHtmlTags(section2.article ?? "article"),
+                      238
+                    ).text
+                  }
+                  datePublished={formatTimestamp(section2.createdAt).fullDate}
+                  article={section2.article}
+                  lineclamp="line-clamp-6"
+                />{" "}
+                <div className="mt-5"></div>
+                <ReadMoreBtn
+                  href={""}
+                  title={section2.title}
+                  id={section2.newsletterId}
+                />
+              </div>
+            </div>
+          </section>
+        </section>
+      ) : null}
+    </div>
   );
 };
 

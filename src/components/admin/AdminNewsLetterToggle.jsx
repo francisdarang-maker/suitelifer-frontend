@@ -848,11 +848,14 @@ function AdminNewsLetterToggle() {
               <button
                 onClick={() => setIsPublishModalOpen(true)}
                 // disabled={selectedMonthlyIssue.assigned < 7}
-                className={`flex gap-2   font-avenir-black p-2 px-3  items-center rounded-md transition ${
-                  selectedMonthlyIssue.assigned === 7
-                    ? "cursor-pointer bg-primary text-white hover:bg-primary/90"
-                    : "cursor-not-allowed bg-gray-300 text-gray-200"
-                }`}
+                className={
+                  "flex gap-2   font-avenir-black p-2 px-3  items-center rounded-md transition cursor-pointer bg-primary text-white hover:bg-primary/90"
+                  //   ${
+                  //   selectedMonthlyIssue.assigned === 7
+                  //     ? "cursor-pointer bg-primary text-white hover:bg-primary/90"
+                  //     : "cursor-not-allowed bg-gray-300 text-gray-200"
+                  // }
+                }
               >
                 <BookmarkSquareIcon className="size-5" />
                 <span className="hidden sm:flex flex-col">
@@ -864,12 +867,16 @@ function AdminNewsLetterToggle() {
                 {" "}
                 <button
                   onClick={() => setIsUnPublishModalOpen(true)}
-                  disabled={selectedMonthlyIssue.assigned < 7}
-                  className={`flex gap-2   font-avenir-black p-2 px-3  items-center rounded-md transition ${
-                    selectedMonthlyIssue.assigned === 7
-                      ? "cursor-pointer bg-red-700 text-white hover:bg-red-800"
-                      : "cursor-not-allowed bg-gray-300 text-gray-200"
-                  }`}
+                  // disabled={selectedMonthlyIssue.assigned < 7}
+                  // added feat: can unpublish even if assigned is less than 7
+                  className={
+                    "flex gap-2   font-avenir-black p-2 px-3  items-center rounded-md transition cursor-pointer bg-red-700 text-white hover:bg-red-800"
+                    //   ${
+                    //   selectedMonthlyIssue.assigned === 7
+                    //     ? "cursor-pointer bg-red-700 text-white hover:bg-red-800"
+                    //     : "cursor-not-allowed bg-gray-300 text-gray-200"
+                    // }
+                  }
                 >
                   <BookmarkSquareIcon className="size-5" />
                   <span className="hidden sm:flex flex-col">

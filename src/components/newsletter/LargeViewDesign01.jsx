@@ -9,7 +9,7 @@ const LargeViewDesign01 = ({
   article,
 }) => {
   return (
-    <section className="bg-red-300">
+    <section className="bg-red-100">
       {image ? (
         <>
           <img
