@@ -16,7 +16,7 @@ import newsletterStore from "../../../store/stores/newsletterStore";
 import MotionUp from "../../animated/MotionUp";
 import ArticlePreviewWithHyphenation from "../ArticlePreviewWithHyphenation";
 
-const NewsletterDesign03 = () => {
+const NewsletterDesign04 = () => {
   const { newsletterContent, setNewsletterContent, isLoading, setIsLoading } =
     newsletterStore();
 
@@ -71,6 +71,7 @@ const NewsletterDesign03 = () => {
   const section1 = getArticleBySection(articles, 1);
   const section2 = getArticleBySection(articles, 2);
   const section3 = getArticleBySection(articles, 3);
+  const section4 = getArticleBySection(articles, 4);
 
   return (
     <div>
@@ -134,10 +135,10 @@ const NewsletterDesign03 = () => {
 
           {/* Main Content Grid - Optimized for 4 Articles */}
           <section className="px-[5%] md:px-[10%]">
-            <div className="grid grid-cols-1 gap-10 mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-12">
               {/* Featured Article - Full Width */}
               <MotionUp>
-                <div>
+                <div className="lg:col-span-2">
                   <LargeViewDesign01
                     image={section1.images[0]}
                     title={section1.title}
@@ -159,10 +160,8 @@ const NewsletterDesign03 = () => {
                   />
                 </div>
               </MotionUp>
-            </div>
 
-            {/* Second Article */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 col-span-2 gap-10">
+              {/* Second Article */}
               <MotionUp>
                 <div>
                   <ArticleViewDesign
@@ -213,6 +212,30 @@ const NewsletterDesign03 = () => {
                   />
                 </div>
               </MotionUp>
+              {/* COLORED ARTICLE */}
+              <MotionUp>
+                <ColoredArticleViewDesign
+                  title={section4.title}
+                  author={section4.pseudonym}
+                  readTime={
+                    readingTime(
+                      removeHtmlTags(section4.article ?? "article"),
+                      238
+                    ).text
+                  }
+                  datePublished={formatTimestamp(section4.createdAt).fullDate}
+                  article={section4.article}
+                  lineclamp="md:line-clamp-17 lg:line-clamp-17 xl:line-clamp-25"
+                />
+                <div className="mt-5"></div>
+                <div className="px-[5%] md:px-0">
+                  <ReadMoreBtn
+                    href={""}
+                    title={section4.title}
+                    id={section4.newsletterId}
+                  />
+                </div>
+              </MotionUp>
             </div>
           </section>
         </section>
@@ -234,4 +257,4 @@ const NewsletterDesign03 = () => {
   );
 };
 
-export default NewsletterDesign03;
+export default NewsletterDesign04;
