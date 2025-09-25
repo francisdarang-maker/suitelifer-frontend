@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import moment from "moment";
+// import moment from "moment";
 import EventCalendar from "../../components/admin/EventCalendar";
 import ContentButtons from "../../components/admin/ContentButtons";
 import ComingSoon from "./ComingSoon";
@@ -17,11 +17,12 @@ import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import api from "../../utils/axios";
 import { useStore } from "../../store/authStore";
 import toast from "react-hot-toast";
+import moment from "moment-timezone";
 
 const AdminEvents = () => {
   const user = useStore((state) => state.user);
 
-  const [isComingSoon, setComingSoon] = useState(false); // Set to true if still in development
+  // const [isComingSoon, setComingSoon] = useState(false); // Set to true if still in development
   const [openDialog, setOpenDialog] = useState(false);
 
   const [events, setEvents] = useState([]);
@@ -36,10 +37,9 @@ const AdminEvents = () => {
     start: new Date(),
     end: new Date(new Date().getTime() + 60 * 60 * 1000),
     description: "",
-    //Added for gdrive url
     gdrive_link: "",
   };
-
+  
   const [eventDetails, setEventDetails] = useState(defaultEventDetails);
 
   const handleEventChange = (e, isDate) => {
@@ -51,21 +51,27 @@ const AdminEvents = () => {
 
   const [dataUpdated, setDataUpdated] = useState(false);
 
-  const fetchEvents = async () => {
-    try {
-      const response = await api.get("/api/events");
-      const rawEvents = response.data.events;
-      const adjustedEvents = rawEvents.map((event) => ({
-        ...event,
-        start: moment.utc(event.start).local().toDate(),
-        end: moment.utc(event.end).local().toDate(),
-      }));
+const fetchEvents = async () => {
+  try {
+    const localTimeZone = moment.tz.guess();
+    console.log("Device TimeZone:", localTimeZone);
 
-      setEvents(adjustedEvents);
-    } catch (err) {
-      console.error("Failed to fetch events:", err);
-    }
-  };
+    const response = await api.get("/api/events");
+    const rawEvents = response.data.events;
+
+    const adjustedEvents = rawEvents.map((event) => {
+      return {
+        ...event,
+        start: moment(event.start).utc(true).tz(localTimeZone).toDate(),
+        end: moment(event.end).utc(true).tz(localTimeZone).toDate(),
+      };
+    });
+
+    setEvents(adjustedEvents);
+  } catch (err) {
+    console.error("Failed to fetch events:", err);
+  }
+};
 
   useEffect(() => {
     fetchEvents();
@@ -95,42 +101,41 @@ const AdminEvents = () => {
     setIsAddModalOpen(true);
   };
 
-  const handleAddEditEvent = async () => {
-    try {
-      console.log(`onAdd:${eventDetails.gdrive_link}`);
-      if (!eventDetails.eventId) {
-        const response = await api.post("/api/events/", {
-          ...eventDetails,
-          userId: user.id,
-        });
+ const handleAddEditEvent = async () => {
+  
+  try {
+    const eventPayload = {
+      ...eventDetails,
+      userId: user.id,
+      start: moment(eventDetails.start).utc().format("YYYY-MM-DD HH:mm:ss"),
+      end: moment(eventDetails.end).utc().format("YYYY-MM-DD HH:mm:ss"),
+    };
 
-        if (response.data.success) {
-          toast.success(response.data.message);
-        }
-      } else {
-        const response = await api.put(`/api/events/`, {
-          ...eventDetails,
-          userId: user.id,
-        });
-
-        if (response.data.success) {
-          toast.success(response.data.message);
-        }
-      }
-
-      setDataUpdated(!dataUpdated);
-    } catch (error) {
-      toast.error(
-        `Encountered a problem while ${
-          eventDetails.eventId ? "updating" : "adding"
-        } the event.`
-      );
-      console.error("Error saving event:", error);
-    } finally {
-      setIsAddModalOpen(false);
-      setEventDetails(defaultEventDetails);
+    let response;
+    if (!eventDetails.eventId) {
+      response = await api.post("/api/events/", eventPayload);
+    } else {
+      response = await api.put(`/api/events/`, eventPayload);
     }
-  };
+
+    if (response.data.success) {
+      toast.success(response.data.message);
+    }
+
+    setDataUpdated(!dataUpdated);
+  } catch (error) {
+    toast.error(
+      `Encountered a problem while ${
+        eventDetails.eventId ? "updating" : "adding"
+      } the event.`
+    );
+    console.error("Error saving event:", error);
+  } finally {
+    setIsAddModalOpen(false);
+    setEventDetails(defaultEventDetails);
+  }
+};
+
 
   const handleEventClick = (event) => {
     setEventDetails(event);
@@ -145,7 +150,7 @@ const AdminEvents = () => {
     setIsAddModalOpen(true);
   };
 
-  if (isComingSoon) return <ComingSoon />;
+  // if (isComingSoon) return <ComingSoon />;
 
   return (
     <div className="bg-white p-2">
@@ -159,8 +164,7 @@ const AdminEvents = () => {
               start: new Date(),
               end: new Date(new Date().getTime() + 60 * 60 * 1000),
               description: "",
-              //Added for gdrive url link
-              gdrive_link: "",
+              gdriveLink: "",
             });
 
             setIsEditing(false);
@@ -169,14 +173,6 @@ const AdminEvents = () => {
           }}
         />
       </div>
-
-      <TextField
-        label="Search Events"
-        fullWidth
-        margin="normal"
-        className="border border-gray-200"
-      />
-
       <div className="flex gap-8 mt-4 h-full">
         <div className="bg-white border border-gray-200 rounded-md p-4 w-full">
           <EventCalendar
@@ -269,7 +265,7 @@ const AdminEvents = () => {
           <TextField
             fullWidth
             label="Drive URL"
-            value={eventDetails.gdrive_link}
+            value={eventDetails.gdriveLink}
             name="gdrive_link"
             onChange={(e) => handleEventChange(e, false)}
             margin="normal"
@@ -330,13 +326,13 @@ const AdminEvents = () => {
                 {/* Added Modal Description */}
                 <Typography>
                   <strong>Link:</strong>{" "}
-                  {selectedEvent.gdrive_link ? (
+                  {selectedEvent.gdriveLink ? (
                     <a
-                      href={selectedEvent.gdrive_link}
+                      href={selectedEvent.gdriveLink}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {selectedEvent.gdrive_link}
+                      {selectedEvent.gdriveLink}
                     </a>
                   ) : (
                     "No link provided"

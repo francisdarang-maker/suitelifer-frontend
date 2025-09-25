@@ -205,7 +205,7 @@ const MoodPage = () => {
           {/* The Suite Vibe Input & Trend */}
           <div className="lg:col-span-2 space-y-6">
             <div className="rounded-lg shadow-sm p-6" style={{ backgroundColor: '#ffffff', border: '1px solid #eee3e3' }}>
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col lg:flex-row items-center lg:items-start lg:justify-between mb-6 gap-6">
                 <div
                   className="rounded-lg p-8 text-center text-white"
                   style={{
