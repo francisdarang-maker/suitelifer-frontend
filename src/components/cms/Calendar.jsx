@@ -15,7 +15,11 @@ import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/20/solid";
 
 const daysOfWeek = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
-const Calendar = ({ eventDates }) => {
+const Calendar = ({
+  eventDates = [],
+  setSelectedCalendarDate,
+  fullEvents = [],
+}) => {
   const events = eventDates.reduce((acc, date) => {
     acc[date] = true;
     return acc;
@@ -24,7 +28,19 @@ const Calendar = ({ eventDates }) => {
   const startDate = startOfWeek(startOfMonth(currentMonth));
   const endDate = endOfWeek(endOfMonth(currentMonth));
   const days = eachDayOfInterval({ start: startDate, end: endDate });
+  // Added for click event
+  const [selectedDate, setSelectedDate] = useState(null);
 
+  // for click day event
+  const handleDayClick = (day) => {
+    const clickedDate = format(day, "yyyy-MM-dd");
+    setSelectedDate(clickedDate);
+    setSelectedCalendarDate(clickedDate);
+    const eventsForDay = fullEvents.filter(
+      (event) => format(new Date(event.start), "yyyy-MM-dd") === clickedDate
+    );
+  };
+  // End of additional
   return (
     <div className="w-full max-w-md mx-auto rounded-lg">
       <div className="flex justify-between items-center mb-4 px-5">
@@ -59,21 +75,42 @@ const Calendar = ({ eventDates }) => {
         {days.map((day) => {
           const isCurrentMonth = isSameMonth(day, currentMonth);
           return (
+            // <div
+            //   key={day}
+            //   onClick={() => handleDayClick(day)}
+            //   className={`grid place-items-center w-9 h-9 relative rounded-full ${
+            //     isCurrentMonth ? "text-black" : "text-gray-300"
+            //   } ${isSameDay(day, new Date()) && "bg-primary text-white"}
+            //   `}
+            // >
+            // added for change for selected date
             <div
               key={day}
-              className={`grid place-items-center w-9 h-9 relative rounded-full ${
-                isCurrentMonth ? "text-black" : "text-gray-300"
-              } ${isSameDay(day, new Date()) && "bg-primary text-white"}
-              `}
+              onClick={() => handleDayClick(day)}
+              className={`cursor-pointer grid place-items-center w-9 h-9 relative rounded-full transition-all duration-200
+  ${isCurrentMonth ? "text-black" : "text-gray-300"}
+  ${
+    format(day, "yyyy-MM-dd") === selectedDate
+      ? isSameDay(day, new Date())
+        ? "bg-primary text-white border-2 border-primary"
+        : "bg-white text-primary border-2 border-primary"
+      : isSameDay(day, new Date())
+      ? "bg-primary text-white"
+      : ""
+  }
+`}
             >
               {format(day, "d")}
               {events[format(day, "yyyy-MM-dd")] && (
                 <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full"></div>
               )}
-              {isSameDay(day, new Date()) &&
-                events[format(day, "yyyy-MM-dd")] && (
-                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-white rounded-full"></div>
-                )}
+              {events[format(day, "yyyy-MM-dd")] && (
+                <div
+                  className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${
+                    isSameDay(day, new Date()) ? "bg-white" : "bg-primary"
+                  }`}
+                ></div>
+              )}
             </div>
           );
         })}

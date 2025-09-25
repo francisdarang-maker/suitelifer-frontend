@@ -11,7 +11,7 @@ const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
 
   const CustomToolbar = ({ label, onNavigate, onView }) => (
     <>
-      Navigation Controls
+      {/* Navigation Controls */}
       <div className="flex w-full flex-wrap justify-between items-center gap-2">
         <button
           className="btn-light p-2 flex w-full md:w-auto text-center justify-center"
@@ -62,8 +62,8 @@ const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
     <Calendar
       localizer={localizer}
       events={events}
-      startAccessor={(event) => moment.utc(event.start).local().toDate()}
-      endAccessor={(event) => moment.utc(event.end).local().toDate()}
+      startAccessor="start"
+      endAccessor="end"
       titleAccessor="title"
       selectable
       onSelectSlot={onSelectSlot}
