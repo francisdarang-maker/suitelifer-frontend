@@ -419,7 +419,7 @@ const Podcast = () => {
               <p className="text-white text-body"></p>
 
               <div className="group mt-6 space-y-5 text-white font-avenir-back text-body">
-                <p className="flex items-center gap-4">
+                <div className="flex items-center gap-4">
                   <img
                     src={emailicon}
                     alt="Email"
@@ -427,39 +427,45 @@ const Podcast = () => {
                   />
                   <div className="flex">
                     <a
-                      href={`mailto:${contactDetails.websiteEmail}`}
-                      className="hover:text-accent-2 transition-colors  no-underline!"
+                      href={`mailto:${
+                        contactDetails?.websiteEmail ||
+                        "suitelifer@getfullsuite.com"
+                      }`}
+                      className="hover:text-accent-2 transition-colors no-underline!"
                     >
-                      {contactDetails.websiteEmail}
+                      {contactDetails?.websiteEmail ||
+                        "suitelifer@getfullsuite.com"}
                     </a>
                   </div>
-                </p>
-                <p className="flex items-center gap-4">
+                </div>
+                <div className="flex items-center gap-4">
                   <img
                     src={phoneicon}
                     alt="Phone"
                     className="w-5 h-5 mb-1 filter invert"
                   />
                   <a
-                    href="tel:742-442-887"
-                    className="hover:text-accent-2 transition-colors  no-underline!"
+                    href={`tel:${contactDetails?.websiteTel || "742-442-887"}`}
+                    className="hover:text-accent-2 transition-colors no-underline!"
                   >
-                    {contactDetails.websiteTel}
+                    {contactDetails?.websiteTel || "742-442-887"}
                   </a>
-                </p>
-                <p className="flex items-center gap-4">
+                </div>
+                <div className="flex items-center gap-4">
                   <img
                     src={tphoneicon}
                     alt="Mobile"
                     className="w-5 h-5 mb-1 filter invert"
                   />
                   <a
-                    href="tel:09175680851"
-                    className="hover:text-accent-2 transition-colors  no-underline!"
+                    href={`tel:${
+                      contactDetails?.websitePhone || "09175680851"
+                    }`}
+                    className="hover:text-accent-2 transition-colors no-underline!"
                   >
-                    {contactDetails.websitePhone}
+                    {contactDetails?.websitePhone || "09175680851"}
                   </a>
-                </p>
+                </div>
               </div>
             </div>
           </div>
