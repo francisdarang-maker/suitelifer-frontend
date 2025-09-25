@@ -139,13 +139,13 @@ const EmployeeEvents = () => {
             </Typography>
             <Typography>
               <strong>Drive Link:</strong>{" "}
-              {selectedEvent.gdrive_link ? (
+              {selectedEvent.gdriveLink ? (
                 <a
-                  href={selectedEvent.gdrive_link}
+                  href={selectedEvent.gdriveLink}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {selectedEvent.gdrive_link}
+                  {selectedEvent.gdriveLink}
                 </a>
               ) : (
                 "No link provided"

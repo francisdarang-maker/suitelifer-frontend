@@ -5,12 +5,15 @@ import Footer from "../../components/footer/Footer";
 import BackToTop from "../../components/buttons/BackToTop";
 
 import NewsletterDesign01 from "../../components/newsletter/templates/NewsletterDesign01";
-import NewsletterDesign02 from "../../components/newsletter/templates/NewsletterDesign02";
+// import NewsletterDesign03 from "../../components/newsletter/templates/NewsletterDesign03";
 import PageMeta from "../../components/layout/PageMeta";
 import { useLocation } from "react-router-dom";
+import newsletterStore from "../../store/stores/newsletterStore";
 
 const Newsletter = () => {
   const location = useLocation();
+
+  const { newsLetterContent } = newsletterStore();
 
   return (
     <section
@@ -37,7 +40,11 @@ const Newsletter = () => {
       </div>
 
       <main className="lg:my-20 mb-20">
-        <NewsletterDesign01 />
+        {/* Switch  or conditional rendering*/}
+        {newsLetterContent.currentIssue?.assigned === 7 && (
+          <NewsletterDesign01 />
+        )}
+        {/* <NewsletterDesign01 /> */}
       </main>
 
       <BackToTop />

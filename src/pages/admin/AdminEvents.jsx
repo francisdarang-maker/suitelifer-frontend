@@ -57,8 +57,8 @@ const AdminEvents = () => {
       const rawEvents = response.data.events;
       const adjustedEvents = rawEvents.map((event) => ({
         ...event,
-        start: moment.utc(event.start).local().toDate(),
-        end: moment.utc(event.end).local().toDate(),
+        start: moment.utc(event.start).add(8, "hours").toDate(),
+        end: moment.utc(event.end).add(8, "hours").toDate(),
       }));
 
       setEvents(adjustedEvents);
@@ -330,13 +330,13 @@ const AdminEvents = () => {
                 {/* Added Modal Description */}
                 <Typography>
                   <strong>Link:</strong>{" "}
-                  {selectedEvent.gdrive_link ? (
+                  {selectedEvent.gdriveLink ? (
                     <a
-                      href={selectedEvent.gdrive_link}
+                      href={selectedEvent.gdriveLink}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {selectedEvent.gdrive_link}
+                      {selectedEvent.gdriveLink}
                     </a>
                   ) : (
                     "No link provided"

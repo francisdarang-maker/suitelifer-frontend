@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { suitebiteAPI } from '../../../utils/suitebiteAPI';
+import React, { useState, useEffect } from "react";
+import { suitebiteAPI } from "../../../utils/suitebiteAPI";
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -20,13 +20,13 @@ import {
   XCircleIcon,
   CloudArrowUpIcon,
   SwatchIcon,
-} from '@heroicons/react/24/outline';
-import useCategoryStore from '../../../store/stores/categoryStore';
-import AddProductForm from './AddProductForm';
+} from "@heroicons/react/24/outline";
+import useCategoryStore from "../../../store/stores/categoryStore";
+import AddProductForm from "./AddProductForm";
 
 /**
  * ProductManagement Component - Enhanced with Variations Support
- * 
+ *
  * Combined product and variation management interface.
  * Features include:
  * - Product CRUD operations with color-coded categories
@@ -38,38 +38,42 @@ import AddProductForm from './AddProductForm';
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
+  const [modalMode, setModalMode] = useState("add"); // 'add' or 'edit'
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [notification, setNotification] = useState({ show: false, type: '', message: '' });
-  
+  const [notification, setNotification] = useState({
+    show: false,
+    type: "",
+    message: "",
+  });
+
   // Enhanced category store with color coding
-  const { 
-    getAllCategories, 
-    getCategoriesForFilter, 
-    getCategoryColor, 
+  const {
+    getAllCategories,
+    getCategoriesForFilter,
+    getCategoryColor,
     getCategoryBgColor,
     getCategoryByName,
     addCategory,
-    syncCategoriesFromProducts 
+    syncCategoriesFromProducts,
   } = useCategoryStore();
 
   // Form state for add/edit modal
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price_points: '',
-    category: '',
-    image_url: ''
+    name: "",
+    description: "",
+    price_points: "",
+    category: "",
+    image_url: "",
   });
 
   // File upload state
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState('');
+  const [imagePreview, setImagePreview] = useState("");
 
   // Variation state
   const [variationTypes, setVariationTypes] = useState([]);
@@ -89,15 +93,15 @@ const ProductManagement = () => {
     try {
       setLoading(true);
       const response = await suitebiteAPI.getAllProducts(false); // Include inactive products
-      
+
       if (response.success) {
         setProducts(response.products || []);
         // Sync categories from products
         syncCategoriesFromProducts(response.products || []);
       }
     } catch (error) {
-      console.error('Error loading products:', error);
-      showNotification('error', 'Failed to load products');
+      console.error("Error loading products:", error);
+      showNotification("error", "Failed to load products");
     } finally {
       setLoading(false);
     }
@@ -110,32 +114,35 @@ const ProductManagement = () => {
         setVariationTypes(response.variationTypes || []);
       }
     } catch (error) {
-      console.error('Error loading variation types:', error);
+      console.error("Error loading variation types:", error);
     }
   };
 
   const showNotification = (type, message) => {
     setNotification({ show: true, type, message });
-    setTimeout(() => setNotification({ show: false, type: '', message: '' }), 4000);
+    setTimeout(
+      () => setNotification({ show: false, type: "", message: "" }),
+      4000
+    );
   };
 
   const handleAddProduct = () => {
-    setModalMode('add');
+    setModalMode("add");
     setSelectedProduct(null);
     setShowModal(true);
   };
 
   const handleEditProduct = (product) => {
-    setModalMode('edit');
+    setModalMode("edit");
     setSelectedProduct(product);
     setShowModal(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.price_points || !formData.category) {
-      showNotification('error', 'Please fill in all required fields');
+      showNotification("error", "Please fill in all required fields");
       return;
     }
 
@@ -145,35 +152,41 @@ const ProductManagement = () => {
         description: formData.description,
         price_points: parseInt(formData.price_points),
         category: formData.category,
-        image_url: imagePreview || formData.image_url
+        image_url: imagePreview || formData.image_url,
       };
 
       let response;
-      if (modalMode === 'add') {
+      if (modalMode === "add") {
         response = await suitebiteAPI.createProduct(productData);
       } else {
-        response = await suitebiteAPI.updateProduct(selectedProduct.product_id, productData);
+        response = await suitebiteAPI.updateProduct(
+          selectedProduct.product_id,
+          productData
+        );
       }
 
       if (response.success) {
-        showNotification('success', `Product ${modalMode === 'add' ? 'created' : 'updated'} successfully!`);
+        showNotification(
+          "success",
+          `Product ${modalMode === "add" ? "created" : "updated"} successfully!`
+        );
         setShowModal(false);
         setFormData({
-          name: '',
-          description: '',
-          price_points: '',
-          category: '',
-          image_url: ''
+          name: "",
+          description: "",
+          price_points: "",
+          category: "",
+          image_url: "",
         });
         setImageFile(null);
-        setImagePreview('');
+        setImagePreview("");
         await loadProducts();
       } else {
-        showNotification('error', response.message || 'Failed to save product');
+        showNotification("error", response.message || "Failed to save product");
       }
     } catch (error) {
-      console.error('Error saving product:', error);
-      showNotification('error', 'Failed to save product');
+      console.error("Error saving product:", error);
+      showNotification("error", "Failed to save product");
     }
   };
 
@@ -189,16 +202,19 @@ const ProductManagement = () => {
       setDeletingProduct(true);
       const response = await suitebiteAPI.deleteProduct(pendingDeleteProduct);
       if (response.success) {
-        showNotification('success', 'Product deleted successfully!');
+        showNotification("success", "Product deleted successfully!");
         setShowDeleteConfirm(false);
         setPendingDeleteProduct(null);
         await loadProducts();
       } else {
-        showNotification('error', response.message || 'Failed to delete product');
+        showNotification(
+          "error",
+          response.message || "Failed to delete product"
+        );
       }
     } catch (error) {
-      console.error('Error deleting product:', error);
-      showNotification('error', 'Failed to delete product');
+      console.error("Error deleting product:", error);
+      showNotification("error", "Failed to delete product");
     } finally {
       setDeletingProduct(false);
     }
@@ -221,19 +237,22 @@ const ProductManagement = () => {
   };
 
   const handleAddCategory = async () => {
-    const categoryName = prompt('Enter new category name:');
+    const categoryName = prompt("Enter new category name:");
     if (categoryName && categoryName.trim()) {
       try {
         const response = await addCategory(categoryName.trim());
         if (response.success) {
-          showNotification('success', 'Category added successfully!');
+          showNotification("success", "Category added successfully!");
           await loadProducts(); // Refresh to sync categories
         } else {
-          showNotification('error', response.message || 'Failed to add category');
+          showNotification(
+            "error",
+            response.message || "Failed to add category"
+          );
         }
       } catch (error) {
-        console.error('Error adding category:', error);
-        showNotification('error', 'Failed to add category');
+        console.error("Error adding category:", error);
+        showNotification("error", "Failed to add category");
       }
     }
   };
@@ -244,25 +263,27 @@ const ProductManagement = () => {
 
   // Filter and sort products
   const filteredProducts = products
-    .filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    .filter((product) => {
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "all" || product.category === selectedCategory;
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
       let aValue = a[sortBy];
       let bValue = b[sortBy];
-      
-      if (sortBy === 'price_points') {
+
+      if (sortBy === "price_points") {
         aValue = parseInt(aValue) || 0;
         bValue = parseInt(bValue) || 0;
       } else {
-        aValue = String(aValue || '').toLowerCase();
-        bValue = String(bValue || '').toLowerCase();
+        aValue = String(aValue || "").toLowerCase();
+        bValue = String(bValue || "").toLowerCase();
       }
-      
-      if (sortOrder === 'asc') {
+
+      if (sortOrder === "asc") {
         return aValue > bValue ? 1 : -1;
       } else {
         return aValue < bValue ? 1 : -1;
@@ -271,16 +292,16 @@ const ProductManagement = () => {
 
   const renderCategoryBadge = (categoryName) => {
     if (!categoryName) return null;
-    
+
     const color = getCategoryColor(categoryName);
     const bgColor = getCategoryBgColor(categoryName);
-    
+
     return (
-      <span 
+      <span
         className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-        style={{ 
-          backgroundColor: bgColor, 
-          color: color 
+        style={{
+          backgroundColor: bgColor,
+          color: color,
         }}
       >
         {categoryName}
@@ -289,14 +310,14 @@ const ProductManagement = () => {
   };
 
   const renderCategoryOption = (category) => {
-    if (category === 'all') {
+    if (category === "all") {
       return (
         <option key="all" value="all" className="text-base">
           All Categories
         </option>
       );
     }
-    
+
     return (
       <option key={category} value={category} className="text-base">
         {category}
@@ -312,17 +333,19 @@ const ProductManagement = () => {
         </label>
         <select
           value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, category: e.target.value })
+          }
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
         >
           <option value="">Select a category</option>
-          {allCategories.map(categoryObj => (
+          {allCategories.map((categoryObj) => (
             <option key={categoryObj.name} value={categoryObj.name}>
               {categoryObj.name}
             </option>
           ))}
         </select>
-        
+
         {/* Category preview */}
         {formData.category && (
           <div className="mt-2">
@@ -338,13 +361,15 @@ const ProductManagement = () => {
     <div className="product-management-container bg-white rounded-lg shadow-sm">
       {/* Toast Notification */}
       {notification.show && (
-        <div className={`notification-toast fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg text-base font-medium max-w-sm ${
-          notification.type === 'success' 
-            ? 'bg-green-50 text-green-800 border border-green-200' 
-            : notification.type === 'error'
-            ? 'bg-red-50 text-red-800 border border-red-200'
-            : 'bg-blue-50 text-blue-800 border border-blue-200'
-        }`}>
+        <div
+          className={`notification-toast fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg text-base font-medium max-w-sm ${
+            notification.type === "success"
+              ? "bg-green-50 text-green-800 border border-green-200"
+              : notification.type === "error"
+              ? "bg-red-50 text-red-800 border border-red-200"
+              : "bg-blue-50 text-blue-800 border border-blue-200"
+          }`}
+        >
           {notification.message}
         </div>
       )}
@@ -384,9 +409,15 @@ const ProductManagement = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
             >
-              <option key="name" value="name">Sort by Name</option>
-              <option key="price_points" value="price_points">Sort by Price</option>
-              <option key="category" value="category">Sort by Category</option>
+              <option key="name" value="name">
+                Sort by Name
+              </option>
+              <option key="price_points" value="price_points">
+                Sort by Price
+              </option>
+              <option key="category" value="category">
+                Sort by Category
+              </option>
             </select>
           </div>
 
@@ -397,8 +428,12 @@ const ProductManagement = () => {
               onChange={(e) => setSortOrder(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
             >
-              <option key="asc" value="asc">Ascending</option>
-              <option key="desc" value="desc">Descending</option>
+              <option key="asc" value="asc">
+                Ascending
+              </option>
+              <option key="desc" value="desc">
+                Descending
+              </option>
             </select>
           </div>
 
@@ -427,11 +462,21 @@ const ProductManagement = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">Image</th>
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">Name</th>
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">Category</th>
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">Price</th>
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">Actions</th>
+                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
+                    Image
+                  </th>
+                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
+                    Name
+                  </th>
+                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
+                    Category
+                  </th>
+                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
+                    Price
+                  </th>
+                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -452,7 +497,9 @@ const ProductManagement = () => {
                     </td>
                     <td className="p-2 border-b">
                       <div>
-                        <p className="font-medium text-gray-900 text-base">{product.name}</p>
+                        <p className="font-medium text-gray-900 text-base">
+                          {product.name}
+                        </p>
                         <p className="text-sm text-gray-500 truncate max-w-xs">
                           {product.description}
                         </p>
@@ -475,7 +522,9 @@ const ProductManagement = () => {
                           <PencilIcon className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteProduct(product.product_id)}
+                          onClick={() =>
+                            handleDeleteProduct(product.product_id)
+                          }
                           className="p-1 text-red-600 hover:text-red-800 transition-colors"
                         >
                           <TrashIcon className="h-4 w-4" />
@@ -496,12 +545,17 @@ const ProductManagement = () => {
           <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <AddProductForm
               onProductAdded={async (product) => {
-                showNotification('success', `Product ${modalMode === 'add' ? 'created' : 'updated'} successfully!`);
+                showNotification(
+                  "success",
+                  `Product ${
+                    modalMode === "add" ? "created" : "updated"
+                  } successfully!`
+                );
                 setShowModal(false);
                 await loadProducts();
               }}
               onCancel={() => setShowModal(false)}
-              product={modalMode === 'edit' ? selectedProduct : null}
+              product={modalMode === "edit" ? selectedProduct : null}
               mode={modalMode}
             />
           </div>
@@ -513,9 +567,12 @@ const ProductManagement = () => {
         <div className="fixed inset-0 bg-black/40 backdrop-blur z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-6">
             <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Confirm Deletion</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Confirm Deletion
+            </h3>
             <p className="text-sm text-gray-600 mb-4">
-              Are you sure you want to delete this product? This action cannot be undone.
+              Are you sure you want to delete this product? This action cannot
+              be undone.
             </p>
             <div className="flex justify-end gap-2">
               <button
@@ -536,7 +593,7 @@ const ProductManagement = () => {
                     Deleting...
                   </>
                 ) : (
-                  'Delete'
+                  "Delete"
                 )}
               </button>
             </div>
