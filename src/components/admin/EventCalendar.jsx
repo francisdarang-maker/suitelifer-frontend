@@ -2,111 +2,164 @@ import React, { useState } from "react";
 import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { Tooltip, Fade } from "@mui/material";
+import EventImageCarousel from '../events/EventImageCarousel'
 
 const localizer = momentLocalizer(moment);
+
+const eventColors = {
+  party: { bg: "from-pink-500 to-rose-500", text: "white", label: "Party" },
+  aunchpod: { bg: "from-blue-500 to-indigo-500", text: "white", label: "Launchpod" },
+  holiday: { bg: "from-green-500 to-emerald-500", text: "white", label: "Holiday" },
+  payroll: { bg: "from-orange-500 to-amber-500", text: "white", label: "Payroll" },
+  default: { bg: "from-cyan-600 to-sky-600", text: "white", label: "Other" },
+};
 
 const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
   const [view, setView] = useState(Views.MONTH);
   const [date, setDate] = useState(new Date());
+  const [hoveredEvent, setHoveredEvent] = useState(null);
+
+const CustomEvent = ({ event }) => {
+  const category = event.category?.toLowerCase() || "default";
+  const colors = eventColors[category] || eventColors.default;
+
+  return (
+    <Tooltip
+      title={<EventImageCarousel />}
+      placement="top"
+      arrow 
+      followCursor
+      slot={{ transition: Fade }}
+      slotProps={{ 
+        transition: { 
+          timeout: 600 
+        }, 
+        tooltip: {
+          sx: {
+            background: `linear-gradient(to right, var(--tw-gradient-stops))`,
+            "--tw-gradient-from": colors.bg.split(" ")[0], 
+            "--tw-gradient-to": colors.bg.split(" ")[1], 
+            color: colors.text,
+            borderRadius: "12px",
+            padding: "10px",
+          },
+        }
+      }}
+      enterDelay={1000}
+      leaveDelay={200}
+      
+
+    >
+      <div
+        onMouseEnter={() => setHoveredEvent(event)}
+        onMouseLeave={() => setHoveredEvent(null)}
+        className={`bg-gradient-to-r ${colors.bg} text-${colors.text} 
+          rounded-lg text-center px-2 py-1 
+          hover:scale-[1.05] hover:shadow-md cursor-pointer transition`}
+      >
+        {event.title}
+      </div>
+
+    </Tooltip>
+  );
+};
+
 
   const CustomToolbar = ({ label, onNavigate, onView }) => (
-    <>
-      {/* Navigation Controls */}
-      <div className="flex w-full flex-wrap justify-between items-center gap-2">
+    <div className="flex flex-col md:flex-row justify-between items-center w-full gap-3 px-4 py-3 bg-white shadow-sm rounded-xl mb-4">
+      {/* Left - Today Button */}
+      <button
+        className="px-4 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary/90 transition"
+        onClick={() => onNavigate("TODAY")}
+      >
+        Today
+      </button>
+
+      {/* Center - Navigation */}
+      <div className="flex items-center gap-2">
         <button
-          className="btn-light p-2 flex w-full md:w-auto text-center justify-center"
-          onClick={() => onNavigate("TODAY")}
+          className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+          onClick={() => onNavigate("PREV")}
         >
-          Today
+          ◀
         </button>
 
-        <div className="flex w-full md:w-auto items-center justify-center gap-2">
-          <button
-            className="btn-light flex px-3 py-2"
-            onClick={() => onNavigate("PREV")}
-          >
-            ◀
-          </button>
+        <h2 className="font-semibold text-xl md:text-2xl text-gray-800 text-center min-w-[150px]">
+          {label}
+        </h2>
 
-          <span className="font-avenir-black text-primary font-bold text-lg md:text-2xl truncate text-center">
-            {label}
-          </span>
-
-          <button
-            className="btn-light flex px-3 py-2"
-            onClick={() => onNavigate("NEXT")}
-          >
-            ▶
-          </button>
-        </div>
-
-        <select
-          className="btn-light w-full md:w-auto text-center"
-          value={view}
-          onChange={(e) => {
-            const newView = e.target.value;
-            setView(newView);
-            onView(newView);
-          }}
+        <button
+          className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+          onClick={() => onNavigate("NEXT")}
         >
-          <option value={Views.MONTH}>Month</option>
-          <option value={Views.WEEK}>Week</option>
-          <option value={Views.DAY}>Day</option>
-          <option value={Views.AGENDA}>Agenda</option>
-        </select>
+          ▶
+        </button>
       </div>
-    </>
+
+      {/* Right - View Selector */}
+      <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+        {[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA].map((v) => (
+          <button
+            key={v}
+            onClick={() => {
+              setView(v);
+              onView(v);
+            }}
+            className={`px-3 py-1 rounded-md text-sm font-medium transition ${
+              view === v
+                ? "bg-primary text-white shadow"
+                : "text-gray-600 hover:bg-gray-200"
+            }`}
+          >
+            {v.charAt(0).toUpperCase() + v.slice(1)}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 
   return (
-    <Calendar
-      localizer={localizer}
-      events={events}
-      startAccessor="start"
-      endAccessor="end"
-      titleAccessor="title"
-      selectable
-      onSelectSlot={onSelectSlot}
-      onSelectEvent={onSelectEvent}
-      style={{ height: 600, width: "100%" }}
-      eventPropGetter={(event) => {
-        const eventDate = new Date(event.start).setHours(0, 0, 0, 0);
-        const today = new Date().setHours(0, 0, 0, 0);
-        const isWeekend =
-          new Date(event.start).getDay() === 0 ||
-          new Date(event.start).getDay() === 6;
-        const isToday = eventDate === today;
-
-        return {
+    <div className="rounded-xl shadow-lg bg-white p-4">
+      <Calendar
+        localizer={localizer}
+        events={events}
+        startAccessor="start"
+        endAccessor="end"
+        titleAccessor="title"
+        selectable
+        onSelectSlot={onSelectSlot}
+        onSelectEvent={onSelectEvent}
+        style={{ height: 650, width: "100%" }}
+        components={{
+          toolbar: CustomToolbar,
+          event: CustomEvent,
+        }}
+        view={view}
+        onView={setView}
+        date={date}
+        onNavigate={setDate}
+        eventPropGetter={() => ({
           style: {
-            backgroundColor: isToday
-              ? "#30ABC1"
-              : isWeekend
-              ? "#bfd1a0"
-              : "#007a8e",
-            color: isToday ? "#ffffff" : isWeekend ? "#000000" : "#000000",
-            border: "none",
+            backgroundColor: "transparent", 
+            border: "none",                  
+            padding: 0,                    
           },
-        };
-      }}
-      dayPropGetter={(date) => {
-        const today = new Date().setHours(0, 0, 0, 0);
-        const isToday = date.setHours(0, 0, 0, 0) === today;
-        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+      })}
+      />
 
-        return {
-          style: {
-            backgroundColor: isToday ? "#007a8e" : "inherit",
-            color: isToday ? "white" : isWeekend ? "#0097b2" : "inherit",
-          },
-        };
-      }}
-      components={{ toolbar: CustomToolbar }}
-      view={view}
-      onView={setView}
-      date={date}
-      onNavigate={setDate}
-    />
+      {/* Legend */}
+      <div className="flex flex-wrap items-center gap-3 mt-4">
+        {Object.entries(eventColors).map(([key, { bg, label }]) => (
+          <span
+            key={key}
+            className={`px-3 py-1 text-xs rounded-full bg-gradient-to-r ${bg} text-white shadow-sm`}
+          >
+            {label}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 };
 

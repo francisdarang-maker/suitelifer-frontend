@@ -1148,6 +1148,9 @@ function AdminNewsLetterToggle() {
           {/* DITO ANG END NG ADDING/EDITING FORM NG NEWS ARTICLE */}
         </>
       )}{" "}
+
+      {/* TODO */}
+      {/* Add the 6 templates that has been added. */}
       <Dialog
         open={openSuiteletterLayoutInfoDialog}
         onClose={() => setOpenSuiteletterLayoutInfoDialog(false)}
