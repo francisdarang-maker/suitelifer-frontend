@@ -133,7 +133,8 @@ const NewsletterDesign01 = () => {
           <div className="pb-[4%]"></div>
 
           {/* Contents */}
-          <section className="md:flex md:gap-10 md:px-[10%] xl:px-[10%] mb-10">
+          {/*  added justify-center*/}
+          <section className="md:flex md:gap-30 md:px-[5%] md:justify-center xl:px-[10%] mb-10">
             <div className="px-[5%] md:px-0 md:w-[66%]">
               <MotionUp>
                 <div className="w-[100%]">
@@ -165,7 +166,7 @@ const NewsletterDesign01 = () => {
         </section>
       ) : null}
     </div>
-  )
-}
+  );
+};
 
-export default NewsletterDesign01
+export default NewsletterDesign01;
