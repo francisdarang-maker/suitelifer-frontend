@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { suitebiteAPI } from '../../utils/suitebiteAPI';
-import { useSuitebiteStore } from '../../store/stores/suitebiteStore';
-import UserHeartbitsManagement from '../../components/suitebite/admin/UserHeartbitsManagement';
-import ProductManagement from '../../components/suitebite/admin/ProductManagement';
-import OrderManagement from '../../components/suitebite/admin/OrderManagement';
-import CheerPostsManagement from '../../components/suitebite/admin/CheerPostsManagement';
+import React, { useState, useEffect, useRef } from "react";
+import { suitebiteAPI } from "../../utils/suitebiteAPI";
+import { useSuitebiteStore } from "../../store/stores/suitebiteStore";
+import UserHeartbitsManagement from "../../components/suitebite/admin/UserHeartbitsManagement";
+import ProductManagement from "../../components/suitebite/admin/ProductManagement";
+import OrderManagement from "../../components/suitebite/admin/OrderManagement";
+import CheerPostsManagement from "../../components/suitebite/admin/CheerPostsManagement";
 import {
   UsersIcon,
   ShoppingBagIcon,
   ClipboardDocumentListIcon,
   ChatBubbleLeftRightIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
 
 /**
  * AdminSuitebite Component
@@ -20,7 +20,7 @@ const AdminSuitebite = () => {
   const { adminStats, setAdminStats } = useSuitebiteStore();
 
   // Local state management
-  const [activeTab, setActiveTab] = useState('users'); // Default to users tab
+  const [activeTab, setActiveTab] = useState("users"); // Default to users tab
   const [loading, setLoading] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
@@ -58,7 +58,10 @@ const AdminSuitebite = () => {
     const timeSinceLastRefresh = Date.now() - lastRefresh.getTime();
     const timeSinceLastTabChange = Date.now() - lastTabChange.current;
     // Refresh if it's been more than 2 minutes since last refresh and more than 30 seconds since last tab change
-    if (timeSinceLastRefresh > 2 * 60 * 1000 && timeSinceLastTabChange > 30 * 1000) {
+    if (
+      timeSinceLastRefresh > 2 * 60 * 1000 &&
+      timeSinceLastTabChange > 30 * 1000
+    ) {
       loadAdminData(true); // silent refresh
     }
     setActiveTab(tabId);
@@ -72,7 +75,7 @@ const AdminSuitebite = () => {
   const loadAdminData = async (silent = false) => {
     try {
       setLoading(true);
-      const statsResponse = await suitebiteAPI.getSystemStats('month');
+      const statsResponse = await suitebiteAPI.getSystemStats("month");
       if (statsResponse.success) {
         setAdminStats(statsResponse.stats);
       }
@@ -110,30 +113,40 @@ const AdminSuitebite = () => {
 
   // Reorganized tabs: Users & Heartbits → Products → Orders
   const tabs = [
-    { id: 'users', label: 'Users & Heartbits', icon: UsersIcon },
-    { id: 'products', label: 'Products', icon: ShoppingBagIcon },
-    { id: 'orders', label: 'Orders', icon: ClipboardDocumentListIcon },
-    { id: 'cheer-posts', label: 'Cheer Posts', icon: ChatBubbleLeftRightIcon },
+    { id: "users", label: "Users & Heartbits", icon: UsersIcon },
+    { id: "products", label: "Products", icon: ShoppingBagIcon },
+    { id: "orders", label: "Orders", icon: ClipboardDocumentListIcon },
+    { id: "cheer-posts", label: "Cheer Posts", icon: ChatBubbleLeftRightIcon },
   ];
 
   return (
-    <div className="admin-suitebite bg-gray-50 flex flex-col min-h-screen py-4">
+    // Added Features:
+    // Removed bg-gray-50
+    <div className="admin-suitebiteflex flex-col min-h-screen py-4">
       {/* Fixed Header */}
-      <div className="admin-header bg-white border-b border-gray-200 px-6 py-1 flex-shrink-0"> {/* Reduce header padding */}
+      {/*Added Features: */}
+      {/* Removed bg-gray-50 */}
+      <div className="admin-header bg-white px-6 py-1 flex-shrink-0">
+        {" "}
+        {/* Reduce header padding */}
         <div className="max-w-7xl mx-auto">
           {/* Navigation Tabs */}
-          <div className="admin-nav-tabs bg-gray-50 rounded-lg p-1"> {/* No margin */}
+          {/* Added feature */}
+          {/*  Removed p-1 */}
+          <div className="admin-nav-tabs bg-gray-50 rounded-lg p-1">
+            {" "}
+            {/* No margin */}
             <div className="flex items-center justify-between">
               <div className="flex space-x-1">
-                {tabs.map(tab => {
+                {tabs.map((tab) => {
                   const IconComponent = tab.icon;
                   return (
                     <button
                       key={tab.id}
                       className={`nav-tab flex items-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                        activeTab === tab.id 
-                          ? 'bg-[#0097b2] text-white shadow-sm' 
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                        activeTab === tab.id
+                          ? "bg-[#0097b2] text-white shadow-sm"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                       }`}
                       onClick={() => handleTabChange(tab.id)}
                     >
@@ -159,28 +172,36 @@ const AdminSuitebite = () => {
           )} */}
 
           {/* Tab Content */}
-          <div className="admin-tab-content mt-0"> {/* No top margin for tab content */}
+          <div className="admin-tab-content mt-0">
+            {" "}
+            {/* No top margin for tab content */}
             {/* Users & Heartbits Tab */}
-            {activeTab === 'users' && (
+            {activeTab === "users" && (
               <div className="users-tab mt-0 mb-6">
                 <UserHeartbitsManagement onRefresh={loadAdminData} />
               </div>
             )}
             {/* Products Tab */}
-            {activeTab === 'products' && (
-              <div className="products-tab mt-0"> {/* Remove extra top margin */}
+            {activeTab === "products" && (
+              <div className="products-tab mt-0">
+                {" "}
+                {/* Remove extra top margin */}
                 <ProductManagement onRefresh={loadAdminData} />
               </div>
             )}
             {/* Orders Tab */}
-            {activeTab === 'orders' && (
-              <div className="orders-tab mt-0"> {/* Remove extra top margin */}
+            {activeTab === "orders" && (
+              <div className="orders-tab mt-0">
+                {" "}
+                {/* Remove extra top margin */}
                 <OrderManagement onRefresh={loadAdminData} />
               </div>
             )}
             {/* Cheer Posts Tab */}
-            {activeTab === 'cheer-posts' && (
-              <div className="cheer-posts-tab mt-0"> {/* Remove extra top margin */}
+            {activeTab === "cheer-posts" && (
+              <div className="cheer-posts-tab mt-0">
+                {" "}
+                {/* Remove extra top margin */}
                 <CheerPostsManagement onRefresh={loadAdminData} />
               </div>
             )}

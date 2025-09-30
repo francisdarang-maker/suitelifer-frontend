@@ -13,6 +13,7 @@ import { readingTime } from "reading-time-estimator";
 import { removeHtmlTags } from "../../../utils/removeHTMLTags";
 import formatTimestamp from "../../../utils/formatTimestamp";
 import Skeleton from "react-loading-skeleton";
+import NewsLetterComingSoon from "../NewsLetterComingSoon";
 
 const NewsletterDesign06 = () => {
   const { newsletterContent, setNewsletterContent, isLoading, setIsLoading } =
@@ -70,28 +71,44 @@ const NewsletterDesign06 = () => {
   const section4 = getArticleBySection(articles, 4);
   const section5 = getArticleBySection(articles, 5);
   const section6 = getArticleBySection(articles, 6);
+  const titles = [
+    section1?.title,
+    section2?.title,
+    section3?.title,
+    section4?.title,
+    section5?.title,
+    section6?.title,
+  ].filter(Boolean);
 
-  if (isLoading) {
-    return (
-      <div>
-        <NewsletterHeader />
-        <div className="px-[5%] md:px-[10%]">
-          <Skeleton className="w-full aspect-video mb-4" />
-          <Skeleton className="h-6 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-1/2 mb-1" />
-          <Skeleton className="h-10 w-24 mb-6" />
-        </div>
+  const allComingSoon = titles.every((title) => title === "Coming Soon");
+  // if (isLoading) {
+  //   return (
+  //     <div>
+  //       <NewsletterHeader />
+  //       <div className="px-[5%] md:px-[10%]">
+  //         <Skeleton className="w-full aspect-video mb-4" />
+  //         <Skeleton className="h-6 w-3/4 mb-2" />
+  //         <Skeleton className="h-4 w-1/2 mb-1" />
+  //         <Skeleton className="h-10 w-24 mb-6" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  return isLoading ? (
+    <div>
+      <NewsletterHeader />
+      <div className="px-[5%] md:px-[10%]">
+        <Skeleton className="w-full aspect-video mb-4" />
+        <Skeleton className="h-6 w-3/4 mb-2" />
+        <Skeleton className="h-4 w-1/2 mb-1" />
+        <Skeleton className="h-10 w-24 mb-6" />
       </div>
-    );
-  }
-
-  return (
+    </div>
+  ) : newsletterContent.currentIssue?.assigned >= 6 && !allComingSoon ? (
     <section>
       <MotionUp>
-        <NewsletterHeader
-          month={currentIssue.month}
-          year={currentIssue.year}
-        />
+        <NewsletterHeader month={currentIssue.month} year={currentIssue.year} />
       </MotionUp>
       <div className="pb-[4%]"></div>
 
@@ -126,7 +143,8 @@ const NewsletterDesign06 = () => {
                   title={section2.title}
                   author={section2.pseudonym}
                   readTime={
-                    readingTime(removeHtmlTags(section2.article ?? ""), 238).text
+                    readingTime(removeHtmlTags(section2.article ?? ""), 238)
+                      .text
                   }
                   datePublished={formatTimestamp(section2.createdAt).fullDate}
                   article={section2.article}
@@ -146,7 +164,8 @@ const NewsletterDesign06 = () => {
                   title={section3.title}
                   author={section3.pseudonym}
                   readTime={
-                    readingTime(removeHtmlTags(section3.article ?? ""), 238).text
+                    readingTime(removeHtmlTags(section3.article ?? ""), 238)
+                      .text
                   }
                   datePublished={formatTimestamp(section3.createdAt).fullDate}
                   article={section3.article}
@@ -176,7 +195,10 @@ const NewsletterDesign06 = () => {
                 <span className="text-gray-400">&nbsp; |</span>
                 <span className="text-primary">
                   &nbsp;&nbsp;
-                  {readingTime(removeHtmlTags(section4.article ?? ""), 238).text}
+                  {
+                    readingTime(removeHtmlTags(section4.article ?? ""), 238)
+                      .text
+                  }
                 </span>
                 <span className="text-gray-400">&nbsp; |</span>
                 <span className="text-primary">
@@ -241,6 +263,8 @@ const NewsletterDesign06 = () => {
         </div>
       </section>
     </section>
+  ) : (
+    <NewsLetterComingSoon />
   );
 };
 

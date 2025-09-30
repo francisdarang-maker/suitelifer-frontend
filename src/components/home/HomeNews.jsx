@@ -64,8 +64,11 @@ const HomeNews = () => {
   const articles = newsletterContent.articles || [];
   const currentIssue = newsletterContent.currentIssue || {};
 
-  if (!articles || articles.length === 0 || newsletterContent.currentIssue?.assigned 
-    !== 7){
+  if (
+    !articles ||
+    articles.length === 0 ||
+    newsletterContent.currentIssue?.assigned !== 7
+  ) {
     return (
       <section className="px-7 xl:px-40 text-center">
         <div className="mb-5 relative">
