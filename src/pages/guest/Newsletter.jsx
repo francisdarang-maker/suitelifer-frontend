@@ -63,9 +63,7 @@ const Newsletter = () => {
         <DesktopNav />
       </div>
 
-      <main className="lg:my-20 mb-20">
-        {SelectedTemplate}
-      </main>
+      <main className="lg:my-20 mb-20">{SelectedTemplate}</main>
 
       <BackToTop />
       <Footer />

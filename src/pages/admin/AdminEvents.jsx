@@ -206,18 +206,6 @@ const fetchEvents = async () => {
             events={events}
             onSelectSlot={handleSelectSlot}
             onSelectEvent={handleEventClick}
-            // eventPropGetter={(event) => ({
-            //   className: "custom-event",
-            // })}
-            // dayPropGetter={(date) => {
-            //   const today = new Date();
-            //   const isToday =
-            //     date.getDate() === today.getDate() &&
-            //     date.getMonth() === today.getMonth() &&
-            //     date.getFullYear() === today.getFullYear();
-
-            //   return isToday ? { className: "custom-today" } : {};
-            // }}
           />
         </div>
       </div>

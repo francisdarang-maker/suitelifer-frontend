@@ -375,7 +375,7 @@ const ProductManagement = () => {
       )}
 
       {/* Filters and Search */}
-      <div className="filters-section sticky top-0 z-10 bg-white pb-1">
+      <div className="filters-section sticky top-0 z-10 bg-white pb-5 px-6 pt-3">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
           {/* Search */}
           <div className="search-field">
@@ -386,7 +386,7 @@ const ProductManagement = () => {
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
+                className="w-full pl-10 pr-4 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
               />
             </div>
           </div>
@@ -396,7 +396,7 @@ const ProductManagement = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
             >
               {categories.map(renderCategoryOption)}
             </select>
@@ -407,7 +407,7 @@ const ProductManagement = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
             >
               <option key="name" value="name">
                 Sort by Name
@@ -426,7 +426,7 @@ const ProductManagement = () => {
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
             >
               <option key="asc" value="asc">
                 Ascending
@@ -441,7 +441,7 @@ const ProductManagement = () => {
           <div className="flex justify-end md:col-span-1">
             <button
               onClick={handleAddProduct}
-              className="bg-[#0097b2] text-white px-4 py-2 rounded-lg hover:bg-[#007a8e] transition-colors duration-200 flex items-center gap-2 w-full md:w-auto text-base"
+              className="bg-[#0097b2] text-white px-4 py-1.5 rounded-lg hover:bg-[#007a8e] transition-colors duration-200 flex items-center gap-2 w-full md:w-auto text-base"
             >
               <PlusIcon className="h-5 w-5" />
               Add Product
@@ -451,91 +451,102 @@ const ProductManagement = () => {
       </div>
 
       {/* Products Table */}
-      <div className="products-table-container max-h-[80vh] overflow-y-auto rounded-lg border mb-0">
+      {/* Added Feature */}
+      {/* Orig   border border-gray-300 */}
+      <div className="products-table-container max-h-[80vh] overflow-hidden rounded-lg mx-6 ">
         {loading ? (
           <div className="text-center py-8">
             <div className="spinner mx-auto mb-4"></div>
             <p className="text-gray-600 text-base">Loading products...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
-                    Image
-                  </th>
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
-                    Name
-                  </th>
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
-                    Category
-                  </th>
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
-                    Price
-                  </th>
-                  <th className="text-left p-2 border-b font-medium text-gray-700 text-base">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.map((product) => (
-                  <tr key={product.product_id} className="hover:bg-gray-50">
-                    <td className="p-2 border-b">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                        {product.image_url ? (
-                          <img
-                            src={product.image_url}
-                            alt={product.name}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        ) : (
-                          <PhotoIcon className="h-6 w-6 text-gray-400" />
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-2 border-b">
-                      <div>
-                        <p className="font-medium text-gray-900 text-base">
-                          {product.name}
-                        </p>
-                        <p className="text-sm text-gray-500 truncate max-w-xs">
-                          {product.description}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="p-2 border-b">
-                      {renderCategoryBadge(product.category)}
-                    </td>
-                    <td className="p-2 border-b">
-                      <span className="font-medium text-[#0097b2] text-base">
-                        {product.price || product.price_points || 0} pts
-                      </span>
-                    </td>
-                    <td className="p-2 border-b">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleEditProduct(product)}
-                          className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleDeleteProduct(product.product_id)
-                          }
-                          className="p-1 text-red-600 hover:text-red-800 transition-colors"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            {/* Header Container */}
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="relative text-left pl-3 py-3 font-medium text-gray-700 text-base w-30 max-w-120px after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                      Image
+                    </th>
+                    <th className="relative text-left pl-3 py-3 font-medium text-gray-700 text-base w-145 max-w-580px after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                      Name
+                    </th>
+                    <th className="relative text-left pl-3 py-3 font-medium text-gray-700 text-base w-43 max-w-172px after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                      Category
+                    </th>
+                    <th className="relative text-left pl-3 py-3 font-medium text-gray-700 text-base  w-35 max-w-140px  after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                      Price
+                    </th>
+                    <th className="text-left pl-3 py-3 font-medium text-gray-700 text-base">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+              </table>
+            </div>
+
+            {/* Body Container */}
+            <div className="overflow-x-auto overflow-y-auto max-h-[70vh]">
+              <table className="w-full border-collapse">
+                <tbody>
+                  {filteredProducts.map((product) => (
+                    <tr key={product.product_id} className="hover:bg-gray-50">
+                      <td className="p-2 border-b  border-gray-300 py-10">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          ) : (
+                            <PhotoIcon className="h-6 w-6 text-gray-400" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-2 border-b border-gray-300">
+                        <div>
+                          <p className="font-medium text-gray-900 text-base">
+                            {product.name}
+                          </p>
+                          <p className="text-sm text-gray-500 truncate max-w-xs">
+                            {product.description}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="p-2 border-b border-gray-300">
+                        {renderCategoryBadge(product.category)}
+                      </td>
+                      <td className="p-2 border-b border-gray-300 ">
+                        <span className="font-medium text-[#0097b2] text-base">
+                          {product.price || product.price_points || 0} pts
+                        </span>
+                      </td>
+                      <td className="p-2 border-b border-gray-300">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleEditProduct(product)}
+                            className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleDeleteProduct(product.product_id)
+                            }
+                            className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

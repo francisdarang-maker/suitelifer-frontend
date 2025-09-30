@@ -79,6 +79,7 @@ import ScrollToTop from "./components/buttons/ScrollToTop";
 import VerifyAccount from "./pages/auth/VerifyAccount";
 import DevelopersPage from "./pages/guest/Developers";
 import LaunchPodEventPage from "./pages/launchpod-event/LaunchPodEventPage";
+import Blogs from "./pages/guest/Blogs";
 
 
 
@@ -117,6 +118,7 @@ function App() {
           <Route path="/d" element={<Navigate to="/developers"/>} />
           <Route path="/newsletter" element={<Newsletter />} />
           <Route path="/newsletter/:slug" element={<NewsletterDetails />} />
+          <Route path="/blogs" element={<Blogs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/podcast" element={<Podcast />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />

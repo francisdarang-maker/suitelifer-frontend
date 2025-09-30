@@ -69,28 +69,30 @@ const NewsletterDesign05 = () => {
   const section3 = getArticleBySection(articles, 3);
   const section4 = getArticleBySection(articles, 4);
   const section5 = getArticleBySection(articles, 5);
+  const titles = [
+    section1?.title,
+    section2?.title,
+    section3?.title,
+    section4?.title,
+    section5?.title,
+  ].filter(Boolean);
 
-  if (isLoading) {
-    return (
-      <div>
-        <NewsletterHeader />
-        <div className="px-[5%] md:px-[10%]">
-          <Skeleton className="w-full aspect-video mb-4" />
-          <Skeleton className="h-6 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-1/2 mb-1" />
-          <Skeleton className="h-10 w-24 mb-6" />
-        </div>
+  const allComingSoon = titles.every((title) => title === "Coming Soon");
+
+  return isLoading ? (
+    <div>
+      <NewsletterHeader />
+      <div className="px-[5%] md:px-[10%]">
+        <Skeleton className="w-full aspect-video mb-4" />
+        <Skeleton className="h-6 w-3/4 mb-2" />
+        <Skeleton className="h-4 w-1/2 mb-1" />
+        <Skeleton className="h-10 w-24 mb-6" />
       </div>
-    );
-  }
-
-  return (
+    </div>
+  ) : newsletterContent.currentIssue?.assigned >= 5 && !allComingSoon ? (
     <section>
       <MotionUp>
-        <NewsletterHeader
-          month={currentIssue.month}
-          year={currentIssue.year}
-        />
+        <NewsletterHeader month={currentIssue.month} year={currentIssue.year} />
       </MotionUp>
       <div className="pb-[4%]"></div>
 
@@ -98,62 +100,25 @@ const NewsletterDesign05 = () => {
         {/* LEFT COLUMN */}
         <div className="px-[5%] md:px-0 md:w-[66%]">
           <MotionUp>
-            {/* HERO STORY */}
-            <LargeViewDesign01
-              image={section1.images[0]}
-              title={section1.title}
-              author={section1.pseudonym}
-              readTime={
-                readingTime(removeHtmlTags(section1.article ?? ""), 238).text
-              }
-              datePublished={formatTimestamp(section1.createdAt).fullDate}
-              article={section1.article}
-            />
-            <div className="mt-5"></div>
-            <ReadMoreBtn
-              href={""}
-              title={section1.title}
-              id={section1.newsletterId}
-            />
+            <LargeViewDesign01 {...section1} />
+            <div className="mt-5" />
+            <ReadMoreBtn title={section1.title} id={section1.newsletterId} />
 
-            {/* TWO ARTICLES SIDE-BY-SIDE */}
             <div className="md:flex gap-10 mt-10">
               <div className="md:w-[50%]">
                 <Divider />
-                <ArticleViewDesign
-                  image={section2.images[0]}
-                  title={section2.title}
-                  author={section2.pseudonym}
-                  readTime={
-                    readingTime(removeHtmlTags(section2.article ?? ""), 238).text
-                  }
-                  datePublished={formatTimestamp(section2.createdAt).fullDate}
-                  article={section2.article}
-                  lineclamp="line-clamp-6"
-                />
-                <div className="mt-5"></div>
+                <ArticleViewDesign {...section2} lineclamp="line-clamp-6" />
+                <div className="mt-5" />
                 <ReadMoreBtn
-                  href={""}
                   title={section2.title}
                   id={section2.newsletterId}
                 />
               </div>
 
               <div className="mt-10 md:mt-0 md:w-[50%]">
-                <ArticleViewDesign
-                  image={section3.images[0]}
-                  title={section3.title}
-                  author={section3.pseudonym}
-                  readTime={
-                    readingTime(removeHtmlTags(section3.article ?? ""), 238).text
-                  }
-                  datePublished={formatTimestamp(section3.createdAt).fullDate}
-                  article={section3.article}
-                  lineclamp="line-clamp-7"
-                />
-                <div className="mt-5"></div>
+                <ArticleViewDesign {...section3} lineclamp="line-clamp-7" />
+                <div className="mt-5" />
                 <ReadMoreBtn
-                  href={""}
                   title={section3.title}
                   id={section3.newsletterId}
                 />
@@ -174,7 +139,10 @@ const NewsletterDesign05 = () => {
                 <span className="text-gray-400">&nbsp; |</span>
                 <span className="text-primary">
                   &nbsp;&nbsp;
-                  {readingTime(removeHtmlTags(section4.article ?? ""), 238).text}
+                  {
+                    readingTime(removeHtmlTags(section4.article ?? ""), 238)
+                      .text
+                  }
                 </span>
                 <span className="text-gray-400">&nbsp; |</span>
                 <span className="text-primary">
@@ -184,36 +152,21 @@ const NewsletterDesign05 = () => {
               <div className="line-clamp-10 text-body text-justify text-gray-500">
                 <ArticlePreviewWithHyphenation content={section4.article} />
               </div>
-              <div className="mt-5"></div>
-              <ReadMoreBtn
-                href={""}
-                title={section4.title}
-                id={section4.newsletterId}
-              />
+              <div className="mt-5" />
+              <ReadMoreBtn title={section4.title} id={section4.newsletterId} />
             </div>
           </MotionUp>
 
           <MotionUp>
-            <ColoredArticleViewDesign
-              title={section5.title}
-              author={section5.pseudonym}
-              readTime={
-                readingTime(removeHtmlTags(section5.article ?? ""), 238).text
-              }
-              datePublished={formatTimestamp(section5.createdAt).fullDate}
-              article={section5.article}
-              lineclamp="line-clamp-12"
-            />
-            <div className="mt-5"></div>
-            <ReadMoreBtn
-              href={""}
-              title={section5.title}
-              id={section5.newsletterId}
-            />
+            <ColoredArticleViewDesign {...section5} lineclamp="line-clamp-12" />
+            <div className="mt-5" />
+            <ReadMoreBtn title={section5.title} id={section5.newsletterId} />
           </MotionUp>
         </div>
       </section>
     </section>
+  ) : (
+    <NewsLetterComingSoon />
   );
 };
 
