@@ -9,6 +9,8 @@ import formatTimestamp from "../../../utils/formatTimestamp";
 import Skeleton from "react-loading-skeleton";
 import newsletterStore from "../../../store/stores/newsletterStore";
 import MotionUp from "../../animated/MotionUp";
+import ArticleViewDesign from "../ArticleViewDesign";
+import NewsLetterComingSoon from "../NewsLetterComingSoon";
 
 const NewsletterDesign01 = () => {
   const { newsletterContent, setNewsletterContent, isLoading, setIsLoading } =
@@ -134,12 +136,12 @@ const NewsletterDesign01 = () => {
 
           {/* Contents */}
           {/*  added justify-center*/}
-          <section className="md:flex md:gap-30 md:px-[5%] md:justify-center xl:px-[10%] mb-10">
+          <section className="md:flex md:gap-30 md:px-[5%] md:justify-center xl:flex xl:flex-row xl:px-[10%] mb-10 ">
             <div className="px-[5%] md:px-0 md:w-[66%]">
               <MotionUp>
                 <div className="w-[100%]">
                   {/* MAIN */}
-                  <LargeViewDesign01
+                  <ArticleViewDesign
                     image={section1.images[0]}
                     title={section1.title}
                     author={section1.pseudonym}
@@ -164,7 +166,21 @@ const NewsletterDesign01 = () => {
             </div>
           </section>
         </section>
-      ) : null}
+      ) : (
+        // <div className="flex flex-col items-center justify-center text-center p-10 min-h-[60vh]">
+        //   <h1 className="text-3xl md:text-5xl font-avenir-black mb-4">
+        //     📬 Your Next Big Read Is On Its Way!
+        //   </h1>
+        //   <p className="text-lg md:text-xl text-gray-600 max-w-xl">
+        //     We're putting the final touches on something special. Fresh stories,
+        //     insights, and updates will be landing here very soon —{" "}
+        //     <span className="font-avenir-black text-primary">
+        //       stay excited!
+        //     </span>
+        //   </p>
+        // </div>
+        <NewsLetterComingSoon />
+      )}
     </div>
   );
 };

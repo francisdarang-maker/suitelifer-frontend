@@ -1,7 +1,13 @@
 import NewsArticle from "./NewsArticle";
 import Issues from "./Issues";
 import PageToggle from "../buttons/PageToggle";
-import SuiteLetterLayout from "../../assets/images/suiteletter-section-layout.webp";
+import SuiteLetterLayout01 from "../../assets/images/suiteletter-section-layout-01.png";
+import SuiteLetterLayout02 from "../../assets/images/suiteletter-section-layout-02.png";
+import SuiteLetterLayout03 from "../../assets/images/suiteletter-section-layout-03.png";
+import SuiteLetterLayout04 from "../../assets/images/suiteletter-section-layout-04.png";
+import SuiteLetterLayout05 from "../../assets/images/suiteletter-section-layout-05.png";
+import SuiteLetterLayout06 from "../../assets/images/suiteletter-section-layout-06.png";
+import SuiteLetterLayout07 from "../../assets/images/suiteletter-section-layout-07.png";
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { AgGridReact } from "@ag-grid-community/react";
 import { ModuleRegistry } from "@ag-grid-community/core";
@@ -498,6 +504,31 @@ function AdminNewsLetterToggle() {
 
   const [confirmBackModalOpen, setConfirmBackModalOpen] = useState(false);
 
+  //added for photos
+  const layoutImages = [
+    SuiteLetterLayout01,
+    SuiteLetterLayout02,
+    SuiteLetterLayout03,
+    SuiteLetterLayout04,
+    SuiteLetterLayout05,
+    SuiteLetterLayout06,
+    SuiteLetterLayout07,
+  ];
+  const [currentLayoutImagesIndex, setLayoutImagesIndex] = useState(0);
+
+  const handlePrev = () => {
+    setLayoutImagesIndex((prev) =>
+      prev === 0 ? layoutImages.length - 1 : prev - 1
+    );
+  };
+
+  const handleNext = () => {
+    setLayoutImagesIndex((prev) =>
+      prev === layoutImages.length - 1 ? 0 : prev + 1
+    );
+  };
+  //
+
   return (
     <div>
       {(!selectedMonthlyIssue || selectedMonthlyIssue.month === undefined) &&
@@ -639,10 +670,7 @@ function AdminNewsLetterToggle() {
                       </div>
                       <div className="flex flex-row justify-start items-center gap-2 text-gray-400">
                         <CheckCircleIcon className="h-4 w-4 " />
-                        <p className=" text-xs">
-                          {issue.assigned}
-                          /7 assigned
-                        </p>
+                        <p className=" text-xs">{issue.assigned} assigned</p>
                       </div>
                       <div className="flex flex-row justify-start items-center gap-2 text-gray-400">
                         <MinusCircleIcon className="h-4 w-4 " />
@@ -957,7 +985,7 @@ function AdminNewsLetterToggle() {
                 Assigned
               </span>
               <div className="text-body text-black text-center">
-                {selectedMonthlyIssue.assigned}/7
+                {selectedMonthlyIssue.assigned}
               </div>
             </div>
             <div className="rounded-md grid place-content-center">
@@ -1190,11 +1218,36 @@ function AdminNewsLetterToggle() {
             </p>
             <div className="py-1"></div>
             <div>
-              <img
-                src={SuiteLetterLayout}
+              {/* old */}
+              {/* <img
+                src={SuiteLetterLayout07}
                 alt="suiteletter layout"
                 className="border border-gray-300 rounded-md h-auto "
+              /> */}
+
+              {/* newly added */}
+              <img
+                src={layoutImages[currentLayoutImagesIndex]}
+                alt={`suiteletter layout ${currentLayoutImagesIndex + 1}`}
+                className="border border-gray-300 rounded-md h-auto"
               />
+            </div>
+            <div className="flex justify-between items-center mt-4">
+              <button
+                onClick={handlePrev}
+                className="text-sm text-primary hover:underline"
+              >
+                ← Previous
+              </button>
+              <span className="text-xs text-gray-500">
+                Layout {currentLayoutImagesIndex + 1} of {layoutImages.length}
+              </span>
+              <button
+                onClick={handleNext}
+                className="text-sm text-primary hover:underline"
+              >
+                Next →
+              </button>
             </div>
           </div>
         </DialogContent>

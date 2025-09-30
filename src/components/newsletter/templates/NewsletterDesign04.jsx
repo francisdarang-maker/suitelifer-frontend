@@ -3,18 +3,14 @@ import LargeViewDesign01 from "../LargeViewDesign01";
 import ArticleViewDesign from "../ArticleViewDesign";
 import ColoredArticleViewDesign from "../ColoredArticleViewDesign";
 import ReadMoreBtn from "../../buttons/ReadMoreBtn";
-import NewsletterArticles from "../NewsletterArticles";
-import Divider from "../Divider";
 import { useState, useEffect } from "react";
 import api from "../../../utils/axios";
 import { readingTime } from "reading-time-estimator";
 import { removeHtmlTags } from "../../../utils/removeHTMLTags";
 import formatTimestamp from "../../../utils/formatTimestamp";
-import TwoCirclesLoader from "../../../assets/loaders/TwoCirclesLoader";
 import Skeleton from "react-loading-skeleton";
 import newsletterStore from "../../../store/stores/newsletterStore";
 import MotionUp from "../../animated/MotionUp";
-import ArticlePreviewWithHyphenation from "../ArticlePreviewWithHyphenation";
 
 const NewsletterDesign04 = () => {
   const { newsletterContent, setNewsletterContent, isLoading, setIsLoading } =
@@ -73,6 +69,15 @@ const NewsletterDesign04 = () => {
   const section3 = getArticleBySection(articles, 3);
   const section4 = getArticleBySection(articles, 4);
 
+  const titles = [
+    section1?.title,
+    section2?.title,
+    section3?.title,
+    section4?.title,
+  ].filter(Boolean);
+
+  const allComingSoon = titles.every((title) => title === "Coming Soon");
+
   return (
     <div>
       {isLoading ? (
@@ -123,7 +128,7 @@ const NewsletterDesign04 = () => {
             </div>
           </section>
         </div>
-      ) : newsletterContent.currentIssue?.assigned >= 4 ? (
+      ) : newsletterContent.currentIssue?.assigned >= 4 && !allComingSoon ? (
         <section>
           <MotionUp>
             <NewsletterHeader
@@ -135,123 +140,148 @@ const NewsletterDesign04 = () => {
 
           {/* Main Content Grid - Optimized for 4 Articles */}
           <section className="px-[5%] md:px-[10%]">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-12">
+            <div className=" grid lg:grid-cols-2 xl:grid-cols-2 gap-10 mb-12 w-[80%] mx-auto">
               {/* Featured Article - Full Width */}
-              <MotionUp>
-                <div className="lg:col-span-2">
-                  <LargeViewDesign01
-                    image={section1.images[0]}
-                    title={section1.title}
-                    author={section1.pseudonym}
-                    readTime={
-                      readingTime(
-                        removeHtmlTags(section1.article ?? "article"),
-                        238
-                      ).text
-                    }
-                    datePublished={formatTimestamp(section1.createdAt).fullDate}
-                    article={section1.article}
-                  />
-                  <div className="mt-5"></div>
-                  <ReadMoreBtn
-                    href={""}
-                    title={section1.title}
-                    id={section1.newsletterId}
-                  />
-                </div>
-              </MotionUp>
 
+              {section1.title !== "Coming Soon" && (
+                <MotionUp>
+                  <div className={`lg:col-span-2 w-full`}>
+                    <LargeViewDesign01
+                      image={section1.images[0]}
+                      title={section1.title}
+                      author={section1.pseudonym}
+                      readTime={
+                        readingTime(
+                          removeHtmlTags(section1.article ?? "article"),
+                          238
+                        ).text
+                      }
+                      datePublished={
+                        formatTimestamp(section1.createdAt).fullDate
+                      }
+                      article={section1.article}
+                    />
+                    <div className="mt-5"></div>
+                    <ReadMoreBtn
+                      href={""}
+                      title={section1.title}
+                      id={section1.newsletterId}
+                    />
+                  </div>
+                </MotionUp>
+              )}
               {/* Second Article */}
-              <MotionUp>
-                <div>
-                  <ArticleViewDesign
-                    title={section2.title}
-                    author={section2.pseudonym}
-                    image={section2.images[0]}
-                    readTime={
-                      readingTime(
-                        removeHtmlTags(section2.article ?? "article"),
-                        238
-                      ).text
-                    }
-                    datePublished={formatTimestamp(section2.createdAt).fullDate}
-                    article={section2.article}
-                    lineclamp="line-clamp-6"
-                  />
-                  <div className="mt-5"></div>
-                  <ReadMoreBtn
-                    href={""}
-                    title={section2.title}
-                    id={section2.newsletterId}
-                  />
-                </div>
-              </MotionUp>
+              {section2.title !== "Coming Soon" && (
+                <MotionUp>
+                  <div
+                    className={`w-full ${
+                      section1.title === "Coming Soon"
+                        ? "xl:col-span-2"
+                        : "xl:col-span-1"
+                    }`}
+                  >
+                    <ArticleViewDesign
+                      title={section2.title}
+                      author={section2.pseudonym}
+                      image={section2.images[0]}
+                      readTime={
+                        readingTime(
+                          removeHtmlTags(section2.article ?? "article"),
+                          238
+                        ).text
+                      }
+                      datePublished={
+                        formatTimestamp(section2.createdAt).fullDate
+                      }
+                      article={section2.article}
+                      lineclamp="line-clamp-6"
+                    />
+                    <div className="mt-5"></div>
+                    <ReadMoreBtn
+                      href={""}
+                      title={section2.title}
+                      id={section2.newsletterId}
+                    />
+                  </div>
+                </MotionUp>
+              )}
 
               {/* Third Article */}
-              <MotionUp>
-                <div>
-                  <ArticleViewDesign
-                    image={section3.images[0]}
-                    title={section3.title}
-                    author={section3.pseudonym}
-                    readTime={
-                      readingTime(
-                        removeHtmlTags(section3.article ?? "article"),
-                        238
-                      ).text
-                    }
-                    datePublished={formatTimestamp(section3.createdAt).fullDate}
-                    article={section3.article}
-                    lineclamp="line-clamp-6"
-                  />
-                  <div className="mt-5"></div>
-                  <ReadMoreBtn
-                    href={""}
-                    title={section3.title}
-                    id={section3.newsletterId}
-                  />
+              {section3.title !== "Coming Soon" && (
+                <div
+                  className={`w-full ${
+                    section4.title === "Coming Soon"
+                      ? "xl:col-span-2"
+                      : "xl:col-span-1"
+                  }`}
+                >
+                  <MotionUp>
+                    <ArticleViewDesign
+                      image={section3.images[0]}
+                      title={section3.title}
+                      author={section3.pseudonym}
+                      readTime={
+                        readingTime(
+                          removeHtmlTags(section3.article ?? "article"),
+                          238
+                        ).text
+                      }
+                      datePublished={
+                        formatTimestamp(section3.createdAt).fullDate
+                      }
+                      article={section3.article}
+                      lineclamp="line-clamp-6"
+                    />
+                    <div className="mt-5"></div>
+                    <ReadMoreBtn
+                      href={""}
+                      title={section3.title}
+                      id={section3.newsletterId}
+                    />
+                  </MotionUp>{" "}
                 </div>
-              </MotionUp>
+              )}
               {/* COLORED ARTICLE */}
-              <MotionUp>
-                <ColoredArticleViewDesign
-                  title={section4.title}
-                  author={section4.pseudonym}
-                  readTime={
-                    readingTime(
-                      removeHtmlTags(section4.article ?? "article"),
-                      238
-                    ).text
-                  }
-                  datePublished={formatTimestamp(section4.createdAt).fullDate}
-                  article={section4.article}
-                  lineclamp="md:line-clamp-17 lg:line-clamp-17 xl:line-clamp-25"
-                />
-                <div className="mt-5"></div>
-                <div className="px-[5%] md:px-0">
-                  <ReadMoreBtn
-                    href={""}
-                    title={section4.title}
-                    id={section4.newsletterId}
-                  />
+              {section4.title !== "Coming Soon" && (
+                <div
+                  className={`w-full  ${
+                    section3.title === "Coming Soon"
+                      ? "xl:col-span-2"
+                      : "xl:col-span-1"
+                  }`}
+                >
+                  <MotionUp>
+                    <ColoredArticleViewDesign
+                      title={section4.title}
+                      author={section4.pseudonym}
+                      readTime={
+                        readingTime(
+                          removeHtmlTags(section4.article ?? "article"),
+                          238
+                        ).text
+                      }
+                      datePublished={
+                        formatTimestamp(section4.createdAt).fullDate
+                      }
+                      article={section4.article}
+                      lineclamp="md:line-clamp-17 lg:line-clamp-17 xl:line-clamp-25"
+                    />
+                    <div className="mt-5"></div>
+                    <div className="px-[5%] md:px-0">
+                      <ReadMoreBtn
+                        href={""}
+                        title={section4.title}
+                        id={section4.newsletterId}
+                      />
+                    </div>
+                  </MotionUp>
                 </div>
-              </MotionUp>
+              )}
             </div>
           </section>
         </section>
       ) : (
-        <div className="flex flex-col items-center justify-center text-center p-10 min-h-[60vh]">
-          <h1 className="text-3xl md:text-5xl font-avenir-black mb-4">
-            📬 Your Next Big Read Is On Its Way!
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 max-w-xl">
-            We're putting the final touches on something special. Fresh stories,
-            insights, and updates will be landing here very soon —{" "}
-            <span className="font-avenir-black text-primary">
-              stay excited!
-            </span>
-          </p>
-        </div>
+        <NewsLetterComingSoon />
       )}
     </div>
   );

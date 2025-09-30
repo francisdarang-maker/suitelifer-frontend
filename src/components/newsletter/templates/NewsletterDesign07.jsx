@@ -17,30 +17,26 @@ import MotionUp from "../../animated/MotionUp";
 import ArticlePreviewWithHyphenation from "../ArticlePreviewWithHyphenation";
 
 const NewsletterDesign07 = () => {
-  const {
-    newsletterContent,
-    setNewsletterContent,
-    isLoading,
-    setIsLoading,
-  } = newsletterStore();
+  const { newsletterContent, setNewsletterContent, isLoading, setIsLoading } =
+    newsletterStore();
 
   useEffect(() => {
     const fetchIssueAndArticles = async () => {
       try {
         const issueRes = await api.get("api/issues/current");
         const current = issueRes.data?.currentIssue ?? null;
-    
+
         console.log("Current Issue:", current);
-    
+
         if (!current) {
           setNewsletterContent({ articles: [], currentIssue: null });
           return;
         }
-    
+
         const articlesRes = await api.get(
           `/api/newsletter?issueId=${current.issueId}`
         );
-    
+
         setNewsletterContent({
           articles: articlesRes.data?.newsletters ?? [],
           currentIssue: current,
@@ -52,7 +48,6 @@ const NewsletterDesign07 = () => {
         setIsLoading(false);
       }
     };
-    
 
     fetchIssueAndArticles();
   }, [setNewsletterContent, setIsLoading]);
@@ -413,21 +408,7 @@ const NewsletterDesign07 = () => {
             </div>
           </section>
         </section>
-      ) 
-      : (
-        <div className="flex flex-col items-center justify-center text-center p-10 min-h-[60vh]">
-          <h1 className="text-3xl md:text-5xl font-avenir-black mb-4">
-            📬 Your Next Big Read Is On Its Way!
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 max-w-xl">
-            We're putting the final touches on something special. Fresh stories,
-            insights, and updates will be landing here very soon —{" "}
-            <span className="font-avenir-black text-primary">
-              stay excited!
-            </span>
-          </p>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 };

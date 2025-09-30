@@ -11,6 +11,8 @@ import newsletterStore from "../../../store/stores/newsletterStore";
 import MotionUp from "../../animated/MotionUp";
 import Divider from "../Divider";
 import ArticleViewDesign from "../ArticleViewDesign";
+import ComingSoon from "../../../pages/admin/ComingSoon";
+import NewsLetterComingSoon from "../NewsLetterComingSoon";
 const NewsletterDesign02 = () => {
   const { newsletterContent, setNewsletterContent, isLoading, setIsLoading } =
     newsletterStore();
@@ -48,6 +50,8 @@ const NewsletterDesign02 = () => {
   }, [setNewsletterContent, setIsLoading]);
 
   const getArticleBySection = (articles, sectionNumber) => {
+    console.log("eto:", articles);
+
     return (
       articles.find((article) => article.section === sectionNumber) || {
         title: "Coming Soon",
@@ -64,6 +68,10 @@ const NewsletterDesign02 = () => {
 
   const section1 = getArticleBySection(articles, 1);
   const section2 = getArticleBySection(articles, 2);
+
+  const titles = [section1?.title, section2?.title].filter(Boolean);
+
+  const allComingSoon = titles.every((title) => title === "Coming Soon");
 
   return (
     <div>
@@ -124,7 +132,7 @@ const NewsletterDesign02 = () => {
             </div>
           </section>
         </div>
-      ) : newsletterContent.currentIssue?.assigned === 2 ? (
+      ) : newsletterContent.currentIssue?.assigned >= 2 && !allComingSoon ? (
         <section>
           <MotionUp>
             <NewsletterHeader
@@ -134,15 +142,22 @@ const NewsletterDesign02 = () => {
           </MotionUp>
           <div className="pb-[4%]"></div>
 
-          {/* Contents */}
-          {/* <section className="md:flex md:gap-10 md:px-[10%] xl:px-[10%] mb-10">
-           */}
-          <section className="mb-10  md:flex md:flex-col md:gap-30 md:px-[5%] md:items-center  xl:px-[10%] ">
-            <div className="px-[5%] md:px-0 md:w-[66%]">
+          <section
+            className={`mb-10 md:flex md:flex-col md:items-center md:justify-center md:gap-10 md:px-[5%] xl:px-[10%] xl:grid ${
+              section2.title !== "Coming Soon"
+                ? "xl:grid-cols-2"
+                : "xl:grid-cols-1"
+            }`}
+          >
+            <div className="px-[5%] md:px-0 md:w-[66%] xl:w-full">
               <MotionUp>
-                <div className="w-[100%]">
+                <div
+                  className={` ${
+                    section2.title !== "Coming Soon" ? "" : "xl:w-[70%] mx-auto"
+                  } `}
+                >
                   {/* MAIN */}
-                  <LargeViewDesign01
+                  <ArticleViewDesign
                     image={section1.images[0]}
                     title={section1.title}
                     author={section1.pseudonym}
@@ -161,28 +176,45 @@ const NewsletterDesign02 = () => {
                     title={section1.title}
                     id={section1.newsletterId}
                   />
-                  {/* <div className="md:mb-1s"></div> */}
                 </div>
               </MotionUp>
             </div>
-            <div className="md:flex gap-10 md:justify-center">
-              <div className="md:w-[80%] px-[5%]">
-                <Divider />
+
+            {/* Second Article */}
+            <div className="md:flex gap-10 md:justify-center px-[5%] md:px-0 md:w-[66%] xl:w-full">
+              <div className="">
+                {/*  */}
+                {section2.title !== "Coming Soon" && (
+                  <div className="block xl:hidden ">
+                    <Divider />
+                  </div>
+                )}
                 <div className="mt-5"></div>
-                <ArticleViewDesign
-                  title={section2.title}
-                  author={section2.pseudonym}
-                  image={section2.images[0]}
-                  readTime={
-                    readingTime(
-                      removeHtmlTags(section2.article ?? "article"),
-                      238
-                    ).text
-                  }
-                  datePublished={formatTimestamp(section2.createdAt).fullDate}
-                  article={section2.article}
-                  lineclamp="line-clamp-6"
-                />{" "}
+
+                {/* new added*/}
+                {section2.title !== "Coming Soon" && (
+                  <div className="">
+                    <ArticleViewDesign
+                      title={section2.title}
+                      author={section2.pseudonym}
+                      image={section2.images[0]}
+                      article={section2.article}
+                      newsletterId={section2.newsletterId}
+                      lineclamp="line-clamp-6"
+                      readTime={
+                        readingTime(
+                          removeHtmlTags(section2.article ?? "article"),
+                          238
+                        ).text
+                      }
+                      datePublished={
+                        formatTimestamp(section2.createdAt).fullDate
+                      }
+                    />
+                  </div>
+                )}
+
+                {/* end */}
                 <div className="mt-5"></div>
                 <ReadMoreBtn
                   href={""}
@@ -193,7 +225,9 @@ const NewsletterDesign02 = () => {
             </div>
           </section>
         </section>
-      ) : null}
+      ) : (
+        <NewsLetterComingSoon />
+      )}
     </div>
   );
 };
