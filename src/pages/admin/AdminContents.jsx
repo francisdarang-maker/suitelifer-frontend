@@ -11,6 +11,7 @@ import FooterPageToggle from "../../components/admin/FooterPageToggle";
 import AdminHomePage from "../../components/admin/AdminHomePage";
 import AdminContactsToggle from "../../components/admin/AdminContactsToggle";
 import AdminNewsLetterToggle from "../../components/admin/AdminNewsLetterToggle";
+import AdminBlogs from "./AdminBlogs";
 
 const AdminContents = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -59,9 +60,10 @@ const AdminContents = () => {
           <Tab label="About" value={1} />
           <Tab label="Careers" value={2} />
           <Tab label="Newsletter" value={3} />
-          <Tab label="Podcast" value={4} />
-          <Tab label="Contact" value={5} />
-          <Tab label="Footer" value={6} />
+          <Tab label="Blogs" value={4} />
+          <Tab label="Podcast" value={5} />
+          <Tab label="Contact" value={6} />
+          <Tab label="Footer" value={7} />
         </Tabs>
       </div>
 
@@ -70,9 +72,10 @@ const AdminContents = () => {
         {activeTab === 1 && <PageToggle />}
         {activeTab === 2 && <Careers />}
         {activeTab === 3 && <AdminNewsLetterToggle />}
-        {activeTab === 4 && <SpotifyEpisodes />}
-        {activeTab === 5 && <AdminContactsToggle />}
-        {activeTab === 6 && <FooterPageToggle />}
+        {activeTab === 4 && <AdminBlogs/>}
+        {activeTab === 5 && <SpotifyEpisodes />}
+        {activeTab === 6 && <AdminContactsToggle />}
+        {activeTab === 7 && <FooterPageToggle />}
       </div>
     </div>
   );

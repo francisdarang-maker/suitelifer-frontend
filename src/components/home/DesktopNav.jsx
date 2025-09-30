@@ -85,8 +85,7 @@ export default function DesktopNav() {
                 before:bottom-[-6px] before:opacity-0 before:transition-all before:duration-300
                 
                 hover:before:opacity-100 hover:before:translate-y-1 
-                ${isActive ? "before:opacity-100 before:translate-y-1" : ""}
-      `
+                ${isActive ? "before:opacity-100 before:translate-y-1" : ""}`
                 }
               >
                 About
@@ -136,6 +135,29 @@ export default function DesktopNav() {
               </NavLink>
             </div>
 
+            {/* Blogs */}
+
+            <div>
+              <NavLink
+                to="/blogs"
+                className={({ isActive }) =>
+                  `relative !no-underline text-dark text-md hover:text-[#007a8e] ${
+                    isActive ? "active-class text-[#007a8e]" : ""
+                  }transition-all duration-300 ease-in-out 
+      
+                before:absolute before:content-[''] before:w-1 before:h-1 
+                before:rounded-full before:bg-[#007a8e] before:left-1/2 before:-translate-x-1/2 
+                before:bottom-[-6px] before:opacity-0 before:transition-all before:duration-300
+                
+                hover:before:opacity-100 hover:before:translate-y-1 
+                ${isActive ? "before:opacity-100 before:translate-y-1" : ""}
+      `
+                }
+              >
+                Blogs
+              </NavLink>
+            </div>
+
             <div>
               <NavLink
                 to="/podcast"
@@ -149,8 +171,7 @@ export default function DesktopNav() {
                 before:bottom-[-6px] before:opacity-0 before:transition-all before:duration-300
                 
                 hover:before:opacity-100 hover:before:translate-y-1 
-                ${isActive ? "before:opacity-100 before:translate-y-1" : ""}
-      `
+                ${isActive ? "before:opacity-100 before:translate-y-1" : ""}`
                 }
               >
                 Podcasts
@@ -170,8 +191,7 @@ export default function DesktopNav() {
                 before:bottom-[-6px] before:opacity-0 before:transition-all before:duration-300
                 
                 hover:before:opacity-100 hover:before:translate-y-1 
-                ${isActive ? "before:opacity-100 before:translate-y-1" : ""}
-      `
+                ${isActive ? "before:opacity-100 before:translate-y-1" : ""}`
                 }
               >
                 Contact

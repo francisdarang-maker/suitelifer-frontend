@@ -111,6 +111,20 @@ export default function MobileNav() {
                   Newsletter
                 </NavLink>
               </div>
+
+              <div>
+                <NavLink
+                  to="/blogs"
+                  className={({ isActive }) =>
+                    `!no-underline text-black text-lg font-medium hover:text-[#007a8e] ${
+                      isActive ? "active-class" : ""
+                    }`
+                  }
+                  onClick={handleClose}
+                >
+                  Blogs
+                </NavLink>
+              </div>
         
               <div>
                 <NavLink
