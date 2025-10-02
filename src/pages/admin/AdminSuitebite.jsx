@@ -122,7 +122,9 @@ const AdminSuitebite = () => {
   return (
     // Added Features:
     // Removed bg-gray-50
-    <div className="admin-suitebiteflex flex-col min-h-screen py-4">
+    //
+    // <div className="admin-suitebiteflex flex-col min-h-screen py-4 ">
+    <div className="flex flex-col min-h-screen py-4 px-4 sm:px-6 lg:px-8">
       {/* Fixed Header */}
       {/*Added Features: */}
       {/* Removed bg-gray-50 */}
@@ -137,7 +139,7 @@ const AdminSuitebite = () => {
             {" "}
             {/* No margin */}
             <div className="flex items-center justify-between">
-              <div className="flex space-x-1">
+              <div className="flex gap-5">
                 {tabs.map((tab) => {
                   const IconComponent = tab.icon;
                   return (
@@ -150,8 +152,10 @@ const AdminSuitebite = () => {
                       }`}
                       onClick={() => handleTabChange(tab.id)}
                     >
-                      <IconComponent className="h-5 w-5 mr-2" />
-                      <span className="tab-label">{tab.label}</span>
+                      <IconComponent className="h-5 w-5" />
+                      <span className="hidden sm:inline tab-label pl-3">
+                        {tab.label}
+                      </span>
                     </button>
                   );
                 })}
@@ -162,6 +166,7 @@ const AdminSuitebite = () => {
       </div>
 
       {/* Scrollable Content Area */}
+
       <div className="admin-content pb-6">
         <div className="max-w-7xl mx-auto">
           {/* Refresh Notification - Hidden but function kept */}

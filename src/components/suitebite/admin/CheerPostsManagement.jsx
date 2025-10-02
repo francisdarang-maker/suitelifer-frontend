@@ -10,9 +10,9 @@ import {
   EyeIcon,
   EyeSlashIcon,
   TrashIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
-  XCircleIcon,
+  ChatBubbleLeftRightIcon,
+  QueueListIcon,
+  HeartIcon,
 } from "@heroicons/react/24/outline";
 
 const CheerPostsManagement = () => {
@@ -86,16 +86,17 @@ const CheerPostsManagement = () => {
   }, [filter, loadCheerPosts]);
 
   // Auto-refresh data every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Only auto-refresh if not currently loading and no search term is active
-      if (!loading && !searchTerm.trim()) {
-        loadCheerPosts(1, false);
-      }
-    }, 30000); // 30 seconds
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     // Only auto-refresh if not currently loading and no search term is active
+  //     if (!loading && !searchTerm.trim()) {
+  //       loadCheerPosts(1, false);
+  //     }
+  //   }, 999999999999999999); // 300000
+  //   // seconds
 
-    return () => clearInterval(interval);
-  }, [loading, searchTerm, loadCheerPosts]);
+  //   return () => clearInterval(interval);
+  // }, [loading, searchTerm, loadCheerPosts]);
 
   const handleModeratePost = async (postId, action) => {
     try {
@@ -344,26 +345,27 @@ const CheerPostsManagement = () => {
   };
 
   return (
-    <div className="cheer-posts-management bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen p-6">
-      {/* Header Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Cheer Posts Management
-            </h1>
-            <p className="text-gray-600">
-              Monitor and moderate community cheer posts
-            </p>
+    <div className="cheer-posts-management  min-h-screen p-6 ">
+      <div className="bg-gradient-to-br from-gray-50 to-gray-100 px-3 py-0.5 mt-2 my-3 rounded-lg ">
+        {/* Header Section */}
+        <div className="mb-5">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Cheer Posts Management
+              </h1>
+              <p className="text-gray-600">
+                Monitor and moderate community cheer posts
+              </p>
+            </div>
           </div>
         </div>
       </div>
-
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:shadow-md transition-shadow duration-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:border-primary hover:shadow-md transition-shadow duration-200">
           <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-            <svg
+            <ChatBubbleLeftRightIcon
               className="w-6 h-6 text-blue-600"
               fill="none"
               stroke="currentColor"
@@ -375,7 +377,7 @@ const CheerPostsManagement = () => {
                 strokeWidth="2"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
               />
-            </svg>
+            </ChatBubbleLeftRightIcon>
           </div>
           <span className="text-3xl font-bold text-gray-900">
             {posts.length}
@@ -383,9 +385,9 @@ const CheerPostsManagement = () => {
           <span className="text-sm text-gray-500 font-medium">Posts</span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:shadow-md transition-shadow duration-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:border-primary hover:shadow-md transition-shadow duration-200">
           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
-            <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            <QueueListIcon className="w-6 h-6 text-green-600" />
           </div>
           <span className="text-3xl font-bold text-gray-900">
             {posts.filter((p) => !p.is_hidden).length}
@@ -393,9 +395,9 @@ const CheerPostsManagement = () => {
           <span className="text-sm text-gray-500 font-medium">Active</span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:shadow-md transition-shadow duration-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:border-primary hover:shadow-md transition-shadow duration-200">
           <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-3">
-            <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600" />
+            <EyeSlashIcon className="w-6 h-6 text-yellow-600" />
           </div>
           <span className="text-3xl font-bold text-gray-900">
             {posts.filter((p) => p.is_hidden).length}
@@ -403,10 +405,10 @@ const CheerPostsManagement = () => {
           <span className="text-sm text-gray-500 font-medium">Hidden</span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:shadow-md transition-shadow duration-200">
-          <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-3">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:border-primary hover:shadow-md transition-shadow duration-200">
+          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
             <svg
-              className="w-6 h-6 text-pink-600"
+              className="w-6 h-6 text-red-600"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -419,15 +421,15 @@ const CheerPostsManagement = () => {
           <span className="text-sm text-gray-500 font-medium">Heartbits</span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:shadow-md transition-shadow duration-200">
-          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-            <svg
-              className="w-6 h-6 text-blue-600"
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:border-primary hover:shadow-md transition-shadow duration-200">
+          <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-3">
+            <HeartIcon
+              className="w-6 h-6 text-pink-600"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
+            </HeartIcon>
           </div>
           <span className="text-3xl font-bold text-gray-900">
             {posts.reduce((sum, p) => sum + (p.likes_count || 0), 0)}
@@ -435,7 +437,7 @@ const CheerPostsManagement = () => {
           <span className="text-sm text-gray-500 font-medium">Likes</span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:shadow-md transition-shadow duration-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center hover:border-primary hover:shadow-md transition-shadow duration-200">
           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
             <svg
               className="w-6 h-6 text-green-600"
@@ -533,7 +535,7 @@ const CheerPostsManagement = () => {
               </select>
             </div>
 
-            <button
+            {/* <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
               className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
               title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
@@ -543,6 +545,20 @@ const CheerPostsManagement = () => {
               ) : (
                 <ArrowUpIcon className="w-4 h-4 text-gray-600" />
               )}
+            </button> */}
+            <button
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base  hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+              title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
+            >
+              <div className="flex items-center justify-between">
+                <span>{sortOrder === "asc" ? "Ascending" : "Descending"}</span>
+                {sortOrder === "desc" ? (
+                  <ArrowDownIcon className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ArrowUpIcon className="w-5 h-5 text-gray-500" />
+                )}
+              </div>
             </button>
           </div>
         </div>
@@ -839,8 +855,8 @@ const PostCard = ({
       <div className="post-main p-6">
         <div className="flex items-start justify-between gap-6">
           {/* Author Info */}
-          <div className="author-section flex items-center gap-4 min-w-0 flex-1">
-            <div className="author-avatar rounded-full w-12 h-12 flex items-center justify-center font-semibold text-sm shadow-md overflow-hidden">
+          <div className="  sm:items-start  author-section flex items-center gap-4 min-w-0 flex-1">
+            <div className=" author-avatar rounded-full w-12 h-12 flex items-center justify-center font-semibold text-sm shadow-md overflow-hidden">
               {post.cheerer_profile_pic ? (
                 <img
                   src={post.cheerer_profile_pic}
@@ -883,7 +899,7 @@ const PostCard = ({
               </div>
 
               {/* Post Content */}
-              <div className="post-details mt-3">
+              <div className="post-details mt-7">
                 <div className="flex items-center gap-2 mb-3 p-2 bg-gray-50 rounded-lg">
                   <span className="text-sm font-medium text-gray-500">To:</span>
                   <span className="text-sm font-semibold text-gray-900">
@@ -893,7 +909,7 @@ const PostCard = ({
                   </span>
                   <span className="ml-auto text-xs text-gray-400 flex items-center gap-1">
                     <svg
-                      className="w-3 h-3"
+                      className="sm:hidden w-3 h-3"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -924,22 +940,25 @@ const PostCard = ({
                 )}
 
                 {/* Engagement Stats */}
-                <div className="engagement-stats flex items-center gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
+                <div className="engagement-stats flex items-start gap-4 mb-4  py-3 pr-3 rounded-lg">
                   <div className="stat-item flex items-center gap-2 px-3 py-1 bg-white rounded-full shadow-sm">
-                    <svg
+                    <HeartIcon
                       className="w-4 h-4 text-pink-500"
-                      fill="currentColor"
+                      fill="transparent"
                       viewBox="0 0 24 24"
                     >
                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                    </svg>
-                    <span className="text-sm font-medium text-gray-700">
+                    </HeartIcon>
+                    <span className="sm:hidden text-sm font-medium text-gray-700">
                       {post.likes_count || 0} likes
+                    </span>
+                    <span className="text-sm font-medium text-gray-700">
+                      {post.likes_count || 0}
                     </span>
                   </div>
                   <div className="stat-item flex items-center gap-2 px-3 py-1 bg-white rounded-full shadow-sm">
                     <svg
-                      className="w-4 h-4 text-blue-500"
+                      className="w-4 h-4 text-green-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -951,8 +970,17 @@ const PostCard = ({
                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                       />
                     </svg>
-                    <span className="text-sm font-medium text-gray-700">
+                    <span
+                      className="sm:hidden
+                     text-sm font-medium text-gray-700 "
+                    >
                       {post.comments_count || 0} comments
+                    </span>
+                    <span
+                      className="
+                     text-sm font-medium text-gray-700 "
+                    >
+                      {post.comments_count || 0}
                     </span>
                   </div>
 
@@ -960,7 +988,8 @@ const PostCard = ({
                   {(post.likes_count > 0 || post.comments_count > 0) && (
                     <button
                       onClick={handleToggleDetails}
-                      className="view-details-btn text-xs text-[#0097b2] hover:text-[#007a8e] font-medium transition-colors duration-200 px-3 py-1 bg-white rounded-full shadow-sm hover:shadow-md"
+                      // className="view-details-btn text-xs text-[#0097b2] hover:text-[#007a8e] font-medium transition-colors duration-200 px-3 py-1 bg-white rounded-full shadow-sm hover:shadow-md"
+                      className="view-details-btn text-xs text-[#0097b2] hover:text-[#007a8e] font-medium transition-colors duration-200 px-3 py-1.5 bg-white rounded-full shadow-sm hover:shadow-md flex items-center justify-center"
                     >
                       {loadingDetails ? (
                         <div className="flex items-center gap-1">
@@ -968,9 +997,15 @@ const PostCard = ({
                           <span>Loading...</span>
                         </div>
                       ) : showDetails ? (
-                        "Hide Details"
+                        <div className="flex items-center gap-1">
+                          <EyeSlashIcon className="w-4 h-4 text-gray-500" />
+                          <span>Hide</span>
+                        </div>
                       ) : (
-                        "View Details"
+                        <div className="flex items-center gap-1">
+                          <EyeIcon className="w-4 h-4 text-gray-500" />
+                          <span>View</span>
+                        </div>
                       )}
                     </button>
                   )}
@@ -980,11 +1015,11 @@ const PostCard = ({
           </div>
 
           {/* Post Stats & Actions */}
-          <div className="post-stats text-right">
+          <div className="post-stats text-left sm:w-50 sm:h-50 sm:max-w-50 sm:max-h-50">
             <div className="stats-container mb-4 p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-end gap-2 mb-2">
+              <div className="flex items-center justify-start gap-2 mb-2">
                 <svg
-                  className="w-5 h-5 text-pink-500"
+                  className="w-5 h-5 text-red-500"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -1129,12 +1164,12 @@ const PostCard = ({
                         </div>
                       </div>
                       <div className="comment-content flex-1">
-                        <div className="comment-header flex items-center gap-2 mb-2">
+                        <div className="comment-header flex items-end gap-2 mb-2 justify-between">
                           <span className="commenter-name font-semibold text-gray-900 text-sm">
                             {comment.commenter_first_name || "Unknown"}{" "}
                             {comment.commenter_last_name || "User"}
                           </span>
-                          <span className="comment-time text-xs text-gray-500 flex items-center gap-1">
+                          <span className="comment-time text-xs text-gray-500 flex items-center gap-1 ">
                             <svg
                               className="w-3 h-3"
                               fill="none"

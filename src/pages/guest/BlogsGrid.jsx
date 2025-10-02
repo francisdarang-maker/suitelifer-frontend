@@ -11,7 +11,7 @@ const Wrapper = ({ children }) => (
 
 // 1 Blog Layout
 const SingleLayout = ({ blogs }) => (
-  <Wrapper>
+  <Wrapper>``
     <MotionUp>
       <BigTile {...blogs[0]} />
     </MotionUp>
@@ -155,29 +155,35 @@ const SevenLayout = ({ blogs }) => (
       </div>
 
       {/* Bottom row */}
-     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full">
         {blogs.slice(4).map((b, i) => (
           <MotionUp key={i}>
             <SmallTile {...b} />
           </MotionUp>
         ))}
-    </div>
-
+      </div>
     </div>
   </Wrapper>
 );
 
-
 // BlogGrid Wrapper
 const BlogGrid = ({ blogs }) => {
+  console.log("Rendering BlogGrid with blogs:", blogs);
   switch (blogs.length) {
-    case 1: return <SingleLayout blogs={blogs} />;
-    case 2: return <TwoLayout blogs={blogs} />;
-    case 3: return <ThreeLayout blogs={blogs} />;
-    case 4: return <FourLayout blogs={blogs} />;
-    case 5: return <FiveLayout blogs={blogs} />;
-    case 6: return <SixLayout blogs={blogs} />;
-    case 7: return <SevenLayout blogs={blogs} />;
+    case 1:
+      return <SingleLayout blogs={blogs} />;
+    case 2:
+      return <TwoLayout blogs={blogs} />;
+    case 3:
+      return <ThreeLayout blogs={blogs} />;
+    case 4:
+      return <FourLayout blogs={blogs} />;
+    case 5:
+      return <FiveLayout blogs={blogs} />;
+    case 6:
+      return <SixLayout blogs={blogs} />;
+    case 7:
+      return <SevenLayout blogs={blogs} />;
     default:
       return <ComingSoon />;
   }

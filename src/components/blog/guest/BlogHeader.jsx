@@ -1,5 +1,4 @@
-const BlogHeader = ({month, year}) => {
-
+const BlogHeader = ({ month, year }) => {
   const months = [
     "January",
     "February",
@@ -19,12 +18,12 @@ const BlogHeader = ({month, year}) => {
   }
 
   return (
-    <header className="flex flex-col">
+    <header className="flex flex-col mt-10">
       <div className="flex items-center justify-end">
         <div className="size-[1.3vh] bg-primary rounded-full"></div>
         <div className="w-[30%] h-[0.25vh] bg-primary"></div>
       </div>
-      <div className="px-[5%] md:px-[10%] xl:px-[15%]">
+      <div className="px-[5%] md:px-[10%] xl:px-[15%] ">
         <p className="header-text self-end flex justify-end font-avenir-black ">
           <span className="text-gray-400">the</span>{" "}
           <span className="text-primary">suite</span>
@@ -37,9 +36,13 @@ const BlogHeader = ({month, year}) => {
             <div className="w-[2ch] lg:w-[5vh] h-[0.25vh] bg-primary"></div>
           </div>
 
-         { month && year ?  <p className="whitespace-nowrap flex-shrink-0 px-2 caption text-primary">
-            {getMonthName(month)} {year} blog
-          </p> : <></>}
+          {month && year ? (
+            <p className="whitespace-nowrap flex-shrink-0 px-2 caption text-primary">
+              {getMonthName(month)} {year} blog
+            </p>
+          ) : (
+            <></>
+          )}
           <div className="w-full h-[0.25vh] bg-primary"></div>
           <p className="whitespace-nowrap flex-shrink-0 px-2 caption text-gray-500">
             Fresh and Bright, Your Monthly Insight!
