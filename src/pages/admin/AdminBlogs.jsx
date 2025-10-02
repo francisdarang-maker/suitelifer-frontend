@@ -80,6 +80,7 @@ function AdminBlogs() {
           headers: { "Content-Type": "multipart/form-data" },
         });
         imageUrl = uploadRes.data?.imageUrl;
+        console.log(uploadRes.data)
       }
 
       const blogData = {
@@ -174,6 +175,7 @@ function AdminBlogs() {
       console.log(isDeleted);
 
       await api.delete(`/api/blogs/${blogId}`);
+
       fetchBlogs();
     } catch (error) {
       console.error("Failed to delete blog:", error);
