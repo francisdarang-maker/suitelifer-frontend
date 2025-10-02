@@ -71,6 +71,7 @@ function AdminBlogs() {
           headers: { "Content-Type": "multipart/form-data" },
         });
         imageUrl = uploadRes.data?.imageUrl;
+        console.log(uploadRes.data)
       }
 
       const blogData = { title: newTitle, article: newArticle, imageUrl };
@@ -89,6 +90,25 @@ function AdminBlogs() {
     }
   };
 
+
+ function extractPublicId(imageUrl) {
+  if (!imageUrl) return null;
+
+  try {
+    const cleanUrl = imageUrl.split("?")[0];
+
+    const parts = cleanUrl.split("/");
+    const filename = parts[parts.length - 1]; 
+    
+    const publicId = filename.split(".")[0];
+
+    return `suitelifer/blogs/${publicId}`;
+  } catch (err) {
+    console.error("Failed to extract publicId from Cloudinary URL:", err);
+    return null;
+  }
+}
+
   // Edit blog
   const handleEditBlog = async (e) => {
     e.preventDefault();
@@ -101,14 +121,20 @@ function AdminBlogs() {
       if (editImage) {
         const imgForm = new FormData();
         imgForm.append("file", editImage);
+        // delete muna last image
+        const oldPublicId = extractPublicId(imageUrl);
+        const isDeleted = await api.delete(`api/blog/${oldPublicId}`);
+
+        console.log(isDeleted)
+
         const uploadRes = await api.post("/api/upload-image/blogs", imgForm, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         imageUrl = uploadRes.data?.imageUrl;
       }
 
-      const updatedData = { title: editTitle, article: editArticle, imageUrl };
-      await api.put(`/api/blogs/${editBlog.blogId}`, updatedData);
+      const updatedData = { blogId: editBlog.blogId, title: editTitle, article: editArticle, imageUrl };
+      await api.put('/api/blogs', updatedData);
 
       setIsEditing(false);
       setEditBlog(null);
@@ -125,10 +151,19 @@ function AdminBlogs() {
   };
 
   // Delete blog
-  const handleDeleteBlog = async (blogId) => {
+  const handleDeleteBlog = async (blogId, imageUrl) => {
     if (!window.confirm("Are you sure you want to delete this blog?")) return;
     try {
+      console.log('from front', blogId)
+
+      const oldPublicId = extractPublicId(imageUrl);
+
+      // Delete first the photo
+      const isDeleted = await api.delete(`api/blog/${oldPublicId}`);
+      console.log(isDeleted)
+
       await api.delete(`/api/blogs/${blogId}`);
+
       fetchBlogs();
     } catch (error) {
       console.error("Failed to delete blog:", error);
@@ -193,7 +228,7 @@ const columnDefs = useMemo(
             <Pencil size={18} />
           </button>
           <button
-            onClick={() => handleDeleteBlog(params.data.blogId)}
+            onClick={() => handleDeleteBlog(params.data.blogId, params.data.imageUrl)}
             className="text-red-600 hover:text-red-800"
           >
             <Trash2 size={18} />
