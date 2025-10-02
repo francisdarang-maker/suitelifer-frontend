@@ -19,7 +19,7 @@ const BlogHeader = ({month, year}) => {
   }
 
   return (
-    <header className="flex flex-col">
+    <header className="flex flex-col mt-10">
       <div className="flex items-center justify-end">
         <div className="size-[1.3vh] bg-primary rounded-full"></div>
         <div className="w-[30%] h-[0.25vh] bg-primary"></div>

@@ -117,15 +117,17 @@ function AdminBlogs() {
     try {
       setIsSubmitting(true);
 
-      let imageUrl = editBlog.imageUrl;
+      let imageUrl = null;
       if (editImage) {
         const imgForm = new FormData();
         imgForm.append("file", editImage);
-        // delete muna last image
-        const oldPublicId = extractPublicId(imageUrl);
-        const isDeleted = await api.delete(`api/blog/${oldPublicId}`);
 
-        console.log(isDeleted)
+        console.log(imageUrl)
+        const oldPublicId = extractPublicId(editBlog.imageUrl);
+
+        if(oldPublicId !== null){
+          await api.delete(`api/blog/${oldPublicId}`);
+        }
 
         const uploadRes = await api.post("/api/upload-image/blogs", imgForm, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -133,8 +135,14 @@ function AdminBlogs() {
         imageUrl = uploadRes.data?.imageUrl;
       }
 
-      const updatedData = { blogId: editBlog.blogId, title: editTitle, article: editArticle, imageUrl };
-      await api.put('/api/blogs', updatedData);
+      const updatedData = {
+        blogId: editBlog.blogId,
+        title: editTitle,
+        article: editArticle,
+        section: editSection,
+        imageUrl: imageUrl
+      };
+      await api.put("/api/blogs", updatedData);
 
       setIsEditing(false);
       setEditBlog(null);
@@ -156,11 +164,10 @@ function AdminBlogs() {
     try {
       console.log('from front', blogId)
 
-      const oldPublicId = extractPublicId(imageUrl);
-
-      // Delete first the photo
-      const isDeleted = await api.delete(`api/blog/${oldPublicId}`);
-      console.log(isDeleted)
+      if(imageUrl){
+        const oldPublicId = extractPublicId(imageUrl);
+        await api.delete(`api/blog/${oldPublicId}`);
+      }
 
       await api.delete(`/api/blogs/${blogId}`);
 
