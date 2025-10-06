@@ -1,9 +1,26 @@
 import React from "react";
 import eventColors from "../../constants/eventColor";
 
-const EventFilter = ({ activeFilters, toggleFilter, toggleAllFilters }) => {
+const EventFilter = ({
+  activeFilters,
+  toggleFilter,
+  toggleAllFilters,
+  onDragStart,
+  onDragEnd,
+  draggedCategory,
+}) => {
   const activeCount = Object.values(activeFilters).filter(Boolean).length;
   const allActive = activeCount === Object.keys(eventColors).length;
+
+  const handleDragStart = (e, category) => {
+    e.dataTransfer.effectAllowed = "copy";
+    e.dataTransfer.setData("text/plain", category);
+    onDragStart(category);
+  };
+
+  const handleDragEnd = () => {
+    onDragEnd();
+  };
 
   return (
     <div className="mt-6 pt-4 border-t border-gray-200">
@@ -26,21 +43,30 @@ const EventFilter = ({ activeFilters, toggleFilter, toggleAllFilters }) => {
             Filter Events ({activeCount}/{Object.keys(eventColors).length})
           </h3>
         </div>
-
-        <button
-          onClick={toggleAllFilters}
-          className="text-sm font-medium text-cyan-600 hover:text-cyan-700 transition-colors"
-        >
-          {allActive ? "Deselect All" : "Select All"}
-        </button>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-gray-500 hidden sm:inline">
+            💡 Drag categories to calendar
+          </span>
+          <button
+            onClick={toggleAllFilters}
+            className="text-sm font-medium text-cyan-600 hover:text-cyan-700 transition-colors"
+          >
+            {allActive ? "Deselect All" : "Select All"}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
         {Object.entries(eventColors).map(([key, { bg, label, glow }]) => {
           const isActive = activeFilters[key];
+          const isDragging = draggedCategory === key;
+
           return (
-            <button
+            <div
               key={key}
+              draggable={isActive}
+              onDragStart={(e) => handleDragStart(e, key)}
+              onDragEnd={handleDragEnd}
               onClick={() => toggleFilter(key)}
               className={`
                 relative group
@@ -48,11 +74,11 @@ const EventFilter = ({ activeFilters, toggleFilter, toggleAllFilters }) => {
                 transition-all duration-300
                 ${
                   isActive
-                    ? `bg-gradient-to-r ${bg} text-white shadow-md hover:shadow-lg scale-100`
-                    : "bg-gray-100 text-gray-400 hover:bg-gray-200 scale-95 opacity-50"
+                    ? `bg-gradient-to-r ${bg} text-white shadow-md hover:shadow-lg scale-100 cursor-grab active:cursor-grabbing`
+                    : "bg-gray-100 text-gray-400 hover:bg-gray-200 scale-95 opacity-50 cursor-pointer"
                 }
+                ${isDragging ? "opacity-50 scale-90" : ""}
                 hover:scale-105
-                cursor-pointer
                 border-2
                 ${isActive ? "border-transparent" : "border-gray-300"}
               `}
@@ -62,17 +88,34 @@ const EventFilter = ({ activeFilters, toggleFilter, toggleAllFilters }) => {
             >
               <span className="relative z-10 flex items-center gap-2">
                 {isActive ? (
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <>
+                    <svg
+                      className="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {!isDragging && (
+                      <svg
+                        className="w-3 h-3 opacity-70"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                        />
+                      </svg>
+                    )}
+                  </>
                 ) : (
                   <svg
                     className="w-4 h-4"
@@ -90,7 +133,19 @@ const EventFilter = ({ activeFilters, toggleFilter, toggleAllFilters }) => {
                 )}
                 {label}
               </span>
-            </button>
+
+              {/* Draggable indicator tooltip */}
+              {isActive && !isDragging && (
+                <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                    Drag to calendar
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-px">
+                      <div className="border-4 border-transparent border-t-gray-900"></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

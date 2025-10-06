@@ -2,77 +2,60 @@ import React, { useState, useEffect } from "react";
 import { Modal, TextField, Typography, Box } from "@mui/material";
 import EventCalendar from "../../components/admin/EventCalendar";
 import ContentButtons from "../../components/admin/ContentButtons";
-import ComingSoon from "./ComingSoon";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import api from "../../utils/axios";
 import { useStore } from "../../store/authStore";
 import toast from "react-hot-toast";
 import moment from "moment-timezone";
 
+const CATEGORY_COLORS = {
+  party: "#ec4899",
+  launchpod: "#3b82f6",
+  holiday: "#22c55e",
+  payroll: "#f97316",
+  meeting: "#EDE9FE",
+  others: "#0097b2",
+};
+
+const DEFAULT_EVENT = {
+  eventId: null,
+  title: "",
+  category: "others",
+  start: new Date(),
+  end: new Date(new Date().getTime() + 60 * 60 * 1000),
+  description: "",
+  gdriveLink: "",
+};
+
+const GDRIVE_REGEX =
+  /^(https:\/\/drive\.google\.com\/(file\/d\/|drive\/folders\/)[a-zA-Z0-9_-]+\/?.*)$/;
+
 const AdminEvents = () => {
   const user = useStore((state) => state.user);
-
   const [events, setEvents] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEventDetailsModalOpen, setIsEventDetailsModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [eventDetails, setEventDetails] = useState(DEFAULT_EVENT);
   const [gdriveError, setGdriveError] = useState("");
-
-  const defaultEventDetails = {
-    eventId: null,
-    title: "",
-    category: "others",
-    start: new Date(),
-    end: new Date(new Date().getTime() + 60 * 60 * 1000),
-    description: "",
-    gdriveLink: "",
-  };
-
-  const [eventDetails, setEventDetails] = useState(defaultEventDetails);
   const [dataUpdated, setDataUpdated] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const categoryColors = {
-    party: "#ec4899",
-    launchpod: "#3b82f6",
-    holiday: "#22c55e",
-    payroll: "#f97316",
-    meeting: "#EDE9FE",
-    others: "#0097b2",
-  };
-
-  const handleEventChange = (e, isDate) => {
-    const { name, value } = e.target;
-
-    setEventDetails((prevDetails) => ({
-      ...prevDetails,
-      [name]: isDate ? new Date(value) : value,
-    }));
-
-    if (name === "gdriveLink") {
-      if (value && !validateGdriveLink(value)) {
-        setGdriveError("Invalid Google Drive link");
-      } else {
-        setGdriveError("");
-      }
-    }
-  };
+  useEffect(() => {
+    fetchEvents();
+  }, [dataUpdated]);
 
   const fetchEvents = async () => {
     try {
       const localTimeZone = moment.tz.guess();
-      console.log("Device TimeZone:", localTimeZone);
-
       const response = await api.get("/api/events");
-      const rawEvents = response.data.events;
 
-      const adjustedEvents = rawEvents.map((event) => {
-        return {
-          ...event,
-          start: moment(event.start).utc(true).tz(localTimeZone).toDate(),
-          end: moment(event.end).utc(true).tz(localTimeZone).toDate(),
-        };
-      });
+      const adjustedEvents = response.data.events.map((event) => ({
+        ...event,
+        start: moment(event.start).utc(true).tz(localTimeZone).toDate(),
+        end: moment(event.end).utc(true).tz(localTimeZone).toDate(),
+      }));
 
       setEvents(adjustedEvents);
     } catch (err) {
@@ -80,18 +63,29 @@ const AdminEvents = () => {
     }
   };
 
-  useEffect(() => {
-    fetchEvents();
-  }, [dataUpdated]);
+  const handleEventChange = (e, isDate) => {
+    const { name, value } = e.target;
+    setEventDetails((prev) => ({
+      ...prev,
+      [name]: isDate ? new Date(value) : value,
+    }));
 
-  const handleSelectSlot = ({ start }) => {
+    if (name === "gdriveLink") {
+      setGdriveError(
+        value && !GDRIVE_REGEX.test(value) ? "Invalid Google Drive link" : ""
+      );
+    }
+  };
+
+  const handleSelectSlot = ({ start, category }) => {
     const eventStart = new Date(start);
     const eventEnd = new Date(eventStart.getTime() + 60 * 60 * 1000);
 
     setEventDetails({
-      ...defaultEventDetails,
+      ...DEFAULT_EVENT,
       start: eventStart,
       end: eventEnd,
+      category: category || "others",
     });
     setIsEditing(false);
     setIsAddModalOpen(true);
@@ -104,23 +98,19 @@ const AdminEvents = () => {
     }
 
     try {
-      const eventPayload = {
+      const payload = {
         ...eventDetails,
         userId: user.id,
         start: moment(eventDetails.start).utc().format("YYYY-MM-DD HH:mm:ss"),
         end: moment(eventDetails.end).utc().format("YYYY-MM-DD HH:mm:ss"),
-        gdrive_link: eventDetails.gdriveLink, // Map camelCase to snake_case for backend
+        gdrive_link: eventDetails.gdriveLink,
       };
+      delete payload.gdriveLink;
 
-      // Remove the camelCase version to avoid confusion
-      delete eventPayload.gdriveLink;
-
-      let response;
-      if (!eventDetails.eventId) {
-        response = await api.post("/api/events/", eventPayload);
-      } else {
-        response = await api.put(`/api/events/`, eventPayload);
-      }
+      const response = await api[eventDetails.eventId ? "put" : "post"](
+        "/api/events/",
+        payload
+      );
 
       if (response.data.success) {
         toast.success(response.data.message);
@@ -128,22 +118,11 @@ const AdminEvents = () => {
 
       setDataUpdated(!dataUpdated);
     } catch (error) {
-      toast.error(
-        `Encountered a problem while ${
-          eventDetails.eventId ? "updating" : "adding"
-        } the event.`
-      );
+      toast.error(`Failed to ${eventDetails.eventId ? "update" : "add"} event`);
       console.error("Error saving event:", error);
     } finally {
-      setIsAddModalOpen(false);
-      setEventDetails(defaultEventDetails);
-      setGdriveError("");
+      closeAddModal();
     }
-  };
-
-  const handleEventClick = (event) => {
-    setSelectedEvent(event);
-    setIsEventDetailsModalOpen(true);
   };
 
   const handleEditEvent = () => {
@@ -154,17 +133,57 @@ const AdminEvents = () => {
       start: selectedEvent.start,
       end: selectedEvent.end,
       description: selectedEvent.description || "",
-      gdriveLink: selectedEvent.gdriveLink || selectedEvent.gdrive_link || "", // Check both camelCase and snake_case
+      gdriveLink: selectedEvent.gdriveLink || selectedEvent.gdrive_link || "",
     });
     setIsEditing(true);
-    setIsEventDetailsModalOpen(false);
+    setIsDetailsModalOpen(false);
     setIsAddModalOpen(true);
   };
 
-  const validateGdriveLink = (link) => {
-    const regex =
-      /^(https:\/\/drive\.google\.com\/(file\/d\/|drive\/folders\/)[a-zA-Z0-9_-]+\/?.*)$/;
-    return regex.test(link);
+  const handleDeleteEvent = async () => {
+    if (!selectedEvent || !selectedEvent.eventId) {
+      toast.error("No event selected for deletion");
+      return;
+    }
+
+    try {
+      const response = await api.delete("/api/events", {
+        data: { eventId: selectedEvent.eventId },
+      });
+
+      if (response.data.success) {
+        toast.success("Event deleted successfully");
+        setDataUpdated((prev) => !prev);
+      } else {
+        toast.error("Failed to delete event");
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      toast.error("Failed to delete event");
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setIsDetailsModalOpen(false);
+    }
+  };
+
+  const openDeleteDialog = () => {
+    setIsDetailsModalOpen(false);
+    setTimeout(() => {
+      setIsDeleteDialogOpen(true);
+    }, 200);
+  };
+
+  const closeAddModal = () => {
+    setIsAddModalOpen(false);
+    setEventDetails(DEFAULT_EVENT);
+    setGdriveError("");
+  };
+
+  const openAddModal = () => {
+    setEventDetails(DEFAULT_EVENT);
+    setIsEditing(false);
+    setGdriveError("");
+    setIsAddModalOpen(true);
   };
 
   return (
@@ -173,103 +192,38 @@ const AdminEvents = () => {
         <ContentButtons
           icon={<PlusCircleIcon className="size-5" />}
           text="Add Event"
-          handleClick={() => {
-            setEventDetails(defaultEventDetails);
-            setIsEditing(false);
-            setGdriveError("");
-            setIsAddModalOpen(true);
-          }}
+          handleClick={openAddModal}
         />
       </div>
+
       <div className="flex gap-8 mt-4 h-full">
         <div className="bg-white border-gray-200 rounded-md p-4 w-full">
           <EventCalendar
             events={events}
             onSelectSlot={handleSelectSlot}
-            onSelectEvent={handleEventClick}
+            onSelectEvent={(event) => {
+              setSelectedEvent(event);
+              setIsDetailsModalOpen(true);
+            }}
           />
         </div>
       </div>
 
-      {/* Add/Edit Event Modal */}
-      <Modal
-        open={isAddModalOpen}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          setEventDetails(defaultEventDetails);
-          setGdriveError("");
-        }}
-        slotProps={{
-          backdrop: {
-            sx: {
-              backgroundColor: "rgba(0,0,0,0.2)",
-              backdropFilter: "blur(4px)",
-            },
-          },
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow:
-              "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-            width: { xs: "95%", sm: "90%", md: "500px" },
-            maxWidth: "500px",
-            maxHeight: { xs: "90vh", sm: "85vh" },
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {/* Header */}
-          <Box
-            sx={{
-              background: "linear-gradient(135deg, #2e97b2 0%, #1c5b6b 100%)",
-              px: { xs: 3, sm: 4 },
-              py: 3,
-              color: "white",
-              position: "relative",
-            }}
-          >
-            <Typography
-              variant="h5"
-              sx={{
-                fontWeight: 700,
-                fontSize: { xs: "1.25rem", sm: "1.5rem" },
-                textAlign: "center",
-              }}
-            >
+      {/* Add/Edit Modal */}
+      <Modal open={isAddModalOpen} onClose={closeAddModal}>
+        <Box sx={modalStyle}>
+          <Box sx={headerStyle}>
+            <Typography variant="h5" sx={titleStyle}>
               {isEditing ? "Edit Event" : "Create New Event"}
             </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                textAlign: "center",
-                opacity: 0.9,
-                mt: 0.5,
-                fontSize: { xs: "0.75rem", sm: "0.875rem" },
-              }}
-            >
+            <Typography variant="body2" sx={subtitleStyle}>
               {isEditing
                 ? "Update your event details"
                 : "Fill in the details below"}
             </Typography>
           </Box>
 
-          {/* Form Content - Scrollable */}
-          <Box
-            sx={{
-              px: { xs: 3, sm: 4 },
-              py: 3,
-              overflowY: "auto",
-              flexGrow: 1,
-            }}
-          >
+          <Box sx={contentStyle}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
               <TextField
                 select
@@ -278,25 +232,20 @@ const AdminEvents = () => {
                 name="category"
                 value={eventDetails.category}
                 onChange={(e) => handleEventChange(e, false)}
-                slotProps={{
-                  select: {
-                    native: true,
-                  },
-                }}
+                slotProps={{ select: { native: true } }}
                 size="small"
               >
-                <option value="party">Party</option>
-                <option value="launchpod">Launchpod</option>
-                <option value="holiday">Holiday</option>
-                <option value="payroll">Payroll</option>
-                <option value="meeting">Meeting</option>
-                <option value="others">Others</option>
+                {Object.keys(CATEGORY_COLORS).map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </option>
+                ))}
               </TextField>
 
               <TextField
                 fullWidth
-                label="Event Title"
                 required
+                label="Event Title"
                 name="title"
                 value={eventDetails.title}
                 onChange={(e) => handleEventChange(e, false)}
@@ -356,40 +305,16 @@ const AdminEvents = () => {
                 size="small"
                 InputProps={{
                   startAdornment: (
-                    <Box
-                      sx={{
-                        mr: 1,
-                        fontSize: "1.25rem",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      📂
-                    </Box>
+                    <Box sx={{ mr: 1, fontSize: "1.25rem" }}>📂</Box>
                   ),
                 }}
               />
             </Box>
           </Box>
 
-          {/* Footer Actions */}
-          <Box
-            sx={{
-              px: { xs: 3, sm: 4 },
-              py: 2.5,
-              borderTop: "1px solid #e5e7eb",
-              display: "flex",
-              gap: 2,
-              justifyContent: "flex-end",
-              flexWrap: { xs: "wrap", sm: "nowrap" },
-            }}
-          >
+          <Box sx={footerStyle}>
             <button
-              onClick={() => {
-                setIsAddModalOpen(false);
-                setEventDetails(defaultEventDetails);
-                setGdriveError("");
-              }}
+              onClick={closeAddModal}
               className="flex-1 sm:flex-none px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
             >
               Cancel
@@ -405,48 +330,19 @@ const AdminEvents = () => {
         </Box>
       </Modal>
 
-      {/* Event Details Modal */}
+      {/* Details Modal */}
       <Modal
-        open={isEventDetailsModalOpen}
-        onClose={() => setIsEventDetailsModalOpen(false)}
-        slotProps={{
-          backdrop: {
-            sx: {
-              backgroundColor: "rgba(0,0,0,0.2)",
-              backdropFilter: "blur(4px)",
-            },
-          },
-        }}
+        open={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
       >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "white",
-            borderRadius: 2,
-            boxShadow:
-              "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-            width: { xs: "95%", sm: "90%", md: "480px" },
-            maxWidth: "480px",
-            maxHeight: { xs: "90vh", sm: "85vh" },
-            overflow: "hidden",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+        <Box sx={detailsModalStyle(CATEGORY_COLORS[selectedEvent?.category])}>
           {selectedEvent && (
             <>
-              {/* Header with Color Accent */}
               <Box
                 sx={{
+                  ...headerStyle,
                   background:
-                    categoryColors[selectedEvent?.category] || "#6B7280",
-                  px: { xs: 3, sm: 4 },
-                  py: 3,
-                  color: "white",
-                  position: "relative",
+                    CATEGORY_COLORS[selectedEvent.category] || "#6B7280",
                 }}
               >
                 <Box
@@ -475,18 +371,16 @@ const AdminEvents = () => {
                         py: 0.5,
                         borderRadius: "12px",
                         backgroundColor: "rgba(255, 255, 255, 0.25)",
-                        backdropFilter: "blur(10px)",
                         fontSize: "0.75rem",
                         fontWeight: 600,
                         textTransform: "uppercase",
-                        letterSpacing: "0.5px",
                       }}
                     >
                       {selectedEvent.category}
                     </Box>
                   </Box>
                   <button
-                    onClick={() => setIsEventDetailsModalOpen(false)}
+                    onClick={() => setIsDetailsModalOpen(false)}
                     className="text-white hover:bg-white/20 transition-colors rounded-full p-1.5 -mt-1"
                   >
                     <svg
@@ -506,238 +400,247 @@ const AdminEvents = () => {
                 </Box>
               </Box>
 
-              {/* Body - Scrollable */}
-              <Box
-                sx={{
-                  px: { xs: 3, sm: 4 },
-                  py: 3,
-                  overflowY: "auto",
-                  flexGrow: 1,
-                }}
-              >
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                  {/* Date & Time */}
-                  <Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        mb: 1,
-                      }}
-                    >
-                      <svg
-                        className="w-5 h-5 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      <Typography
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "0.875rem",
-                          color: "#374151",
-                        }}
-                      >
-                        Schedule
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        pl: 4,
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 0.5,
-                      }}
-                    >
-                      <Typography
-                        sx={{ fontSize: "0.875rem", color: "#6B7280" }}
-                      >
-                        <span className="font-medium text-gray-700">
-                          Starts:
-                        </span>{" "}
-                        {moment(selectedEvent.start).format(
-                          "MMM D, YYYY • h:mm A"
-                        )}
-                      </Typography>
-                      <Typography
-                        sx={{ fontSize: "0.875rem", color: "#6B7280" }}
-                      >
-                        <span className="font-medium text-gray-700">Ends:</span>{" "}
-                        {moment(selectedEvent.end).format(
-                          "MMM D, YYYY • h:mm A"
-                        )}
-                      </Typography>
-                    </Box>
-                  </Box>
+              <Box sx={contentStyle}>
+                <DetailSection
+                  icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  title="Schedule"
+                >
+                  <Typography sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
+                    <span className="font-medium text-gray-700">Starts:</span>{" "}
+                    {moment(selectedEvent.start).format("MMM D, YYYY • h:mm A")}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
+                    <span className="font-medium text-gray-700">Ends:</span>{" "}
+                    {moment(selectedEvent.end).format("MMM D, YYYY • h:mm A")}
+                  </Typography>
+                </DetailSection>
 
-                  {/* Description */}
-                  <Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        mb: 1,
-                      }}
+                <DetailSection
+                  icon="M4 6h16M4 12h16M4 18h7"
+                  title="Description"
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "0.875rem",
+                      color: "#6B7280",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {selectedEvent.description || (
+                      <span style={{ fontStyle: "italic", color: "#9CA3AF" }}>
+                        No description provided
+                      </span>
+                    )}
+                  </Typography>
+                </DetailSection>
+
+                <DetailSection
+                  icon="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  title="Attachments"
+                >
+                  {selectedEvent.gdriveLink || selectedEvent.gdrive_link ? (
+                    <a
+                      href={
+                        selectedEvent.gdriveLink || selectedEvent.gdrive_link
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors text-sm font-medium"
                     >
                       <svg
-                        className="w-5 h-5 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
+                        xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
+                        className="w-5 h-5"
                       >
                         <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 6h16M4 12h16M4 18h7"
+                          fill="#4285F4"
+                          d="M12 2L3.5 17h5.5l8.5-15h-5.5z"
+                        />
+                        <path fill="#34A853" d="M3.5 17L8.5 22H20L15 17H3.5z" />
+                        <path
+                          fill="#FBBC05"
+                          d="M20 22l-8.5-15h5.5L24 17l-4 5z"
                         />
                       </svg>
-                      <Typography
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "0.875rem",
-                          color: "#374151",
-                        }}
-                      >
-                        Description
-                      </Typography>
-                    </Box>
+                      Open in Drive
+                    </a>
+                  ) : (
                     <Typography
                       sx={{
-                        pl: 4,
                         fontSize: "0.875rem",
-                        color: "#6B7280",
-                        lineHeight: 1.6,
+                        color: "#9CA3AF",
+                        fontStyle: "italic",
                       }}
                     >
-                      {selectedEvent.description || (
-                        <span style={{ fontStyle: "italic", color: "#9CA3AF" }}>
-                          No description provided
-                        </span>
-                      )}
+                      No files attached
                     </Typography>
-                  </Box>
-
-                  {/* Google Drive Link */}
-                  <Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        mb: 1,
-                      }}
-                    >
-                      <svg
-                        className="w-5 h-5 text-gray-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                        />
-                      </svg>
-                      <Typography
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: "0.875rem",
-                          color: "#374151",
-                        }}
-                      >
-                        Attachments
-                      </Typography>
-                    </Box>
-                    <Box sx={{ pl: 4 }}>
-                      {selectedEvent.gdriveLink || selectedEvent.gdrive_link ? (
-                        <a
-                          href={
-                            selectedEvent.gdriveLink ||
-                            selectedEvent.gdrive_link
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors text-sm font-medium"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            className="w-5 h-5"
-                          >
-                            <path
-                              fill="#4285F4"
-                              d="M12 2L3.5 17h5.5l8.5-15h-5.5z"
-                            />
-                            <path
-                              fill="#34A853"
-                              d="M3.5 17L8.5 22H20L15 17H3.5z"
-                            />
-                            <path
-                              fill="#FBBC05"
-                              d="M20 22l-8.5-15h5.5L24 17l-4 5z"
-                            />
-                          </svg>
-                          Open in Drive
-                        </a>
-                      ) : (
-                        <Typography
-                          sx={{
-                            fontSize: "0.875rem",
-                            color: "#9CA3AF",
-                            fontStyle: "italic",
-                          }}
-                        >
-                          No files attached
-                        </Typography>
-                      )}
-                    </Box>
-                  </Box>
-                </Box>
+                  )}
+                </DetailSection>
               </Box>
 
-              {/* Footer */}
-              <Box
-                sx={{
-                  px: { xs: 3, sm: 4 },
-                  py: 2.5,
-                  borderTop: "1px solid #e5e7eb",
-                  display: "flex",
-                  gap: 2,
-                  justifyContent: "flex-end",
-                  flexWrap: { xs: "wrap", sm: "nowrap" },
-                }}
-              >
+              <Box sx={footerStyle}>
                 <button
-                  onClick={() => setIsEventDetailsModalOpen(false)}
+                  onClick={() => setIsDetailsModalOpen(false)}
                   className="flex-1 sm:flex-none px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                 >
                   Close
                 </button>
+
                 <button
                   onClick={handleEditEvent}
                   className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white rounded-lg font-medium hover:from-cyan-700 hover:to-cyan-800 transition-all shadow-md hover:shadow-lg"
                 >
                   Edit Event
                 </button>
+
+                <button
+                  onClick={openDeleteDialog}
+                  className="flex-1 sm:flex-none px-5 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all shadow-md hover:shadow-lg"
+                >
+                  Delete
+                </button>
               </Box>
             </>
           )}
         </Box>
       </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        open={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+      >
+        <Box sx={deleteDialogStyle}>
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+            Confirm Deletion
+          </Typography>
+          <Typography sx={{ color: "#6B7280", mb: 3 }}>
+            Are you sure you want to delete{" "}
+            <strong>{selectedEvent?.title || "this event"}</strong>? This action
+            cannot be undone.
+          </Typography>
+
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+            <button
+              onClick={() => setIsDeleteDialogOpen(false)}
+              className="px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteEvent}
+              className="px-5 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all shadow-md hover:shadow-lg"
+            >
+              Delete
+            </button>
+          </Box>
+        </Box>
+      </Modal>
     </div>
   );
+};
+
+const DetailSection = ({ icon, title, children }) => (
+  <Box>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+      <svg
+        className="w-5 h-5 text-gray-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d={icon}
+        />
+      </svg>
+      <Typography
+        sx={{ fontWeight: 600, fontSize: "0.875rem", color: "#374151" }}
+      >
+        {title}
+      </Typography>
+    </Box>
+    <Box sx={{ pl: 4, display: "flex", flexDirection: "column", gap: 0.5 }}>
+      {children}
+    </Box>
+  </Box>
+);
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "background.paper",
+  borderRadius: 2,
+  boxShadow:
+    "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+  width: { xs: "95%", sm: "90%", md: "500px" },
+  maxWidth: "500px",
+  maxHeight: { xs: "90vh", sm: "85vh" },
+  overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
+};
+
+const detailsModalStyle = (color) => ({
+  ...modalStyle,
+  width: { xs: "95%", sm: "90%", md: "480px" },
+  maxWidth: "480px",
+});
+
+const headerStyle = {
+  background: "linear-gradient(135deg, #2e97b2 0%, #25798e 100%)",
+  px: { xs: 3, sm: 4 },
+  py: 3,
+  color: "white",
+};
+
+const titleStyle = {
+  fontWeight: 700,
+  fontSize: { xs: "1.25rem", sm: "1.5rem" },
+  textAlign: "center",
+};
+
+const subtitleStyle = {
+  textAlign: "center",
+  opacity: 0.9,
+  mt: 0.5,
+  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+};
+
+const contentStyle = {
+  px: { xs: 3, sm: 4 },
+  py: 3,
+  overflowY: "auto",
+  flexGrow: 1,
+};
+
+const footerStyle = {
+  px: { xs: 3, sm: 4 },
+  py: 2.5,
+  borderTop: "1px solid #e5e7eb",
+  display: "flex",
+  gap: 2,
+  justifyContent: "flex-end",
+  flexWrap: { xs: "wrap", sm: "nowrap" },
+};
+
+const deleteDialogStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "white",
+  borderRadius: 2,
+  boxShadow:
+    "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+  width: { xs: "95%", sm: "90%", md: "480px" },
+  maxWidth: "480px",
+  p: 4,
+  zIndex: 2000,
 };
 
 export default AdminEvents;
