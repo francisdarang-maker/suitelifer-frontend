@@ -1,251 +1,150 @@
 import NewsletterHeader from "../NewsletterHeader";
 import LargeViewDesign01 from "../LargeViewDesign01";
 import ArticleViewDesign from "../ArticleViewDesign";
-import ColoredArticleViewDesign from "../ColoredArticleViewDesign";
 import ReadMoreBtn from "../../buttons/ReadMoreBtn";
-import NewsletterArticles from "../NewsletterArticles";
-import Divider from "../Divider";
-import { useState, useEffect } from "react";
-import api from "../../../utils/axios";
 import { readingTime } from "reading-time-estimator";
 import { removeHtmlTags } from "../../../utils/removeHTMLTags";
 import formatTimestamp from "../../../utils/formatTimestamp";
-import TwoCirclesLoader from "../../../assets/loaders/TwoCirclesLoader";
 import Skeleton from "react-loading-skeleton";
-import newsletterStore from "../../../store/stores/newsletterStore";
 import MotionUp from "../../animated/MotionUp";
-import ArticlePreviewWithHyphenation from "../ArticlePreviewWithHyphenation";
 import NewsLetterComingSoon from "../NewsLetterComingSoon";
 
+//
+
+import {
+  Fallback_article,
+  Coming_soon_title,
+  Reading_speed,
+} from "../Constants";
+
+import useNewsletterData from "../hooks/useNewsletterData";
+//
 const NewsletterDesign03 = () => {
-  const { newsletterContent, setNewsletterContent, isLoading, setIsLoading } =
-    newsletterStore();
+  const { newsletterContent, isLoading } = useNewsletterData();
 
-  useEffect(() => {
-    const fetchIssueAndArticles = async () => {
-      try {
-        const issueRes = await api.get("api/issues/current");
-        const current = issueRes.data?.currentIssue ?? null;
+  const getArticleBySection = (articles, sectionNumber) =>
+    articles.find((article) => article.section === sectionNumber) ||
+    Fallback_article;
 
-        // console.log("Current Issue:", current);
+  const isValidSection = (section) =>
+    (section?.title ?? "").toLowerCase() !== Coming_soon_title;
 
-        if (!current) {
-          setNewsletterContent({ articles: [], currentIssue: null });
-          return;
-        }
+  const formatSectionProps = (section) => ({
+    ...section,
+    image: section.images?.[0],
+    readTime: readingTime(removeHtmlTags(section.article ?? ""), Reading_speed)
+      .text,
+    datePublished: formatTimestamp(section.createdAt).fullDate,
+    author: section.pseudonym,
+  });
 
-        const articlesRes = await api.get(
-          `/api/newsletter?issueId=${current.issueId}`
-        );
+  const RenderSection = ({ section, clamp }) => {
+    if (!section || (section?.title ?? "").toLowerCase() === Coming_soon_title)
+      return null;
 
-        setNewsletterContent({
-          articles: articlesRes.data?.newsletters ?? [],
-          currentIssue: current,
-        });
-      } catch (error) {
-        console.error("Error fetching issue/articles:", error.message);
-        setNewsletterContent({ articles: [], currentIssue: null }); // fallback
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchIssueAndArticles();
-  }, [setNewsletterContent, setIsLoading]);
-
-  const getArticleBySection = (articles, sectionNumber) => {
     return (
-      articles.find((article) => article.section === sectionNumber) || {
-        title: "Coming Soon",
-        article: "This section is being prepared. Stay tuned!",
-        pseudonym: "FullSuite Team",
-        createdAt: new Date().toISOString(),
-        newsletterId: "",
-        images: [],
-      }
+      <MotionUp>
+        <ArticleViewDesign {...formatSectionProps(section)} lineclamp={clamp} />
+        <div className="mt-5">
+          <ReadMoreBtn title={section.title} id={section.newsletterId} />
+        </div>
+      </MotionUp>
+    );
+  };
+
+  const RenderMainSection = ({ section }) => {
+    if (!isValidSection(section)) return null;
+
+    return (
+      <div className="grid gap-10 mb-12">
+        <MotionUp>
+          <div>
+            <LargeViewDesign01
+              {...formatSectionProps(section)}
+              article={section.article}
+            />
+            <div className="mt-5" />
+            <ReadMoreBtn title={section.title} id={section.newsletterId} />
+          </div>
+        </MotionUp>
+      </div>
     );
   };
 
   const articles = newsletterContent.articles || [];
   const currentIssue = newsletterContent.currentIssue || {};
 
-  const section1 = getArticleBySection(articles, 1);
-  const section2 = getArticleBySection(articles, 2);
-  const section3 = getArticleBySection(articles, 3);
+  const sections = [1, 2, 3].map((n) => getArticleBySection(articles, n));
+  const [section1, section2, section3] = sections;
 
-  const titles = [section1?.title, section2?.title, section3?.title].filter(
-    Boolean
-  );
+  const showContent =
+    newsletterContent.currentIssue?.assigned >= 3 &&
+    sections.some(isValidSection);
 
-  const allComingSoon = titles.every((title) => title === "Coming Soon");
+  if (isLoading) {
+    return (
+      <div>
+        <NewsletterHeader />
+        <div className="pb-[4%]"></div>
+        <section className="px-[5%] md:px-[10%]">
+          {/* Loading skeleton for 3-article layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
+            {/* Main featured article */}
+            <div className="lg:col-span-2">
+              <Skeleton className="w-full aspect-video mb-4" />
+              <Skeleton className="h-8 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-1/2 mb-1" />
+              <Skeleton className="h-4 w-full mb-4" />
+              <Skeleton className="h-10 w-24 mb-6" />
+            </div>
+
+            {/* Secondary articles */}
+            <div>
+              <Skeleton className="w-full aspect-[4/3] mb-4" />
+              <Skeleton className="h-6 w-2/3 mb-2" />
+              <Skeleton className="h-4 w-full mb-1" />
+              <Skeleton className="h-4 w-full mb-1" />
+              <Skeleton className="h-10 w-20 mt-4" />
+            </div>
+
+            <div>
+              <Skeleton className="w-full aspect-[4/3] mb-4" />
+              <Skeleton className="h-6 w-2/3 mb-2" />
+              <Skeleton className="h-4 w-full mb-1" />
+              <Skeleton className="h-4 w-full mb-1" />
+              <Skeleton className="h-10 w-20 mt-4" />
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  if (!showContent) return <NewsLetterComingSoon />;
 
   return (
-    <div>
-      {isLoading ? (
-        <div>
-          <NewsletterHeader />
-          <div className="pb-[4%]"></div>
-          <section className="px-[5%] md:px-[10%]">
-            {/* Loading skeleton for 4-article layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-10">
-              {/* Main featured article */}
-              <div className="lg:col-span-2">
-                <Skeleton className="w-full aspect-video mb-4" />
-                <Skeleton className="h-8 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-1/2 mb-1" />
-                <Skeleton className="h-4 w-full mb-4" />
-                <Skeleton className="h-10 w-24 mb-6" />
-              </div>
+    <section>
+      <MotionUp>
+        <NewsletterHeader month={currentIssue.month} year={currentIssue.year} />
+      </MotionUp>
+      <div className="pb-[4%]" />
+      <section className="px-[5%] md:px-[10%] xl:w-[80%] xl:mx-auto">
+        {/* Section 1 - Main */}
+        {isValidSection(section1) && <RenderMainSection section={section1} />}
 
-              {/* Secondary articles */}
-              <div>
-                <Skeleton className="w-full aspect-[4/3] mb-4" />
-                <Skeleton className="h-6 w-2/3 mb-2" />
-                <Skeleton className="h-4 w-full mb-1" />
-                <Skeleton className="h-4 w-full mb-1" />
-                <Skeleton className="h-10 w-20 mt-4" />
-              </div>
-
-              <div>
-                <Skeleton className="w-full aspect-[4/3] mb-4" />
-                <Skeleton className="h-6 w-2/3 mb-2" />
-                <Skeleton className="h-4 w-full mb-1" />
-                <Skeleton className="h-4 w-full mb-1" />
-                <Skeleton className="h-10 w-20 mt-4" />
-              </div>
-            </div>
-
-            {/* Fourth article in colored section */}
-            <div className="w-full bg-primary/10 rounded-lg p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                <Skeleton className="w-full aspect-square rounded-lg" />
-                <div className="md:col-span-2">
-                  <Skeleton className="h-6 w-2/3 mb-2" />
-                  <Skeleton className="h-4 w-full mb-1" />
-                  <Skeleton className="h-4 w-full mb-1" />
-                  <Skeleton className="h-10 w-20 mt-4" />
-                </div>
-              </div>
-            </div>
-          </section>
+        {/* Section 2 & 3 - Grid */}
+        <div
+          className={`gap-10 ${
+            isValidSection(section2) && isValidSection(section3)
+              ? "grid xl:grid-cols-2"
+              : ""
+          }`}
+        >
+          <RenderSection section={section2} clamp="line-clamp-6" />
+          <RenderSection section={section3} clamp="line-clamp-6" />
         </div>
-      ) : newsletterContent.currentIssue?.assigned >= 3 && !allComingSoon ? (
-        <section>
-          <MotionUp>
-            <NewsletterHeader
-              month={currentIssue.month}
-              year={currentIssue.year}
-            />
-          </MotionUp>
-          <div className="pb-[4%]"></div>
-
-          {/* Main Content Grid  */}
-          <section className="px-[5%] md:px-[10%] xl:w-[80%] xl:mx-auto">
-            <div className="grid  gap-10 mb-12 ">
-              {/* Featured Article - Full Width */}
-              {section1.title !== "Coming Soon" && (
-                <MotionUp>
-                  <div>
-                    <LargeViewDesign01
-                      image={section1.images[0]}
-                      title={section1.title}
-                      author={section1.pseudonym}
-                      readTime={
-                        readingTime(
-                          removeHtmlTags(section1.article ?? "article"),
-                          238
-                        ).text
-                      }
-                      datePublished={
-                        formatTimestamp(section1.createdAt).fullDate
-                      }
-                      article={section1.article}
-                    />
-                    <div className="mt-5"></div>
-                    <ReadMoreBtn
-                      href={""}
-                      title={section1.title}
-                      id={section1.newsletterId}
-                    />
-                  </div>
-                </MotionUp>
-              )}
-            </div>
-
-            {/* Second Article */}
-            <div
-              className={`gap-10 ${
-                section2.title !== "Coming Soon" &&
-                section3.title !== "Coming Soon"
-                  ? "grid xl:grid-cols-2"
-                  : ""
-              }`}
-            >
-              {section2.title !== "Coming Soon" && (
-                <MotionUp>
-                  <div>
-                    <ArticleViewDesign
-                      title={section2.title}
-                      author={section2.pseudonym}
-                      image={section2.images[0]}
-                      article={section2.article}
-                      lineclamp="line-clamp-6"
-                      readTime={
-                        readingTime(
-                          removeHtmlTags(section2.article ?? "article"),
-                          238
-                        ).text
-                      }
-                      datePublished={
-                        formatTimestamp(section2.createdAt).fullDate
-                      }
-                    />
-                    <div className="mt-5" />
-                    <ReadMoreBtn
-                      href=""
-                      title={section2.title}
-                      id={section2.newsletterId}
-                    />
-                  </div>
-                </MotionUp>
-              )}
-              {/* Third Section */}
-              {section3.title !== "Coming Soon" && (
-                <MotionUp>
-                  <div>
-                    <ArticleViewDesign
-                      title={section3.title}
-                      author={section3.pseudonym}
-                      image={section3.images[0]}
-                      article={section3.article}
-                      lineclamp="line-clamp-6"
-                      readTime={
-                        readingTime(
-                          removeHtmlTags(section3.article ?? "article"),
-                          238
-                        ).text
-                      }
-                      datePublished={
-                        formatTimestamp(section3.createdAt).fullDate
-                      }
-                    />
-                    <div className="mt-5" />
-                    <ReadMoreBtn
-                      href=""
-                      title={section3.title}
-                      id={section3.newsletterId}
-                    />
-                  </div>
-                </MotionUp>
-              )}
-            </div>
-          </section>
-        </section>
-      ) : (
-        <NewsLetterComingSoon />
-      )}
-    </div>
+      </section>
+    </section>
   );
 };
-
 export default NewsletterDesign03;
