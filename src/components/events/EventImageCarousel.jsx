@@ -15,7 +15,7 @@ export default function EventImageCarousel({ isLoading, hasLink, images }) {
     speed: 600,
     arrows: false,
     autoplay: images.length > 1,
-    autoplaySpeed: 3500,
+    autoplaySpeed: 2000,
     slidesToShow: 1,
     slidesToScroll: 1,
     fade: true,
