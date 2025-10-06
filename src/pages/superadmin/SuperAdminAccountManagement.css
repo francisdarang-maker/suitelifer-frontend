@@ -1,0 +1,61 @@
+.ag-theme-quartz {
+  --ag-header-background-color: transparent;
+  --ag-header-foreground-color: #6b7280;
+  --ag-border-color: #f3f4f6;
+  --ag-row-hover-color: #faf5ff;
+  --ag-background-color: transparent;
+  --ag-odd-row-background-color: transparent;
+  --ag-header-height: 48px;
+  --ag-font-size: 14px;
+}
+
+.ag-header-cell-label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ag-header {
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.ag-row {
+  border: none !important;
+  border-radius: 12px;
+  margin: 4px 0;
+  transition: all 0.2s;
+}
+
+.ag-row:hover {
+  background-color: #faf5ff !important;
+  transform: translateX(4px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.superadmin-current-user-row {
+  background: linear-gradient(to right, #faf5ff, #e8f3ff) !important;
+  border-left: 4px solid #0097B2 !important;
+  box-shadow: 0 2px 4px rgba(168, 85, 247, 0.1);
+}
+
+.ag-cell {
+  display: flex !important;
+  align-items: center !important;
+  border: none !important;
+}
+
+.ag-paging-panel {
+  border-top: 2px solid #f3f4f6;
+  padding: 1rem;
+  background: linear-gradient(to right, #fafafa, #ffffff);
+}
+
+.ag-paging-button {
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.ag-paging-button:hover {
+  background-color: #f3f4f6;
+}

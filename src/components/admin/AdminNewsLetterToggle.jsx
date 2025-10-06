@@ -26,6 +26,8 @@ import {
   PencilIcon,
   TrashIcon,
   ExclamationTriangleIcon,
+  PlusCircleIcon,
+  NewspaperIcon,
 } from "@heroicons/react/24/outline";
 import emptyIllustration from "../../assets/images/empty-illustration.svg";
 import {
@@ -39,11 +41,10 @@ import {
   ClickAwayListener,
 } from "@mui/material";
 import YearFilterDropDown from "./NewsletterFilter";
-import React, { useState, useEffect, useRef, useMemo, use } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import api from "../../utils/axios";
-import { set } from "react-hook-form";
 import formatTimestamp from "../../utils/formatTimestamp";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles, Calendar, FileText, Notebook } from "lucide-react";
 import ActionButtons from "../buttons/ActionButtons";
 import { useStore } from "../../store/authStore";
 import toast from "react-hot-toast";
@@ -54,33 +55,26 @@ import { useAddAuditLog } from "./UseAddAuditLog";
 import ConfirmationDialog from "./ConfirmationDialog";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
+
 function AdminNewsLetterToggle() {
   const addLog = useAddAuditLog();
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isUnPublishModalOpen, setIsUnPublishModalOpen] = useState(false);
-  const [sectionsNewsletterByMonth, setSectionsNewsletterByMonth] = useState(
-    []
-  );
+  const [sectionsNewsletterByMonth, setSectionsNewsletterByMonth] = useState([]);
   const user = useStore((state) => state.user);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
   const [selectedMonthlyIssue, setSelectedMonthlyIssue] = useState(null);
-
   const [updateTrigger, setUpdateTrigger] = useState(Date.now());
-
   const [currentPublishedIssue, setCurrentPublishedIssue] = useState({});
   const [oldestIssue, setOldestIssue] = useState({});
-
   const [issues, setIssues] = useState([]);
   const [isNewestFirst, setIsNewestFirst] = useState(true);
-
   const [newslettersByMonth, setNewslettersByMonth] = useState([]);
   const [openIssueDialog, setOpenIssueDialog] = useState(false);
   const [isOpenArticleForm, setIsOpenArticleForm] = useState(false);
   const [prevClickedIssue, setPrevClickedIssue] = useState({});
-
-  const [openSuiteletterLayoutInfoDialog, setOpenSuiteletterLayoutInfoDialog] =
-    useState(false);
+  const [openSuiteletterLayoutInfoDialog, setOpenSuiteletterLayoutInfoDialog] = useState(false);
 
   const defaultArticleDetails = {
     newsletterId: "",
@@ -96,19 +90,10 @@ function AdminNewsLetterToggle() {
   const currentMonth = currentDate.getMonth() + 1;
 
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
+  
   const [selectedYear, setSelectedYear] = useState(currentYear);
 
   let initMonth = currentMonth + 1;
@@ -134,23 +119,16 @@ function AdminNewsLetterToggle() {
       if (currentIssue.year === currentYear + 1) return [1];
       return [];
     }
-
     if (currentIssue.year === currentYear) {
-      return Array.from(
-        { length: 12 - currentMonth + 1 },
-        (_, i) => currentMonth + i
-      );
+      return Array.from({ length: 12 - currentMonth + 1 }, (_, i) => currentMonth + i);
     }
-
     if (currentIssue.year > currentYear) {
       return Array.from({ length: 12 }, (_, i) => i + 1);
     }
-
     return [];
   }, [currentIssue.year, currentMonth, currentYear]);
 
   const handleSaveIssue = async () => {
-    console.log("Saving issue:", currentIssue);
     if (!currentIssue.month || !currentIssue.year) {
       toast.error("Please select both month and year.");
       return;
@@ -163,14 +141,7 @@ function AdminNewsLetterToggle() {
       toast.error("You cannot select a year in the past.");
       return;
     }
-    // if (
-    //   currentIssue.month === currentMonth &&
-    //   currentIssue.year === currentYear
-    // ) {
-    //   toast.error("You cannot select the current month.");
-    //   return;
-    // }
-    if (currentIssue.month > 12) {
+    if (currentIssue.month > 12 || currentIssue.month < 1) {
       toast.error("Invalid month selected.");
       return;
     }
@@ -178,40 +149,23 @@ function AdminNewsLetterToggle() {
       toast.error("Invalid year selected.");
       return;
     }
-    if (currentIssue.month < 1) {
-      toast.error("Invalid month selected.");
-      return;
-    }
-    const newIssue = {
-      ...currentIssue,
-      userId: user.id,
-    };
-    let response;
+
+    const newIssue = { ...currentIssue, userId: user.id };
+    
     try {
-      console.log("Sending to backend:", newIssue);
-
-      response = await api.post("/api/issues", newIssue);
-      console.log(response.data);
-
+      const response = await api.post("/api/issues", newIssue);
       if (response.data?.success) {
         toast.success(response.data.message);
-
         addLog({
           action: "CREATE",
-          description: `New issue for ${getMonthName(currentIssue.month)} ${
-            currentIssue.year
-          } has been created`,
+          description: `New issue for ${getMonthName(currentIssue.month)} ${currentIssue.year} has been created`,
         });
       } else {
         toast.error(response.data.message || "Failed to save issue.");
       }
     } catch (err) {
       if (err.response?.data?.month && err.response?.data?.year) {
-        toast.error(
-          `Issue for ${getMonthName(err.response.data.month)} ${
-            err.response.data.year
-          } already exists.`
-        );
+        toast.error(`Issue for ${getMonthName(err.response.data.month)} ${err.response.data.year} already exists.`);
         return;
       } else {
         toast.error("An error occurred while saving. Please try again.");
@@ -228,22 +182,16 @@ function AdminNewsLetterToggle() {
     try {
       const response = await api.get("/api/newsletter?issueId=" + issueId);
       const fetchedNewslettersByMonth = response.data.newsletters;
-      console.log(response);
+      
       const sortedNewsletters = [...fetchedNewslettersByMonth].sort((a, b) => {
         const aNum = Number(a.section);
         const bNum = Number(b.section);
-
         const inRange = (n) => n >= 1 && n <= 7;
 
-        if (inRange(aNum) && inRange(bNum)) {
-          return aNum - bNum;
-        } else if (inRange(aNum)) {
-          return -1;
-        } else if (inRange(bNum)) {
-          return 1;
-        } else {
-          return aNum - bNum;
-        }
+        if (inRange(aNum) && inRange(bNum)) return aNum - bNum;
+        else if (inRange(aNum)) return -1;
+        else if (inRange(bNum)) return 1;
+        else return aNum - bNum;
       });
 
       setNewslettersByMonth(sortedNewsletters);
@@ -260,12 +208,8 @@ function AdminNewsLetterToggle() {
       setSelectedMonthlyIssue((prev) => ({
         ...prev,
         articleCount: fetchedNewslettersByMonth.length,
-        assigned: fetchedNewslettersByMonth.filter(
-          (newsletter) => newsletter.section > 0
-        ).length,
-        unassigned: fetchedNewslettersByMonth.filter(
-          (newsletter) => newsletter.section === 0
-        ).length,
+        assigned: fetchedNewslettersByMonth.filter((newsletter) => newsletter.section > 0).length,
+        unassigned: fetchedNewslettersByMonth.filter((newsletter) => newsletter.section === 0).length,
       }));
 
       setIssues((prev) =>
@@ -274,12 +218,8 @@ function AdminNewsLetterToggle() {
             ? {
                 ...issue,
                 articleCount: fetchedNewslettersByMonth.length,
-                assigned: fetchedNewslettersByMonth.filter(
-                  (newsletter) => newsletter.section > 0
-                ).length,
-                unassigned: fetchedNewslettersByMonth.filter(
-                  (newsletter) => newsletter.section === 0
-                ).length,
+                assigned: fetchedNewslettersByMonth.filter((newsletter) => newsletter.section > 0).length,
+                unassigned: fetchedNewslettersByMonth.filter((newsletter) => newsletter.section === 0).length,
               }
             : issue
         )
@@ -295,11 +235,7 @@ function AdminNewsLetterToggle() {
     try {
       const response = await api.get("/api/issues?year=" + year);
       let issues = response.data.issues;
-
-      if (!isNewestFirst) {
-        issues = issues.slice().reverse();
-      }
-
+      if (!isNewestFirst) issues = issues.slice().reverse();
       setIssues(issues);
     } catch (err) {
       console.log(err);
@@ -349,12 +285,10 @@ function AdminNewsLetterToggle() {
     fetchOldestIssue();
   }, [selectedYear, updateTrigger]);
 
-  // dito article form functions
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   const [blogTitle, setBlogTitle] = useState("");
   const [blogDescription, setBlogDescription] = useState("");
-
   const refTitle = useRef();
   const refDesc = useRef();
 
@@ -367,24 +301,12 @@ function AdminNewsLetterToggle() {
 
   const handlePublishIssue = async () => {
     try {
-      const response = await api.patch(
-        "/api/issues",
-        {
-          issueId: selectedMonthlyIssue.issueId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.patch("/api/issues", { issueId: selectedMonthlyIssue.issueId }, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (response.data.success) {
-        toast.success(
-          `${getMonthName(selectedMonthlyIssue.month)} ${
-            selectedMonthlyIssue.year
-          } issue published successfully.`
-        );
+        toast.success(`${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue published successfully.`);
         setUpdateTrigger(Date.now());
         setSelectedMonthlyIssue(null);
         setIsOpenArticleForm(false);
@@ -393,37 +315,22 @@ function AdminNewsLetterToggle() {
       }
       addLog({
         action: "CREATE",
-        description: `${getMonthName(selectedMonthlyIssue.month)} ${
-          selectedMonthlyIssue.year
-        } issue has been published`,
+        description: `${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue has been published`,
       });
     } catch (error) {
       console.error("Error publishing issue:", error);
-      toast.error(
-        "An error occurred while publishing the issue. Please try again."
-      );
+      toast.error("An error occurred while publishing the issue. Please try again.");
     }
   };
 
   const handleUnPublishIssue = async () => {
     try {
-      const response = await api.patch(
-        "/api/issues/unpublish",
-        {
-          issueId: selectedMonthlyIssue.issueId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.patch("/api/issues/unpublish", { issueId: selectedMonthlyIssue.issueId }, {
+        headers: { "Content-Type": "application/json" },
+      });
+      
       if (response.data.success) {
-        toast.success(
-          `${getMonthName(selectedMonthlyIssue.month)} ${
-            selectedMonthlyIssue.year
-          } issue unpublished successfully.`
-        );
+        toast.success(`${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue unpublished successfully.`);
         setUpdateTrigger(Date.now());
         setSelectedMonthlyIssue(null);
         setIsOpenArticleForm(false);
@@ -432,15 +339,11 @@ function AdminNewsLetterToggle() {
       }
       addLog({
         action: "UPDATE",
-        description: `${getMonthName(selectedMonthlyIssue.month)} ${
-          selectedMonthlyIssue.year
-        } issue has been unpublished`,
+        description: `${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue has been unpublished`,
       });
     } catch (error) {
       console.error("Error unpublishing issue:", error);
-      toast.error(
-        "An error occurred while unpublishing the issue. Please try again."
-      );
+      toast.error("An error occurred while unpublishing the issue. Please try again.");
     }
   };
 
@@ -457,18 +360,17 @@ function AdminNewsLetterToggle() {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
 
   const handleEditClick = (article) => {
-    console.log("Editing article:", article);
     setEditingData(article);
     setIsOpenArticleForm(true);
   };
 
   const handleDeleteClick = (article) => {
-    console.log("Deleting article:", article);
     setNewsletterDetails(article);
     setDeleteModalIsOpen(true);
   };
 
   const [updateTableTrigger, setUpdateTableTrigger] = useState(Date.now());
+  
   useEffect(() => {
     if (updateTableTrigger) {
       fetchNewsLettersByMonth(newsletterDetails.issueId);
@@ -504,760 +406,676 @@ function AdminNewsLetterToggle() {
 
   const [confirmBackModalOpen, setConfirmBackModalOpen] = useState(false);
 
-  //added for photos
   const layoutImages = [
-    SuiteLetterLayout01,
-    SuiteLetterLayout02,
-    SuiteLetterLayout03,
-    SuiteLetterLayout04,
-    SuiteLetterLayout05,
-    SuiteLetterLayout06,
+    SuiteLetterLayout01, SuiteLetterLayout02, SuiteLetterLayout03,
+    SuiteLetterLayout04, SuiteLetterLayout05, SuiteLetterLayout06,
     SuiteLetterLayout07,
   ];
   const [currentLayoutImagesIndex, setLayoutImagesIndex] = useState(0);
 
   const handlePrev = () => {
-    setLayoutImagesIndex((prev) =>
-      prev === 0 ? layoutImages.length - 1 : prev - 1
-    );
+    setLayoutImagesIndex((prev) => (prev === 0 ? layoutImages.length - 1 : prev - 1));
   };
 
   const handleNext = () => {
-    setLayoutImagesIndex((prev) =>
-      prev === layoutImages.length - 1 ? 0 : prev + 1
-    );
+    setLayoutImagesIndex((prev) => (prev === layoutImages.length - 1 ? 0 : prev + 1));
   };
-  //
+
+  // Calculate total issues and stats
+  const totalIssues = issues.length;
+  const publishedIssues = issues.filter(i => i.is_published).length;
+  const totalArticles = issues.reduce((sum, i) => sum + (i.articleCount || 0), 0);
 
   return (
-    <div>
-      {(!selectedMonthlyIssue || selectedMonthlyIssue.month === undefined) &&
-      !isOpenArticleForm ? (
-        <>
-          {!currentPublishedIssue ? (
-            <div className="mt-10 py-7 flex flex-row items-center justify-between bg-gray-300 text-white p-4 rounded-lg mb-4 ">
-              <p className="-mb-1 font-avenir-black">
-                No issue is currently published. Once an issue is published, it
-                will appear here.
-              </p>
-            </div>
-          ) : (
-            <div>
-              <h3>Currently Published Issue</h3>
-              <div
-                onClick={() => {
-                  handleMonthClick(currentPublishedIssue);
-                  setPrevClickedIssue(currentPublishedIssue);
-                }}
-                className="flex flex-row items-center justify-between bg-primary text-white p-4 rounded-lg mb-4 cursor-pointer hover:scale-101 hover:shadow-lg transition duration-300 ease-in-out"
-              >
-                <h3 className="font-avenir-black">
-                  {getMonthName(currentPublishedIssue.month) +
-                    " " +
-                    currentPublishedIssue.year}
-                </h3>
-                <div className="flex flex-row items-center justify-center gap-1">
-                  <RectangleStackIcon className="h-5 w-5 text-white" />
-                  <p className="-mb-1 font-avenir-black">
-                    {currentPublishedIssue.articleCount} articles
-                  </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-8">
+      <div className="max-w-7xl mx-auto">
+        {(!selectedMonthlyIssue || selectedMonthlyIssue.month === undefined) && !isOpenArticleForm ? (
+          <>
+            {/* Header */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-primary rounded-lg shadow-lg">
+                  <Notebook className="w-6 h-6 text-white" />
                 </div>
-                <div className="flex flex-row items-center justify-center gap-1">
-                  <CheckCircleIcon className="h-5 w-5 text-white" />
-                  <p className="font-avenir-black">
-                    {currentPublishedIssue.assigned}/7 assigned
-                  </p>
-                </div>
-                <div className="flex flex-row items-center justify-center gap-1">
-                  <MinusCircleIcon className="h-5 w-5 text-white" />
-                  <p className="font-avenir-black">
-                    {currentPublishedIssue.unassigned} unassigned
-                  </p>
-                </div>
-                <ArrowRightIcon className="h-5 w-5 text-white" />
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                  Newsletter Management
+                </h1>
               </div>
+              <p className="text-slate-600 ml-14">Create, manage, and publish newsletter issues</p>
             </div>
-          )}
 
-          <div className="py-3"></div>
-          <div className="flex flex-row items-center justify-start gap-2">
-            <h3>All Issues</h3>
-            {/* <InformationCircleIcon className="w-5 h-5 text-primary cursor-pointer" /> */}
-
-            <InformationCircleIcon
-              className="w-5 h-5 text-primary cursor-pointer"
-              ref={anchorRef}
-              onClick={() => setOpen((prev) => !prev)}
-            />
-          </div>
-          <div className="flex flex-row items-center justify-between">
-            <div className="flex justify-start items-center">
-              <div className="bg-primary/20 rounded-md text-white pr-4 flex items-center cursor-pointer">
-                <YearFilterDropDown
-                  startYear={oldestIssue.year}
-                  endYear={currentYear}
-                  selectedYear={selectedYear}
-                  onYearChange={setSelectedYear}
-                />
-              </div>
-              <div
-                className="flex flex-row items-center justify-center gap-1 ml-4 text-gray-500 cursor-pointer text-xs"
-                onClick={handleSortToggle}
-              >
-                <div>
-                  {isNewestFirst ? (
-                    <ArrowDownIcon className="h-4 w-4" />
-                  ) : (
-                    <ArrowUpIcon className="h-4 w-4" />
-                  )}
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">Total Issues</p>
+                    <p className="text-3xl font-bold text-slate-900 mt-1">{totalIssues}</p>
+                  </div>
+                  <div className="p-3 bg-blue-100 rounded-xl">
+                    <NewspaperIcon className="w-6 h-6 text-blue-600" />
+                  </div>
                 </div>
-                <div>{isNewestFirst ? "Newest first" : "Oldest first"}</div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">Published</p>
+                    <p className="text-3xl font-bold text-slate-900 mt-1">{publishedIssues}</p>
+                  </div>
+                  <div className="p-3 bg-emerald-100 rounded-xl">
+                    <CheckCircleIcon className="w-6 h-6 text-emerald-600" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">Total Articles</p>
+                    <p className="text-3xl font-bold text-slate-900 mt-1">{totalArticles}</p>
+                  </div>
+                  <div className="p-3 bg-indigo-100 rounded-xl">
+                    <FileText className="w-6 h-6 text-indigo-600" />
+                  </div>
+                </div>
               </div>
             </div>
-            <div
-              className="cursor-pointer"
-              onClick={() => {
-                setOpenIssueDialog(true);
-                setCurrentIssue({ issueId: "", month: "", year: "" });
-              }}
-            >
-              <p className="font-avenir-black text-primary  ">
-                + Add new issue
-              </p>
-            </div>
-          </div>
-          <div className="py-5"></div>
-          {issues.length > 0 ? (
-            <div className="flex flex-wrap justify-center lg:justify-start gap-10 p-1">
-              {issues.map((issue) => (
+
+            {/* Currently Published Issue */}
+            {currentPublishedIssue && (
+              <div className="mb-8">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Currently Published Issue</h3>
                 <div
-                  key={issue.issueId}
                   onClick={() => {
-                    handleMonthClick(issue);
-                    setPrevClickedIssue(issue);
-                    console.log("ETOOOO: ");
-                    console.log(issue);
+                    handleMonthClick(currentPublishedIssue);
+                    setPrevClickedIssue(currentPublishedIssue);
                   }}
+                  className="bg-primary text-white p-6 rounded-2xl cursor-pointer hover:shadow-2xl transition-all hover:-translate-y-1 border border-primary"
                 >
-                  <div
-                    className={`group border ${
-                      issue.is_published
-                        ? "border-primary border-2 "
-                        : "border-gray-500/50"
-                    } p-5 rounded-xl flex flex-col cursor-pointer hover:shadow-lg transition duration-300 ease-in-out hover:scale-101`}
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <h3 className="text-2xl font-bold">
+                      {getMonthName(currentPublishedIssue.month)} {currentPublishedIssue.year}
+                    </h3>
+                    <div className="flex gap-6 flex-wrap">
+                      <div className="flex items-center gap-2">
+                        <RectangleStackIcon className="h-5 w-5" />
+                        <span className="font-medium">{currentPublishedIssue.articleCount} articles</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircleIcon className="h-5 w-5" />
+                        <span className="font-medium">{currentPublishedIssue.assigned}/7 assigned</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MinusCircleIcon className="h-5 w-5" />
+                        <span className="font-medium">{currentPublishedIssue.unassigned} unassigned</span>
+                      </div>
+                    </div>
+                    <ArrowRightIcon className="h-6 w-6" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* All Issues Section */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-slate-200">
+              <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-xl font-bold text-slate-900">All Issues</h3>
+                  <InformationCircleIcon
+                    ref={anchorRef}
+                    onClick={() => setOpen((prev) => !prev)}
+                    className="w-5 h-5 text-slate-400 cursor-pointer hover:text-blue-600 transition-colors"
+                  />
+                </div>
+
+                <div className="flex items-center gap-4 flex-wrap">
+                  <div className="bg-slate-50 rounded-lg px-4 py-2 border border-slate-200">
+                    <YearFilterDropDown
+                      startYear={oldestIssue.year}
+                      endYear={currentYear}
+                      selectedYear={selectedYear}
+                      onYearChange={setSelectedYear}
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleSortToggle}
+                    className="flex items-center gap-2 text-sm text-slate-600 hover:text-blue-600 transition-colors"
                   >
-                    <div className="flex flex-row justify-start items-center gap-2">
-                      <div
-                        className={`w-2 h-2 ${
-                          issue.assigned < 7 && !issue.is_published
-                            ? "bg-orange-400"
-                            : issue.assigned >= 7 && !issue.is_published
-                            ? "bg-primary"
-                            : "bg-green-700"
-                        } rounded-full`}
-                      ></div>
-                      <p className="font-avenir-black text-body">
-                        {getMonthName(issue.month)}
-                      </p>
-                    </div>
-                    <div className="py-2"></div>
-                    <div className="flex flex-col gap-2 pr-20">
-                      <div className="flex flex-row justify-start items-center gap-2 text-gray-400">
-                        <RectangleStackIcon className="h-4 w-4 " />
-                        <p className=" text-xs">
-                          {issue.articleCount} articles
+                    {isNewestFirst ? <ArrowDownIcon className="h-4 w-4" /> : <ArrowUpIcon className="h-4 w-4" />}
+                    {isNewestFirst ? "Newest first" : "Oldest first"}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setOpenIssueDialog(true);
+                      setCurrentIssue({ issueId: "", month: "", year: "" });
+                    }}
+                    className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all font-medium"
+                  >
+                    <PlusCircleIcon className="w-5 h-5" />
+                    Add New Issue
+                  </button>
+                </div>
+              </div>
+
+              {/* Issues Grid */}
+              {issues.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {issues.map((issue) => (
+                    <div
+                      key={issue.issueId}
+                      onClick={() => {
+                        handleMonthClick(issue);
+                        setPrevClickedIssue(issue);
+                      }}
+                      className="group bg-white border-2 rounded-2xl p-6 cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1"
+                      style={{
+                        borderColor: issue.is_published
+                          ? "#10b981"
+                          : issue.assigned >= 7
+                          ? "#0097A7"
+                          : "#F57C00",
+                      }}
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{
+                            backgroundColor: issue.is_published
+                              ? "#10b981"
+                              : issue.assigned >= 7
+                              ? "#0097A7"
+                              : "#F57C00",
+                          }}
+                        />
+                        <h3 className="text-xl font-bold text-slate-900">{getMonthName(issue.month)}</h3>
+                        {issue.is_published && (
+                          <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">
+                            Published
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center gap-2 text-slate-600 text-sm">
+                          <RectangleStackIcon className="h-4 w-4" />
+                          <span>{issue.articleCount} articles</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-600 text-sm">
+                          <CheckCircleIcon className="h-4 w-4" />
+                          <span>{issue.assigned}/7 assigned</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-600 text-sm">
+                          <MinusCircleIcon className="h-4 w-4" />
+                          <span>{issue.unassigned} unassigned</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-4 border-t border-slate-200">
+                        <p className="text-xs text-slate-500">
+                          Created {formatTimestamp(issue.issueCreatedAt).fullDate}
                         </p>
                       </div>
-                      <div className="flex flex-row justify-start items-center gap-2 text-gray-400">
-                        <CheckCircleIcon className="h-4 w-4 " />
-                        <p className=" text-xs">{issue.assigned} assigned</p>
-                      </div>
-                      <div className="flex flex-row justify-start items-center gap-2 text-gray-400">
-                        <MinusCircleIcon className="h-4 w-4 " />
-                        <p className=" text-xs">
-                          {issue.unassigned} unassigned
-                        </p>
-                      </div>
                     </div>
-                    <div className="py-3"></div>
-                    <div className="w-full justify-end flex ">
-                      <p className="text-xs scale-90 text-gray-400 font-avenir-roman-oblique ">
-                        created on{" "}
-                        {formatTimestamp(issue.issueCreatedAt).fullDate}
-                      </p>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <img src={emptyIllustration} alt="No issues" className="w-auto h-40 mx-auto mb-6 opacity-50" />
+                  <p className="text-slate-600 text-lg font-medium">No issues for {selectedYear}</p>
+                  <p className="text-slate-500 text-sm mt-2">Create your first issue to get started</p>
+                </div>
+              )}
+            </div>
+
+            {/* Legend Popper */}
+            <Popper open={open} anchorEl={anchorRef.current} placement="bottom-start">
+              <ClickAwayListener onClickAway={() => setOpen(false)}>
+                <Paper className="p-4 mt-2 rounded-xl shadow-xl border border-slate-200">
+                  <p className="font-bold mb-3 text-sm text-slate-900">LEGEND</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-emerald-500" />
+                      <span className="text-xs text-slate-600">Currently Published</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#0097A7]" />
+                      <span className="text-xs text-slate-600">Complete/Ready to Publish</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#F57C00]" />
+                      <span className="text-xs text-slate-600">In Progress/Incomplete</span>
+                    </div>
+                  </div>
+                </Paper>
+              </ClickAwayListener>
+            </Popper>
+
+            {/* Add Issue Dialog */}
+            <Dialog open={openIssueDialog} onClose={() => {}} fullWidth maxWidth="sm" disableEscapeKeyDown>
+              <DialogTitle className="text-xl font-bold">
+                {currentIssue.issueId ? "Edit Issue" : "Add New Issue"}
+              </DialogTitle>
+              <DialogContent>
+                <div className="space-y-6 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Year<span className="text-red-600">*</span>
+                    </label>
+                    <select
+                      value={currentIssue.year}
+                      onChange={(e) =>
+                        setCurrentIssue({
+                          ...currentIssue,
+                          year: parseInt(e.target.value),
+                          month: "",
+                        })
+                      }
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    >
+                      <option value="" hidden>Select year</option>
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Month<span className="text-red-600">*</span>
+                    </label>
+                    <select
+                      value={currentIssue.month}
+                      onChange={(e) =>
+                        setCurrentIssue({
+                          ...currentIssue,
+                          month: parseInt(e.target.value),
+                        })
+                      }
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    >
+                      <option value="" hidden>Select month</option>
+                      {monthOptions.map((monthNumber) => (
+                        <option key={monthNumber} value={monthNumber}>
+                          {months[monthNumber - 1]}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </DialogContent>
+              <DialogActions className="p-6">
+                <button
+                  onClick={() => setOpenIssueDialog(false)}
+                  className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-all font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveIssue}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all font-medium"
+                >
+                  Save Issue
+                </button>
+              </DialogActions>
+            </Dialog>
+          </>
+        ) : selectedMonthlyIssue && !isOpenArticleForm ? (
+          <>
+            {/* Issue Details View */}
+            <div className="mb-6">
+              <button
+                onClick={() => handleMonthClick(null)}
+                className="group flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mb-6"
+              >
+                <ArrowLeft size={18} />
+                <span className="font-medium group-hover:underline">Back to all issues</span>
+              </button>
+
+              <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+                <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{
+                        backgroundColor: selectedMonthlyIssue.is_published
+                          ? "#10b981"
+                          : selectedMonthlyIssue.assigned >= 7
+                          ? "#0097A7"
+                          : "#F57C00",
+                      }}
+                    />
+                    <h2 className="text-3xl font-bold text-slate-900">
+                      {getMonthName(selectedMonthlyIssue.month)} {selectedMonthlyIssue.year}
+                    </h2>
+                    {selectedMonthlyIssue.is_published && (
+                      <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
+                        Published
+                      </span>
+                    )}
+                    <InformationCircleIcon
+                      onClick={() => setOpenSuiteletterLayoutInfoDialog(true)}
+                      className="w-5 h-5 text-slate-400 cursor-pointer hover:text-blue-600 transition-colors"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    {!prevClickedIssue.is_published ? (
+                      <button
+                        onClick={() => setIsPublishModalOpen(true)}
+                        className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all font-medium"
+                      >
+                        <BookmarkSquareIcon className="w-5 h-5" />
+                        Publish Issue
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setIsUnPublishModalOpen(true)}
+                        className="flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all font-medium"
+                      >
+                        <BookmarkSquareIcon className="w-5 h-5" />
+                        Unpublish Issue
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
+                    <p className="text-sm font-medium text-slate-600 mb-1">Total Articles</p>
+                    <p className="text-3xl font-bold text-slate-900">{selectedMonthlyIssue.articleCount}</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
+                    <p className="text-sm font-medium text-slate-600 mb-1">Assigned</p>
+                    <p className="text-3xl font-bold text-slate-900">{selectedMonthlyIssue.assigned}/7</p>
+                  </div>
+                  <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-100">
+                    <p className="text-sm font-medium text-slate-600 mb-1">Unassigned</p>
+                    <p className="text-3xl font-bold text-slate-900">{selectedMonthlyIssue.unassigned}</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleAddEditArticle}
+                  className="w-full md:w-auto flex items-center justify-center gap-2 bg-primary text-white px-6 py-3 rounded-xl hover:shadow-lg hover:scale-105 transition-all font-medium"
+                >
+                  <PlusCircleIcon className="w-5 h-5" />
+                  Add New Article
+                </button>
+              </div>
+            </div>
+
+            {/* Articles Cards */}
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+              <div className="p-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900">Articles</h3>
+                    <p className="text-sm text-slate-600 mt-1">
+                      {newslettersByMonth.length} article{newslettersByMonth.length !== 1 ? 's' : ''} in this issue
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-100">
+                      <CheckCircleIcon className="w-4 h-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-700">{selectedMonthlyIssue.assigned} Assigned</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-50 rounded-lg border border-orange-100">
+                      <MinusCircleIcon className="w-4 h-4 text-orange-600" />
+                      <span className="text-sm font-medium text-orange-700">{selectedMonthlyIssue.unassigned} Unassigned</span>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid place-content-center px-5 text-center text-small text-gray-400 min-h-70 my-7">
-              <img
-                src={emptyIllustration}
-                alt="No issues illustration"
-                className="w-auto h-30 mx-auto mb-6"
-              />
-              <p>No issues have been published for this selected year.</p>
-            </div>
-          )}
-          {/* <div className="py-15"></div> */}
-          {/* <PageToggle tabs={tabs} /> */}
-          <Popper
-            open={open}
-            anchorEl={anchorRef.current}
-            placement="bottom-start"
-          >
-            <ClickAwayListener onClickAway={() => setOpen(false)}>
-              <Paper
-                sx={{
-                  p: 3,
-                  borderRadius: 2,
-                  border: "1px solid #E7E7E7",
-                  mt: 1,
-                  width: 220,
-                  bgcolor: "white",
-                  boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.08)",
-                }}
-              >
-                <p className="font-avenir-black mb-3  text-small">LEGEND</p>
-
-                <Box display="flex" alignItems="center" gap={1} mb={1}>
-                  <Box
-                    width={12}
-                    height={12}
-                    borderRadius="50%"
-                    bgcolor="green"
-                  />
-                  <p className=" font-avenir-roman text-xs text-gray-500">
-                    Currently Published
-                  </p>
-                </Box>
-
-                <Box display="flex" alignItems="center" gap={1} mb={1}>
-                  <Box
-                    width={12}
-                    height={12}
-                    borderRadius="50%"
-                    bgcolor="#0097A7"
-                  />
-                  <p className=" font-avenir-roman text-xs text-gray-500">
-                    Complete/Ready to Publish
-                  </p>
-                </Box>
-
-                <Box display="flex" alignItems="center" gap={1}>
-                  <Box
-                    width={12}
-                    height={12}
-                    borderRadius="50%"
-                    bgcolor="#F57C00"
-                  />
-                  <p className=" font-avenir-roman text-xs text-gray-500">
-                    In Progress/Incomplete
-                  </p>
-                </Box>
-              </Paper>
-            </ClickAwayListener>
-          </Popper>
-          <Dialog
-            open={openIssueDialog}
-            onClose={(event, reason) => {
-              if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
-                setOpenIssueDialog(false);
-              }
-            }}
-            fullWidth
-            disableEscapeKeyDown={true}
-            sx={{
-              "& .MuiDialog-paper": {
-                width: "600px",
-                height: "auto",
-                maxHeight: "90vh",
-              },
-            }}
-          >
-            <DialogTitle>
-              {currentIssue.issueId ? "Edit Issue" : "Add New Issue"}
-            </DialogTitle>
-            <DialogContent>
-              <div className="mb-4">
-                <label className="block text-gray-700 font-avenir-black">
-                  Year<span className="text-primary">*</span>
-                </label>
-                <select
-                  value={currentIssue.year}
-                  onChange={(e) =>
-                    setCurrentIssue({
-                      ...currentIssue,
-                      year: parseInt(e.target.value),
-                      // Reset month when year changes to avoid mismatch
-                      month: "",
-                    })
-                  }
-                  className="w-full p-3 mt-2 border rounded bg-primary/10 focus:ring-2 focus:ring-primary"
-                >
-                  <option value="" hidden>
-                    Select year
-                  </option>
-                  {yearOptions.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
               </div>
-
-              <div>
-                <label className="block text-gray-700 font-avenir-black">
-                  Month<span className="text-primary">*</span>
-                </label>
-                <select
-                  value={currentIssue.month}
-                  onChange={(e) =>
-                    setCurrentIssue({
-                      ...currentIssue,
-                      month: parseInt(e.target.value),
-                    })
-                  }
-                  className="w-full p-3 mt-2 border rounded bg-primary/10 focus:ring-2 focus:ring-primary"
-                >
-                  <option value="" hidden>
-                    Select month
-                  </option>
-                  {monthOptions.map((monthNumber) => (
-                    <option key={monthNumber} value={monthNumber}>
-                      {months[monthNumber - 1]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </DialogContent>
-
-            <DialogActions>
-              <button
-                className="btn-light"
-                onClick={() => setOpenIssueDialog(false)}
-              >
-                Cancel
-              </button>
-              <button className="btn-primary" onClick={handleSaveIssue}>
-                Save
-              </button>
-            </DialogActions>
-          </Dialog>
-        </>
-      ) : selectedMonthlyIssue && !isOpenArticleForm ? (
-        <>
-          <ConfirmationDialog
-            open={isPublishModalOpen}
-            onClose={() => setIsPublishModalOpen(false)}
-            onConfirm={async () => {
-              setIsPublishModalOpen(false);
-              await handlePublishIssue();
-            }}
-            title={`Publish ${getMonthName(selectedMonthlyIssue.month)} ${
-              selectedMonthlyIssue.year
-            } issue?`}
-            description={`This will publish the issue and make it visible to the public. Are you sure you want to proceed?`}
-            confirmLabel="Continue"
-            cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
-            confirmBtnClass="p-2 px-4 cursor-pointer rounded-lg bg-red-700 hover:bg-red-800 duration-500 text-white"
-          />
-          <div className="py-5"></div>
-          <div className="flex flex-row items-center justify-between">
-            <button
-              onClick={() => handleMonthClick(null)}
-              className="group cursor-pointer flex items-center gap-2 text-primary text-xss transition active:font-avenir-black"
-            >
-              <ArrowLeft size={15} />
-              <span className="mt-1 group-hover:font-avenir-black">Back</span>
-            </button>
-            {prevClickedIssue.is_published === 0 ? (
-              <button
-                onClick={() => setIsPublishModalOpen(true)}
-                // disabled={selectedMonthlyIssue.assigned < 7}
-                className={
-                  "flex gap-2   font-avenir-black p-2 px-3  items-center rounded-md transition cursor-pointer bg-primary text-white hover:bg-primary/90"
-                  //   ${
-                  //   selectedMonthlyIssue.assigned === 7
-                  //     ? "cursor-pointer bg-primary text-white hover:bg-primary/90"
-                  //     : "cursor-not-allowed bg-gray-300 text-gray-200"
-                  // }
-                }
-              >
-                <BookmarkSquareIcon className="size-5" />
-                <span className="hidden sm:flex flex-col">
-                  Publish this issue
-                </span>
-              </button>
-            ) : (
-              <>
-                {" "}
-                <button
-                  onClick={() => setIsUnPublishModalOpen(true)}
-                  // disabled={selectedMonthlyIssue.assigned < 7}
-                  // added feat: can unpublish even if assigned is less than 7
-                  className={
-                    "flex gap-2   font-avenir-black p-2 px-3  items-center rounded-md transition cursor-pointer bg-red-700 text-white hover:bg-red-800"
-                    //   ${
-                    //   selectedMonthlyIssue.assigned === 7
-                    //     ? "cursor-pointer bg-red-700 text-white hover:bg-red-800"
-                    //     : "cursor-not-allowed bg-gray-300 text-gray-200"
-                    // }
-                  }
-                >
-                  <BookmarkSquareIcon className="size-5" />
-                  <span className="hidden sm:flex flex-col">
-                    Unpublish this issue
-                  </span>
-                </button>
-                <ConfirmationDialog
-                  open={isUnPublishModalOpen}
-                  onClose={() => setIsUnPublishModalOpen(false)}
-                  onConfirm={async () => {
-                    setIsUnPublishModalOpen(false);
-                    await handleUnPublishIssue();
-                  }}
-                  title={`Unpublish ${getMonthName(
-                    selectedMonthlyIssue.month
-                  )} ${selectedMonthlyIssue.year} issue?`}
-                  description={`This will unpublish the issue and hide it from the public. Are you sure you want to proceed?`}
-                  confirmLabel="Continue"
-                  cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
-                  confirmBtnClass="p-2 px-4 cursor-pointer rounded-lg bg-red-700 hover:bg-red-800 duration-500 text-white"
-                />
-              </>
-            )}
-          </div>
-          <div className="py-2"></div>
-          <div className="flex flex-row items-center justify-between">
-            <div className="flex flex-row justify-start items-center gap-2">
-              <div
-                className={`w-2 h-2  ${
-                  selectedMonthlyIssue.assigned < 7 &&
-                  !selectedMonthlyIssue.is_published
-                    ? "bg-orange-400"
-                    : selectedMonthlyIssue.assigned >= 7 &&
-                      !selectedMonthlyIssue.is_published
-                    ? "bg-primary"
-                    : "bg-green-700"
-                } rounded-full`}
-              ></div>
-              <h3 className="font-avenir-black">
-                {getMonthName(selectedMonthlyIssue.month) +
-                  " " +
-                  selectedMonthlyIssue.year}{" "}
-                {/* <span className="text-sm text-gray-500 font-avenir-roman">
-                  ({selectedMonthlyIssue.articleCount})
-                </span> */}
-                <span className="text-sm text-green-700 font-avenir-roman">
-                  {!selectedMonthlyIssue.is_published
-                    ? ""
-                    : "(Currently Published)"}
-                </span>
-              </h3>
-              <InformationCircleIcon
-                className="w-4 h-4 text-gray-500 cursor-pointer"
-                onClick={() =>
-                  setOpenSuiteletterLayoutInfoDialog((prev) => !prev)
-                }
-              />
-            </div>
-            <div onClick={(e) => handleAddEditArticle(e)}>
-              {" "}
-              <p className="font-avenir-black text-primary cursor-pointer ">
-                + Add new article
-              </p>
-            </div>
-          </div>
-          <div className="py-1"></div>
-          <section className=" mb-4 grid grid-cols-1 sm:grid-cols-3 grid-rows-[5rem] [&>*]:bg-white [&>*]:border [&>*]:border-gray-300 gap-4">
-            <div className="rounded-md grid place-content-center ">
-              <span className="text-small font-avenir-black text-primary text-center">
-                Total
-              </span>
-              <div className="text-body  text-black text-center">
-                {selectedMonthlyIssue.articleCount}
-              </div>
-            </div>
-            <div className="rounded-md grid place-content-center">
-              <span className="text-small font-avenir-black text-gray-500 text-center">
-                Assigned
-              </span>
-              <div className="text-body text-black text-center">
-                {selectedMonthlyIssue.assigned}
-              </div>
-            </div>
-            <div className="rounded-md grid place-content-center">
-              <span className="text-small font-avenir-black text-gray-500 text-center">
-                Unassigned
-              </span>
-              <div className="text-body text-black text-center">
-                {selectedMonthlyIssue.unassigned}
-              </div>
-            </div>
-          </section>
-          <div className="py-1"></div>
-          <div
-            className="ag-theme-quartz min-w-[600px] lg:w-full "
-            style={{ height: "500px", width: "100%" }}
-          >
-            <AgGridReact
-              enableBrowserTooltips={true}
-              ref={gridRef}
-              rowData={newslettersByMonth}
-              columnDefs={[
-                {
-                  headerName: "Title",
-                  field: "title",
-                  flex: 3,
-                  tooltipField: "title",
-                  headerClass: "text-primary font-bold bg-gray-100",
-                },
-                {
-                  headerName: "Article",
-                  field: "article",
-                  flex: 3,
-                  headerClass: "text-primary font-bold bg-gray-100",
-                  tooltipField: "article",
-                  valueFormatter: (params) =>
-                    params.value?.replace(/<[^>]+>/g, ""),
-                  cellStyle: {
-                    display: "block",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: "vertical",
-                    whiteSpace: "normal",
-                  },
-                },
-                {
-                  headerName: "Author",
-                  field: "pseudonym",
-                  flex: 1,
-                  tooltipField: "author",
-                  headerClass: "text-primary font-bold bg-gray-100",
-                },
-                {
-                  headerName: "Section",
-                  field: "section",
-                  flex: 1,
-                  headerClass: "text-primary font-bold bg-gray-100",
-                  valueFormatter: (params) =>
-                    params.value === 0 ? "Unassigned" : params.value,
-                },
-                {
-                  headerName: "Date Created",
-                  field: "createdAt",
-                  flex: 2,
-                  headerClass: "text-primary font-bold bg-gray-100",
-                  valueGetter: (params) =>
-                    params.data?.createdAt
-                      ? new Date(params.data.createdAt).toLocaleString()
-                      : "N/A",
-                },
-
-                {
-                  headerName: "Action",
-                  field: "action",
-                  flex: 1,
-                  headerClass: "text-primary font-bold bg-gray-100",
-                  cellRenderer: (params) => (
-                    <div className="flex">
-                      <ActionButtons
-                        icon={<PencilIcon className="size-5 cursor-pointer" />}
-                        handleClick={() => handleEditClick(params.data)}
-                      />
-                      <ActionButtons
-                        icon={<TrashIcon className="size-5 cursor-pointer" />}
-                        handleClick={() => handleDeleteClick(params.data)}
-                      />
-                    </div>
-                  ),
-                },
-              ]}
-              defaultColDef={{
-                filter: "agTextColumnFilter",
-                floatingFilter: true,
-                sortable: true,
-                cellStyle: {
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "left",
-                },
-              }}
-              pagination
-              paginationPageSize={10}
-              paginationPageSizeSelector={[5, 10, 20, 50]}
-            />
-          </div>{" "}
-          <div className="py-20"></div>
-          <ConfirmationDialog
-            open={deleteModalIsOpen}
-            onClose={() => setDeleteModalIsOpen(false)}
-            onConfirm={async () => {
-              await handleDelete();
-            }}
-            title={`Delete this article?`}
-            description={`"${newsletterDetails.title}" will be permanently deleted. Are you sure you want to proceed?`}
-            confirmLabel="Continue"
-            cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
-            confirmBtnClass="p-2 px-4 cursor-pointer rounded-lg bg-red-700 hover:bg-red-800 duration-500 text-white"
-          />
-        </>
-      ) : (
-        <>
-          {/* DITO ANG FORM ADDING/EDITING ARTICLE */}
-          {/* <section className="h-[100vh] overflow-auto"> */}
-          <section>
-            <div className="py-5"></div>
-            <button
-              onClick={() => {
-                setConfirmBackModalOpen(true);
-              }}
-              className="group cursor-pointer flex items-center gap-2 text-primary text-xss transition active:font-avenir-black"
-            >
-              <ArrowLeft size={15} />
-              <span className="mt-1 group-hover:font-avenir-black">Back</span>
-            </button>
-            <div className="py-2"></div>
-            <div className="flex items-center justify-between ">
-              <div className="flex items-center gap-2">
-                <h2 className="font-avenir-black">
-                  {!editingData ? "Add New Article" : "Edit Article"}
-                </h2>
-                <InformationCircleIcon
-                  className="w-4 h-4 text-gray-500 cursor-pointer"
-                  onClick={() =>
-                    setOpenSuiteletterLayoutInfoDialog((prev) => !prev)
-                  }
-                />
-              </div>
-              {/* <span
-                onClick={() => {
-                  handleMonthClick(prevClickedIssue);
-                  setIsOpenArticleForm(false);
-                }}
-                className="font-avenir-black text-red-700 text-sm cursor-pointer"
-              >
               
-              </span> */}
+              <div className="p-6">
+                {newslettersByMonth.length > 0 ? (
+                  <div className="space-y-4">
+                    {newslettersByMonth.map((article, index) => (
+                      <div
+                        key={article.newsletterId}
+                        className="group bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-slate-300 transition-all duration-200"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          {/* Left Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start gap-3 mb-3">
+                              <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                {index + 1}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-lg font-bold text-slate-900 mb-1 line-clamp-1">
+                                  {article.title}
+                                </h4>
+                                <p className="text-sm text-slate-600 line-clamp-2">
+                                  {article.article?.replace(/<[^>]+>/g, "")}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {/* Article Info */}
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 ml-13">
+                              <div className="flex items-center gap-1.5">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span className="font-medium">{article.pseudonym || "N/A"}</span>
+                              </div>
+                              
+                              <div className="flex items-center gap-1.5">
+                                <Calendar className="w-4 h-4" />
+                                <span>
+                                  {new Date(article.createdAt).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </span>
+                              </div>
+                              
+                              <div>
+                                {article.section === 0 ? (
+                                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 border border-orange-200">
+                                    Unassigned
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+                                    Section {article.section}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleEditClick(article)}
+                              className="p-2.5 hover:bg-blue-50 rounded-lg transition-all group/btn"
+                              title="Edit article"
+                            >
+                              <PencilIcon className="w-5 h-5 text-blue-600 group-hover/btn:scale-110 transition-transform" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(article)}
+                              className="p-2.5 hover:bg-red-50 rounded-lg transition-all group/btn"
+                              title="Delete article"
+                            >
+                              <TrashIcon className="w-5 h-5 text-red-600 group-hover/btn:scale-110 transition-transform" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-16">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
+                      <FileText className="w-8 h-8 text-slate-400" />
+                    </div>
+                    <p className="text-slate-600 font-medium mb-1">No articles yet</p>
+                    <p className="text-slate-500 text-sm">Add your first article to get started</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <section>
-              <ContentEditor
-                sectionsNewsletterByMonth={sectionsNewsletterByMonth}
-                handleBackAfterSubmitForm={handleBackAfterSubmitForm}
-                editingData={editingData}
-                type={"newsletter"}
-                issueId={selectedMonthlyIssue.issueId}
-                user={user}
-              />
-            </section>
+            {/* Confirmation Dialogs */}
+            <ConfirmationDialog
+              open={isPublishModalOpen}
+              onClose={() => setIsPublishModalOpen(false)}
+              onConfirm={async () => {
+                setIsPublishModalOpen(false);
+                await handlePublishIssue();
+              }}
+              title={`Publish ${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue?`}
+              description="This will publish the issue and make it visible to the public. Are you sure you want to proceed?"
+              confirmLabel="Publish"
+              cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
+              confirmBtnClass="p-2 px-4 cursor-pointer rounded-lg bg-blue-600 hover:bg-blue-700 duration-500 text-white"
+            />
 
-            <div className="pb-40"></div>
-          </section>
-          <ConfirmationDialog
-            open={confirmBackModalOpen}
-            onClose={() => setConfirmBackModalOpen(false)}
-            onConfirm={async () => {
-              await handleMonthClick(prevClickedIssue);
-              setIsOpenArticleForm(false);
-              setConfirmBackModalOpen(false);
-            }}
-            title={`Are you sure to cancel ${
-              editingData ? "editing" : "adding"
-            } this article?`}
-            description={`This will discard any unsaved changes. Are you sure you want to proceed?`}
-            confirmLabel="Continue"
-            cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
-            confirmBtnClass="p-2 px-4 cursor-pointer rounded-lg bg-red-700 hover:bg-red-800 duration-500 text-white"
-          />
-          {/* DITO ANG END NG ADDING/EDITING FORM NG NEWS ARTICLE */}
-        </>
-      )}{" "}
+            <ConfirmationDialog
+              open={isUnPublishModalOpen}
+              onClose={() => setIsUnPublishModalOpen(false)}
+              onConfirm={async () => {
+                setIsUnPublishModalOpen(false);
+                await handleUnPublishIssue();
+              }}
+              title={`Unpublish ${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue?`}
+              description="This will unpublish the issue and hide it from the public. Are you sure you want to proceed?"
+              confirmLabel="Unpublish"
+              cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
+              confirmBtnClass="p-2 px-4 cursor-pointer rounded-lg bg-red-700 hover:bg-red-800 duration-500 text-white"
+            />
 
-      {/* TODO */}
-      {/* Add the 6 templates that has been added. */}
-      <Dialog
-        open={openSuiteletterLayoutInfoDialog}
-        onClose={() => setOpenSuiteletterLayoutInfoDialog(false)}
-        fullWidth
-        disableEscapeKeyDown={false}
-        sx={{
-          "& .MuiDialog-paper": {
-            width: "600px",
-            height: "auto",
-            maxHeight: "90vh",
-            borderRadius: "0.75rem",
-          },
-        }}
-      >
-        <DialogTitle>
-          {" "}
-          <span className="flex flex-row items-center">
-            <InformationCircleIcon className="w-6 h-6 text-gray-500 " />
-            &nbsp; Suiteletter Section Layout
-          </span>
-        </DialogTitle>
-        <DialogContent>
-          <div className="p-2">
-            {" "}
-            <p className="text-sm text-gray-500">
-              Preview the newsletter layout. Articles will appear in the section
-              you assign (1–7).
-              <span className="flex text-xs text-gray-600 mb-4 mt-2">
-                <ExclamationTriangleIcon className="size-4 text-orange-500/70" />
-                <span className="ml-2">
-                  You can't publish the issue until{" "}
-                  <strong className="text-black">all 7 sections </strong>
-                  have assigned articles. The issue will{" "}
-                  <strong className="text-red-800">
-                    not be visible to the public{" "}
-                  </strong>
-                  until then.
+            <ConfirmationDialog
+              open={deleteModalIsOpen}
+              onClose={() => setDeleteModalIsOpen(false)}
+              onConfirm={handleDelete}
+              title="Delete this article?"
+              description={`"${newsletterDetails.title}" will be permanently deleted. Are you sure you want to proceed?`}
+              confirmLabel="Delete"
+              cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
+              confirmBtnClass="p-2 px-4 cursor-pointer rounded-lg bg-red-700 hover:bg-red-800 duration-500 text-white"
+            />
+          </>
+        ) : (
+          <>
+            {/* Article Form */}
+            <div className="mb-6">
+              <button
+                onClick={() => setConfirmBackModalOpen(true)}
+                className="group flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mb-6"
+              >
+                <ArrowLeft size={18} />
+                <span className="font-medium group-hover:underline">Back to issue</span>
+              </button>
+
+              <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-3xl font-bold text-slate-900">
+                      {!editingData ? "Add New Article" : "Edit Article"}
+                    </h2>
+                    <InformationCircleIcon
+                      onClick={() => setOpenSuiteletterLayoutInfoDialog(true)}
+                      className="w-5 h-5 text-slate-400 cursor-pointer hover:text-blue-600 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <ContentEditor
+                  sectionsNewsletterByMonth={sectionsNewsletterByMonth}
+                  handleBackAfterSubmitForm={handleBackAfterSubmitForm}
+                  editingData={editingData}
+                  type="newsletter"
+                  issueId={selectedMonthlyIssue.issueId}
+                  user={user}
+                />
+              </div>
+            </div>
+
+            <ConfirmationDialog
+              open={confirmBackModalOpen}
+              onClose={() => setConfirmBackModalOpen(false)}
+              onConfirm={async () => {
+                await handleMonthClick(prevClickedIssue);
+                setIsOpenArticleForm(false);
+                setConfirmBackModalOpen(false);
+              }}
+              title={`Cancel ${editingData ? "editing" : "adding"} this article?`}
+              description="This will discard any unsaved changes. Are you sure you want to proceed?"
+              confirmLabel="Discard Changes"
+              cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
+              confirmBtnClass="p-2 px-4 cursor-pointer rounded-lg bg-red-700 hover:bg-red-800 duration-500 text-white"
+            />
+          </>
+        )}
+
+        {/* Layout Info Dialog */}
+        <Dialog
+          open={openSuiteletterLayoutInfoDialog}
+          onClose={() => setOpenSuiteletterLayoutInfoDialog(false)}
+          fullWidth
+          maxWidth="md"
+        >
+          <DialogTitle className="text-xl font-bold">
+            <div className="flex items-center gap-2">
+              <InformationCircleIcon className="w-6 h-6 text-blue-600" />
+              Suiteletter Section Layout
+            </div>
+          </DialogTitle>
+          <DialogContent>
+            <div className="py-4">
+              <p className="text-sm text-slate-600 mb-4">
+                Preview the newsletter layout. Articles will appear in the section you assign (1–7).
+              </p>
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
+                <div className="flex gap-2">
+                  <ExclamationTriangleIcon className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-slate-700">
+                    You can't publish the issue until <strong>all 7 sections</strong> have assigned articles.
+                    The issue will <strong className="text-red-700">not be visible to the public</strong> until then.
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <img
+                  src={layoutImages[currentLayoutImagesIndex]}
+                  alt={`Layout ${currentLayoutImagesIndex + 1}`}
+                  className="w-full border border-slate-200 rounded-xl shadow-sm"
+                />
+              </div>
+
+              <div className="flex items-center justify-between mt-6">
+                <button
+                  onClick={handlePrev}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors font-medium text-slate-700"
+                >
+                  ← Previous
+                </button>
+                <span className="text-sm text-slate-600">
+                  Layout {currentLayoutImagesIndex + 1} of {layoutImages.length}
                 </span>
-              </span>
-            </p>
-            <div className="py-1"></div>
-            <div>
-              {/* old */}
-              {/* <img
-                src={SuiteLetterLayout07}
-                alt="suiteletter layout"
-                className="border border-gray-300 rounded-md h-auto "
-              /> */}
-
-              {/* newly added */}
-              <img
-                src={layoutImages[currentLayoutImagesIndex]}
-                alt={`suiteletter layout ${currentLayoutImagesIndex + 1}`}
-                className="border border-gray-300 rounded-md h-auto"
-              />
+                <button
+                  onClick={handleNext}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors font-medium text-slate-700"
+                >
+                  Next →
+                </button>
+              </div>
             </div>
-            <div className="flex justify-between items-center mt-4">
-              <button
-                onClick={handlePrev}
-                className="text-sm text-primary hover:underline"
-              >
-                ← Previous
-              </button>
-              <span className="text-xs text-gray-500">
-                Layout {currentLayoutImagesIndex + 1} of {layoutImages.length}
-              </span>
-              <button
-                onClick={handleNext}
-                className="text-sm text-primary hover:underline"
-              >
-                Next →
-              </button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }
 
 export default AdminNewsLetterToggle;
-//SORRRY ANG HABAAA NAA POOO :(
