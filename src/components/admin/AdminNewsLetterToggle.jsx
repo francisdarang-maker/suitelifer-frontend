@@ -489,8 +489,10 @@ function AdminNewsLetterToggle() {
                 <h3 className="text-xl font-bold text-slate-900 mb-4">Currently Published Issue</h3>
                 <div
                   onClick={() => {
-                    handleMonthClick(currentPublishedIssue);
-                    setPrevClickedIssue(currentPublishedIssue);
+                    handleMonthClick(issue);
+                    setPrevClickedIssue(issue);
+                    // console.log("ETOOOO: ");
+                    // console.log(issue);
                   }}
                   className="bg-primary text-white p-6 rounded-2xl cursor-pointer hover:shadow-2xl transition-all hover:-translate-y-1 border border-primary"
                 >
