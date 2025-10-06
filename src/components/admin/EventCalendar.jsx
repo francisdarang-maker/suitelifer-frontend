@@ -22,6 +22,7 @@ const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
   const [activeFilters, setActiveFilters] = useState(
     Object.keys(eventColors).reduce((acc, key) => ({ ...acc, [key]: true }), {})
   );
+  const [draggedCategory, setDraggedCategory] = useState(null);
 
   // Computed values
   const filteredEvents = events.filter((event) => {
@@ -47,6 +48,94 @@ const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
     );
     setActiveFilters(newState);
   }, [activeFilters]);
+
+  // Drag and Drop handlers
+  const handleDragStart = useCallback((category) => {
+    setDraggedCategory(category);
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    // Clean up all drag-over highlights when drag ends
+    document.querySelectorAll(".rbc-day-bg.drag-over").forEach((cell) => {
+      cell.classList.remove("drag-over");
+    });
+    setDraggedCategory(null);
+  }, []);
+
+  // Handle drop on calendar
+  const handleCalendarDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      if (!draggedCategory) return;
+
+      // Find the calendar cell that was dropped on
+      const calendarCell = e.target.closest(".rbc-day-bg, .rbc-time-slot");
+      if (!calendarCell) return;
+
+      // Get the date from the cell's data attribute or calculate it
+      let droppedDate = new Date();
+
+      // For month view, find the date from the calendar structure
+      const dateSlot = calendarCell.closest(".rbc-day-bg");
+      if (dateSlot) {
+        // Get date from adjacent date header or calculate from calendar
+        const allDayCells = Array.from(
+          document.querySelectorAll(".rbc-day-bg")
+        );
+        const cellIndex = allDayCells.indexOf(dateSlot);
+
+        // Calculate the date based on the current view's visible dates
+        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+        const firstDayOfWeek = monthStart.getDay();
+        const cellDate = new Date(monthStart);
+        cellDate.setDate(cellDate.getDate() - firstDayOfWeek + cellIndex);
+        droppedDate = cellDate;
+      }
+
+      // Create event with the dropped date and category
+      const eventStart = new Date(droppedDate);
+      eventStart.setHours(9, 0, 0, 0); // Default to 9 AM
+      const eventEnd = new Date(eventStart.getTime() + 60 * 60 * 1000);
+
+      onSelectSlot({
+        start: eventStart,
+        end: eventEnd,
+        category: draggedCategory,
+      });
+
+      setDraggedCategory(null);
+    },
+    [draggedCategory, date, onSelectSlot]
+  );
+
+  const handleCalendarDragOver = useCallback((e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+
+    // Add visual feedback to the hovered cell
+    const calendarCell = e.target.closest(".rbc-day-bg");
+    if (calendarCell) {
+      calendarCell.classList.add("drag-over");
+    }
+  }, []);
+
+  const handleCalendarDragLeave = useCallback((e) => {
+    const calendarCell = e.target.closest(".rbc-day-bg");
+    if (calendarCell) {
+      calendarCell.classList.remove("drag-over");
+    }
+  }, []);
+
+  const handleSlotSelect = useCallback(
+    (slotInfo) => {
+      // Only pass through normal slot selection if not dragging
+      if (!draggedCategory) {
+        onSelectSlot(slotInfo);
+      }
+    },
+    [draggedCategory, onSelectSlot]
+  );
 
   // Google Drive utilities
   const extractFolderId = useCallback((gdriveLink) => {
@@ -279,35 +368,71 @@ const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
           .rbc-off-range-bg {
             background-color: #fafafa !important;
           }
+          .rbc-day-bg.drag-over {
+            background-color: #dbeafe !important;
+            border: 2px dashed #3b82f6 !important;
+            transition: all 0.2s ease;
+          }
         `}
       </style>
 
-      <Calendar
-        localizer={localizer}
-        events={filteredEvents}
-        startAccessor="start"
-        endAccessor="end"
-        titleAccessor="title"
-        selectable
-        onSelectSlot={onSelectSlot}
-        onSelectEvent={onSelectEvent}
-        style={{ height: 650, width: "100%" }}
-        components={{
-          toolbar: CustomToolbar,
-          event: CustomEvent,
-        }}
-        view={view}
-        onView={setView}
-        date={date}
-        onNavigate={setDate}
-        dayPropGetter={dayPropGetter}
-        eventPropGetter={eventPropGetter}
-      />
+      {draggedCategory && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-2">
+          <svg
+            className="w-5 h-5 text-blue-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
+          <span className="text-sm font-medium text-blue-800">
+            Drag the <strong>{eventColors[draggedCategory]?.label}</strong>{" "}
+            category to any date to create an event
+          </span>
+        </div>
+      )}
+
+      <div
+        onDrop={handleCalendarDrop}
+        onDragOver={handleCalendarDragOver}
+        onDragLeave={handleCalendarDragLeave}
+      >
+        <Calendar
+          localizer={localizer}
+          events={filteredEvents}
+          startAccessor="start"
+          endAccessor="end"
+          titleAccessor="title"
+          selectable
+          onSelectSlot={handleSlotSelect}
+          onSelectEvent={onSelectEvent}
+          style={{ height: 650, width: "100%" }}
+          components={{
+            toolbar: CustomToolbar,
+            event: CustomEvent,
+          }}
+          view={view}
+          onView={setView}
+          date={date}
+          onNavigate={setDate}
+          dayPropGetter={dayPropGetter}
+          eventPropGetter={eventPropGetter}
+        />
+      </div>
 
       <EventFilter
         activeFilters={activeFilters}
         toggleFilter={toggleFilter}
         toggleAllFilters={toggleAllFilters}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        draggedCategory={draggedCategory}
       />
     </div>
   );
