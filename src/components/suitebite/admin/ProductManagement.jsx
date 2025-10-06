@@ -3,23 +3,11 @@ import { suitebiteAPI } from "../../../utils/suitebiteAPI";
 import {
   PlusIcon,
   MagnifyingGlassIcon,
-  FunnelIcon,
-  ArrowsUpDownIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
   PencilIcon,
   TrashIcon,
-  EyeIcon,
-  EyeSlashIcon,
-  PhotoIcon,
-  XMarkIcon,
-  CheckIcon,
   ExclamationTriangleIcon,
-  DocumentArrowDownIcon,
-  ChartBarIcon,
-  CubeIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  CloudArrowUpIcon,
-  SwatchIcon,
 } from "@heroicons/react/24/outline";
 import useCategoryStore from "../../../store/stores/categoryStore";
 import AddProductForm from "./AddProductForm";
@@ -358,7 +346,9 @@ const ProductManagement = () => {
   };
 
   return (
-    <div className="product-management-container bg-white rounded-lg shadow-sm">
+    // Added Feature
+    // Removed Shadow Botton Orig  'shadow-md'
+    <div className="product-management-container bg-white rounded-lg ">
       {/* Toast Notification */}
       {notification.show && (
         <div
@@ -423,28 +413,38 @@ const ProductManagement = () => {
 
           {/* Sort Order */}
           <div className="sort-order">
-            <select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
+            {/* <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label> */}
+            <button
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-base text-gray-700 hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+              title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
             >
-              <option key="asc" value="asc">
-                Ascending
-              </option>
-              <option key="desc" value="desc">
-                Descending
-              </option>
-            </select>
+              <div className="flex items-center justify-between">
+                <span>{sortOrder === "asc" ? "Ascending" : "Descending"}</span>
+                {sortOrder === "desc" ? (
+                  <ArrowDownIcon className="w-5 h-5 text-gray-500" />
+                ) : (
+                  <ArrowUpIcon className="w-5 h-5 text-gray-500" />
+                )}
+              </div>
+            </button>
           </div>
 
           {/* Add Product Button - moved here */}
-          <div className="flex justify-end md:col-span-1">
+          {/* <div className="flex justify-end md:col-span-1 lg:col-span-1">
             <button
               onClick={handleAddProduct}
-              className="bg-[#0097b2] text-white px-4 py-1.5 rounded-lg hover:bg-[#007a8e] transition-colors duration-200 flex items-center gap-2 w-full md:w-auto text-base"
+              className=" bg-[#0097b2] text-white px-4 py-1.5 rounded-lg hover:bg-[#007a8e] transition-colors duration-200 flex items-center gap-2 w-full md:w-auto text-base"
             >
               <PlusIcon className="h-5 w-5" />
               Add Product
+            </button>
+          </div> */}
+
+          <div className="hidden md:flex 2xl:hidden">
+            <button className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#0097b2] text-white hover:bg-[#007a8e] transition-colors duration-200 text-base">
+              <PlusIcon className="h-5 w-5" />
+              <span>Add</span>
             </button>
           </div>
         </div>
@@ -463,22 +463,28 @@ const ProductManagement = () => {
           <>
             {/* Header Container */}
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+              {/* */}
+              <table className="w-full border-collapse ">
                 <thead>
-                  <tr className="bg-gray-100">
-                    <th className="relative text-left pl-3 py-3 font-medium text-gray-700 text-base w-30 max-w-120px after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                  <tr className="bg-gray-100 rounded-lg">
+                    {/* Image column – hidden on small screens */}
+                    <th className="hidden sm:w-2 sm:max-w-500px md:table-cell md:w-20 md:pr-9  xl:w-24 2xl:w-28 relative text-left pl-2 py-3 font-medium text-gray-700 text-base after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
                       Image
                     </th>
-                    <th className="relative text-left pl-3 py-3 font-medium text-gray-700 text-base w-145 max-w-580px after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                    {/* Name column */}
+                    <th className="w-40 sm:pr-100  md:w-60 md:pr-1 xl:w-[580px] 2xl:w-[600px] relative text-left pl-2 py-3 font-medium text-gray-700 text-base after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
                       Name
                     </th>
-                    <th className="relative text-left pl-3 py-3 font-medium text-gray-700 text-base w-43 max-w-172px after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                    {/* Category column – hidden on small screens */}
+                    <th className="hidden md:table-cell md:w-32 xl:w-[172px] relative text-left pl-2 py-3 font-medium text-gray-700 text-base after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
                       Category
                     </th>
-                    <th className="relative text-left pl-3 py-3 font-medium text-gray-700 text-base  w-35 max-w-140px  after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                    {/* Price column */}
+                    <th className="hidden w-20 md:w-24 md:inline-block xl:w-[140px] relative text-left pl-2 py-3 font-medium text-gray-700 text-base after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
                       Price
                     </th>
-                    <th className="text-left pl-3 py-3 font-medium text-gray-700 text-base">
+                    {/* Actions column */}
+                    <th className="w-20 md:w-24 xl:w-[140px] relative text-left pl-2 py-3 font-medium text-gray-700 text-base">
                       Actions
                     </th>
                   </tr>
@@ -487,64 +493,58 @@ const ProductManagement = () => {
             </div>
 
             {/* Body Container */}
-            <div className="overflow-x-auto overflow-y-auto max-h-[70vh]">
-              <table className="w-full border-collapse">
-                <tbody>
-                  {filteredProducts.map((product) => (
-                    <tr key={product.product_id} className="hover:bg-gray-50">
-                      <td className="p-2 border-b  border-gray-300 py-10">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                          {product.image_url ? (
-                            <img
-                              src={product.image_url}
-                              alt={product.name}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <PhotoIcon className="h-6 w-6 text-gray-400" />
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-2 border-b border-gray-300">
-                        <div>
-                          <p className="font-medium text-gray-900 text-base">
-                            {product.name}
-                          </p>
-                          <p className="text-sm text-gray-500 truncate max-w-xs">
-                            {product.description}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="p-2 border-b border-gray-300">
-                        {renderCategoryBadge(product.category)}
-                      </td>
-                      <td className="p-2 border-b border-gray-300 ">
-                        <span className="font-medium text-[#0097b2] text-base">
-                          {product.price || product.price_points || 0} pts
-                        </span>
-                      </td>
-                      <td className="p-2 border-b border-gray-300">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleEditProduct(product)}
-                            className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleDeleteProduct(product.product_id)
-                            }
-                            className="p-1 text-red-600 hover:text-red-800 transition-colors"
-                          >
-                            <TrashIcon className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex flex-col gap-4 max-h-[70vh] overflow-y-auto mt-3 hover:border-primary">
+              {filteredProducts.map((product) => (
+                <div
+                  key={product.product_id}
+                  // className="group flex items-center justify-between border border-gray-200 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-all duration-200 hover:border-[#0097b2] hover:bg-gray-50"
+                  className="group flex items-center justify-between border border-gray-300 rounded-xl p-4 bg-gray-50 hover:bg-white shadow-sm hover:shadow-md transition-all duration-200 hover:border-[#0097b2]"
+                >
+                  {/* Image */}
+                  {product.image_url && (
+                    // <div className="hidden md:flex w-15 h-15 bg-gray-100 rounded-lg items-center justify-center mr-4 shrink-0  hover:h-20 hover:w-20 group-hover:scale-105">
+                    <div className="hidden md:flex w-16 h-16 bg-white rounded-lg items-center justify-center mr-4 shrink-0 overflow-hidden transition-transform duration-300 group-hover:scale-105 shadow-sm group-hover:shadow-md ring-1 ring-gray-200">
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold font-sans text-xl text-gray-800 text-base leading-snug">
+                      {product.name}
+                    </p>
+                    <p className="text-sm text-gray-600 truncate mt-1 max-w-[200px]">
+                      {product.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-4 shrink-0">
+                    <div className="hidden md:flex md:pr-7  items-center lg:pr-5 ">
+                      {renderCategoryBadge(product.category)}
+                      <span className="font-medium text-[#0097b2] text-sm md:pl-20 lg:pl-10 xl:pr-10 xl:pl-15 2xl:pl-25 2xl:pr-15">
+                        {product.price || product.price_points || 0} pts
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      <PencilIcon className="h-6 w-6 transition-transform duration-200 hover:scale-150" />
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteProduct(product.product_id)}
+                      className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                    >
+                      <TrashIcon className="h-6 w-6 transition-transform duration-200 hover:scale-150" />
+                    </button>
+                  </div>
+                </div>
+                // </div>
+              ))}
             </div>
           </>
         )}

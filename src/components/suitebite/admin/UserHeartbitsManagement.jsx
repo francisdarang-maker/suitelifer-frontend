@@ -4,17 +4,14 @@ import { pointsSystemApi } from "../../../api/pointsSystemApi";
 import { formatDate } from "../../../utils/dateHelpers";
 import {
   MagnifyingGlassIcon,
-  FunnelIcon,
+  ArrowDownIcon,
+  ArrowUpIcon,
   XMarkIcon,
   CheckIcon,
-  TrashIcon,
   ArrowPathIcon,
   CogIcon,
   UserGroupIcon,
   HeartIcon,
-  PlusIcon,
-  MinusIcon,
-  PencilIcon,
 } from "@heroicons/react/24/outline";
 import { useStore } from "../../../store/authStore";
 
@@ -23,10 +20,12 @@ const UserHeartbitsManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  //
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
+  //
   const [globalLimit, setGlobalLimit] = useState(1000);
   const [showGlobalLimitModal, setShowGlobalLimitModal] = useState(false);
   const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false);
@@ -57,6 +56,19 @@ const UserHeartbitsManagement = () => {
       setGlobalLimit(1000);
     }
   };
+  //
+  const defaultValues = {
+    selectedUsers: [],
+    searchTerm: "",
+    sortBy: "name",
+    sortOrder: "asc",
+  };
+  const showResetButton =
+    selectedUsers.length > 0 ||
+    searchTerm !== defaultValues.searchTerm ||
+    sortBy !== defaultValues.sortBy ||
+    sortOrder !== defaultValues.sortOrder;
+  //
 
   const showNotification = (type, message) => {
     setNotification({ show: true, type, message });
@@ -220,7 +232,7 @@ const UserHeartbitsManagement = () => {
     setSortBy("name");
     setSortOrder("asc");
     setSelectedUsers([]);
-    showNotification("info", "All filters and selections reset");
+    // showNotification("info", "All filters and selections reset");
   };
 
   // Simplified filtering logic
@@ -443,7 +455,9 @@ const UserHeartbitsManagement = () => {
   };
 
   return (
-    <div className="user-heartbits-management rounded-lg shadow-sm pb-10 px-5 pt-2">
+    // Added Feature
+    // Removed Shadow Botton Orig  'shadow-sm'
+    <div className="user-heartbits-management rounded-lg  pb-10 px-5 pt-2">
       {/* Notification */}
       {notification.show && (
         <div
@@ -504,16 +518,25 @@ const UserHeartbitsManagement = () => {
             {sortOrder === "asc" ? "↑" : "↓"}
           </button> */}
           <div className="flex items-center gap-2">
-            <select
+            <label htmlFor="sortOrder" className="sr-only">
+              Sort Order
+            </label>
+            <button
               id="sortOrder"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm"
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="px-2 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
               style={{ minWidth: "120px" }}
+              title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
             >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
+              <div className="flex items-center justify-between">
+                <span>{sortOrder === "asc" ? "Ascending" : "Descending"}</span>
+                {sortOrder === "desc" ? (
+                  <ArrowDownIcon className="w-4 h-4 text-gray-500 ml-2" />
+                ) : (
+                  <ArrowUpIcon className="w-4 h-4 text-gray-500 ml-2" />
+                )}
+              </div>
+            </button>
           </div>
           {/* Added Feature */}
           {/* Removed focus:ring-2 focus:ring-[#0097b2] focus:border-transparent */}
@@ -540,13 +563,22 @@ const UserHeartbitsManagement = () => {
               ? "Deselect All"
               : "Select All"}
           </button>
-          <button
+          {/* Old */}
+          {/* <button
             onClick={resetFilters}
             className="px-2 py-2    border border-gray-300  rounded-lg text-sm font-medium flex items-center gap-2"
           >
             <ArrowPathIcon className="w-5 h-5 text-black" />
             Reset
-          </button>
+          </button> */}
+          {showResetButton && (
+            <button
+              onClick={resetFilters}
+              className="px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
+            >
+              Reset
+            </button>
+          )}
           {/*  */}
           {/* Added Feature */}
           {/* Change ui of button */}
@@ -666,12 +698,20 @@ const UserHeartbitsManagement = () => {
                   <div className="flex flex-col space-y-2">
                     {/* Avatar and Name Row */}
                     <div className="flex items-center space-x-3">
-                      <img
+                      {/* <img
                         src={user.avatar || "/default-avatar.png"}
                         alt={`${user.first_name || ""} ${
                           user.last_name || ""
                         }`.trim()}
                         className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
+                      /> */}
+                      <img
+                        src={user.avatar || "/default-avatar.png"}
+                        alt={`${user.first_name || ""} ${
+                          user.last_name || ""
+                        }`.trim()}
+                        // xl:inline-block
+                        className="block lg:hidden xl:hidden 2xl:inline-block w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="font-bold text-gray-900 text-sm sm:text-base truncate">
@@ -686,12 +726,14 @@ const UserHeartbitsManagement = () => {
                     </div>
 
                     {/* Heartbits Row */}
-                    <div className="flex items-center justify-center sm:justify-start gap-2 pt-1">
+                    <div className="flex items-center justify-start sm:justify-start gap-2 pt-1">
                       <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-pink-400 flex-shrink-0 " />
                       <span className="font-semibold text-[#0097b2] text-base sm:text-lg">
                         {user.heartbits_balance || 0}
                       </span>
-                      <span className="text-xs text-gray-500">Heartbits</span>
+                      <span className="block lg:hidden xl:inline-block text-xs text-gray-500">
+                        Heartbits
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -797,7 +839,7 @@ const UserHeartbitsManagement = () => {
 
       {/* Bulk Update Modal */}
       {showBulkUpdateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur  ">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Give Heartbits to Selected Users
