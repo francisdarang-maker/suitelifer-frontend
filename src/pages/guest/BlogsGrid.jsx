@@ -135,9 +135,9 @@ const BlogGrid = ({ blogs }) => {
     navigate(`/blog/${blogId}`);
   };
 
-  if (!blogs || blogs.length === 0) {
-    return <ComingSoon />;
-  }
+  // if (!blogs || blogs.length === 0) {
+  //   return <ComingSoon />;
+  // }
 
   // Filter out hidden blogs (section = -1) and sort by section
   const visibleBlogs = blogs
@@ -148,9 +148,9 @@ const BlogGrid = ({ blogs }) => {
       return sectionA - sectionB;
     });
 
-  if (visibleBlogs.length === 0) {
-    return <ComingSoon />;
-  }
+  // if (visibleBlogs.length === 0) {
+  //   return <ComingSoon />;
+  // }
 
   const totalCount = visibleBlogs.length;
 
@@ -170,7 +170,7 @@ const BlogGrid = ({ blogs }) => {
     case 7:
       return <SevenLayout blogs={visibleBlogs} onBlogClick={handleBlogClick} />;
     default:
-      return <ComingSoon />;
+      // return <ComingSoon />;
   }
 };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 function SmallTile({ blogId, imageUrl, title, article, onClick }) {
   const [expanded, setExpanded] = useState(false);
@@ -17,18 +17,22 @@ function SmallTile({ blogId, imageUrl, title, article, onClick }) {
 
   return (
     <div 
-      className="flex gap-4 items-start rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer" 
+      className="flex gap-4 items-start rounded-xl p-4 bg-white shadow-sm hover:scale-105 hover:shadow-md transition-all duration-300 cursor-pointer" 
       onClick={handleTileClick}
     >
       {/* Image Thumbnail */}
-      <div className="w-32 h-24 md:w-40 md:h-28 flex-shrink-0 rounded-md overflow-hidden">
-        <img
-          src={imageUrl}
-          alt={title}
-          className="w-full h-full object-cover"
-        />
+      <div className="w-32 h-24 md:w-40 md:h-28 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <span className="text-gray-400 text-xs">No Image</span>
+          // or you could use an <img src="/default-thumbnail.png" />
+        )}
       </div>
-
       {/* Content */}
       <div className="flex flex-col flex-1">
         <h3 className="font-semibold text-base text-gray-800 mb-1 line-clamp-2">
@@ -49,7 +53,7 @@ function SmallTile({ blogId, imageUrl, title, article, onClick }) {
           )}
           
           <button
-            className="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-200"
+            className="px-3 py-1 text-xs font-medium bg-primary text-white rounded-full hover:scale-105 transition-colors duration-200"
             onClick={(e) => {
               e.stopPropagation();
               handleTileClick();
