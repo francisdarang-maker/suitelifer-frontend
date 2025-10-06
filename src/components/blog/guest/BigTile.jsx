@@ -54,7 +54,7 @@ function BigTile({ blogId, imageUrl, title, article, onClick }) {
           )}
           
           <button
-            className="px-4 py-2 text-xs md:text-sm font-medium bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-200"
+            className="px-4 py-2 text-xs md:text-sm font-medium bg-primary text-white rounded-full hover:scale-105 transition-colors duration-200"
             onClick={(e) => {
               e.stopPropagation();
               handleTileClick();

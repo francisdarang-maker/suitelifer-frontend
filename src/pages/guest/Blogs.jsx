@@ -8,19 +8,26 @@ import BlogHeader from "../../components/blog/guest/BlogHeader";
 import MotionUp from "../../components/animated/MotionUp";
 import api from "../../utils/axios";
 import BlogGrid from "../guest/BlogsGrid";
+import Loading from "../../components/loader/Loading";
 
 function Blogs() {
   const location = useLocation();
   const [blogs, setBlogs] = useState([]);
   const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchBlogs = async () => {
     try {
+      setIsLoading(true)
       const getBlogs = await api.get("/api/blogs");
       if (!getBlogs) {
         return isError(true);
       }
-      setBlogs(getBlogs.data["data"]);
+      const filteredBlogs = getBlogs.data['data'].filter((blog) => blog.section !== 0)
+      setBlogs(filteredBlogs);
+
+      // Done Loading
+      setIsLoading(false)
     } catch (error) {
       setIsError(true);
       console.log(error);
@@ -41,7 +48,7 @@ function Blogs() {
       }}
     >
       <PageMeta
-        title="Home | Empowering Careers & Opportunities - Suitelifer"
+        title="Blogs | Empowering Careers & Opportunities - Suitelifer"
         desc="Discover career opportunities, company insights, and the latest updates at FullSuite. Your journey to success starts here."
         isDefer={false}
         url={location.pathname}
@@ -64,9 +71,10 @@ function Blogs() {
           <BlogHeader />
         </MotionUp>
       </section>
-
-      {/* BLOG GRID (Dynamic) */}
-      <BlogGrid blogs={blogs} />
+        {
+          isLoading ?  <Loading/> : 
+          <BlogGrid blogs={blogs} />
+        } 
     </section>
   );
 }
