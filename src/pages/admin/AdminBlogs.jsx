@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FileText, Sparkles, CircleAlert } from "lucide-react";
+import { FileText, NotebookPen } from "lucide-react";
 import api from "../../utils/axios";
 import BlogContentCard from "../../components/blog/admin/BlogContentCard";
 import Loading from "../../components/loader/Loading";
@@ -162,12 +162,11 @@ function AdminBlogs() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-gradient-to-br bg-primary rounded-lg shadow-lg">
-              <Sparkles className="w-6 h-6 text-white" />
+              <NotebookPen  className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
               Blog Management
             </h1>
-            <CircleAlert className="text-primary h-5 w-5" />
           </div>
         </div>
 
@@ -197,79 +196,83 @@ function AdminBlogs() {
           />
         )}
 
-        {isLoading ? (
-          <Loading />
-        ) : isError ? (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-lg border border-red-200">
-            <div className="text-red-600 text-lg font-semibold mb-2">
-              Failed to load blogs
-            </div>
-            <p className="text-slate-600 mb-4">
-              There was an error loading the blogs. Please try again.
-            </p>
-            <button
-              onClick={fetchBlogs}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all font-medium"
-            >
-              Retry
-            </button>
-          </div>
-        ) : paginatedBlogs.length > 0 ? (
+        {!showAddForm && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {paginatedBlogs.map((blog) => (
-                <BlogContentCard
-                  key={blog.blogId}
-                  blog={blog}
-                  onEdit={() => {
-                    setEditBlog(blog);
-                    setIsEditing(true);
-                  }}
-                  onDelete={() => setDeleteBlog(blog)}
-                />
-              ))}
-            </div>
+            {isLoading ? (
+              <Loading />
+            ) : isError ? (
+              <div className="text-center py-20 bg-white rounded-2xl shadow-lg border border-red-200">
+                <div className="text-red-600 text-lg font-semibold mb-2">
+                  Failed to load blogs
+                </div>
+                <p className="text-slate-600 mb-4">
+                  There was an error loading the blogs. Please try again.
+                </p>
+                <button
+                  onClick={fetchBlogs}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all font-medium"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : paginatedBlogs.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {paginatedBlogs.map((blog) => (
+                    <BlogContentCard
+                      key={blog.blogId}
+                      blog={blog}
+                      onEdit={() => {
+                        setEditBlog(blog);
+                        setIsEditing(true);
+                      }}
+                      onDelete={() => setDeleteBlog(blog)}
+                    />
+                  ))}
+                </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                >
-                  Previous
-                </button>
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`w-10 h-10 rounded-lg font-medium transition-all ${
-                      currentPage === i + 1
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
-                        : "bg-white border border-slate-200 hover:bg-slate-50"
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                >
-                  Next
-                </button>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      Previous
+                    </button>
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`w-10 h-10 rounded-lg font-medium transition-all ${
+                          currentPage === i + 1
+                            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                            : "bg-white border border-slate-200 hover:bg-slate-50"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-20 bg-white rounded-2xl shadow-lg border border-slate-200">
+                <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-600 text-lg">No blogs found</p>
               </div>
             )}
           </>
-        ) : (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-lg border border-slate-200">
-            <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-600 text-lg">No blogs found</p>
-          </div>
         )}
 
         {isEditing && editBlog && (
@@ -277,6 +280,7 @@ function AdminBlogs() {
             blog={editBlog}
             onEdit={handleEditBlog}
             setIsEditing={setIsEditing}
+            blogs={blogs}
           />
         )}
       </div>

@@ -44,7 +44,13 @@ import YearFilterDropDown from "./NewsletterFilter";
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import api from "../../utils/axios";
 import formatTimestamp from "../../utils/formatTimestamp";
-import { ArrowLeft, Sparkles, Calendar, FileText, Notebook } from "lucide-react";
+import {
+  ArrowLeft,
+  Sparkles,
+  Calendar,
+  FileText,
+  Notebook,
+} from "lucide-react";
 import ActionButtons from "../buttons/ActionButtons";
 import { useStore } from "../../store/authStore";
 import toast from "react-hot-toast";
@@ -60,7 +66,9 @@ function AdminNewsLetterToggle() {
   const addLog = useAddAuditLog();
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isUnPublishModalOpen, setIsUnPublishModalOpen] = useState(false);
-  const [sectionsNewsletterByMonth, setSectionsNewsletterByMonth] = useState([]);
+  const [sectionsNewsletterByMonth, setSectionsNewsletterByMonth] = useState(
+    []
+  );
   const user = useStore((state) => state.user);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
@@ -74,7 +82,9 @@ function AdminNewsLetterToggle() {
   const [openIssueDialog, setOpenIssueDialog] = useState(false);
   const [isOpenArticleForm, setIsOpenArticleForm] = useState(false);
   const [prevClickedIssue, setPrevClickedIssue] = useState({});
-  const [openSuiteletterLayoutInfoDialog, setOpenSuiteletterLayoutInfoDialog] = useState(false);
+  const [openSuiteletterLayoutInfoDialog, setOpenSuiteletterLayoutInfoDialog] =
+    useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const defaultArticleDetails = {
     newsletterId: "",
@@ -90,10 +100,20 @@ function AdminNewsLetterToggle() {
   const currentMonth = currentDate.getMonth() + 1;
 
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
-  
+
   const [selectedYear, setSelectedYear] = useState(currentYear);
 
   let initMonth = currentMonth + 1;
@@ -120,13 +140,30 @@ function AdminNewsLetterToggle() {
       return [];
     }
     if (currentIssue.year === currentYear) {
-      return Array.from({ length: 12 - currentMonth + 1 }, (_, i) => currentMonth + i);
+      return Array.from(
+        { length: 12 - currentMonth + 1 },
+        (_, i) => currentMonth + i
+      );
     }
     if (currentIssue.year > currentYear) {
       return Array.from({ length: 12 }, (_, i) => i + 1);
     }
     return [];
   }, [currentIssue.year, currentMonth, currentYear]);
+
+  const filteredNewsletters = useMemo(() => {
+    if (!searchQuery.trim()) return newslettersByMonth;
+    const query = searchQuery.toLowerCase();
+    return newslettersByMonth.filter(
+      (article) =>
+        article.title.toLowerCase().includes(query) ||
+        article.pseudonym?.toLowerCase().includes(query) ||
+        article.article
+          ?.replace(/<[^>]+>/g, "")
+          .toLowerCase()
+          .includes(query)
+    );
+  }, [newslettersByMonth, searchQuery]);
 
   const handleSaveIssue = async () => {
     if (!currentIssue.month || !currentIssue.year) {
@@ -151,21 +188,27 @@ function AdminNewsLetterToggle() {
     }
 
     const newIssue = { ...currentIssue, userId: user.id };
-    
+
     try {
       const response = await api.post("/api/issues", newIssue);
       if (response.data?.success) {
         toast.success(response.data.message);
         addLog({
           action: "CREATE",
-          description: `New issue for ${getMonthName(currentIssue.month)} ${currentIssue.year} has been created`,
+          description: `New issue for ${getMonthName(currentIssue.month)} ${
+            currentIssue.year
+          } has been created`,
         });
       } else {
         toast.error(response.data.message || "Failed to save issue.");
       }
     } catch (err) {
       if (err.response?.data?.month && err.response?.data?.year) {
-        toast.error(`Issue for ${getMonthName(err.response.data.month)} ${err.response.data.year} already exists.`);
+        toast.error(
+          `Issue for ${getMonthName(err.response.data.month)} ${
+            err.response.data.year
+          } already exists.`
+        );
         return;
       } else {
         toast.error("An error occurred while saving. Please try again.");
@@ -182,7 +225,7 @@ function AdminNewsLetterToggle() {
     try {
       const response = await api.get("/api/newsletter?issueId=" + issueId);
       const fetchedNewslettersByMonth = response.data.newsletters;
-      
+
       const sortedNewsletters = [...fetchedNewslettersByMonth].sort((a, b) => {
         const aNum = Number(a.section);
         const bNum = Number(b.section);
@@ -208,8 +251,12 @@ function AdminNewsLetterToggle() {
       setSelectedMonthlyIssue((prev) => ({
         ...prev,
         articleCount: fetchedNewslettersByMonth.length,
-        assigned: fetchedNewslettersByMonth.filter((newsletter) => newsletter.section > 0).length,
-        unassigned: fetchedNewslettersByMonth.filter((newsletter) => newsletter.section === 0).length,
+        assigned: fetchedNewslettersByMonth.filter(
+          (newsletter) => newsletter.section > 0
+        ).length,
+        unassigned: fetchedNewslettersByMonth.filter(
+          (newsletter) => newsletter.section === 0
+        ).length,
       }));
 
       setIssues((prev) =>
@@ -218,8 +265,12 @@ function AdminNewsLetterToggle() {
             ? {
                 ...issue,
                 articleCount: fetchedNewslettersByMonth.length,
-                assigned: fetchedNewslettersByMonth.filter((newsletter) => newsletter.section > 0).length,
-                unassigned: fetchedNewslettersByMonth.filter((newsletter) => newsletter.section === 0).length,
+                assigned: fetchedNewslettersByMonth.filter(
+                  (newsletter) => newsletter.section > 0
+                ).length,
+                unassigned: fetchedNewslettersByMonth.filter(
+                  (newsletter) => newsletter.section === 0
+                ).length,
               }
             : issue
         )
@@ -245,6 +296,7 @@ function AdminNewsLetterToggle() {
   const handleMonthClick = (monthlyIssue) => {
     setSelectedMonthlyIssue(monthlyIssue);
     fetchNewsLettersByMonth(monthlyIssue.issueId);
+    setSearchQuery("");
   };
 
   const handleAddEditArticle = (e) => {
@@ -301,12 +353,18 @@ function AdminNewsLetterToggle() {
 
   const handlePublishIssue = async () => {
     try {
-      const response = await api.patch("/api/issues", { issueId: selectedMonthlyIssue.issueId }, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await api.patch(
+        "/api/issues",
+        { issueId: selectedMonthlyIssue.issueId },
+        { headers: { "Content-Type": "application/json" } }
+      );
 
       if (response.data.success) {
-        toast.success(`${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue published successfully.`);
+        toast.success(
+          `${getMonthName(selectedMonthlyIssue.month)} ${
+            selectedMonthlyIssue.year
+          } issue published successfully.`
+        );
         setUpdateTrigger(Date.now());
         setSelectedMonthlyIssue(null);
         setIsOpenArticleForm(false);
@@ -315,22 +373,32 @@ function AdminNewsLetterToggle() {
       }
       addLog({
         action: "CREATE",
-        description: `${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue has been published`,
+        description: `${getMonthName(selectedMonthlyIssue.month)} ${
+          selectedMonthlyIssue.year
+        } issue has been published`,
       });
     } catch (error) {
       console.error("Error publishing issue:", error);
-      toast.error("An error occurred while publishing the issue. Please try again.");
+      toast.error(
+        "An error occurred while publishing the issue. Please try again."
+      );
     }
   };
 
   const handleUnPublishIssue = async () => {
     try {
-      const response = await api.patch("/api/issues/unpublish", { issueId: selectedMonthlyIssue.issueId }, {
-        headers: { "Content-Type": "application/json" },
-      });
-      
+      const response = await api.patch(
+        "/api/issues/unpublish",
+        { issueId: selectedMonthlyIssue.issueId },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
       if (response.data.success) {
-        toast.success(`${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue unpublished successfully.`);
+        toast.success(
+          `${getMonthName(selectedMonthlyIssue.month)} ${
+            selectedMonthlyIssue.year
+          } issue unpublished successfully.`
+        );
         setUpdateTrigger(Date.now());
         setSelectedMonthlyIssue(null);
         setIsOpenArticleForm(false);
@@ -339,11 +407,15 @@ function AdminNewsLetterToggle() {
       }
       addLog({
         action: "UPDATE",
-        description: `${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue has been unpublished`,
+        description: `${getMonthName(selectedMonthlyIssue.month)} ${
+          selectedMonthlyIssue.year
+        } issue has been unpublished`,
       });
     } catch (error) {
       console.error("Error unpublishing issue:", error);
-      toast.error("An error occurred while unpublishing the issue. Please try again.");
+      toast.error(
+        "An error occurred while unpublishing the issue. Please try again."
+      );
     }
   };
 
@@ -370,7 +442,7 @@ function AdminNewsLetterToggle() {
   };
 
   const [updateTableTrigger, setUpdateTableTrigger] = useState(Date.now());
-  
+
   useEffect(() => {
     if (updateTableTrigger) {
       fetchNewsLettersByMonth(newsletterDetails.issueId);
@@ -407,31 +479,41 @@ function AdminNewsLetterToggle() {
   const [confirmBackModalOpen, setConfirmBackModalOpen] = useState(false);
 
   const layoutImages = [
-    SuiteLetterLayout01, SuiteLetterLayout02, SuiteLetterLayout03,
-    SuiteLetterLayout04, SuiteLetterLayout05, SuiteLetterLayout06,
+    SuiteLetterLayout01,
+    SuiteLetterLayout02,
+    SuiteLetterLayout03,
+    SuiteLetterLayout04,
+    SuiteLetterLayout05,
+    SuiteLetterLayout06,
     SuiteLetterLayout07,
   ];
   const [currentLayoutImagesIndex, setLayoutImagesIndex] = useState(0);
 
   const handlePrev = () => {
-    setLayoutImagesIndex((prev) => (prev === 0 ? layoutImages.length - 1 : prev - 1));
+    setLayoutImagesIndex((prev) =>
+      prev === 0 ? layoutImages.length - 1 : prev - 1
+    );
   };
 
   const handleNext = () => {
-    setLayoutImagesIndex((prev) => (prev === layoutImages.length - 1 ? 0 : prev + 1));
+    setLayoutImagesIndex((prev) =>
+      prev === layoutImages.length - 1 ? 0 : prev + 1
+    );
   };
 
-  // Calculate total issues and stats
   const totalIssues = issues.length;
-  const publishedIssues = issues.filter(i => i.is_published).length;
-  const totalArticles = issues.reduce((sum, i) => sum + (i.articleCount || 0), 0);
+  const publishedIssues = issues.filter((i) => i.is_published).length;
+  const totalArticles = issues.reduce(
+    (sum, i) => sum + (i.articleCount || 0),
+    0
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-white via-white-50 to-white-50 p-8">
       <div className="max-w-7xl mx-auto">
-        {(!selectedMonthlyIssue || selectedMonthlyIssue.month === undefined) && !isOpenArticleForm ? (
+        {(!selectedMonthlyIssue || selectedMonthlyIssue.month === undefined) &&
+        !isOpenArticleForm ? (
           <>
-            {/* Header */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-primary rounded-lg shadow-lg">
@@ -441,16 +523,18 @@ function AdminNewsLetterToggle() {
                   Newsletter Management
                 </h1>
               </div>
-              <p className="text-slate-600 ml-14">Create, manage, and publish newsletter issues</p>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600">Total Issues</p>
-                    <p className="text-3xl font-bold text-slate-900 mt-1">{totalIssues}</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Total Issues
+                    </p>
+                    <p className="text-3xl font-bold text-slate-900 mt-1">
+                      {totalIssues}
+                    </p>
                   </div>
                   <div className="p-3 bg-blue-100 rounded-xl">
                     <NewspaperIcon className="w-6 h-6 text-blue-600" />
@@ -461,8 +545,12 @@ function AdminNewsLetterToggle() {
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600">Published</p>
-                    <p className="text-3xl font-bold text-slate-900 mt-1">{publishedIssues}</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Published
+                    </p>
+                    <p className="text-3xl font-bold text-slate-900 mt-1">
+                      {publishedIssues}
+                    </p>
                   </div>
                   <div className="p-3 bg-emerald-100 rounded-xl">
                     <CheckCircleIcon className="w-6 h-6 text-emerald-600" />
@@ -473,8 +561,12 @@ function AdminNewsLetterToggle() {
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600">Total Articles</p>
-                    <p className="text-3xl font-bold text-slate-900 mt-1">{totalArticles}</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Total Articles
+                    </p>
+                    <p className="text-3xl font-bold text-slate-900 mt-1">
+                      {totalArticles}
+                    </p>
                   </div>
                   <div className="p-3 bg-indigo-100 rounded-xl">
                     <FileText className="w-6 h-6 text-indigo-600" />
@@ -483,35 +575,41 @@ function AdminNewsLetterToggle() {
               </div>
             </div>
 
-            {/* Currently Published Issue */}
             {currentPublishedIssue && (
               <div className="mb-8">
-                <h3 className="text-xl font-bold text-slate-900 mb-4">Currently Published Issue</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-4">
+                  Currently Published Issue
+                </h3>
                 <div
                   onClick={() => {
-                    handleMonthClick(issue);
-                    setPrevClickedIssue(issue);
-                    // console.log("ETOOOO: ");
-                    // console.log(issue);
+                    handleMonthClick(currentPublishedIssue);
+                    setPrevClickedIssue(currentPublishedIssue);
                   }}
                   className="bg-primary text-white p-6 rounded-2xl cursor-pointer hover:shadow-2xl transition-all hover:-translate-y-1 border border-primary"
                 >
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <h3 className="text-2xl font-bold">
-                      {getMonthName(currentPublishedIssue.month)} {currentPublishedIssue.year}
+                      {getMonthName(currentPublishedIssue.month)}{" "}
+                      {currentPublishedIssue.year}
                     </h3>
                     <div className="flex gap-6 flex-wrap">
                       <div className="flex items-center gap-2">
                         <RectangleStackIcon className="h-5 w-5" />
-                        <span className="font-medium">{currentPublishedIssue.articleCount} articles</span>
+                        <span className="font-medium">
+                          {currentPublishedIssue.articleCount} articles
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircleIcon className="h-5 w-5" />
-                        <span className="font-medium">{currentPublishedIssue.assigned}/7 assigned</span>
+                        <span className="font-medium">
+                          {currentPublishedIssue.assigned}/7 assigned
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <MinusCircleIcon className="h-5 w-5" />
-                        <span className="font-medium">{currentPublishedIssue.unassigned} unassigned</span>
+                        <span className="font-medium">
+                          {currentPublishedIssue.unassigned} unassigned
+                        </span>
                       </div>
                     </div>
                     <ArrowRightIcon className="h-6 w-6" />
@@ -520,11 +618,12 @@ function AdminNewsLetterToggle() {
               </div>
             )}
 
-            {/* All Issues Section */}
             <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-slate-200">
               <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-xl font-bold text-slate-900">All Issues</h3>
+                  <h3 className="text-xl font-bold text-slate-900">
+                    All Issues
+                  </h3>
                   <InformationCircleIcon
                     ref={anchorRef}
                     onClick={() => setOpen((prev) => !prev)}
@@ -546,7 +645,11 @@ function AdminNewsLetterToggle() {
                     onClick={handleSortToggle}
                     className="flex items-center gap-2 text-sm text-slate-600 hover:text-blue-600 transition-colors"
                   >
-                    {isNewestFirst ? <ArrowDownIcon className="h-4 w-4" /> : <ArrowUpIcon className="h-4 w-4" />}
+                    {isNewestFirst ? (
+                      <ArrowDownIcon className="h-4 w-4" />
+                    ) : (
+                      <ArrowUpIcon className="h-4 w-4" />
+                    )}
                     {isNewestFirst ? "Newest first" : "Oldest first"}
                   </button>
 
@@ -563,7 +666,6 @@ function AdminNewsLetterToggle() {
                 </div>
               </div>
 
-              {/* Issues Grid */}
               {issues.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {issues.map((issue) => (
@@ -593,10 +695,16 @@ function AdminNewsLetterToggle() {
                               : "#F57C00",
                           }}
                         />
-                        <h3 className="text-xl font-bold text-slate-900">{getMonthName(issue.month)}</h3>
-                        {issue.is_published && (
+                        <h3 className="text-xl font-bold text-slate-900">
+                          {getMonthName(issue.month)}
+                        </h3>
+                        {issue.is_published ? (
                           <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">
                             Published
+                          </span>
+                        ) : (
+                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-medium">
+                            Unpublished
                           </span>
                         )}
                       </div>
@@ -618,7 +726,8 @@ function AdminNewsLetterToggle() {
 
                       <div className="pt-4 border-t border-slate-200">
                         <p className="text-xs text-slate-500">
-                          Created {formatTimestamp(issue.issueCreatedAt).fullDate}
+                          Created{" "}
+                          {formatTimestamp(issue.issueCreatedAt).fullDate}
                         </p>
                       </div>
                     </div>
@@ -626,38 +735,62 @@ function AdminNewsLetterToggle() {
                 </div>
               ) : (
                 <div className="text-center py-20">
-                  <img src={emptyIllustration} alt="No issues" className="w-auto h-40 mx-auto mb-6 opacity-50" />
-                  <p className="text-slate-600 text-lg font-medium">No issues for {selectedYear}</p>
-                  <p className="text-slate-500 text-sm mt-2">Create your first issue to get started</p>
+                  <img
+                    src={emptyIllustration}
+                    alt="No issues"
+                    className="w-auto h-40 mx-auto mb-6 opacity-50"
+                  />
+                  <p className="text-slate-600 text-lg font-medium">
+                    No issues for {selectedYear}
+                  </p>
+                  <p className="text-slate-500 text-sm mt-2">
+                    Create your first issue to get started
+                  </p>
                 </div>
               )}
             </div>
 
-            {/* Legend Popper */}
-            <Popper open={open} anchorEl={anchorRef.current} placement="bottom-start">
+            <Popper
+              open={open}
+              anchorEl={anchorRef.current}
+              placement="bottom-start"
+            >
               <ClickAwayListener onClickAway={() => setOpen(false)}>
                 <Paper className="p-4 mt-2 rounded-xl shadow-xl border border-slate-200">
-                  <p className="font-bold mb-3 text-sm text-slate-900">LEGEND</p>
+                  <p className="font-bold mb-3 text-sm text-slate-900">
+                    LEGEND
+                  </p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                      <span className="text-xs text-slate-600">Currently Published</span>
+                      <span className="text-xs text-slate-600">
+                        Currently Published
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-[#0097A7]" />
-                      <span className="text-xs text-slate-600">Complete/Ready to Publish</span>
+                      <span className="text-xs text-slate-600">
+                        Complete/Ready to Publish
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-[#F57C00]" />
-                      <span className="text-xs text-slate-600">In Progress/Incomplete</span>
+                      <span className="text-xs text-slate-600">
+                        In Progress/Incomplete
+                      </span>
                     </div>
                   </div>
                 </Paper>
               </ClickAwayListener>
             </Popper>
 
-            {/* Add Issue Dialog */}
-            <Dialog open={openIssueDialog} onClose={() => {}} fullWidth maxWidth="sm" disableEscapeKeyDown>
+            <Dialog
+              open={openIssueDialog}
+              onClose={() => {}}
+              fullWidth
+              maxWidth="sm"
+              disableEscapeKeyDown
+            >
               <DialogTitle className="text-xl font-bold">
                 {currentIssue.issueId ? "Edit Issue" : "Add New Issue"}
               </DialogTitle>
@@ -678,9 +811,13 @@ function AdminNewsLetterToggle() {
                       }
                       className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     >
-                      <option value="" hidden>Select year</option>
+                      <option value="" hidden>
+                        Select year
+                      </option>
                       {yearOptions.map((year) => (
-                        <option key={year} value={year}>{year}</option>
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -699,7 +836,9 @@ function AdminNewsLetterToggle() {
                       }
                       className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     >
-                      <option value="" hidden>Select month</option>
+                      <option value="" hidden>
+                        Select month
+                      </option>
                       {monthOptions.map((monthNumber) => (
                         <option key={monthNumber} value={monthNumber}>
                           {months[monthNumber - 1]}
@@ -718,7 +857,7 @@ function AdminNewsLetterToggle() {
                 </button>
                 <button
                   onClick={handleSaveIssue}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all font-medium"
+                  className="px-6 py-3 bg-primary text-white rounded-xl hover:shadow-lg transition-all font-medium"
                 >
                   Save Issue
                 </button>
@@ -727,14 +866,15 @@ function AdminNewsLetterToggle() {
           </>
         ) : selectedMonthlyIssue && !isOpenArticleForm ? (
           <>
-            {/* Issue Details View */}
             <div className="mb-6">
               <button
                 onClick={() => handleMonthClick(null)}
-                className="group flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mb-6"
+                className="group flex items-center gap-2 text-primary hover:text-blue-700 transition-colors mb-6"
               >
                 <ArrowLeft size={18} />
-                <span className="font-medium group-hover:underline">Back to all issues</span>
+                <span className="font-medium group-hover:underline">
+                  Back to all issues
+                </span>
               </button>
 
               <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
@@ -751,7 +891,8 @@ function AdminNewsLetterToggle() {
                       }}
                     />
                     <h2 className="text-3xl font-bold text-slate-900">
-                      {getMonthName(selectedMonthlyIssue.month)} {selectedMonthlyIssue.year}
+                      {getMonthName(selectedMonthlyIssue.month)}{" "}
+                      {selectedMonthlyIssue.year}
                     </h2>
                     {selectedMonthlyIssue.is_published && (
                       <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium">
@@ -785,20 +926,82 @@ function AdminNewsLetterToggle() {
                   </div>
                 </div>
 
-                {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
-                    <p className="text-sm font-medium text-slate-600 mb-1">Total Articles</p>
-                    <p className="text-3xl font-bold text-slate-900">{selectedMonthlyIssue.articleCount}</p>
+                    <p className="text-sm font-medium text-slate-600 mb-1">
+                      Total Articles
+                    </p>
+                    <p className="text-3xl font-bold text-slate-900">
+                      {selectedMonthlyIssue.articleCount}
+                    </p>
                   </div>
                   <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
-                    <p className="text-sm font-medium text-slate-600 mb-1">Assigned</p>
-                    <p className="text-3xl font-bold text-slate-900">{selectedMonthlyIssue.assigned}/7</p>
+                    <p className="text-sm font-medium text-slate-600 mb-1">
+                      Assigned
+                    </p>
+                    <p className="text-3xl font-bold text-slate-900">
+                      {selectedMonthlyIssue.assigned}/7
+                    </p>
                   </div>
                   <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-100">
-                    <p className="text-sm font-medium text-slate-600 mb-1">Unassigned</p>
-                    <p className="text-3xl font-bold text-slate-900">{selectedMonthlyIssue.unassigned}</p>
+                    <p className="text-sm font-medium text-slate-600 mb-1">
+                      Unassigned
+                    </p>
+                    <p className="text-3xl font-bold text-slate-900">
+                      {selectedMonthlyIssue.unassigned}
+                    </p>
                   </div>
+                </div>
+
+                <div className="mb-6">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search articles by title, author, or content..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full px-4 py-3 pl-11 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                    <svg
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  {searchQuery && (
+                    <p className="mt-2 text-sm text-slate-600">
+                      Found {filteredNewsletters.length} article
+                      {filteredNewsletters.length !== 1 ? "s" : ""}
+                    </p>
+                  )}
                 </div>
 
                 <button
@@ -811,43 +1014,51 @@ function AdminNewsLetterToggle() {
               </div>
             </div>
 
-            {/* Articles Cards */}
             <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
               <div className="p-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">Articles</h3>
+                    <h3 className="text-xl font-bold text-slate-900">
+                      Articles
+                    </h3>
                     <p className="text-sm text-slate-600 mt-1">
-                      {newslettersByMonth.length} article{newslettersByMonth.length !== 1 ? 's' : ''} in this issue
+                      {filteredNewsletters.length} article
+                      {filteredNewsletters.length !== 1 ? "s" : ""}{" "}
+                      {searchQuery ? "found" : "in this issue"}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-100">
                       <CheckCircleIcon className="w-4 h-4 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-700">{selectedMonthlyIssue.assigned} Assigned</span>
+                      <span className="text-sm font-medium text-blue-700">
+                        {selectedMonthlyIssue.assigned} Assigned
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-50 rounded-lg border border-orange-100">
                       <MinusCircleIcon className="w-4 h-4 text-orange-600" />
-                      <span className="text-sm font-medium text-orange-700">{selectedMonthlyIssue.unassigned} Unassigned</span>
+                      <span className="text-sm font-medium text-orange-700">
+                        {selectedMonthlyIssue.unassigned} Unassigned
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-6">
-                {newslettersByMonth.length > 0 ? (
+                {filteredNewsletters.length > 0 ? (
                   <div className="space-y-4">
-                    {newslettersByMonth.map((article, index) => (
+                    {filteredNewsletters.map((article, index) => (
                       <div
                         key={article.newsletterId}
                         className="group bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-slate-300 transition-all duration-200"
                       >
                         <div className="flex items-start justify-between gap-4">
-                          {/* Left Content */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start gap-3 mb-3">
                               <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                                {index + 1}
+                                {newslettersByMonth.findIndex(
+                                  (a) => a.newsletterId === article.newsletterId
+                                ) + 1}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h4 className="text-lg font-bold text-slate-900 mb-1 line-clamp-1">
@@ -858,27 +1069,40 @@ function AdminNewsLetterToggle() {
                                 </p>
                               </div>
                             </div>
-                            
-                            {/* Article Info */}
+
                             <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 ml-13">
                               <div className="flex items-center gap-1.5">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                  />
                                 </svg>
-                                <span className="font-medium">{article.pseudonym || "N/A"}</span>
+                                <span className="font-medium">
+                                  {article.pseudonym || "N/A"}
+                                </span>
                               </div>
-                              
+
                               <div className="flex items-center gap-1.5">
                                 <Calendar className="w-4 h-4" />
                                 <span>
-                                  {new Date(article.createdAt).toLocaleDateString("en-US", {
+                                  {new Date(
+                                    article.createdAt
+                                  ).toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
                                     year: "numeric",
                                   })}
                                 </span>
                               </div>
-                              
+
                               <div>
                                 {article.section === 0 ? (
                                   <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 border border-orange-200">
@@ -892,8 +1116,7 @@ function AdminNewsLetterToggle() {
                               </div>
                             </div>
                           </div>
-                          
-                          {/* Action Buttons */}
+
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleEditClick(article)}
@@ -919,14 +1142,19 @@ function AdminNewsLetterToggle() {
                     <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
                       <FileText className="w-8 h-8 text-slate-400" />
                     </div>
-                    <p className="text-slate-600 font-medium mb-1">No articles yet</p>
-                    <p className="text-slate-500 text-sm">Add your first article to get started</p>
+                    <p className="text-slate-600 font-medium mb-1">
+                      {searchQuery ? "No articles found" : "No articles yet"}
+                    </p>
+                    <p className="text-slate-500 text-sm">
+                      {searchQuery
+                        ? "Try a different search term"
+                        : "Add your first article to get started"}
+                    </p>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Confirmation Dialogs */}
             <ConfirmationDialog
               open={isPublishModalOpen}
               onClose={() => setIsPublishModalOpen(false)}
@@ -934,7 +1162,9 @@ function AdminNewsLetterToggle() {
                 setIsPublishModalOpen(false);
                 await handlePublishIssue();
               }}
-              title={`Publish ${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue?`}
+              title={`Publish ${getMonthName(selectedMonthlyIssue.month)} ${
+                selectedMonthlyIssue.year
+              } issue?`}
               description="This will publish the issue and make it visible to the public. Are you sure you want to proceed?"
               confirmLabel="Publish"
               cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
@@ -948,7 +1178,9 @@ function AdminNewsLetterToggle() {
                 setIsUnPublishModalOpen(false);
                 await handleUnPublishIssue();
               }}
-              title={`Unpublish ${getMonthName(selectedMonthlyIssue.month)} ${selectedMonthlyIssue.year} issue?`}
+              title={`Unpublish ${getMonthName(selectedMonthlyIssue.month)} ${
+                selectedMonthlyIssue.year
+              } issue?`}
               description="This will unpublish the issue and hide it from the public. Are you sure you want to proceed?"
               confirmLabel="Unpublish"
               cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
@@ -968,14 +1200,15 @@ function AdminNewsLetterToggle() {
           </>
         ) : (
           <>
-            {/* Article Form */}
             <div className="mb-6">
               <button
                 onClick={() => setConfirmBackModalOpen(true)}
-                className="group flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mb-6"
+                className="group flex items-center gap-2 text-primary hover:text-blue-700 transition-colors mb-6"
               >
                 <ArrowLeft size={18} />
-                <span className="font-medium group-hover:underline">Back to issue</span>
+                <span className="font-medium group-hover:underline">
+                  Back to issue
+                </span>
               </button>
 
               <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
@@ -1010,7 +1243,9 @@ function AdminNewsLetterToggle() {
                 setIsOpenArticleForm(false);
                 setConfirmBackModalOpen(false);
               }}
-              title={`Cancel ${editingData ? "editing" : "adding"} this article?`}
+              title={`Cancel ${
+                editingData ? "editing" : "adding"
+              } this article?`}
               description="This will discard any unsaved changes. Are you sure you want to proceed?"
               confirmLabel="Discard Changes"
               cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
@@ -1019,7 +1254,6 @@ function AdminNewsLetterToggle() {
           </>
         )}
 
-        {/* Layout Info Dialog */}
         <Dialog
           open={openSuiteletterLayoutInfoDialog}
           onClose={() => setOpenSuiteletterLayoutInfoDialog(false)}
@@ -1035,14 +1269,20 @@ function AdminNewsLetterToggle() {
           <DialogContent>
             <div className="py-4">
               <p className="text-sm text-slate-600 mb-4">
-                Preview the newsletter layout. Articles will appear in the section you assign (1–7).
+                Preview the newsletter layout. Articles will appear in the
+                section you assign (1–7).
               </p>
               <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
                 <div className="flex gap-2">
                   <ExclamationTriangleIcon className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-slate-700">
-                    You can't publish the issue until <strong>all 7 sections</strong> have assigned articles.
-                    The issue will <strong className="text-red-700">not be visible to the public</strong> until then.
+                    You can't publish the issue until{" "}
+                    <strong>all 7 sections</strong> have assigned articles. The
+                    issue will{" "}
+                    <strong className="text-red-700">
+                      not be visible to the public
+                    </strong>{" "}
+                    until then.
                   </div>
                 </div>
               </div>

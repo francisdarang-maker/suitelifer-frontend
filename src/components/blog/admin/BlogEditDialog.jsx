@@ -1,20 +1,21 @@
-import { Image } from "lucide-react";
+import { Image, FileText, Layout, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export default function BlogEditDialog({ blog, onEdit, setIsEditing }) {
+export default function BlogEditDialog({ blog, onEdit, setIsEditing, blogs = [] }) {
   const [editTitle, setEditTitle] = useState("");
   const [editArticle, setEditArticle] = useState("");
   const [editSection, setEditSection] = useState(0);
   const [editImage, setEditImage] = useState(null);
   const [oldUrl, setOldUrl] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
 
   useEffect(() => {
     if (blog) {
-      setEditTitle(blog.title);
-      setEditArticle(blog.article);
-      setEditSection(blog.section);
-      setOldUrl(blog.imageUrl);
+      setEditTitle(blog.title || "");
+      setEditArticle(blog.article || "");
+      setEditSection(blog.section || 0);
+      setOldUrl(blog.imageUrl || null);
       setEditImage(null);
     }
   }, [blog]);
@@ -26,80 +27,172 @@ export default function BlogEditDialog({ blog, onEdit, setIsEditing }) {
     setIsSubmitting(false);
   };
 
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setEditImage(e.dataTransfer.files[0]);
+    }
+  };
+
+  const renderSectionOptions = () => {
+    if (!blog || !blogs) {
+      return [1, 2, 3, 4, 5, 6, 7].map((sec) => (
+        <option key={sec} value={sec}>
+          Section {sec}
+        </option>
+      ));
+    }
+
+    const assigned = blogs.map((b) => Number(b.section));
+
+    return [1, 2, 3, 4, 5, 6, 7].map((sec) => {
+      const isTaken = assigned.includes(sec) && sec !== blog.section;
+      const isCurrent = sec === blog.section;
+
+      return (
+        <option key={sec} value={sec} disabled={isTaken}>
+          Section {sec}
+          {isTaken ? " • Taken" : isCurrent ? " • Current" : ""}
+        </option>
+      );
+    });
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold text-slate-900 mb-6">Edit Blog</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+      <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl shadow-2xl border border-slate-200/60 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="bg-primary px-8 py-3">
+          <div className="flex items-center gap-3">
+            <div>
+              <h2 className="text-2xl font-bold text-white">Edit Blog</h2>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-8 space-y-6 overflow-y-auto flex-1">
+          {/* Title Input */}
+          <div className="group">
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
+              <FileText className="w-4 h-4" />
               Title
             </label>
             <input
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl focus:border-slate-900 focus:ring-4 focus:ring-slate-100 transition-all duration-200 text-slate-900 placeholder-slate-400 font-medium outline-none"
+              placeholder="Enter an engaging title..."
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Article
+          {/* Article Textarea */}
+          <div className="group">
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
+              <Layout className="w-4 h-4" />
+              Blog Content
             </label>
             <textarea
               value={editArticle}
               onChange={(e) => setEditArticle(e.target.value)}
-              rows={6}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+              rows={8}
+              className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl focus:border-slate-900 focus:ring-4 focus:ring-slate-100 transition-all duration-200 text-slate-900 placeholder-slate-400 outline-none resize-none"
+              placeholder="Write your blog content here..."
             />
+            <div className="flex justify-between items-center mt-2 px-1">
+              <p className="text-xs text-slate-500">
+                Express your thoughts clearly and concisely
+              </p>
+              <p className="text-xs text-slate-400">
+                {editArticle.length} characters
+              </p>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Section (Layout)
+          {/* Section Selector */}
+          <div className="group">
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
+              <Layout className="w-4 h-4" />
+              Section Assignment
             </label>
             <select
               value={editSection}
               onChange={(e) => setEditSection(Number(e.target.value))}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl focus:border-slate-900 focus:ring-4 focus:ring-slate-100 transition-all duration-200 text-slate-900 font-medium outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22currentColor%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3e%3cpolyline points=%226 9 12 15 18 9%22%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[center_right_1rem] bg-no-repeat"
             >
-              {[1, 2, 3, 4, 5, 6, 7].map((sec) => (
-                <option key={sec} value={sec}>
-                  Section {sec}
-                </option>
-              ))}
+              {renderSectionOptions()}
               <option value={0}>Assign Later</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+          {/* Image Upload */}
+          <div className="group">
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
+              <Upload className="w-4 h-4" />
               Featured Image
             </label>
-            <label className="block border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all">
+            <label
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              className={`block border-2 border-dashed rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden ${
+                dragActive
+                  ? "border-slate-900 bg-slate-50 scale-[1.02]"
+                  : editImage || oldUrl
+                  ? "border-slate-300 bg-white"
+                  : "border-slate-200 bg-slate-50/50 hover:border-slate-400 hover:bg-white"
+              }`}
+            >
               {editImage ? (
-                <div className="flex flex-col items-center gap-3">
+                <div className="relative group/img">
                   <img
                     src={URL.createObjectURL(editImage)}
                     alt="Preview"
-                    className="w-32 h-32 object-cover rounded-lg shadow-md"
+                    className="w-full h-64 object-cover"
                   />
-                  <span className="text-sm text-slate-600">{editImage.name}</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
+                    <span className="text-white font-medium">
+                      Click to change image
+                    </span>
+                  </div>
                 </div>
               ) : oldUrl ? (
-                <div className="flex flex-col items-center gap-3">
+                <div className="relative group/img">
                   <img
                     src={oldUrl}
                     alt="Current"
-                    className="w-32 h-32 object-cover rounded-lg shadow-md"
+                    className="w-full h-64 object-cover"
                   />
-                  <span className="text-sm text-slate-600">Click to change</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
+                    <span className="text-white font-medium">
+                      Click to change image
+                    </span>
+                  </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center gap-3">
-                  <Image className="w-12 h-12 text-slate-400" />
-                  <span className="text-slate-600">Click to upload</span>
+                <div className="p-12 text-center">
+                  <div className="bg-slate-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Image className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <p className="text-slate-700 font-medium mb-1">
+                    Drop your image here, or browse
+                  </p>
+                  <p className="text-slate-500 text-sm">
+                    PNG, JPG, GIF, WEBP or HEIC up to 4MB
+                  </p>
                 </div>
               )}
               <input
@@ -111,23 +204,31 @@ export default function BlogEditDialog({ blog, onEdit, setIsEditing }) {
             </label>
           </div>
 
-          <div className="flex gap-3 pt-4">
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
             <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all font-medium disabled:opacity-50"
+              onClick={handleSubmit}
+              disabled={isSubmitting || !editTitle || !editArticle}
+              className="flex-1 bg-primary hover:from-slate-800 hover:to-slate-700 text-white py-4 px-6 rounded-2xl font-semibold shadow-lg shadow-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-xl hover:shadow-slate-900/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              {isSubmitting ? "Saving..." : "Save Changes"}
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>Save Changes</>
+              )}
             </button>
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-all font-medium"
+              className="px-8 py-4 bg-slate-100 text-slate-700 rounded-2xl hover:bg-slate-200 transition-all duration-300 font-semibold hover:scale-[1.02] active:scale-[0.98]"
             >
               Cancel
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
