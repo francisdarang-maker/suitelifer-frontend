@@ -11,7 +11,7 @@ import FooterPageToggle from "../../components/admin/FooterPageToggle";
 import AdminHomePage from "../../components/admin/AdminHomePage";
 import AdminContactsToggle from "../../components/admin/AdminContactsToggle";
 import AdminNewsLetterToggle from "../../components/admin/AdminNewsLetterToggle";
-import AdminBlogs from "./AdminBlogs";
+import AdminBlogs from "../../components/admin/AdminBlogs";
 
 const AdminContents = () => {
   const [activeTab, setActiveTab] = useState(0);
