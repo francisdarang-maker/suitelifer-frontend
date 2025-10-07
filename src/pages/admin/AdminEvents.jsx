@@ -542,7 +542,7 @@ const AdminEvents = () => {
 
 const DetailSection = ({ icon, title, children }) => (
   <Box>
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <svg
         className="w-5 h-5 text-gray-500"
         fill="none"
