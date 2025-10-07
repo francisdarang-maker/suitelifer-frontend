@@ -13,7 +13,12 @@ import EventFilter from "../../components/events/EventFilter";
 const localizer = momentLocalizer(moment);
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
-const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
+const EventCalendar = ({
+  events,
+  onSelectSlot,
+  onSelectEvent,
+  enableDragDrop = true,
+}) => {
   // State management
   const [view, setView] = useState(Views.MONTH);
   const [date, setDate] = useState(new Date());
@@ -284,12 +289,12 @@ const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
   const CustomToolbar = useCallback(
     ({ label, onNavigate, onView }) => (
       <div className="flex flex-col md:flex-row justify-between items-center w-full gap-4 px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl mb-6 border border-gray-200 shadow-sm">
-        <button
+        {/* <button
           className="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:from-cyan-700 hover:to-cyan-800 transition-all duration-300 hover:scale-105 active:scale-95"
           onClick={() => onNavigate("TODAY")}
         >
           Today
-        </button>
+        </button> */}
 
         <div className="flex items-center gap-3">
           <button
@@ -399,9 +404,9 @@ const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
       )}
 
       <div
-        onDrop={handleCalendarDrop}
-        onDragOver={handleCalendarDragOver}
-        onDragLeave={handleCalendarDragLeave}
+        onDrop={enableDragDrop ? handleCalendarDrop : undefined}
+        onDragOver={enableDragDrop ? handleCalendarDragOver : undefined}
+        onDragLeave={enableDragDrop ? handleCalendarDragLeave : undefined}
       >
         <Calendar
           localizer={localizer}
@@ -430,9 +435,10 @@ const EventCalendar = ({ events, onSelectSlot, onSelectEvent }) => {
         activeFilters={activeFilters}
         toggleFilter={toggleFilter}
         toggleAllFilters={toggleAllFilters}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
+        onDragStart={enableDragDrop ? handleDragStart : undefined}
+        onDragEnd={enableDragDrop ? handleDragEnd : undefined}
         draggedCategory={draggedCategory}
+        enableDragDrop={enableDragDrop}
       />
     </div>
   );

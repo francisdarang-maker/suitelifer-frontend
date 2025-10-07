@@ -8,20 +8,25 @@ const EventFilter = ({
   onDragStart,
   onDragEnd,
   draggedCategory,
+  enableDragDrop = true,
 }) => {
   const activeCount = Object.values(activeFilters).filter(Boolean).length;
   const allActive = activeCount === Object.keys(eventColors).length;
 
   const handleDragStart = (e, category) => {
+    if (!enableDragDrop) {
+      e.preventDefault();
+      return;
+    }
     e.dataTransfer.effectAllowed = "copy";
     e.dataTransfer.setData("text/plain", category);
     onDragStart(category);
   };
 
   const handleDragEnd = () => {
+    if (!enableDragDrop) return;
     onDragEnd();
   };
-
   return (
     <div className="mt-6 pt-4 border-t border-gray-200">
       <div className="flex items-center justify-between mb-3">
@@ -44,9 +49,11 @@ const EventFilter = ({
           </h3>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500 hidden sm:inline">
-            💡 Drag categories to calendar
-          </span>
+          {enableDragDrop && (
+            <span className="text-xs text-gray-500 hidden sm:inline">
+              💡 Drag categories to calendar
+            </span>
+          )}
           <button
             onClick={toggleAllFilters}
             className="text-sm font-medium text-cyan-600 hover:text-cyan-700 transition-colors"
