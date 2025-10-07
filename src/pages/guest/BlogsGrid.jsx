@@ -1,9 +1,7 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+
 import MotionUp from "../../components/animated/MotionUp";
 import BigTile from "../../components/blog/guest/BigTile";
 import SmallTile from "../../components/blog/guest/SmallTile";
-import ComingSoon from "../admin/ComingSoon";
 
 // Wrapper ensures consistent padding across layouts
 const Wrapper = ({ children }) => (
@@ -11,21 +9,21 @@ const Wrapper = ({ children }) => (
 );
 
 // 1 Blog Layout
-const SingleLayout = ({ blogs, onBlogClick }) => (
+const SingleLayout = ({ blogs }) => (
   <Wrapper>
     <MotionUp>
-      <BigTile {...blogs[0]} onClick={onBlogClick} />
+      <BigTile {...blogs[0]} />
     </MotionUp>
   </Wrapper>
 );
 
 // 2 Blogs Layout
-const TwoLayout = ({ blogs, onBlogClick }) => (
+const TwoLayout = ({ blogs }) => (
   <Wrapper>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {blogs.map((b, i) => (
         <MotionUp key={b.blogId || i}>
-          <BigTile {...b} onClick={onBlogClick} />
+          <BigTile {...b} />
         </MotionUp>
       ))}
     </div>
@@ -33,16 +31,16 @@ const TwoLayout = ({ blogs, onBlogClick }) => (
 );
 
 // 3 Blogs Layout
-const ThreeLayout = ({ blogs, onBlogClick }) => (
+const ThreeLayout = ({ blogs }) => (
   <Wrapper>
     <div className="grid grid-cols-1 gap-8">
       <MotionUp>
-        <BigTile {...blogs[0]} onClick={onBlogClick} />
+        <BigTile {...blogs[0]}  />
       </MotionUp>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {blogs.slice(1).map((b, i) => (
           <MotionUp key={b.blogId || i}>
-            <SmallTile {...b} onClick={onBlogClick} />
+            <SmallTile {...b}  />
           </MotionUp>
         ))}
       </div>
@@ -51,16 +49,16 @@ const ThreeLayout = ({ blogs, onBlogClick }) => (
 );
 
 // 4 Blogs Layout
-const FourLayout = ({ blogs, onBlogClick }) => (
+const FourLayout = ({ blogs }) => (
   <Wrapper>
     <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8">
       <MotionUp>
-        <BigTile {...blogs[0]} onClick={onBlogClick} />
+        <BigTile {...blogs[0]}  />
       </MotionUp>
       <div className="flex flex-col gap-6">
         {blogs.slice(1).map((b, i) => (
           <MotionUp key={b.blogId || i}>
-            <SmallTile {...b} onClick={onBlogClick} />
+            <SmallTile {...b} />
           </MotionUp>
         ))}
       </div>
@@ -69,16 +67,16 @@ const FourLayout = ({ blogs, onBlogClick }) => (
 );
 
 // 5 Blogs Layout - Simplified
-const FiveLayout = ({ blogs, onBlogClick }) => (
+const FiveLayout = ({ blogs }) => (
   <Wrapper>
     <div className="grid grid-cols-1 gap-8">
       <MotionUp>
-        <BigTile {...blogs[0]} onClick={onBlogClick} />
+        <BigTile {...blogs[0]} />
       </MotionUp>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {blogs.slice(1).map((b, i) => (
           <MotionUp key={b.blogId || i}>
-            <SmallTile {...b} onClick={onBlogClick} />
+            <SmallTile {...b} />
           </MotionUp>
         ))}
       </div>
@@ -87,20 +85,20 @@ const FiveLayout = ({ blogs, onBlogClick }) => (
 );
 
 // 6 Blogs Layout - Simplified Grid
-const SixLayout = ({ blogs, onBlogClick }) => (
+const SixLayout = ({ blogs }) => (
   <Wrapper>
     <div className="grid grid-cols-1 gap-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {blogs.slice(0, 2).map((b, i) => (
           <MotionUp key={b.blogId || i}>
-            <BigTile {...b} onClick={onBlogClick} />
+            <BigTile {...b}  />
           </MotionUp>
         ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {blogs.slice(2).map((b, i) => (
           <MotionUp key={b.blogId || i}>
-            <SmallTile {...b} onClick={onBlogClick} />
+            <SmallTile {...b}  />
           </MotionUp>
         ))}
       </div>
@@ -109,16 +107,16 @@ const SixLayout = ({ blogs, onBlogClick }) => (
 );
 
 // 7 Blogs Layout - Clean Magazine Style
-const SevenLayout = ({ blogs, onBlogClick }) => (
+const SevenLayout = ({ blogs }) => (
   <Wrapper>
     <div className="grid grid-cols-1 gap-8">
       <MotionUp>
-        <BigTile {...blogs[0]} onClick={onBlogClick} />
+        <BigTile {...blogs[0]}  />
       </MotionUp>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {blogs.slice(1).map((b, i) => (
           <MotionUp key={b.blogId || i}>
-            <SmallTile {...b} onClick={onBlogClick} />
+            <SmallTile {...b} />
           </MotionUp>
         ))}
       </div>
@@ -126,20 +124,8 @@ const SevenLayout = ({ blogs, onBlogClick }) => (
   </Wrapper>
 );
 
-// BlogGrid Wrapper - Layout based on total count, section for positioning
 const BlogGrid = ({ blogs }) => {
-  const navigate = useNavigate();
 
-  const handleBlogClick = (blogId) => {
-    console.log("Navigating to blog:", blogId);
-    navigate(`/blog/${blogId}`);
-  };
-
-  // if (!blogs || blogs.length === 0) {
-  //   return <ComingSoon />;
-  // }
-
-  // Filter out hidden blogs (section = -1) and sort by section
   const visibleBlogs = blogs
     .filter(blog => (blog.section ?? 0) !== -1)
     .sort((a, b) => {
@@ -148,27 +134,23 @@ const BlogGrid = ({ blogs }) => {
       return sectionA - sectionB;
     });
 
-  // if (visibleBlogs.length === 0) {
-  //   return <ComingSoon />;
-  // }
-
   const totalCount = visibleBlogs.length;
 
   switch (totalCount) {
     case 1:
-      return <SingleLayout blogs={visibleBlogs} onBlogClick={handleBlogClick} />;
+      return <SingleLayout blogs={visibleBlogs} />;
     case 2:
-      return <TwoLayout blogs={visibleBlogs} onBlogClick={handleBlogClick} />;
+      return <TwoLayout blogs={visibleBlogs}  />;
     case 3:
-      return <ThreeLayout blogs={visibleBlogs} onBlogClick={handleBlogClick} />;
+      return <ThreeLayout blogs={visibleBlogs}  />;
     case 4:
-      return <FourLayout blogs={visibleBlogs} onBlogClick={handleBlogClick} />;
+      return <FourLayout blogs={visibleBlogs}  />;
     case 5:
-      return <FiveLayout blogs={visibleBlogs} onBlogClick={handleBlogClick} />;
+      return <FiveLayout blogs={visibleBlogs} />;
     case 6:
-      return <SixLayout blogs={visibleBlogs} onBlogClick={handleBlogClick} />;
+      return <SixLayout blogs={visibleBlogs}  />;
     case 7:
-      return <SevenLayout blogs={visibleBlogs} onBlogClick={handleBlogClick} />;
+      return <SevenLayout blogs={visibleBlogs} />;
     default:
       // return <ComingSoon />;
   }

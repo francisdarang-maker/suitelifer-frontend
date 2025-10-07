@@ -1,17 +1,15 @@
-import React, { useState } from "react";
 
-function BigTile({ blogId, imageUrl, title, article, onClick }) {
-  const [expanded, setExpanded] = useState(false);
+import { useNavigate } from "react-router-dom";
+
+function BigTile({ blogId, imageUrl, title, article }) {
+
   const isLong = article && article.length > 160;
+  const navigate = useNavigate();
 
-  const handleReadMore = (e) => {
-    e.stopPropagation();
-    setExpanded(!expanded);
-  };
 
   const handleTileClick = () => {
-    if (onClick && blogId) {
-      onClick(blogId);
+    if (blogId) {
+      navigate(`/blogs/${blogId}`);
     }
   };
 
@@ -36,23 +34,10 @@ function BigTile({ blogId, imageUrl, title, article, onClick }) {
         </h2>
 
         <p className="text-gray-600 text-sm md:text-base flex-1 mb-4">
-          {expanded
-            ? article
-            : isLong
-            ? `${article.slice(0, 160)}...`
-            : article}
+          { isLong ? `${article.slice(0, 160)}...` : article }
         </p>
 
         <div className="flex items-center gap-3 mt-auto">
-          {isLong && (
-            <button 
-              className="px-4 py-2 text-xs md:text-sm font-medium bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors duration-200" 
-              onClick={handleReadMore}
-            >
-              {expanded ? 'Show Less' : 'Read More'}
-            </button>
-          )}
-          
           <button
             className="px-4 py-2 text-xs md:text-sm font-medium bg-primary text-white rounded-full hover:scale-105 transition-colors duration-200"
             onClick={(e) => {
