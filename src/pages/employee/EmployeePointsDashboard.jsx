@@ -538,13 +538,13 @@ const PointsDashboard = () => {
             <div className="relative flex items-center justify-between">
               <div>
                 <p
-                  className="text-sm font-bold mb-2"
+                  className="text-sm font-bold mb-2 "
                   style={{ color: "#1e40af", fontFamily: "Avenir, sans-serif" }}
                 >
                   Current Balance
                 </p>
                 <p
-                  className="text-4xl font-black mb-1 transition-all duration-300 group-hover:scale-110"
+                  className="text-4xl font-black mb-1 transition-all duration-300 group-hover:scale-110 lg:text-md"
                   style={{
                     color: "#1e40af",
                     fontFamily: "Avenir, sans-serif",
@@ -563,7 +563,7 @@ const PointsDashboard = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-blue-400 rounded-full opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <StarIconSolid
-                  className="w-14 h-14 relative transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110"
+                  className="w-14 h-14 relative transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 lg:hidden 2xl:inline"
                   style={{ color: "#1e40af" }}
                 />
               </div>
@@ -622,7 +622,7 @@ const PointsDashboard = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-pink-400 rounded-full opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <HeartIconSolid
-                  className="w-14 h-14 relative transition-transform duration-300 group-hover:scale-110 group-hover:animate-pulse"
+                  className="w-14 h-14 relative transition-transform duration-300 group-hover:scale-110 group-hover:animate-pulse lg:hidden 2xl:inline"
                   style={{ color: "#be185d" }}
                 />
               </div>
@@ -655,11 +655,16 @@ const PointsDashboard = () => {
             <div className="relative flex items-center justify-between">
               <div>
                 <p
-                  className="text-sm font-bold mb-2"
+                  className="text-sm font-bold mb-2 lg:whitespace-normal"
                   style={{ color: "#065f46", fontFamily: "Avenir, sans-serif" }}
                 >
-                  Total Earned
+                  Total{" "}
+                  <span className="hidden lg:inline xl:hidden">
+                    <br />
+                  </span>
+                  Earned
                 </p>
+
                 <p
                   className="text-4xl font-black mb-1 transition-all duration-300 group-hover:scale-110"
                   style={{
@@ -680,7 +685,7 @@ const PointsDashboard = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-green-400 rounded-full opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <TrophyIcon
-                  className="w-14 h-14 relative transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12"
+                  className="w-14 h-14 relative transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12 lg:hidden 2xl:inline"
                   style={{ color: "#065f46" }}
                 />
               </div>
@@ -713,11 +718,16 @@ const PointsDashboard = () => {
             <div className="relative flex items-center justify-between">
               <div>
                 <p
-                  className="text-sm font-bold mb-2"
+                  className="text-sm font-bold mb-2 lg:whitespace-normal xl:whitespace-nowrap"
                   style={{ color: "#92400e", fontFamily: "Avenir, sans-serif" }}
                 >
-                  Total Spent
+                  Total{" "}
+                  <span className="hidden lg:inline xl:hidden">
+                    <br />
+                  </span>
+                  Spent
                 </p>
+
                 <p
                   className="text-4xl font-black mb-1 transition-all duration-300 group-hover:scale-110"
                   style={{
@@ -738,7 +748,7 @@ const PointsDashboard = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-orange-400 rounded-full opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <GiftIcon
-                  className="w-14 h-14 relative transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12"
+                  className="w-14 h-14 relative transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12 lg:hidden 2xl:inline"
                   style={{ color: "#92400e" }}
                 />
               </div>
