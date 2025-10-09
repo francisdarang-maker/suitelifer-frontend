@@ -32,7 +32,7 @@ const RootLayout = () => {
           <img src={logoFull} alt="fullsuite" className="w-full h-full" />
         </div>
         <Bars2Icon
-          className="w-9 h-9 rounded-full p-2 bg-[#B2E0E8]"
+          className="w-9 h-9 rounded-full p-2 text-primary cursor-pointer  hover:bg-gray-100"
           onClick={() => handleDrawer("0%")}
         />
       </section>

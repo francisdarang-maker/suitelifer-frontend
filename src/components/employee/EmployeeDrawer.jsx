@@ -1,7 +1,7 @@
 import { useState } from "react";
 import logoFull from "../../assets/logos/logo-fs-full.svg";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   NewspaperIcon,
   CalendarIcon,
@@ -28,7 +28,7 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { ArrowRightCircleIcon } from "lucide-react";
+import defaultProfileImg from "../../assets/images/defaultAvatar.svg";
 
 const regularServices = [
   { feature_name: "Blogs Feed", path: "blogs-feed", icon: NewspaperIcon },
@@ -84,12 +84,16 @@ const adminFeatures = [
 ];
 
 const EmployeeDrawer = ({ onClose, user }) => {
-
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isCollapse, setCollapse] = useState(false);
   const [showTool, setShowTool] = useState(
     JSON.parse(localStorage.getItem("showTools")) ?? true
   );
+  const navigate = useNavigate();
+
+  const handleProfilePage = () => {
+    navigate("/app/my-profile");
+  };
 
   const handleDisclosureBtn = () => {
     const updatedShowTool = !showTool;
@@ -138,14 +142,20 @@ const EmployeeDrawer = ({ onClose, user }) => {
       />
 
       {/* HEADER (fixed, non-scrollable) */}
-      <section className="flex justify-between items-center pt-5 pb-3 px-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+      <section className="flex justify-between items-center pt-5 pb-3  border-b border-gray-200 sticky top-0 bg-white z-10">
         <div className="w-20 h-auto">
           <img src={logoFull} alt="fullsuite" className="w-full h-full" />
         </div>
-        <XMarkIcon
-          className="w-9 h-9 rounded-full p-1 cursor-pointer text-primary hover:bg-gray-100"
-          onClick={handleClose}
-        />
+
+        <div
+          className="flex w-9 h-9 rounded-full justify-center items-center cursor-pointer text-primary
+        hover:bg-gray-100"
+        >
+          <XMarkIcon
+            className="!w-6 !h-6  rounded-full"
+            onClick={handleClose}
+          />
+        </div>
       </section>
 
       {/* SCROLLABLE CONTENT */}
@@ -234,15 +244,39 @@ const EmployeeDrawer = ({ onClose, user }) => {
       </section>
 
       {/* FIXED LOGOUT BUTTON */}
-      <section
-        className="mt-auto p-5 bg-white flex justify-center items-center gap-2 cursor-pointer text-sm border-t border-gray-200"
-        onClick={() => {
-          setIsOpenModal(true);
-          handleClose();
-        }}
-      >
-        <span className="text-primary font-avenir-medium">Logout</span>
-        <ArrowUpOnSquareIcon className="w-5 h-5 rotate-90 text-primary" />
+      <section className="mt-auto p-5 bg-white flex justify-between items-center border-t border-gray-200 text-sm">
+        {/* Profile section */}
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => {
+            handleProfilePage();
+            handleClose();
+          }}
+        >
+          <img
+            src={user?.profile_pic || defaultProfileImg}
+            alt="Profile"
+            className="w-8 h-8 rounded-full object-cover border border-gray-200"
+          />
+          <span className="text-gray-700 font-medium">
+            {user?.first_name
+              ? user.first_name.length > 20
+                ? user.first_name.slice(0, 20) + "…"
+                : user.first_name
+              : "User"}
+          </span>
+        </div>
+
+        {/* Logout section */}
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => {
+            setIsOpenModal(true);
+            handleClose();
+          }}
+        >
+          <ArrowUpOnSquareIcon className="w-5 h-5 rotate-90 text-primary" />
+        </div>
       </section>
     </nav>
   );

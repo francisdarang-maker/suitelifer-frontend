@@ -49,8 +49,8 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
       //TODO: check first if exists in HRIS
       console.log("nakapasok hereee ");
 
-      const {token} = await loginUser({ email, password });
-        localStorage.setItem("hris-token", token);
+      const { token } = await loginUser({ email, password });
+      localStorage.setItem("hris-token", token);
 
       console.log("hris-token: ", token);
 
@@ -152,6 +152,12 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
           "Log in"
         )}
       </button>
+      <p
+        className="text-xs text-white text-center select-none cursor-pointer"
+        onClick={() => navigate("/")}
+      >
+        Back
+      </p>
     </form>
   );
 };
@@ -234,7 +240,7 @@ const Login = () => {
                 src={fullsuiteLogo}
                 alt="Logo"
                 className="h-15 cursor-pointer"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/")}
               />
             </div>
             <div className="flex flex-col items-center  mb-10">
