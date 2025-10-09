@@ -6,27 +6,25 @@ import { Bars2Icon } from "@heroicons/react/20/solid";
 import EmployeeDrawer from "../../components/employee/EmployeeDrawer";
 import CMSNavigation from "../navigation/CMSNavigation";
 import CMSTopNavigation from "../navigation/CMSTopNavigation";
+import { useStore } from "../../store/authStore";
 
 const RootLayout = () => {
   const drawerRef = useRef();
-
+  const user = useStore((state) => state.user);
   const handleDrawer = (location) => {
     drawerRef.current.style.top = location;
   };
 
   return (
-    <section
-      className="flex gap-4 flex-col lg:flex-row h-screen"
-      style={{ maxWidth: "1800px", margin: "0 auto", padding: "0 1em" }}
-    >
+    <section className="flex flex-col lg:flex-row h-screen gap-4 max-w-[1800px] mx-auto px-4 lg:px-0">
       <section
         className="px-6 bg-white fixed -top-full left-0 right-0 z-50 transition-all duration-300"
         ref={drawerRef}
       >
-        <EmployeeDrawer onClose={handleDrawer} />
+        <EmployeeDrawer onClose={handleDrawer} user={user}/>
       </section>
       <section className="hidden lg:block overflow-y-auto pr-3">
-        <CMSNavigation />
+        <CMSNavigation user={user} />
       </section>
 
       <section className="lg:hidden flex justify-between pt-5 px-2">

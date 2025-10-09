@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useStore } from "../../store/authStore";
 import { ModalLogout } from "../modals/ModalLogout";
 import fullsuitelogo from "../../assets/logos/logo-fs-full.svg";
@@ -8,30 +8,28 @@ import {
   NewspaperIcon,
   CalendarIcon,
   Bars3BottomLeftIcon,
-  ArrowRightCircleIcon,
   Square2StackIcon,
   ClipboardIcon,
   ArrowPathRoundedSquareIcon,
   ChevronDownIcon,
   BookOpenIcon,
   FaceSmileIcon,
-  UsersIcon,
-  ArrowDownOnSquareIcon,
   TableCellsIcon,
   ChartBarIcon,
   HeartIcon,
   ShoppingBagIcon,
-  ClipboardDocumentIcon
-} from "@heroicons/react/20/solid";
-import TeamPlayerIcon from '../../assets/icons/TeamPlayerIcon.jsx';
+  ClipboardDocumentIcon,
+  ArrowUpOnSquareIcon,
+  ArrowDownTrayIcon,
+} from "@heroicons/react/24/outline";
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import SidebarCollapse from "../../assets/icons/SidebarCollapse";
 import { useEffect } from "react";
-
+import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
+ 
 const regularFeatures = [
   { feature_name: "Blogs Feed", path: "blogs-feed", icon: NewspaperIcon },
   { feature_name: "My Blogs", path: "my-blogs", icon: ClipboardIcon },
@@ -52,15 +50,23 @@ const regularFeatures = [
 // Suitebite features for employees (only Mood and Points Dashboard remain)
 const suitebiteFeaturesForEmployees = [
   { feature_name: "The Suite Vibe", path: "mood", icon: FaceSmileIcon },
-  { feature_name: "Points Dashboard", path: "points-dashboard", icon: ChartBarIcon },
+  {
+    feature_name: "Points Dashboard",
+    path: "points-dashboard",
+    icon: ChartBarIcon,
+  },
   { feature_name: "Cheer a Peer", path: "cheer-a-peer", icon: HeartIcon },
-  { feature_name: "The Gift Suite", path: "suitebite/shop", icon: ShoppingBagIcon },
+  {
+    feature_name: "The Gift Suite",
+    path: "suitebite/shop",
+    icon: ShoppingBagIcon,
+  },
 ];
 
 const adminFeatures = [
   { feature_name: "Content", path: "contents", icon: Bars3BottomLeftIcon },
   { feature_name: "Events", path: "events", icon: CalendarIcon },
-  { feature_name: "The Gift Suite", path: "suitebite", icon: HeartIcon },
+  { feature_name: "The Gift Suite", path: "suitebite", icon: ShoppingBagIcon },
   { feature_name: "Courses", path: "courses", icon: BookOpenIcon },
   {
     feature_name: "Personality Test",
@@ -74,20 +80,20 @@ const adminFeatures = [
   },
 ];
 
-const superAdminFeatures = [
-  {
-    feature_name: "Accounts",
-    path: "super/accounts-management",
-    icon: UsersIcon,
-  },
-];
+// const superAdminFeatures = [
+//   {
+//     feature_name: "Accounts",
+//     path: "super/accounts-management",
+//     icon: UsersIcon,
+//   },
+// ];
 
-const CMSNavigation = () => {
+const CMSNavigation = ({user}) => {
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const user = useStore((state) => state.user);
+
   const [isCollapse, setCollapse] = useState(
     JSON.parse(localStorage.getItem("isCollapsed")) ?? false
-  );
+  ); 
   const [showTool, setShowTool] = useState(
     JSON.parse(localStorage.getItem("showTools")) ?? true
   );
@@ -95,6 +101,8 @@ const CMSNavigation = () => {
   // For PWA
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     try {
@@ -104,6 +112,7 @@ const CMSNavigation = () => {
       const showTools = JSON.parse(localStorage.getItem("showTools")) ?? true;
       setCollapse(isCollaped);
       setShowTool(showTools);
+      console.log("useeeer: ", user);
     } catch (error) {
       console.log(error);
     } finally {
@@ -161,9 +170,7 @@ const CMSNavigation = () => {
         return (
           <li key={index}>
             <Disclosure as="div" defaultOpen={false}>
-              <DisclosureButton
-                className="group cursor-pointer flex w-full items-center justify-between p-3 rounded-lg hover:bg-blue-50"
-              >
+              <DisclosureButton className="group cursor-pointer flex w-full items-center justify-between p-3 rounded-lg hover:bg-blue-50">
                 <div className="flex items-center gap-3">
                   {service ? (
                     <service.icon className="size-4" />
@@ -180,7 +187,11 @@ const CMSNavigation = () => {
                   <ChevronDownIcon className="size-4 text-primary group-data-[open]:rotate-180" />
                 )}
               </DisclosureButton>
-              <DisclosurePanel className={`${!isCollapse && "ml-6"} mt-1 flex flex-col space-y-1`}>
+              <DisclosurePanel
+                className={`${
+                  !isCollapse && "ml-6"
+                } mt-1 flex flex-col space-y-1`}
+              >
                 {service.subFeatures.map((subFeature, subIndex) => (
                   <NavLink
                     key={subIndex}
@@ -234,7 +245,7 @@ const CMSNavigation = () => {
               <Square2StackIcon className="size-4 group-hover:hidden" />
             )}
             {!isCollapse && (
-              <span className="no-underline! truncate font-avenir-black">
+              <span className="no-underline! truncate font-avenir-medium !text-sm">
                 {service.feature_name}
               </span>
             )}
@@ -244,51 +255,101 @@ const CMSNavigation = () => {
     });
   };
 
+  const handleProfilePage = () => {
+    navigate("/app/my-profile");
+  };
+
   if (isLoading) return null;
 
   return (
     <section>
-      <nav className={`${isCollapse && "w-min"} h-dvh flex flex-col`}>
+      <nav
+        className={`h-dvh flex flex-col transition-all duration-300 ${
+          isCollapse ? "w-20" : "w-50"
+        }`}
+      >
         <ModalLogout
           isOpen={isOpenModal}
           handleClose={() => setIsOpenModal(false)}
         />
-        <section className={`relative ${isCollapse ? "pt-8" : "py-5"}`}>
+        <section className={`relative ${isCollapse ? "mt-8" : "my-5"}`}>
           <section
             className={`${
-              isCollapse ? "flex justify-center" : "absolute top-8 right-0"
+              isCollapse ? "flex justify-center mb-2" : "absolute top-3 right-0"
             }`}
             onClick={handleCollapseBtn}
           >
-            <SidebarCollapse direction={"left"} />
+            {isCollapse ? (
+              <PanelLeftOpen className="w-5 h-5 text-primary stroke-1 cursor-pointer" />
+            ) : (
+              <PanelRightOpen className="w-5 h-5 text-primary stroke-1 cursor-pointer" />
+            )}
           </section>
-          <div
-            className={`size-20 mx-auto mb-3 ${isCollapse ? "mt-3" : "mb-3"}`}
-          >
-            <img
-              src={defaultProfileImg}
-              alt="profile picture"
-              className="w-full h-full object-cover rounded-full"
-            />
+          <div className="select-none">
+            <div
+              className={`relative group mt-3 mx-auto mb-3 rounded-full cursor-pointer ${
+                isCollapse ? "size-10 ml-4.5 mb-10" : "mb-3 size-20"
+              }`}
+              onClick={handleProfilePage}
+            >
+              <span className="absolute inset-0 -z-10 rounded-full bg-primary opacity-70 scale-0 group-hover:scale-125 group-hover:opacity-0 transition-all duration-500" />
+              <span className="absolute inset-0 -z-20 rounded-full bg-primary opacity-40 scale-0 group-hover:scale-175 group-hover:opacity-0 transition-all duration-700" />
+              <span className="absolute inset-0 -z-30 rounded-full bg-primary opacity-20 scale-0 group-hover:scale-225 group-hover:opacity-0 transition-all duration-1000" />
+
+              <div className="relative rounded-full border border-gray-200 overflow-hidden w-full h-full">
+                <img
+                  src={user?.profile_pic || defaultProfileImg}
+                  alt="profile picture"
+                  className="absolute inset-0 w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+            </div>
+
+            {!isCollapse && (
+              <>
+                <p
+                  className="font-avenir-black text-center truncate !text-sm cursor-pointer"
+                  onClick={handleProfilePage}
+                >
+                  {`${user?.first_name ?? "Unknown User"}`}
+                </p>
+                <p className="!text-xs truncate text-center text-primary">
+                  {/* {`@${user.email.split("@")[0]}`} */}
+                  {`${user?.id ?? ""}`}
+
+                </p>
+              </>
+            )}
           </div>
-          {!isCollapse && (
-            <>
-              <p className="font-avenir-black text-center truncate">
-                {`${user?.first_name ?? "Unknown"} ${
-                  user?.last_name ?? "User"
-                }`}
-              </p>
-              <p className="text-sm text-center text-primary">
-                {`@${user.email.split("@")[0]}`}
-              </p>
-            </>
-          )}
-        </section>        <section className=" flex-1 ">
+        </section>
+        <section className=" flex-1 ">
           <ul className="list-none!">
             {displayFeatures(regularFeatures, "/app")}
-            
+
             {/* Mood and Points features */}
-            {displayFeatures(suitebiteFeaturesForEmployees, "/app")}
+
+            <Disclosure as="div" defaultOpen={showTool}>
+              <DisclosureButton
+                className="group cursor-pointer flex w-full items-center justify-between"
+                onClick={handleDisclosureBtn}
+              >
+                {!isCollapse && (
+                  <p className="font-avenir-black text-primary p-3 !text-sm">
+                    My Pulse
+                  </p>
+                )}
+                <ChevronDownIcon
+                  className={`size-5 text-primary  group-data-[open]:rotate-180 ${
+                    isCollapse && "ml-2.5"
+                  }`}
+                />
+              </DisclosureButton>
+              <DisclosurePanel
+                className={`${!isCollapse && "ml-5"} mt-1 flex flex-col`}
+              >
+                {displayFeatures(suitebiteFeaturesForEmployees, "/app")}
+              </DisclosurePanel>
+            </Disclosure>
 
             {(user.role === "ADMIN" || user.role === "SUPER ADMIN") && (
               <Disclosure as="div" defaultOpen={showTool}>
@@ -297,18 +358,25 @@ const CMSNavigation = () => {
                   onClick={handleDisclosureBtn}
                 >
                   {!isCollapse && (
-                    <p className="font-avenir-black text-primary p-3">
+                    <p className="font-avenir-black text-primary p-3 !text-sm">
                       Admin Tools
                     </p>
                   )}
-                  <ChevronDownIcon className="size-5 text-primary  group-data-[open]:rotate-180" />
+                  <ChevronDownIcon
+                    className={`size-5 text-primary  group-data-[open]:rotate-180 ${
+                      isCollapse && "ml-2.5"
+                    }`}
+                  />
                 </DisclosureButton>
                 <DisclosurePanel
                   className={`${!isCollapse && "ml-5"} mt-1 flex flex-col`}
                 >
                   {displayFeatures(
-                    user.role === "SUPER ADMIN" 
-                      ? [...superAdminFeatures, ...adminFeatures]
+                    user.role === "SUPER ADMIN"
+                      ? [
+                          // ...superAdminFeatures,
+                          ...adminFeatures,
+                        ]
                       : adminFeatures,
                     "/app/admin-tools"
                   )}
@@ -317,9 +385,12 @@ const CMSNavigation = () => {
             )}
           </ul>
         </section>
-
-        <section className="p-5 py-7 flex flex-col gap-4">
-          <div className="flex justify-between">
+        <section className={`p-5 py-7 flex flex-col ${!isCollapse && "gap-4"}`}>
+          <div
+            className={`${
+              isCollapse ? "flex justify-center" : "flex justify-between"
+            }`}
+          >
             {!isCollapse && (
               <img
                 src={fullsuitelogo}
@@ -327,18 +398,22 @@ const CMSNavigation = () => {
                 className="w-20 h-auto"
               />
             )}
-            <div className="flex items-start justify-center gap-2">
+            <div
+              className={`flex items-center justify-center gap-2 ${
+                isCollapse && "flex-col gap-5"
+              }`}
+            >
+              {showInstallPrompt && (
+                <button className="cursor-pointer" onClick={handleInstallClick}>
+                  <ArrowDownTrayIcon className="w-5 h-4 text-primary" />
+                </button>
+              )}{" "}
               <button
                 className="cursor-pointer"
                 onClick={() => setIsOpenModal(true)}
               >
-                <ArrowRightCircleIcon className="w-6 h-7 text-primary" />
+                <ArrowUpOnSquareIcon className="w-5 h-5 rotate-90 text-primary" />
               </button>
-              {showInstallPrompt && (
-                <button className="cursor-pointer" onClick={handleInstallClick}>
-                  <ArrowDownOnSquareIcon className="w-6 h-6 text-primary" />
-                </button>
-              )}
             </div>
           </div>
         </section>

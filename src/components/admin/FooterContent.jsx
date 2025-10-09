@@ -35,8 +35,6 @@ const FooterContent = () => {
     try {
       const response = await api.get("/api/certification");
       setCertifications(response.data.certifications || []);
-
-
     } catch (error) {}
   };
 
@@ -162,15 +160,16 @@ const FooterContent = () => {
       </div>
 
       {certifications.length < 1 ? (
-  <div className="text-center py-8">
-    <p className="text-lg text-primary font-semibold">
-      No certifications available
-    </p>
-    <p className="text-sm text-gray-500">
-      This company hasn’t shared any certifications yet. They will appear here once available.
-    </p>
-  </div>
-) : null}
+        <div className="text-center py-8">
+          <p className="text-lg text-primary font-semibold">
+            No certifications available
+          </p>
+          <p className="text-sm text-gray-500">
+            This company hasn’t shared any certifications yet. They will appear
+            here once available.
+          </p>
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {certifications.map((cert) => (
@@ -207,7 +206,7 @@ const FooterContent = () => {
       <FooterImageUpload
         isOpen={isEditing}
         onClose={() => setIsEditing(false)}
-        onSave={handleAddOrEdit} 
+        onSave={handleAddOrEdit}
         certificationDetails={certificationDetails}
         setCertificationDetails={setCertificationDetails}
         isEditing={isEditing}

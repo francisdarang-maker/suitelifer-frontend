@@ -122,7 +122,7 @@ const SuperAdminAccountManagement = () => {
 
       setUserAccounts(response.data.users);
     } catch (err) {
-      console.log("Unable to fetch User Accounts",err);
+      console.log("Unable to fetch User Accounts", err);
     }
   };
 
@@ -171,7 +171,7 @@ const SuperAdminAccountManagement = () => {
         toast.success("Role Updated Successfully");
       }
     } catch (err) {
-      console.log("Unable to Update User Type",err);
+      console.log("Unable to Update User Type", err);
     } finally {
       window.location.reload();
       setModal((m) => defaultModalDetails);
@@ -227,7 +227,7 @@ const SuperAdminAccountManagement = () => {
         toast.success("Status Updated Successfully");
       }
     } catch (err) {
-      console.log("Unable to Update Status",err);
+      console.log("Unable to Update Status", err);
     } finally {
       window.location.reload();
       setModal((m) => defaultModalDetails);
@@ -330,7 +330,11 @@ const SuperAdminAccountManagement = () => {
           paginationPageSize={15}
           domLayout="autoHeight"
           paginationPageSizeSelector={[15, 25, 50]}
-          getRowClass={params => params.data && params.data.userEmail === user.email ? 'superadmin-current-user-row' : ''}
+          getRowClass={(params) =>
+            params.data && params.data.userEmail === user.email
+              ? "superadmin-current-user-row"
+              : ""
+          }
           className=" bg-red-300 h-[calc(100% - 100px)]"
         />
       </section>

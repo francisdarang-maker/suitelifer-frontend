@@ -22,13 +22,12 @@ export const ModalResetPassword = ({ isOpen, handleClose }) => {
     e.preventDefault();
 
     // Validate email domain
-    const emailDomain = "@fullsuite.ph";
-    if (!email.endsWith(emailDomain)) {
-      toast.error(
-        "Please use your company-issued email address ending with @fullsuite.ph."
-      );
-      return;
-    }
+  const emailDomains = ["@fullsuite.ph", "@getfullsuite.com", "@viascari.com"];
+
+if (!emailDomains.some((domain) => email.endsWith(domain))) {
+  toast.error("Please use your company-issued email address.");
+  return;
+}
 
     try {
       setLoading(true);
