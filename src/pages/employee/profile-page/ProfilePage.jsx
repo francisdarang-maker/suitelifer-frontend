@@ -506,68 +506,65 @@ const ProfilePage = () => {
   }
 
   return (
-    <>
-      <section className="min-h-screen">
-        <div className="max-w-4xl mx-auto ">
-          <div className="bg-white overflow-hidden">
-            <ProfileHeader
-              user={currentUser}
-              onEditProfilePic={() => setActiveModal("profilePic")}
-            />
+  <section className="p-2 xl:p-3 mb-20 flex-1 w-full max-w-full">
+  <div className="bg-white rounded-md overflow-hidden">
+    <ProfileHeader
+      user={currentUser}
+      onEditProfilePic={() => setActiveModal("profilePic")}
+    />
 
-            <TabNavigation
-              tabs={tabs}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+    <TabNavigation
+      tabs={tabs}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+    />
 
-            <div className="p-6">
-              {activeTab === "personal" && (
-                <PersonalInfo
-                  user={currentUser}
-                  onEdit={() => setActiveModal("personalDetails")}
-                />
-              )}
-              {activeTab === "address" && (
-                <AddressInfo
-                  user={currentUser}
-                  onEdit={() => setActiveModal("address")}
-                />
-              )}
-              {activeTab === "contact" && (
-                <ContactInfo
-                  user={currentUser}
-                  onEditContact={() => setActiveModal("contact")}
-                  onEditEmergencyContacts={() =>
-                    setActiveModal("emergencyContacts")
-                  }
-                />
-              )} {activeTab === "remittances" && (
-                <Remittances
-                  user={currentUser}
-                  onOpen={() => setActiveModal("viewOnlyRemittances")}
-                />
-              )}
-              {activeTab === "employment" && (
-                <EmploymentInfo
-                  user={currentUser}
-                  onOpen={() => setActiveModal("viewOnlyEmploymentInfo")}
-                />
-              )}
-              {activeTab === "documents" && (
-                <Documents
-                  user={currentUser}
-                  onOpen={() => setActiveModal("viewOnlyDocuments")}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="p-6">
+      {activeTab === "personal" && (
+        <PersonalInfo
+          user={currentUser}
+          onEdit={() => setActiveModal("personalDetails")}
+        />
+      )}
+      {activeTab === "address" && (
+        <AddressInfo
+          user={currentUser}
+          onEdit={() => setActiveModal("address")}
+        />
+      )}
+      {activeTab === "contact" && (
+        <ContactInfo
+          user={currentUser}
+          onEditContact={() => setActiveModal("contact")}
+          onEditEmergencyContacts={() =>
+            setActiveModal("emergencyContacts")
+          }
+        />
+      )}
+      {activeTab === "remittances" && (
+        <Remittances
+          user={currentUser}
+          onOpen={() => setActiveModal("viewOnlyRemittances")}
+        />
+      )}
+      {activeTab === "employment" && (
+        <EmploymentInfo
+          user={currentUser}
+          onOpen={() => setActiveModal("viewOnlyEmploymentInfo")}
+        />
+      )}
+      {activeTab === "documents" && (
+        <Documents
+          user={currentUser}
+          onOpen={() => setActiveModal("viewOnlyDocuments")}
+        />
+      )}
+    </div>
+  </div>
 
-      {/* Render Active Modal */}
-      {activeModal && modals[activeModal]}
-    </>
+  {activeModal && modals[activeModal]}
+</section>
+
   );
 };
 

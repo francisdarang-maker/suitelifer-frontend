@@ -29,7 +29,7 @@ import {
 } from "@headlessui/react";
 import { useEffect } from "react";
 import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
- 
+
 const regularFeatures = [
   { feature_name: "Blogs Feed", path: "blogs-feed", icon: NewspaperIcon },
   { feature_name: "My Blogs", path: "my-blogs", icon: ClipboardIcon },
@@ -88,12 +88,12 @@ const adminFeatures = [
 //   },
 // ];
 
-const CMSNavigation = ({user}) => {
+const CMSNavigation = ({ user, onCollapseChange }) => {
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   const [isCollapse, setCollapse] = useState(
     JSON.parse(localStorage.getItem("isCollapsed")) ?? false
-  ); 
+  );
   const [showTool, setShowTool] = useState(
     JSON.parse(localStorage.getItem("showTools")) ?? true
   );
@@ -138,8 +138,13 @@ const CMSNavigation = ({user}) => {
   }, []);
 
   const handleCollapseBtn = () => {
-    localStorage.setItem("isCollapsed", !isCollapse);
-    setCollapse((prev) => !prev);
+    const newCollapsedState = !isCollapse;
+    localStorage.setItem("isCollapsed", newCollapsedState);
+    setCollapse(newCollapsedState);
+
+    if (onCollapseChange) {
+      onCollapseChange(newCollapsedState);
+    }
   };
 
   const handleDisclosureBtn = () => {
@@ -264,7 +269,7 @@ const CMSNavigation = ({user}) => {
   return (
     <section>
       <nav
-        className={`h-dvh flex flex-col transition-all duration-300 ${
+        className={`h-dvh flex flex-col transition-all duration-300  ${
           isCollapse ? "w-20" : "w-50"
         }`}
       >
@@ -316,7 +321,6 @@ const CMSNavigation = ({user}) => {
                 <p className="!text-xs truncate text-center text-primary">
                   {/* {`@${user.email.split("@")[0]}`} */}
                   {`${user?.id ?? ""}`}
-
                 </p>
               </>
             )}

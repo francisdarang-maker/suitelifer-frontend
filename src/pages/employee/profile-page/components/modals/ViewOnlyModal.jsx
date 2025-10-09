@@ -9,7 +9,7 @@ const ViewOnlyModal = ({ onClose, title ='View only', description="This is for v
           <p className="text-lg font-avenir-medium text-gray-900">{title}</p>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 cursor-pointer"
           >
             <XMarkIcon className="w-6 h-6" />
           </button>

@@ -33,7 +33,7 @@ const EmploymentInfo = ({ user, loading, onOpen }) => {
           Company-issued Contact Information
         </p>
         <div
-          className="flex items-center sm:space-x-2 sm:px-4 py-2 text-sm font-medium text-gray-500 bg-white sm:border sm:border-gray-300 sm:rounded-lg sm:hover:bg-gray-50 transition-colors"
+          className="flex items-center sm:space-x-2 sm:px-4 py-2 text-sm font-medium text-gray-500 bg-white sm:border sm:border-gray-300 sm:rounded-lg sm:hover:bg-gray-50 transition-colors  cursor-pointer"
           onClick={onOpen}
         >
           <EyeIcon className="w-4 h-4" />

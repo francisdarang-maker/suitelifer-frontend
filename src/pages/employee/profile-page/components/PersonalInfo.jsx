@@ -34,13 +34,13 @@ const PersonalInfo = ({ user, loading, onEdit }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center ">
         <p className="text-sm font-avenir-black text-gray-900">
           Personal Details
         </p>
         <button
           onClick={onEdit}
-          className="flex items-center sm:space-x-2 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white sm:border sm:border-gray-300 sm:rounded-lg sm:hover:bg-gray-50 transition-colors"
+          className="flex items-center sm:space-x-2 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white sm:border sm:border-gray-300 sm:rounded-lg sm:hover:bg-gray-50 transition-colors cursor-pointer"
         >
           <PencilIcon className="w-4 h-4" />
           <span className="hidden sm:block">Edit</span>

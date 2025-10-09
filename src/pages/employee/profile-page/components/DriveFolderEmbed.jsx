@@ -6,8 +6,8 @@ export default function DriveFolderEmbed({ folderLink, isGrid = false }) {
 
   if (!folderLink || typeof folderLink !== "string") {
     return (
-      <p className="text-muted-foreground italic text-sm">
-        No Google Drive folder link has been set up yet.
+      <p className="text-gray-500 italic text-sm text-center p-10">
+        No Google Drive folder link has been set up yet. Please contact Culture and People team.
       </p>
     );
   }
@@ -17,7 +17,7 @@ export default function DriveFolderEmbed({ folderLink, isGrid = false }) {
 
   if (!folderId) {
     return (
-      <p className="text-muted-foreground italic text-sm">
+      <p className="text-gray-500 italic text-sm">
         Invalid Google Drive folder link format. Click 'Edit' to check and
         change.
       </p>

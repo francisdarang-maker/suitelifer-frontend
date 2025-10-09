@@ -50,7 +50,7 @@ const EditAddressModal = ({ user, onSave, onClose }) => {
           </p>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 cursor-pointer"
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
@@ -156,7 +156,7 @@ const EditAddressModal = ({ user, onSave, onClose }) => {
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -164,7 +164,7 @@ const EditAddressModal = ({ user, onSave, onClose }) => {
               type="button"
               disabled={isSubmitting}
               onClick={handleOpenConfirmModal}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors"
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors cursor-pointer"
             >
               Save Changes
             </button>
