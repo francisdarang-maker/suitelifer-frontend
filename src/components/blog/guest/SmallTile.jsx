@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 function SmallTile({ blogId, imageUrl, title, article }) {
 
   const isLong = article && article.length > 100;
-
+const sliceArticle =  isLong ? `${article.slice(0, 160)}...` : article 
   const navigate = useNavigate()
     const handleTileClick = () => {
     if (blogId) {
@@ -36,9 +36,7 @@ function SmallTile({ blogId, imageUrl, title, article }) {
         <h3 className="font-semibold text-base text-gray-800 mb-1 line-clamp-2">
           {title}
         </h3>
-        <p className={`text-gray-600 text-sm flex-1 mb-2 line-clamp-2`}>
-          { isLong ? `${article.slice(0, 160)}...` : article }
-        </p>
+        <p className={`text-gray-600 text-sm flex-1 mb-2 line-clamp-2`} dangerouslySetInnerHTML={{ __html: sliceArticle }}/>
         
         <div className="flex items-center gap-2 mt-auto">
          

@@ -36,9 +36,9 @@ function BlogContentCard({ blog, onEdit, onDelete }) {
         <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2">
           {blog.title}
         </h3>
-        <p className="text-slate-600 text-sm mb-4 line-clamp-3">
-          {blog.article}
-        </p>
+
+        <p className="text-slate-600 text-sm mb-4 line-clamp-3" dangerouslySetInnerHTML={{__html: blog.article}}/>
+        
 
         {/* Date */}
         <div className="flex items-center gap-2 text-xs text-slate-500 mb-4">
