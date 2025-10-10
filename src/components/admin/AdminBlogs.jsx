@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FileText, Sparkles, CircleAlert } from "lucide-react";
+import { FileText, CircleAlert, NotebookPen } from "lucide-react";
 import api from "../../utils/axios";
 import BlogContentCard from "../blog/admin/BlogContentCard";
 import Loading from "../loader/Loading";
@@ -157,7 +157,7 @@ function AdminBlogs() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-gradient-to-br bg-primary rounded-lg shadow-lg">
-              <Sparkles className="w-6 h-6 text-white" />
+              <NotebookPen className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
               Blog Management

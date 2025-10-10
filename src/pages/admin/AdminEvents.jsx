@@ -13,7 +13,6 @@ const CATEGORY_COLORS = {
   launchpod: "#3b82f6",
   holiday: "#22c55e",
   payroll: "#f97316",
-  meeting: "#EDE9FE",
   others: "#0097b2",
 };
 

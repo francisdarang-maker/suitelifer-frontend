@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ArrowUpRightIcon,
   HeartIcon,
@@ -7,13 +7,43 @@ import {
 import { Link } from "react-router-dom";
 import { toSlug } from "../../utils/slugUrl";
 import ModalFullImages from "../modals/ModalFullImages";
+import { Heart } from "lucide-react";
+import api from "../../utils/axios";
 
 const BlogCard = ({ blog }) => {
   const [isFullImages, setIsFullImages] = useState(false);
-
+  const [isHeart, setIsHeart] = useState(false)
   const handleViewImages = () => {
     setIsFullImages((prev) => !prev);
   };
+
+  const handleHeartClick = async () => {
+    const newState = !isHeart;
+    setIsHeart(newState);
+    blog.likeCount += newState ? 1 : -1;
+
+    try {
+      await api.post(`/api/${blog.eblogId}/like`);
+    } catch (err) {
+      console.error("Error toggling like:", err);
+      setIsHeart(!newState);
+      blog.likeCount += newState ? -1 : 1;
+    }
+  };
+
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      try {
+        const { data } = await api.get(`/api/${blog.eblogId}/is-liked`);
+        setIsHeart(data.liked);
+        console.log(blog)
+      } catch (err) {
+        console.error("Error fetching like status:", err);
+      }
+    };
+    fetchLikeStatus();
+  }, [blog.eblogId]);
+
 
   return (
     <section className="rounded-lg p-5 xl:p-8 flex flex-col gap-6 border border-gray-100">
@@ -40,7 +70,7 @@ const BlogCard = ({ blog }) => {
         </div>
 
         <Link
-          to={`blog/${blog.id}/${toSlug(blog.title)}`}
+          to={`blog/${blog.eblogId}/${toSlug(blog.title)}`}
           state={{ previousPage: location.pathname }}
         >
           <ArrowUpRightIcon className="w-7 h-7 text-primary cursor-pointer" />
@@ -48,9 +78,13 @@ const BlogCard = ({ blog }) => {
       </section>
       <section>
         <h3 className="font-avenir-black">{blog.title}</h3>
-        <p>{blog.description}</p>
+        <p dangerouslySetInnerHTML={{ __html: blog.description}}/>
       </section>
       <section className="grid grid-cols-4 grid-row grid-rows-2 gap-4">
+
+        {/* Loop here the content of the image */}
+
+
         <div className="col-start-1 col-end-3 row-start-1 row-end-3">
           <img
             src={blog.images[0]}
@@ -81,14 +115,27 @@ const BlogCard = ({ blog }) => {
         </div>
       </section>
       <section className="flex gap-3">
-        <button className="flex gap-3 cursor-pointer">
-          <HeartIcon className="w-5 h-5 text-gray-400" />
+        <button className="flex gap-3 cursor-pointer" onClick={handleHeartClick}>
+          {
+            isHeart ? 
+            <HeartIcon className="w-5 h-5 text-red-400 "/>
+            :
+            <Heart className="w-5 h-5 text-gray-400 " />
+          }
+          
           <span className="text-gray-500">{blog.likeCount}</span>
         </button>
-        <button className="flex gap-3 cursor-pointer">
-          <ChatBubbleLeftEllipsisIcon className="w-5 h-5 text-gray-400" />
-          <span className="text-gray-500">{blog.commentCount}</span>
-        </button>
+        {/* <button className="flex gap-3 cursor-pointer"> */}
+          <Link
+          to={`blog/${blog.eblogId}/${toSlug(blog.title)}`}
+          state={{ previousPage: location.pathname }}
+          className="flex gap-3 cursor-pointer no-underline "
+        >
+           <ChatBubbleLeftEllipsisIcon className="w-5 h-5 text-gray-400" />
+          <span className="text-gray-500 ">{blog.commentCount}</span>
+        </Link>
+         
+        {/* </button> */}
       </section>
     </section>
   );

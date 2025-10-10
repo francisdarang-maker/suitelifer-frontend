@@ -1,5 +1,8 @@
-import { useState } from "react";
-import { Image, FileText, Layout, Upload, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Image, FileText, Layout, Upload, Bold, Italic, Underline, List, ListOrdered } from "lucide-react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import UnderlineExtension from "@tiptap/extension-underline";
 
 export default function BlogAddForm({ onSubmit, blogs }) {
   const [title, setTitle] = useState("");
@@ -8,6 +11,19 @@ export default function BlogAddForm({ onSubmit, blogs }) {
   const [image, setImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+
+  // Initialize TipTap editor
+  const editor = useEditor({
+    extensions: [StarterKit, UnderlineExtension],
+    content: "",
+    onUpdate: ({ editor }) => {
+      setArticle(editor.getHTML());
+    },
+  });
+
+  const articleLength = editor
+    ? editor.getText().trim().split(/\s+/).filter(Boolean).length
+    : 0;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,16 +37,14 @@ export default function BlogAddForm({ onSubmit, blogs }) {
     setArticle("");
     setSection(0);
     setImage(null);
+    editor.commands.clearContent();
   };
 
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
+    else if (e.type === "dragleave") setDragActive(false);
   };
 
   const handleDrop = (e) => {
@@ -47,11 +61,7 @@ export default function BlogAddForm({ onSubmit, blogs }) {
       <div className="bg-gradient-to-br from-white to-slate-50 rounded-3xl shadow-2xl border border-slate-200/60 overflow-hidden">
         {/* Header */}
         <div className="bg-primary px-8 py-3">
-          <div className="flex items-center gap-3">
-            <div>
-              <h2 className="text-2xl font-bold text-white">Create New Blog</h2>
-            </div>
-          </div>
+          <h2 className="text-2xl font-bold text-white">Create New Blog</h2>
         </div>
 
         <div className="p-8 space-y-6">
@@ -70,27 +80,45 @@ export default function BlogAddForm({ onSubmit, blogs }) {
             />
           </div>
 
-          {/* Article Textarea */}
+          {/* Blog Content (TipTap Editor) */}
           <div className="group">
             <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
               <Layout className="w-4 h-4" />
               Blog Content
             </label>
-            <textarea
-              value={article}
-              onChange={(e) => setArticle(e.target.value)}
-              rows={8}
-              className="w-full px-5 py-4 bg-white border-2 border-slate-200 rounded-2xl focus:border-slate-900 focus:ring-4 focus:ring-slate-100 transition-all duration-200 text-slate-900 placeholder-slate-400 outline-none resize-none"
-              placeholder="Write your blog content here..."
-            />
-            <div className="flex justify-between items-center mt-2 px-1">
-              <p className="text-xs text-slate-500">
-                Express your thoughts clearly and concisely
-              </p>
-              <p className="text-xs text-slate-400">
-                {article.length} characters
-              </p>
+
+            {/* Toolbar */}
+            <div className="flex gap-3 mb-3 mt-2 place-items-center">
+              <Bold
+                className={`size-5 cursor-pointer ${editor?.isActive("bold") ? "text-primary" : ""}`}
+                onClick={() => editor?.chain().focus().toggleBold().run()}
+              />
+              <Italic
+                className={`size-5 cursor-pointer ${editor?.isActive("italic") ? "text-primary" : ""}`}
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
+              />
+              <Underline
+                className={`size-5 cursor-pointer ${editor?.isActive("underline") ? "text-primary" : ""}`}
+                onClick={() => editor?.chain().focus().toggleUnderline().run()}
+              />
+              <List
+                className={`size-5 cursor-pointer ${editor?.isActive("bulletList") ? "text-primary" : ""}`}
+                onClick={() => editor?.chain().focus().toggleBulletList().run()}
+              />
+              <ListOrdered
+                className={`size-5 cursor-pointer ${editor?.isActive("orderedList") ? "text-primary" : ""}`}
+                onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+              />
             </div>
+
+            {/* Editor */}
+            <div className="border-2 border-slate-200 focus-within:border-slate-900 outline-none p-4 min-h-[200px] rounded-2xl bg-white text-slate-900 transition-all duration-200">
+              <EditorContent editor={editor} className="prose prose-slate max-w-none" />
+            </div>
+
+            <p className="text-right text-gray-500 text-xs mt-2">
+              {articleLength} words
+            </p>
           </div>
 
           {/* Section Selector */}
@@ -106,12 +134,10 @@ export default function BlogAddForm({ onSubmit, blogs }) {
             >
               {[1, 2, 3, 4, 5, 6, 7].map((sec) => {
                 const assigned = blogs.map((b) => Number(b.section));
-                const maxAssigned =
-                  assigned.length > 0 ? Math.max(...assigned) : 0;
+                const maxAssigned = assigned.length > 0 ? Math.max(...assigned) : 0;
                 const isTaken = assigned.includes(sec);
                 const isNext = sec === maxAssigned + 1;
                 const disabled = !isNext && !isTaken;
-
                 return (
                   <option key={sec} value={sec} disabled={disabled || isTaken}>
                     Section {sec}
@@ -164,7 +190,6 @@ export default function BlogAddForm({ onSubmit, blogs }) {
                     Drop your image here, or browse
                   </p>
                   <p className="text-slate-500 text-sm">
-                    {" "}
                     PNG, JPG, GIF, WEBP or HEIC up to 4MB
                   </p>
                 </div>
@@ -182,7 +207,7 @@ export default function BlogAddForm({ onSubmit, blogs }) {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || !title || !article}
-            className="w-full bg-primary hover:from-slate-800 hover:to-slate-700 text-white py-4 px-6 rounded-2xl font-semibold shadow-lg shadow-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-xl hover:shadow-slate-900/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full bg-primary text-white py-4 px-6 rounded-2xl font-semibold shadow-lg shadow-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-xl hover:shadow-slate-900/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
           >
             {isSubmitting ? (
               <>
