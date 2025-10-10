@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 function BigTile({ blogId, imageUrl, title, article }) {
 
   const isLong = article && article.length > 160;
+  const sliceArticle = isLong ? `${article.slice(0, 160)}...` : article
   const navigate = useNavigate();
 
 
@@ -33,9 +34,7 @@ function BigTile({ blogId, imageUrl, title, article }) {
           {title}
         </h2>
 
-        <p className="text-gray-600 text-sm md:text-base flex-1 mb-4">
-          { isLong ? `${article.slice(0, 160)}...` : article }
-        </p>
+        <p className="text-gray-600 text-sm md:text-base flex-1 mb-4" dangerouslySetInnerHTML={{ __html: sliceArticle}}/>
 
         <div className="flex items-center gap-3 mt-auto">
           <button
