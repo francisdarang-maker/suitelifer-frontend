@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import api from "../../utils/axios";
 import * as THREE from "three";
 import GLOBE from "vanta/dist/vanta.net.min";
-import fullsuite from "../../assets/logos/logo-fs-full.svg";
+import fullsuiteLogo from "../../assets/logos/logo-fs.svg";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import TwoCirclesLoader from "../../assets/loaders/TwoCirclesLoader";
 import { getUserFromCookie } from "../../utils/cookie";
 import {
@@ -16,6 +16,7 @@ import {
 import { ModalResetPassword } from "../../components/modals/ModalResetPassword";
 import { Link } from "react-router-dom";
 import sendVerification from "../../utils/sendVerification";
+import { useLoginUserAPIhris } from "../../api/auth/useAuthAPI";
 
 const LoginForm = ({ email, password, setEmail, setPassword }) => {
   const navigate = useNavigate();
@@ -23,6 +24,12 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
   const [loading, setLoading] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
 
+  const { loginUser, loading: hrisLoading } = useLoginUserAPIhris();
+
+  const handleResetPasswordBtn = () => {
+    // setResetModal((prev) => !prev); // Fixed typo here
+    navigate("/reset-password");
+  };
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -39,40 +46,37 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
     try {
       setLoading(true);
       const recaptchaToken = await executeRecaptcha("login");
-      const response = await api.post("/api/login", {
-        email,
-        password,
-        recaptchaToken,
-      });
+      //TODO: check first if exists in HRIS
+      console.log("nakapasok hereee ");
 
-      if (response.data.accessToken) {
-        // Store token in localStorage for Suitebite API compatibility
-        localStorage.setItem('token', response.data.accessToken);
-        toast.success("Welcome back! You have successfully logged in.");
-        navigate("/app/blogs-feed");
-      } else if (response.data.recaptchaError) {
-        toast.success(response.data.message);
-      } else {
-        toast.error("Login failed. Please check your credentials.");
+      const { token } = await loginUser({ email, password });
+      localStorage.setItem("hris-token", token);
+
+      console.log("hris-token: ", token);
+
+      //then proceed if yes...
+      if (token) {
+        const response = await api.post("/api/login", {
+          email,
+          recaptchaToken,
+        });
+
+        if (response.data.accessToken) {
+          // Store token in localStorage for Suitebite API compatibility
+          localStorage.setItem("token", response.data.accessToken);
+          console.log("tokeeeen: ", response.data.accessToken);
+          toast.success("Welcome back! You have successfully logged in.");
+          navigate("/app/blogs-feed");
+        } else if (response.data.recaptchaError) {
+          toast.success(response.data.message);
+        } else {
+          toast.error("Login failed. Please check your credentials.");
+        }
       }
     } catch (error) {
       setLoading(false);
       if (error.response?.status === 400) {
         toast.error("Invalid email or password. Please try again.");
-      } else if (error.response?.data?.isAttemptExceeded) {
-        toast.error(
-          "You've reached the maximum number of verification attempts. Please try again in 15 minutes."
-        );
-      } else if (error.response?.data?.isNotVerified) {
-        const id = error.response?.data?.userId;
-        const email = error.response?.data?.email;
-        setLoading(true);
-        const response = await sendVerification(id, email);
-        if (response.isSuccess) {
-          toast.success("Check your email to verify your account.");
-        } else {
-          toast.error("Failed to send verification code.");
-        }
       } else if (error.response?.data?.isNotActive) {
         navigate("/account-deactivated");
       } else {
@@ -81,14 +85,12 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
         );
       }
     } finally {
-      setEmail("");
-      setPassword("");
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleLogin} className="flex flex-col gap-5">
+    <form onSubmit={handleLogin} className="dark flex flex-col gap-5">
       <div>
         <input
           type="text"
@@ -96,7 +98,7 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
           value={email}
           placeholder="Email"
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary placeholder-primary/50"
+          className=" text-white w-full p-3 border border-white/20 rounded-md bg-white/10 focus:outline-none focus:ring-2 focus:ring-white placeholder-white/50"
         />
       </div>
       <div className="relative">
@@ -106,7 +108,7 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
           value={password}
           placeholder="Password"
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary placeholder-primary/50"
+          className="w-full p-3 border text-white border-white/20 rounded-md bg-white/10 focus:outline-none focus:ring-2 focus:ring-white placeholder-white/50"
           onPaste={(e) => e.preventDefault()}
           onCopy={(e) => e.preventDefault()}
           onCut={(e) => e.preventDefault()}
@@ -114,19 +116,27 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="cursor-pointer absolute top-3 right-3 text-gray-500"
+          className="cursor-pointer absolute top-3.5 right-3 text-gray-500"
         >
           {showPassword ? (
-            <EyeSlashIcon className="size-5 cursor-pointer" />
+            <EyeSlashIcon className="size-5 cursor-pointer text-white/70" />
           ) : (
-            <EyeIcon className="size-5 cursor-pointer" />
+            <EyeIcon className="size-5 cursor-pointer text-white/70" />
           )}
         </button>
       </div>
+      <section className="flex justify-end mb-5">
+        <p
+          className="text-xs text-white no-underline hover:underline! cursor-pointer"
+          onClick={handleResetPasswordBtn}
+        >
+          Forgot password?
+        </p>
+      </section>
       <button
         type="submit"
         disabled={loading}
-        className="cursor-pointer hover:bg-[#007a8e] duration-300 mt-5 w-full bg-primary p-3 rounded-xl text-white font-avenir-black"
+        className="w-full py-2.5 rounded-lg font-avenir-black text-white bg-white/30 shadow-xs hover:bg-white/40 disabled:opacity-50 transition cursor-pointer"
       >
         {loading ? (
           <div className="mx-auto w-fit">
@@ -139,9 +149,15 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
             />
           </div>
         ) : (
-          "LOG IN"
+          "Log in"
         )}
       </button>
+      <p
+        className="text-xs text-white text-center select-none cursor-pointer"
+        onClick={() => navigate("/")}
+      >
+        Back
+      </p>
     </form>
   );
 };
@@ -149,7 +165,7 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
 const Login = () => {
   const navigate = useNavigate();
   const vantaRef = useRef(null);
-  const [isResetModal, setResetModal] = useState(false); // Fixed typo here
+  // const [isResetModal, setResetModal] = useState(false); // Fixed typo here
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -168,12 +184,12 @@ const Login = () => {
         // Suppress THREE.js deprecation warnings for Vanta.js
         const originalWarn = console.warn;
         console.warn = (message, ...args) => {
-          if (typeof message === 'string' && message.includes('vertexColors')) {
+          if (typeof message === "string" && message.includes("vertexColors")) {
             return; // Suppress the vertexColors warning
           }
           originalWarn(message, ...args);
         };
-        
+
         effect = GLOBE({
           THREE,
           el: "#vanta-bg",
@@ -191,7 +207,7 @@ const Login = () => {
           spacing: 16.0,
           showDots: true,
         });
-        
+
         // Restore original console.warn
         console.warn = originalWarn;
       }
@@ -204,51 +220,42 @@ const Login = () => {
     };
   }, []);
 
-  const handleResetPasswordBtn = () => {
-    setResetModal((prev) => !prev); // Fixed typo here
-  };
-
   return (
     <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
-      <div id="vanta-bg" className="min-h-screen bg-white overflow-y-auto">
-        <ModalResetPassword
+      <div
+        // id="vanta-bg"
+        className="dark min-h-screen bg-primary overflow-y-auto"
+      >
+        {/* <ModalResetPassword
           isOpen={isResetModal}
           handleClose={handleResetPasswordBtn}
-        />
+        /> */}
         <div className="flex flex-col items-center justify-center h-screen">
           <div
-            className="bg-white mx-auto rounded-2xl p-10 py-16 border border-gray-200"
+            className="w-full max-w-md space-y-6 p-10 rounded-2xl shadow-xl border border-white/20 bg-white/10 backdrop-blur-md mx-auto"
             style={{ width: "min(90%, 600px)" }}
           >
-            <img
-              src={fullsuite}
-              alt="FullSuite"
-              onClick={() => navigate("/")}
-              className="w-28 h-auto mx-auto cursor-pointer"
-            />
-            <p className="text-center text-base my-4 text-gray-500 mb-10">
-              Welcome, Suitelifer!
-            </p>
+            <div className="flex justify-center">
+              <img
+                src={fullsuiteLogo}
+                alt="Logo"
+                className="h-15 cursor-pointer"
+                onClick={() => navigate("/")}
+              />
+            </div>
+            <div className="flex flex-col items-center  mb-10">
+              <p className=" text-lg  text-white">
+                Welcome,{" "}
+                <span className="font-avenir-roman-oblique">Suitelifer!</span>
+              </p>
+              <p className="text-sm  text-white/50">Enter to empower.</p>
+            </div>
             <LoginForm
               email={email}
               password={password}
               setEmail={setEmail}
               setPassword={setPassword}
             />
-            <section className="flex justify-between mt-3">
-              <Link
-                className="text-sm text-primary no-underline hover:underline! cursor-pointer"
-                to={"/register"}
-              >
-                Don't have an account?
-              </Link>
-              <p
-                className="text-sm text-primary no-underline hover:underline! cursor-pointer"
-                onClick={handleResetPasswordBtn}
-              >
-                Reset Password?
-              </p>
-            </section>
           </div>
         </div>
       </div>

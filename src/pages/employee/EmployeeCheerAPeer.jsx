@@ -14,6 +14,10 @@ import {
 } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { formatFullDateTime } from "../../utils/dateHelpers";
+// Remove import { motion, AnimatePresence } from 'framer-motion';
+// Remove confettiAnimating state and all setConfettiAnimating logic
+// Remove confettiColor function
+import defaultAvatar from "../../assets/images/defaultAvatar.svg";
 
 const CheerPage = () => {
   const user = useStore((state) => state.user);
@@ -214,7 +218,7 @@ const CheerPage = () => {
           fromUser: {
             _id: user.id,
             name: `${user.first_name} ${user.last_name}`,
-            avatar: user.profile_pic,
+            avatar: user?.profile_pic || defaultAvatar,
           },
           createdAt: data.created_at || data.createdAt,
         };

@@ -15,6 +15,7 @@ import atsAPI from "../../utils/atsAPI";
 import api from "../../utils/axios";
 import MotionUp from "../../components/animated/MotionUp";
 import useHeroImagesStore from "../../store/stores/heroImagesStore";
+import img_placeholder from "../../assets/images/img-placeholder.svg";
 
 const Careers = () => {
   const { heroImages, isHeroLoading, setHeroImages, setIsHeroLoading } =
@@ -134,13 +135,13 @@ const Careers = () => {
                   {/* upper left image MAIN */}
                   <img
                     className="absolute w-[30vw] max-w-[220px] -translate-y-[13vw] -translate-x-[30%] rounded-2xl object-cover aspect-3/4"
-                    src={heroImages.careersLeftImage}
+                    src={heroImages?.careersLeftImage || img_placeholder}
                     alt="left hero image"
                   />
                   {/* lower right image MAIN */}
                   <img
                     className="absolute right-0 w-[35vw] translate-y-[30vw] translate-x-[14vw] rounded-2xl object-cover aspect-3/4"
-                    src={heroImages.careersRightImage}
+                    src={heroImages?.careersRightImage || img_placeholder}
                     alt="right hero image"
                   />
                 </section>
@@ -184,28 +185,26 @@ const Careers = () => {
                     </div>
                   </div>
 
-                  {/* Left Image */}
-                  {heroImages.careersLeftImage && (
-                    <>
-                      <img
-                        className="hidden md:block size-[18%] z-20 xl:max-w-[200px] object-cover aspect-3/4 rounded-2xl md:rounded-2xl"
-                        src={heroImages.careersLeftImage}
-                        alt="left hero image"
-                      />
-                      {/* Main Image (CENTER) */}
-                      <img
-                        className="size-[40%] md:size-[35%] z-20 max-w-[350px] xl:max-w-[380px] object-cover aspect-3/4 rounded-2xl md:rounded-4xl"
-                        src={heroImages.careersMainImage}
-                        alt="main hero image"
-                      />
-                      {/* Right Image */}
-                      <img
-                        className="hidden md:block self-end z-20 size-[20%] xl:max-w-[220px] object-cover aspect-3/4 rounded-2xl md:rounded-2xl"
-                        src={heroImages.careersRightImage}
-                        alt="right hero image"
-                      />
-                    </>
-                  )}
+                  <>
+                    {/* Left Image */}
+                    <img
+                      className="hidden md:block size-[18%] z-20 xl:max-w-[200px] object-cover aspect-3/4 rounded-2xl md:rounded-2xl"
+                      src={heroImages?.careersLeftImage || img_placeholder}
+                      alt="left hero image"
+                    />
+                    {/* Main Image (CENTER) */}
+                    <img
+                      className="size-[40%] md:size-[35%] z-20 max-w-[350px] xl:max-w-[380px] object-cover aspect-3/4 rounded-2xl md:rounded-4xl"
+                      src={heroImages?.careersMainImage || img_placeholder}
+                      alt="main hero image"
+                    />
+                    {/* Right Image */}
+                    <img
+                      className="hidden md:block self-end z-20 size-[20%] xl:max-w-[220px] object-cover aspect-3/4 rounded-2xl md:rounded-2xl"
+                      src={heroImages?.careersRightImage || img_placeholder}
+                      alt="right hero image"
+                    />
+                  </>
                 </div>
                 <div
                   className={`${

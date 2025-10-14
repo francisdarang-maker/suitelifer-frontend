@@ -63,7 +63,7 @@ const ContactDetails = () => {
       });
       setDataUpdated(!dataUpdated);
     } catch (err) {
-      console.log("Unable to Update Contact Details",err);
+      console.log("Unable to Update Contact Details", err);
       toast.error("Error updating contact details.");
     }
   };

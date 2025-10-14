@@ -4,16 +4,21 @@ import { pointsSystemApi } from "../../../api/pointsSystemApi";
 import { formatDate } from "../../../utils/dateHelpers";
 import {
   MagnifyingGlassIcon,
-  ArrowDownIcon,
-  ArrowUpIcon,
+  FunnelIcon,
   XMarkIcon,
   CheckIcon,
   ArrowPathIcon,
   CogIcon,
   UserGroupIcon,
   HeartIcon,
-} from "@heroicons/react/24/outline";
-import { useStore } from "../../../store/authStore";
+  ArrowDownIcon,
+  ArrowUpIcon,
+  PlusIcon,
+  MinusIcon,
+  PencilIcon
+} from '@heroicons/react/24/outline';
+import { useStore } from '../../../store/authStore';
+import defaultAvatar from "../../../assets/images/defaultAvatar.svg";
 
 const UserHeartbitsManagement = () => {
   const currentUser = useStore((state) => state.user);
@@ -690,9 +695,23 @@ const UserHeartbitsManagement = () => {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
+                        <svg
+                          className="w-3 h-3 sm:w-4 sm:h-4 text-white drop-shadow-lg"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
                       )}
                     </span>
                   </div>
+
 
                   {/* User Content - Responsive Layout */}
                   <div className="flex flex-col space-y-2">
@@ -722,8 +741,17 @@ const UserHeartbitsManagement = () => {
                         <div className="text-xs sm:text-sm text-gray-600">
                           {getRoleLabel(user.user_type)}
                         </div>
+                        <div className="font-bold text-gray-900 text-sm sm:text-base truncate">
+                          {`${user.first_name || ""} ${
+                            user.last_name || ""
+                          }`.trim()}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-600">
+                          {getRoleLabel(user.user_type)}
+                        </div>
                       </div>
                     </div>
+
 
                     {/* Heartbits Row */}
                     <div className="flex items-center justify-start sm:justify-start gap-2 pt-1">
