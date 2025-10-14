@@ -26,12 +26,12 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent!;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #8888881d;
 }
 
 * {
@@ -40,14 +40,14 @@
 }
 
 *:hover {
-  scrollbar-color: #c4c4c4 #f7f7f7b0;
+  scrollbar-color: #d5d5d5 transparent;
   transition: all ease 0.2s;
 }
 
 /* Utility class to hide scrollbars */
 .scrollbar-hide {
   /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none;  
+  -ms-overflow-style: none;
   scrollbar-width: none;
   /* Ensure smooth scrolling */
   scroll-behavior: smooth;
@@ -70,7 +70,7 @@
 /* Custom scrollbar for main content areas */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e0 #f7fafc;
+  scrollbar-color: #8888881d #f7fafc;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -84,12 +84,12 @@
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
+  background: #8888881d;
   border-radius: 2px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
+  background: rgba(163, 166, 170, 0.558)45;
 }
 
 a {
@@ -157,6 +157,8 @@ b {
   font-family: var(--font-avenir-black);
 }
 
+
+
 em,
 i {
   font-family: var(--font-avenir-roman-oblique);
@@ -194,6 +196,7 @@ i {
   --font-avenir-black-oblique: Avenir-BlackOblique, "sans-serif";
   --font-avenir-roman: Avenir-Roman, "sans-serif";
   --font-avenir-roman-oblique: Avenir-RomanOblique, "sans-serif";
+  --font-avenir-medium: Avenir-Medium, "sans-serif";
   --font-sansita-black: SansitaSwashed-Black, "sans-serif";
   --font-sansita-bold: SansitaSwashed-Bold, "sans-serif";
   --font-sansita-regular: SansitaSwashed-Regular, "sans-serif";
@@ -307,11 +310,28 @@ i {
   box-shadow: none !important;
 }
 
-
 .is-editor-empty::before {
   content: attr(data-placeholder);
   color: #9ca3af;
   float: left;
   height: 0;
   pointer-events: none;
+}
+
+.dark {
+  --autofill-text-color: white; /* when dark mode */
+
+  --background: oklch(0.145 0 0);
+
+  --foreground: oklch(0.985 0 0);
+
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+  box-shadow: 0 0 0px 1000px transparent inset !important;
+  -webkit-text-fill-color: var(--autofill-text-color, black) !important;
+  transition: background-color 9999s ease-in-out 0s !important;
 }

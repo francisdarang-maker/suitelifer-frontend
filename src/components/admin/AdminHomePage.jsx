@@ -10,6 +10,7 @@ import Information from "./Information";
 import { useAddAuditLog } from "../../components/admin/UseAddAuditLog";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import LoadingAnimation from "../loader/Loading";
+import img_placeholder from "../../assets/images/img-placeholder.svg";
 
 const AdminHomePage = () => {
   //Loading
@@ -27,7 +28,7 @@ const AdminHomePage = () => {
   // HOME DETAILS
   const [homeDetails, setHomeDetails] = useState({
     contentId: null,
-    getInTouchImage: "",
+    getInTouchImage: img_placeholder,
     kickstartVideo: "",
   });
 
@@ -151,13 +152,13 @@ const AdminHomePage = () => {
     );
 
     await Promise.all(uploadPromises);
-    
+
     Object.values(fileInputRefs.current).forEach((ref) => {
       if (ref?.current) {
         ref.current.value = "";
       }
     });
-
+ 
     // Clear selected images state
     setIndustryImages({});
     handlePublishChanges();
@@ -194,19 +195,23 @@ const AdminHomePage = () => {
           {/* REMINDERS END */}
 
           {imageFile === null ? (
-            homeDetails.getInTouchImage && (
-              <div className={`preview mt-4`}>
-                <img
-                  className="h-72 mt-2 mx-auto"
-                  src={homeDetails.getInTouchImage}
-                  alt="Preview"
-                />
-              </div>
-            )
+            <div className="preview mt-4">
+              <img
+                className="h-72 mt-2 mx-auto"
+                src={
+                  homeDetails?.getInTouchImage &&
+                  homeDetails.getInTouchImage.trim() !== ""
+                    ? homeDetails.getInTouchImage
+                    : img_placeholder
+                }
+                alt="Preview"
+              />
+            </div>
           ) : (
             <img
               className="h-72 mt-2 mx-auto"
               src={URL.createObjectURL(imageFile)}
+              alt="Uploaded Preview"
             />
           )}
         </div>
@@ -220,7 +225,7 @@ const AdminHomePage = () => {
           <input
             type="text"
             name="kickstartVideo"
-            value={homeDetails.kickstartVideo}
+            value={homeDetails?.kickstartVideo ?? ""}
             onChange={(e) => handleHomeDetailsChange(e)}
             className="w-full p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary"
           />

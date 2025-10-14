@@ -190,7 +190,7 @@ const Contact = () => {
                 </p>
 
                 <div className="group mt-6 space-y-5 text-white font-avenir-back text-body">
-                  <p className="flex items-center gap-4">
+                  <div className="flex items-center gap-4">
                     <img
                       src={emailicon}
                       alt="Email"
@@ -199,49 +199,51 @@ const Contact = () => {
                     <div className="flex flex-col xl:flex-row items-start">
                       <div className="">
                         <a
-                          href={`mailto:${contactDetails.careersEmail}`}
-                          className="hover:text-secondary transition-colors  no-underline!"
-                        >
-                          {contactDetails.careersEmail}
-                        </a>
+  href={`mailto:${contactDetails?.careersEmail || "hireme@getfullsuite.com"}`}
+  className="hover:text-secondary transition-colors no-underline!"
+>
+  {contactDetails?.careersEmail || "hireme@getfullsuite.com"}
+</a>
                       </div>
                       <div className="hidden px-3 xl:block">|</div>
                       <div className="">
-                        <a
-                          href={`mailto:${contactDetails.internshipEmail}`}
-                          className="hover:text-secondary transition-colors  no-underline!"
-                        >
-                          {contactDetails.internshipEmail}
-                        </a>
+                      <a
+  href={`mailto:${contactDetails?.internshipEmail || "internships@getfullsuite.com"}`}
+  className="hover:text-secondary transition-colors no-underline!"
+>
+  {contactDetails?.internshipEmail || "internships@getfullsuite.com"}
+</a>
                       </div>
                     </div>
-                  </p>
-                  <p className="flex items-center gap-4">
+                  </div>
+                  <div className="flex items-center gap-4">
                     <img
                       src={phoneicon}
                       alt="Phone"
                       className="w-5 h-5 mb-1 filter invert"
                     />
-                    <a
-                      href="tel:742-442-887"
-                      className="hover:text-secondary transition-colors  no-underline!"
-                    >
-                      {contactDetails.websiteTel}
-                    </a>
-                  </p>
-                  <p className="flex items-center gap-4">
+                   <a
+  href={`tel:${contactDetails?.websiteTel || "742-442-887"}`}
+  className="hover:text-secondary transition-colors no-underline!"
+>
+  {contactDetails?.websiteTel || "742-442-887"}
+</a>
+
+                  </div>
+                  <div className="flex items-center gap-4">
                     <img
                       src={tphoneicon}
                       alt="Mobile"
                       className="w-5 h-5 mb-1 filter invert"
                     />
-                    <a
-                      href="tel:09190639001"
-                      className="hover:text-secondary transition-colors  no-underline!"
-                    >
-                      {contactDetails.careersPhone}
-                    </a>
-                  </p>
+                  <a
+  href={`tel:${contactDetails?.careersPhone || "09190639001"}`}
+  className="hover:text-secondary transition-colors no-underline!"
+>
+  {contactDetails?.careersPhone || "09190639001"}
+</a>
+
+                  </div>
                 </div>
               </div>
             </div>

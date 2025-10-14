@@ -5,6 +5,7 @@ export default function BlogDeleteDialog({
   handleDeleteBlog,
   isDeleting,
   onCancel,
+  isEmployeeBlog = false
 }) {
   if (!deleteBlog) return null;
 
@@ -23,7 +24,7 @@ export default function BlogDeleteDialog({
         <div className="flex gap-3">
           {/* Confirm Delete */}
           <button
-            onClick={() => handleDeleteBlog(deleteBlog.blogId, deleteBlog.imageUrl)}
+            onClick={() => isEmployeeBlog ? handleDeleteBlog(deleteBlog.eblogId) : handleDeleteBlog(deleteBlog.blogId, deleteBlog.imageUrl)}
             disabled={isDeleting}
             className="flex-1 bg-red-600 text-white px-6 py-3 rounded-xl hover:bg-red-700 transition-all font-medium disabled:opacity-50"
           >

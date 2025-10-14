@@ -46,7 +46,7 @@ export default function AdminJobListing() {
 
       setOpenJobs((oj) => response.data.data.count);
     } catch (err) {
-      console.log("Unable to fetch Available Jobs ",err);
+      console.log("Unable to fetch Available Jobs ", err);
     }
   };
 
@@ -56,7 +56,7 @@ export default function AdminJobListing() {
 
       setClosedJobs((cj) => response.data.data.count);
     } catch (err) {
-      console.log("Unable to fetch Unavailable Jobs",err);
+      console.log("Unable to fetch Unavailable Jobs", err);
     }
   };
 
@@ -169,7 +169,7 @@ export default function AdminJobListing() {
       setJobListings(response.data.data);
       setRowJobData(response.data.data);
     } catch (err) {
-      console.log("Unable to fetch Job Lists",err);
+      console.log("Unable to fetch Job Lists", err);
     }
   };
 
@@ -296,9 +296,7 @@ export default function AdminJobListing() {
           setSetups((s) => [...s, setupDetails]);
         } else {
           const updatedSetups = setups.map((setup) =>
-            setup.setupId === setupDetails.setupId
-              ? { ...setupDetails }
-              : setup
+            setup.setupId === setupDetails.setupId ? { ...setupDetails } : setup
           );
           setSetups((s) => updatedSetups);
         }
@@ -598,7 +596,7 @@ export default function AdminJobListing() {
             <span className="mr-2">+</span> SET-UP
           </button>
 
-          {/* Mobile Buttons (Icons Only) */} 
+          {/* Mobile Buttons (Icons Only) */}
           <button
             className="btn-primary flex sm:hidden p-2 gap-2"
             onClick={handleAddJobListingButtonClick}

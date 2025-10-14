@@ -94,7 +94,7 @@ function Testimonials() {
         const uploadResponse = await api.post(
           "/api/upload-image/testimonials",
           formData,
-          { 
+          {
             headers: { "Content-Type": "multipart/form-data" },
           }
         );

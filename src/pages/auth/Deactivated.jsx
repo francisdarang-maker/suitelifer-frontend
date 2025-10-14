@@ -41,7 +41,7 @@ const DeactivatedPage = () => {
                   href="/login"
                 >
                   <button className="cursor-pointer text-small">
-                    Login Page
+                    Go Back
                   </button>
                 </a>
               </div>

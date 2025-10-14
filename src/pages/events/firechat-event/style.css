@@ -1,0 +1,338 @@
+@font-face {
+  font-family: 'CoreSansRegular';
+  src: url('../firechat-event/font/CoreSansA45Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'CoreSansBold';
+  src: url('../firechat-event/font/CoreSansA65Bold.otf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+.firechat-event {
+  font-family: 'CoreSansRegular', Arial, sans-serif;
+  text-align: center;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #FCFDFD;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+.firechat-event * {
+  box-sizing: border-box;
+}
+
+.firechat-event .events-title-img {
+  width: 28vw;
+  max-width: 90vw;
+  margin-top: 3vw;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.firechat-event .fireside-title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: -2vw;
+  transform: scale(0.75);
+}
+
+.firechat-event .register-btn {
+  background-color: #EF400D;
+  border: none;
+  color: white;
+  font-family: 'CoreSansBold';
+  font-size: 2vw;
+  padding: 1vw 3vw;
+  border-radius: 1vw;
+  cursor: pointer;
+  margin-top: 3vw;
+  z-index: 10;         
+  position: relative; 
+}
+
+.firechat-event .chairs-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: -5vw;
+}
+
+.firechat-event .orangebg, 
+.firechat-event .greenbg {
+  position: absolute;
+  left: 0;
+  width: 100vw;
+  height: 1.5vw;
+  z-index: 1; 
+}
+
+.firechat-event .orangebg {
+  background: #EF400D;
+  top: 88vw;   
+  border-radius: 0;
+}
+
+.firechat-event .greenbg {
+  background: #1E2824;
+  width: 90vw;
+  top: 89.5vw;   
+  border-radius: 0;
+}
+
+.firechat-event h2 {
+  color: #1E2824;
+  font-family: 'CoreSansBold';
+  font-size: 2vw;
+  margin: 1vw 0; 
+  letter-spacing: 0.6em;
+  text-align: center;
+}
+
+.firechat-event .event-countDown {
+  font-size: 9vw;
+  color: #1E2824;
+  margin: 3vw 0; 
+  font-family: 'CoreSansBold';
+  letter-spacing: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.firechat-event .event-date {
+  font-size: 2vw;
+  color: #1E2824;
+  margin: 1vw 0; 
+  text-align: center;
+}
+
+.firechat-event h1 {
+  font-family: 'CoreSansBold';
+  font-size: 4vw;
+  margin-top: 4vw;
+  text-align: center;
+  color: #1E2824;
+}
+
+/* Speaker - left */
+.firechat-event .speaker-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  margin-bottom: 6vw;
+}
+
+.firechat-event .speaker-img {
+  width: 28vw;
+  height: auto;
+  margin-left: 7vw;
+}
+
+.firechat-event .speaker-info {
+  display: flex;
+  flex-direction: column; 
+  justify-content: left; 
+}
+
+.firechat-event .speaker-name {
+  font-family: 'CoreSansBold';
+  font-size: 2.5vw;
+  color: #1E2824;
+  margin-top: 3vw;
+  margin-left: 3vw;
+  text-align: left;
+  white-space: nowrap; 
+}
+
+.firechat-event .speaker-title {
+  color: #EF400D;
+  font-family: 'CoreSansBold';
+  font-size: 1.3vw;
+  margin-top: 0vw;
+  margin-left: 3vw;
+  margin-bottom: 0.5vw;
+}
+
+.firechat-event .speaker-bio {
+  color: #1E2824;
+  font-family: 'CoreSansRegular';
+  font-size: 1.5vw;
+  width: 45vw; 
+  margin-top: 0.5vw;
+  margin-left: 3vw;
+  text-align: justify;
+}
+
+.firechat-event .speaker-orange {
+  color: #EF400D;
+}
+
+/* Speaker - right - FIXED VERSION */
+.firechat-event .speaker-container-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0 8vw 10vw 0;
+  gap: 3vw;
+}
+
+.firechat-event .speaker-img-right {
+  width: 28vw;
+  height: auto;
+  order: 2; /* Image comes after text */
+}
+
+.firechat-event .speaker-info-right {
+  order: 1; /* Text comes before image */
+  text-align: right;
+  max-width: 45vw;
+}
+
+.firechat-event .speaker-name-right {
+  font-family: 'CoreSansBold';
+  font-size: 2.5vw;
+  color: #1E2824;
+  margin: 0;
+}
+
+.firechat-event .speaker-title-right {
+  color: #EF400D;
+  font-family: 'CoreSansBold';
+  font-size: 1.3vw;
+  margin: 0.5vw 0 1vw 0;
+  line-height: 1.3;
+}
+
+.firechat-event .speaker-bio-right {
+  color: #1E2824;
+  font-family: 'CoreSansRegular';
+  font-size: 1.5vw;
+  text-align: justify;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.firechat-event .speaker-orange-right {
+  color: #EF400D;
+}
+
+/* Icons */
+.firechat-event .social-icon {
+  transform: scale(0.5);
+  pointer-events: none;
+  user-select: none;
+  display: inline-block;
+}
+
+.firechat-event .social-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 5vw;
+  margin-top: 2vw;
+  margin-bottom: 5vw;
+}
+
+/* Chair Image */
+.firechat-event img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Divider */
+.firechat-event .divider, 
+.firechat-event .divider2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+  margin: 0 auto;
+  margin-top: 8vw;
+  transform: scale(0.8);
+  margin-bottom: 8vw;
+}
+
+.firechat-event .circle {
+  width: 1.5vw;
+  height: 1.5vw;
+  border-radius: 50%;
+  background-color: red;
+}
+
+.firechat-event .opacity-16 { opacity: 0.16; }
+.firechat-event .opacity-40 { opacity: 0.40; }
+.firechat-event .opacity-77 { opacity: 0.77; }
+
+.firechat-event .center-bar {
+  width: 10vw;
+  height: 1.5vw;
+  background-color: black;
+  border-radius: 1.5vw;
+}
+
+.firechat-event .scroll-toggle-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #EF400D;
+  border: none;
+  border-radius: 50%;
+  padding: 14px;
+  cursor: pointer;
+  color: white;
+  z-index: 100;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  transition: transform 0.3s ease, background 0.3s ease;
+  animation: bounceUpDown 1.5s infinite ease-in-out;
+}
+
+.firechat-event .scroll-toggle-btn:hover {
+  transform: translateX(-50%) scale(1.1);
+  background: #d9360c;
+}
+
+/* 🔹 Bounce animation */
+@keyframes bounceUpDown {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+
+/* Animation keyframes */
+@keyframes fancyBounce {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

@@ -4,6 +4,7 @@ import Loader from '../../components/loader/Loading'
 import { useState, useEffect } from "react";
 import api from "../../utils/axios";
 import { RefreshCcw } from "lucide-react";
+import BlogDeleteDialog from "../../components/blog/admin/BlogDeleteDialog";
 
 const EmployeeMyBlogs = () => {
 
@@ -21,12 +22,30 @@ const EmployeeMyBlogs = () => {
   setIsLoading(false)
 }
 
+  // const handleDeleteBlog = async (eBlogId) => {
+  //   try {
+  //     setIsDeleting(true)
+
+  //     const deleteBlog = await api.delete(`api/delete-employee-blog/${blog.eblogId}`)
+
+  //   } catch (error) {
+      
+  //   }
+  // }
+
 useEffect( () => {
   fetchEmployeeBlogs()
 },[])
 
 
   return (
+    <>
+    {/* Delete Dialog */}
+    {/* <BlogDeleteDialog
+    deleteBlog={handleDeleteBlog}
+    /> */}
+
+
     <section className="mb-50">
       <div className="p-2 xl:p-3 ">
         <main>
@@ -36,7 +55,7 @@ useEffect( () => {
             {myBlogs.length > 0 ? (
               myBlogs.map((blog, index) => (
                 <div key={index} className="mb-5">
-                  <BlogCard blog={blog} />
+                  <BlogCard blog={blog} isMine={true} />
                 </div>
               ))
             ) : (
@@ -61,6 +80,7 @@ useEffect( () => {
         </main>
       </div>
     </section>
+    </>
   );
 };
 

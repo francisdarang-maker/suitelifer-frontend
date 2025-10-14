@@ -2,7 +2,7 @@ import api from "./axios";
 
 export const getUserFromCookie = async () => {
   try {
-    const response = await api.get("/api/user-info");
+    const response = await api.get("/api/user-info"); 
     return response.data.user;
   } catch (error) {
     if (error.response && error.response.status === 403) {

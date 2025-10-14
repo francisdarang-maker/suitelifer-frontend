@@ -21,6 +21,11 @@
 }
 
 @font-face {
+  font-family: "Avenir-Medium";
+  src: url("/fonts/avenir/AvenirLTProMedium.otf");
+}
+
+@font-face {
   font-family: "SansitaSwashed-Black";
   src: url("/fonts/sansita/SansitaSwashed-Black.ttf");
 }

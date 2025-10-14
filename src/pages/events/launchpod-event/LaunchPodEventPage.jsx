@@ -9,7 +9,7 @@ import eventsTitleImg from "../launchpod-event/img/events-title.png";
 import bgImg from "../launchpod-event/img/bg.jpg";
 import "../launchpod-event/eventStyles.css";
 import EventCountdown from "./EventCoundown";
-import MotionUp from "../../components/animated/MotionUp";
+import MotionUp from "../../../components/animated/MotionUp";
 
 const LaunchPodEventPage = () => {
   return (

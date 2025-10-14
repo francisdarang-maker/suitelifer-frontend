@@ -11,13 +11,13 @@ import React, { Fragment } from "react";
 export const ModalLogout = ({ isOpen, handleClose }) => {
   const handleLogout = async () => {
     handleClose();
-    try {
+    try { 
       const response = await api.post("/api/logout");
 
       if (response.data.isLoggedOut) {
         // Clear token from localStorage
         localStorage.removeItem('token');
-        window.location.href = "/";
+        window.location.href = "/login";
       } else {
         console.log("Failed to log out");
       }
