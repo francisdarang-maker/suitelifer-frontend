@@ -759,7 +759,7 @@ const ContentEditor = ({
         <label className="block text-sm font-avenir-black text-gray-700 mb-2">
           Upload Images
         </label>
-        <div className="relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 hover:border-green-500/70 transition-all duration-300">
+        <div className="relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 hover:border-primary transition-all duration-300">
           <input
             type="file"
             accept="image/*"
@@ -814,7 +814,7 @@ const ContentEditor = ({
         onChange={(e) => handleTitleChange(e.target.value)}
         placeholder="Write your blog title here..."
         className="w-full border border-gray-300 rounded-md px-4 py-3 text-lg font-avenir-black
-                   focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition-all duration-200"
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
       />
 
       {/* Toolbar */}
@@ -823,7 +823,7 @@ const ContentEditor = ({
           (Icon, i) => (
             <Icon
               key={i}
-              className="w-5 h-5 text-gray-500 cursor-pointer hover:text-green-600 transition-all duration-200"
+              className="w-5 h-5 text-gray-500 cursor-pointer hover:text-primary transition-all duration-200"
               onClick={() => {
                 if (Icon === BoldIcon) editor.chain().focus().toggleBold().run();
                 else if (Icon === ItalicIcon)
@@ -844,7 +844,7 @@ const ContentEditor = ({
       <EditorContent
         editor={editor}
         className="border border-gray-300 h-[220px] p-4 rounded-md bg-gray-50 text-gray-700 font-avenir overflow-y-auto
-                   focus-within:ring-2 focus-within:ring-green-300 transition-all duration-200
+                   focus-within:ring-2 focus-within:ring-primary transition-all duration-200
                    [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_strong]:font-avenir-black"
       />
 
