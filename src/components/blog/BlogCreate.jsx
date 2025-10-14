@@ -12,7 +12,7 @@ const BlogCreate = () => {
   const [blogDescription, setBlogDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 🔍 Log the selected images
+
   const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files || []);
     setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);

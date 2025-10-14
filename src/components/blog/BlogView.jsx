@@ -85,11 +85,10 @@ const BlogView = () => {
 
   // simulate 1.5s delay like an API call
 
-  // after delay, mock that comment is submitted
   toast("Comment submitted successfully!");
 
   setIsSubmitComment(false);
-  onCommentChange(""); // clear textarea after submit
+  onCommentChange(""); 
 };
 
 

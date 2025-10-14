@@ -36,7 +36,6 @@ const BlogCard = ({ blog }) => {
       try {
         const { data } = await api.get(`/api/${blog.eblogId}/is-liked`);
         setIsHeart(data.liked);
-        console.log(blog)
       } catch (err) {
         console.error("Error fetching like status:", err);
       }
@@ -82,9 +81,6 @@ const BlogCard = ({ blog }) => {
       </section>
       <section className="grid grid-cols-4 grid-row grid-rows-2 gap-4">
 
-        {/* Loop here the content of the image */}
-
-
         <div className="col-start-1 col-end-3 row-start-1 row-end-3">
           <img
             src={blog.images[0]}
@@ -125,7 +121,6 @@ const BlogCard = ({ blog }) => {
           
           <span className="text-gray-500">{blog.likeCount}</span>
         </button>
-        {/* <button className="flex gap-3 cursor-pointer"> */}
           <Link
           to={`blog/${blog.eblogId}/${toSlug(blog.title)}`}
           state={{ previousPage: location.pathname }}
@@ -135,7 +130,6 @@ const BlogCard = ({ blog }) => {
           <span className="text-gray-500 ">{blog.commentCount}</span>
         </Link>
          
-        {/* </button> */}
       </section>
     </section>
   );

@@ -18,6 +18,8 @@ const fetchEmployeeBlogs = async () => {
   const employeeBlogs = await api.get('api/all-employee-blog')
   
   setEmployeeblogs(employeeBlogs.data)
+
+  console.log(employeeBlogs)
   setIsLoading(false)
   
 }
