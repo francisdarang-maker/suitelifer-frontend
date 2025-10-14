@@ -49,19 +49,18 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
       //TODO: check first if exists in HRIS
       console.log("nakapasok hereee ");
 
-      const { token } = await loginUser({ email, password });
-      localStorage.setItem("hris-token", token);
+      // const { token } = await loginUser({ email, password });
+      // localStorage.setItem("hris-token", token);
 
-      console.log("hris-token: ", token);
+      // console.log("hris-token: ", token);
 
-      //then proceed if yes...
-      if (token) {
+      // //then proceed if yes...
+      // if (token) {
         const response = await api.post("/api/login", {
           email,
           recaptchaToken,
         });
 
-<<<<<<< Updated upstream
       if (response.data.accessToken) {
         // Store token in localStorage for Suitebite API compatibility
         localStorage.setItem('token', response.data.accessToken);
@@ -72,32 +71,7 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
       } else {
         toast.error("Login failed. Please check your credentials.");
       }
-=======
-      // const { token } = await loginUser({ email, password });
-      // localStorage.setItem("hris-token", token);
-
-      // console.log("hris-token: ", token);
-
-      //then proceed if yes...
-      // if (token) {
-        const response = await api.post("/api/login", {
-          email,
-          recaptchaToken,
-        });
-
-        if (response.data.accessToken) {
-          // Store token in localStorage for Suitebite API compatibility
-          localStorage.setItem("token", response.data.accessToken);
-          console.log("tokeeeen: ", response.data.accessToken);
-          toast.success("Welcome back! You have successfully logged in.");
-          navigate("/app/blogs-feed");
-        } else if (response.data.recaptchaError) {
-          toast.success(response.data.message);
-        } else {
-          toast.error("Login failed. Please check your credentials.");
-        }
-      // }
->>>>>>> Stashed changes
+    // }
     } catch (error) {
       setLoading(false);
       if (error.response?.status === 400) {
@@ -248,8 +222,8 @@ const Login = () => {
   return (
     <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
       <div
-        // id="vanta-bg"
-        className="dark min-h-screen bg-primary overflow-y-auto"
+        id="vanta-bg"
+        className="dark max-h-screen bg-primary overflow-y-auto"
       >
         {/* <ModalResetPassword
           isOpen={isResetModal}

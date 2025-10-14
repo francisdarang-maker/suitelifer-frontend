@@ -296,24 +296,23 @@ import VerifyAccount from "./pages/auth/VerifyAccount";
 import DevelopersPage from "./pages/guest/Developers";
 
 //Events
-import LaunchPodEventPage from "./pages/events/launchpod-event/LaunchPodEventPage";
+// import LaunchPodEventPage from "./pages/events/launchpod-event/LaunchPodEventPage";
 import FirechatEvent from "./pages/events/firechat-event/FirechatEvent";
-import ResetPasswordPage from "./pages/auth/reset-password/ResetPasswordPage";
-import ProfilePage from "./pages/employee/profile-page/ProfilePage";
-import { EmployeeDetailsProvider } from "./pages/employee/context/EmployeeDetailsContext";
-import Logout from "./pages/auth/Logout";
+// import ResetPasswordPage from "./pages/auth/reset-password/ResetPasswordPage";
+// import ProfilePage from "./pages/employee/profile-page/ProfilePage";
+// import { EmployeeDetailsProvider } from "./pages/employee/context/EmployeeDetailsContext";
+// import Logout from "./pages/auth/Logout";
 
-=======
+
 //Events
 import LaunchPodEventPage from "./pages/events/launchpod-event/LaunchPodEventPage";
-import FirechatEvent from "./pages/events/firechat-event/FirechatEvent";
 import ResetPasswordPage from "./pages/auth/reset-password/ResetPasswordPage";
 import ProfilePage from "./pages/employee/profile-page/ProfilePage";
 import { EmployeeDetailsProvider } from "./pages/employee/context/EmployeeDetailsContext";
 import Logout from "./pages/auth/Logout";
 import BlogsPage from "./pages/guest/Blogs";
 import BlogDetails from './components/blog/guest/BlogDetails'
->>>>>>> Stashed changes
+
 const queryClient = new QueryClient();
 function App() {
   return (
@@ -392,7 +391,7 @@ function App() {
                 element={<SuitebiteLeaderboard />}
               />
 
-=======
+
               {/* Suitebite Employee Routes */}
               <Route path="suitebite" element={<SuitebiteHome />} />
               <Route path="suitebite/cheer" element={<SuitebiteHome />} />
@@ -400,7 +399,7 @@ function App() {
                 path="suitebite/leaderboard"
                 element={<SuitebiteLeaderboard />}
               />
->>>>>>> Stashed changes
+
               {/* Points Shop/Mood/Cheer/PointsDashboard Routes */}
               <Route path="mood" element={<MoodPage />} />
               {/* Remove old points and cheer routes, keep only the new ones */}
@@ -410,12 +409,11 @@ function App() {
                 element={<EmployeePointsDashboard />}
               />
 
-=======
               <Route
                 path="points-dashboard"
                 element={<EmployeePointsDashboard />}
               />
->>>>>>> Stashed changes
+
               {/* SuitebiteShop moved to bottom */}
               <Route path="suitebite/shop" element={<SuitebiteShop />} />
               {/* Admin Protected Routes */}
