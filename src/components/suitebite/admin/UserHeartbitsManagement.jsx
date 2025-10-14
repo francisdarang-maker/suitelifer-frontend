@@ -677,6 +677,7 @@ const UserHeartbitsManagement = () => {
                       }}
                     >
                       {isSelected && (
+                        <>
                         <svg
                           className="w-3 h-3 sm:w-4 sm:h-4 text-white drop-shadow-lg"
                           fill="none"
@@ -690,6 +691,23 @@ const UserHeartbitsManagement = () => {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
+<<<<<<< Updated upstream
+=======
+                        <svg
+                          className="w-3 h-3 sm:w-4 sm:h-4 text-white drop-shadow-lg"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        </>
+>>>>>>> Stashed changes
                       )}
                     </span>
                   </div>

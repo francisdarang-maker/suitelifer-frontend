@@ -10,7 +10,7 @@ import api from "../../utils/axios";
 import BlogGrid from "../guest/BlogsGrid";
 import Loading from "../../components/loader/Loading";
 
-function Blogs() {
+function BlogsPage() {
   const location = useLocation();
   const [blogs, setBlogs] = useState([]);
   const [isError, setIsError] = useState(false);
@@ -79,4 +79,4 @@ function Blogs() {
   );
 }
 
-export default Blogs;
+export default BlogsPage;
