@@ -12,7 +12,6 @@ export default function BlogAddForm({ onSubmit, blogs }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
-  // Initialize TipTap editor
   const editor = useEditor({
     extensions: [StarterKit, UnderlineExtension],
     content: "",
