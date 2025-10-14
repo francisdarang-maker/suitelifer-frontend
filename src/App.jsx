@@ -121,6 +121,8 @@ function App() {
           <Route path="/d" element={<Navigate to="/developers" />} />
           <Route path="/newsletter" element={<Newsletter />} />
           <Route path="/newsletter/:slug" element={<NewsletterDetails />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blogs/:slugs" element={<BlogDetails />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/podcast" element={<Podcast />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />

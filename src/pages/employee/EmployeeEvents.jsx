@@ -1,70 +1,319 @@
-import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CalendarDaysIcon, Clock } from "lucide-react";
-import ComingSoon from "../admin/ComingSoon";
+import { Modal, Box, Typography } from "@mui/material";
+import EventCalendar from "../../components/admin/EventCalendar";
+import api from "../../utils/axios";
+import moment from "moment-timezone";
+
+const CATEGORY_COLORS = {
+  party: "#ec4899",
+  launchpod: "#3b82f6",
+  holiday: "#22c55e",
+  payroll: "#f97316",
+  meeting: "#8b5cf6",
+  others: "#0097b2",
+};
 
 const EmployeeEvents = () => {
-  const [isComingSoon, setComingSoon] = useState(true); //Change this when the page is ready.
+  const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isEventDetailsModalOpen, setIsEventDetailsModalOpen] = useState(false);
 
-  if (isComingSoon) {
-    return <ComingSoon />;
-  }
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
+    setIsEventDetailsModalOpen(true);
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const localTimeZone = moment.tz.guess();
+      const response = await api.get("/api/events");
+      const adjustedEvents = response.data.events.map((event) => ({
+        ...event,
+        start: moment(event.start).utc(true).tz(localTimeZone).toDate(),
+        end: moment(event.end).utc(true).tz(localTimeZone).toDate(),
+      }));
+      setEvents(adjustedEvents);
+    } catch (err) {
+      console.error("Failed to fetch events:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   return (
-    <section className="p-5 border border-primary rounded-2xl flex flex-col gap-4 mb-25">
-      <div className="">
-        <label className="text-sm text-gray-500">DATE</label>
-        <p className="text-primary font-avenir-black flex gap-2">
-          {" "}
-          <span>
-            <CalendarDaysIcon className="size-5" />
-          </span>
-          April 02, 2025
-        </p>
+    <div className="bg-white p-4">
+      <h2 className="text-xl font-bold mb-4">Events Calendar</h2>
+
+      <div className="rounded-md p-4">
+        <EventCalendar
+          events={events}
+          onSelectEvent={handleEventClick}
+          onSelectSlot={() => {}}
+          enableDragDrop={false}
+        />
       </div>
-      <div className="">
-        <label className="text-sm text-gray-500">TIME</label>
-        <p className="text-primary font-avenir-black flex gap-2">
-          <span>
-            <Clock className="size-5" />
-          </span>{" "}
-          7:00 AM - 6:00 PM
-        </p>
-      </div>
-      <div className="">
-        <label className="text-sm text-gray-500">EVENT TITLE</label>
-        <p className="font-avenir-black text-xl">Sports Fest 2025</p>
-      </div>
-      <div className="">
-        <label className="text-sm text-gray-500">DESCRIPTION</label>
-        <p className="">
-          Get ready for an action-packed day of competition, teamwork, and fun
-          at Sports Fest 2025! This annual company-wide event is designed to
-          bring employees together through friendly matches, exciting
-          challenges, and a celebration of sportsmanship. Whether you're an
-          athlete, a casual player, or just there to cheer for your team,
-          there's something for everyone! The event will feature a variety of
-          sports and activities, including basketball, volleyball, relay races,
-          and fun games to ensure that all employees, regardless of skill level,
-          can participate. Teams will compete for trophies, medals, and special
-          prizes, but most importantly, for the glory of teamwork and
-          camaraderie. Aside from the games, there will be food stalls, music,
-          and designated relaxation areas for those who want to take a break and
-          enjoy the festive atmosphere. The day will conclude with an awarding
-          ceremony, recognizing the best teams and outstanding individual
-          performances. Join us as we promote wellness, unity, and a strong
-          company culture through the spirit of sports! Mark your calendars and
-          start preparing—Sports Fest 2025 is coming soon! <br />
-          <br />
-          📍 Venue: FullSuite Covered Court <br />
-          👕 Dress Code: Sportswear / Team Colors <br />
-          <br />
-          Stay tuned for team assignments, schedules, and additional details.
-          Let's make this event a memorable one! 🏆🔥
-        </p>
-      </div>
-    </section>
+
+      {/* Event Details Modal */}
+      <Modal
+        open={isEventDetailsModalOpen}
+        onClose={() => setIsEventDetailsModalOpen(false)}
+      >
+        <Box
+          sx={detailsModalStyle(
+            CATEGORY_COLORS[selectedEvent?.category] || "#6B7280"
+          )}
+        >
+          {selectedEvent && (
+            <>
+              {/* Header */}
+              <Box
+                sx={{
+                  ...headerStyle,
+                  background:
+                    CATEGORY_COLORS[selectedEvent.category] ||
+                    "linear-gradient(135deg, #2e97b2 0%, #25798e 100%)",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <Box sx={{ flex: 1, pr: 2 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: { xs: "1.125rem", sm: "1.25rem" },
+                        lineHeight: 1.3,
+                        mb: 1,
+                      }}
+                    >
+                      {selectedEvent.title}
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "inline-block",
+                        px: 2,
+                        py: 0.5,
+                        borderRadius: "12px",
+                        backgroundColor: "rgba(255, 255, 255, 0.25)",
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {selectedEvent.category}
+                    </Box>
+                  </Box>
+
+                  <button
+                    onClick={() => setIsEventDetailsModalOpen(false)}
+                    className="text-white hover:bg-white/20 transition-colors rounded-full p-1.5 -mt-1"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </Box>
+              </Box>
+
+              {/* Content */}
+              <Box sx={contentStyle}>
+                <DetailSection
+                  icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  title="Schedule"
+                >
+                  <Typography sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
+                    <span className="font-medium text-gray-700">Starts:</span>{" "}
+                    {moment(selectedEvent.start).format("MMM D, YYYY • h:mm A")}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
+                    <span className="font-medium text-gray-700">Ends:</span>{" "}
+                    {moment(selectedEvent.end).format("MMM D, YYYY • h:mm A")}
+                  </Typography>
+                </DetailSection>
+
+                <DetailSection
+                  icon="M4 6h16M4 12h16M4 18h7"
+                  title="Description"
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "0.875rem",
+                      color: "#6B7280",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {selectedEvent.description || (
+                      <span style={{ fontStyle: "italic", color: "#9CA3AF" }}>
+                        No description provided
+                      </span>
+                    )}
+                  </Typography>
+                </DetailSection>
+
+                <DetailSection
+                  icon="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                  title="Attachments"
+                >
+                  {selectedEvent.gdriveLink || selectedEvent.gdrive_link ? (
+                    <a
+                      href={
+                        selectedEvent.gdriveLink || selectedEvent.gdrive_link
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        className="w-5 h-5"
+                      >
+                        <path
+                          fill="#4285F4"
+                          d="M12 2L3.5 17h5.5l8.5-15h-5.5z"
+                        />
+                        <path fill="#34A853" d="M3.5 17L8.5 22H20L15 17H3.5z" />
+                        <path
+                          fill="#FBBC05"
+                          d="M20 22l-8.5-15h5.5L24 17l-4 5z"
+                        />
+                      </svg>
+                      Open in Drive
+                    </a>
+                  ) : (
+                    <Typography
+                      sx={{
+                        fontSize: "0.875rem",
+                        color: "#9CA3AF",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      No files attached
+                    </Typography>
+                  )}
+                </DetailSection>
+              </Box>
+
+              {/* Footer */}
+              <Box sx={footerStyle}>
+                <button
+                  onClick={() => setIsEventDetailsModalOpen(false)}
+                  className="w-full px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                >
+                  Close
+                </button>
+              </Box>
+            </>
+          )}
+        </Box>
+      </Modal>
+    </div>
   );
+};
+
+/* 🔹 Reusable DetailSection Component (from Admin modal) */
+const DetailSection = ({ icon, title, children }) => (
+  <Box>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <svg
+        className="w-5 h-5 text-gray-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d={icon}
+        />
+      </svg>
+      <Typography
+        sx={{ fontWeight: 600, fontSize: "0.875rem", color: "#374151" }}
+      >
+        {title}
+      </Typography>
+    </Box>
+    <Box sx={{ pl: 4, display: "flex", flexDirection: "column", gap: 0.5 }}>
+      {children}
+    </Box>
+  </Box>
+);
+
+/* 🔹 Modal Styles (same as Admin modal) */
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "background.paper",
+  borderRadius: 2,
+  boxShadow:
+    "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+  width: { xs: "95%", sm: "90%", md: "480px" },
+  maxWidth: "480px",
+  maxHeight: { xs: "90vh", sm: "85vh" },
+  overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
+};
+
+const detailsModalStyle = (color) => ({
+  ...modalStyle,
+  borderTop: "none",
+  overflow: "hidden",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "6px",
+    backgroundColor: color,
+  },
+});
+
+const headerStyle = {
+  background: "linear-gradient(135deg, #2e97b2 0%, #25798e 100%)",
+  px: { xs: 3, sm: 4 },
+  py: 3,
+  color: "white",
+  borderTopLeftRadius: "8px",
+  borderTopRightRadius: "8px",
+  mt: 0,
+};
+
+const contentStyle = {
+  px: { xs: 3, sm: 4 },
+  py: 3,
+  overflowY: "auto",
+  flexGrow: 1,
+};
+
+const footerStyle = {
+  px: { xs: 3, sm: 4 },
+  py: 2.5,
+  borderTop: "1px solid #e5e7eb",
+  display: "flex",
+  justifyContent: "flex-end",
 };
 
 export default EmployeeEvents;

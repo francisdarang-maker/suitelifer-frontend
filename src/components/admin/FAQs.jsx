@@ -58,6 +58,7 @@ function FAQs() {
     faq_id: "",
     question: "",
     answer: "",
+    is_shown: 1,
     createdAt: "",
     createdBy: "",
   });
@@ -65,59 +66,68 @@ function FAQs() {
   const gridRef = useRef();
 
   const handleSave = async () => {
-    if (currentFAQ.faq_id) {
-      setFaqs((prev) =>
-        prev.map((faq) => (faq.faq_id === currentFAQ.faq_id ? currentFAQ : faq))
-      );
-      try {
+    // Validation
+    if (!currentFAQ.question.trim() || !currentFAQ.answer.trim()) {
+      toast.error("Question and Answer are required");
+      return;
+    }
+
+    if (currentFAQ.is_shown === "" || currentFAQ.is_shown === undefined) {
+      toast.error("Please select visibility");
+      return;
+    }
+
+    try {
+      if (currentFAQ.faq_id) {
+        // Update existing FAQ
         const response = await api.post("/api/edit-faq", {
           ...currentFAQ,
           user_id: user.id,
         });
 
-        //Log
-        addLog({
-          action: "UPDATE",
-          description: `FAQ (${currentFAQ.question}) has been updated`,
-        });
-
         if (response.data?.success) {
           toast.success(response.data.message);
-        } else {
-          toast.error(response.data.message || "Failed to update faq.");
-        }
+          
+          //Log
+          addLog({
+            action: "UPDATE",
+            description: `FAQ (${currentFAQ.question}) has been updated`,
+          });
 
-        setDataUpdated(!dataUpdated);
-      } catch (err) {
-        console.error(err.message);
-      }
-    } else {
-      const newFaq = {
-        ...currentFAQ,
-        user_id: user.id,
-      };
-      setFaqs((prev) => [newFaq, ...prev]);
-      try {
+          setDataUpdated(!dataUpdated);
+        } else {
+          toast.error(response.data.message || "Failed to update FAQ.");
+        }
+      } else {
+        // Add new FAQ
+        const newFaq = {
+          ...currentFAQ,
+          user_id: user.id,
+        };
+        
         const response = await api.post("/api/add-faq", newFaq);
 
         if (response.data?.success) {
           toast.success(response.data.message);
-        } else {
-          toast.error(response.data.message || "Failed to save faq.");
-        }
-        //Log
-        addLog({
-          action: "CREATE",
-          description: `A new FAQ (${newFaq.question}) has been added`,
-        });
-        setDataUpdated(!dataUpdated);
-      } catch (err) {
-        console.error(err.message);
-      }
-    }
+          
+          //Log
+          addLog({
+            action: "CREATE",
+            description: `A new FAQ (${newFaq.question}) has been added`,
+          });
 
-    setCurrentFAQ({ faq_id: "", question: "", answer: "" });
-    setOpenDialog(false);
+          setDataUpdated(!dataUpdated);
+        } else {
+          toast.error(response.data.message || "Failed to save FAQ.");
+        }
+      }
+
+      setCurrentFAQ({ faq_id: "", question: "", answer: "", is_shown: 1 });
+      setOpenDialog(false);
+    } catch (err) {
+      console.error(err.message);
+      toast.error("An error occurred while saving the FAQ");
+    }
   };
 
   const handleEdit = (faq) => {
@@ -133,15 +143,17 @@ function FAQs() {
   const handleDelete = async (faq_id, q) => {
     try {
       await api.post("/api/delete-faq", { faq_id });
-      setFaqs((prev) => prev.filter((faq) => faq.faq_id !== faq_id));
 
       //Log
       addLog({
         action: "DELETE",
         description: `FAQ (${q}) has been deleted`,
       });
+      
       toast.success("FAQ deleted successfully");
       setDataUpdated((prev) => !prev);
+      setDeleteModalOpen(false);
+      setCurrentFAQ({ faq_id: "", question: "", answer: "", is_shown: 1 });
     } catch (err) {
       console.error(err.message);
       toast.error("Failed to delete FAQ");
@@ -149,7 +161,11 @@ function FAQs() {
   };
 
   const handleFaqDetailsChange = (e) => {
-    setCurrentFAQ((td) => ({ ...td, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setCurrentFAQ((prev) => ({ 
+      ...prev, 
+      [name]: name === 'is_shown' ? parseInt(value) : value 
+    }));
   };
 
   return (
@@ -160,13 +176,13 @@ function FAQs() {
           text="Add FAQ"
           handleClick={() => {
             setOpenDialog(true);
-            setCurrentFAQ({ faq_id: "", question: "", answer: "" });
+            setCurrentFAQ({ faq_id: "", question: "", answer: "", is_shown: 1 });
           }}
         />
       </div>
 
       <div
-        className="ag-theme-quartz min-w-[600px] lg:w-full "
+        className="ag-theme-quartz min-w-[600px] lg:w-full"
         style={{ height: "500px", width: "100%" }}
       >
         <AgGridReact
@@ -180,20 +196,36 @@ function FAQs() {
               flex: 3,
               tooltipField: "question",
               headerClass: "text-primary font-bold bg-gray-100",
+              cellStyle: {
+                whiteSpace: "normal",
+                lineHeight: "1.5",
+              },
+              autoHeight: true,
             },
             {
               headerName: "Answer",
               field: "answer",
-              flex: 3,
+              flex: 4,
               headerClass: "text-primary font-bold bg-gray-100",
               tooltipField: "answer",
               cellStyle: {
-                display: "block",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: "vertical",
                 whiteSpace: "normal",
+                lineHeight: "1.5",
+                padding: "10px",
+              },
+              autoHeight: true,
+              cellRenderer: (params) => {
+                return (
+                  <div 
+                    style={{ 
+                      whiteSpace: "normal",
+                      wordWrap: "break-word",
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    {params.value}
+                  </div>
+                );
               },
             },
             {
@@ -201,8 +233,20 @@ function FAQs() {
               field: "is_shown",
               flex: 1,
               headerClass: "text-primary font-bold bg-gray-100",
-              valueFormatter: (params) =>
-                params.value === 1 ? "Shown" : "Hidden",
+              cellRenderer: (params) => {
+                const isShown = params.value === 1;
+                return (
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      isShown
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {isShown ? "Shown" : "Hidden"}
+                  </span>
+                );
+              },
             },
             {
               headerName: "Date Created",
@@ -226,7 +270,7 @@ function FAQs() {
               flex: 1,
               headerClass: "text-primary font-bold bg-gray-100",
               cellRenderer: (params) => (
-                <div className="flex">
+                <div className="flex gap-1">
                   <ActionButtons
                     icon={<PencilIcon className="size-5 cursor-pointer" />}
                     handleClick={() => handleEdit(params.data)}
@@ -257,66 +301,89 @@ function FAQs() {
           pagination
           paginationPageSize={10}
           paginationPageSizeSelector={[5, 10, 20, 50]}
+          domLayout="autoHeight"
         />
       </div>
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth>
-        <DialogTitle>{currentFAQ.faq_id ? "Edit FAQ" : "Add FAQ"}</DialogTitle>
+      <Dialog 
+        open={openDialog} 
+        onClose={() => setOpenDialog(false)} 
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle>
+          <span className="text-xl font-bold">
+            {currentFAQ.faq_id ? "Edit FAQ" : "Add FAQ"}
+          </span>
+        </DialogTitle>
         <DialogContent>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-avenir-black">
-              Question<span className="text-primary">*</span>
-            </label>
-            <input
-              value={currentFAQ.question}
-              onChange={(e) =>
-                setCurrentFAQ({ ...currentFAQ, question: e.target.value })
-              }
-              className="w-full p-3 mt-2 border rounded bg-primary/10 focus:ring-2 focus:ring-primary"
-              placeholder="Enter the question"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-avenir-black">
-              Answer<span className="text-primary">*</span>
-            </label>
-            <textarea
-              value={currentFAQ.answer}
-              onChange={(e) =>
-                setCurrentFAQ({ ...currentFAQ, answer: e.target.value })
-              }
-              className="w-full p-3 mt-2 border rounded bg-primary/10 focus:ring-2 focus:ring-primary"
-              rows={4}
-              placeholder="Enter the answer"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-avenir-black">
-              Visibility<span className="text-primary">*</span>
-            </label>
-            <select
-              name="is_shown"
-              required
-              value={
-                currentFAQ.is_shown !== undefined ? currentFAQ.is_shown : ""
-              }
-              onChange={(e) => handleFaqDetailsChange(e)}
-              className="w-full p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary mt-2"
-            >
-              <option value="" disabled>
-                -- Select an option --
-              </option>
-              <option value={1}>Shown</option>
-              <option value={0}>Hidden</option>
-            </select>
+          <div className="space-y-4 mt-2">
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Question<span className="text-red-500 ml-1">*</span>
+              </label>
+              <input
+                value={currentFAQ.question}
+                onChange={(e) =>
+                  setCurrentFAQ({ ...currentFAQ, question: e.target.value })
+                }
+                className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                placeholder="Enter the question"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Answer<span className="text-red-500 ml-1">*</span>
+              </label>
+              <textarea
+                value={currentFAQ.answer}
+                onChange={(e) =>
+                  setCurrentFAQ({ ...currentFAQ, answer: e.target.value })
+                }
+                className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
+                rows={6}
+                placeholder="Enter the answer"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Visibility<span className="text-red-500 ml-1">*</span>
+              </label>
+              <select
+                name="is_shown"
+                required
+                value={
+                  currentFAQ.is_shown !== undefined ? currentFAQ.is_shown : ""
+                }
+                onChange={handleFaqDetailsChange}
+                className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              >
+                <option value="" disabled>
+                  -- Select an option --
+                </option>
+                <option value={1}>Shown</option>
+                <option value={0}>Hidden</option>
+              </select>
+            </div>
           </div>
         </DialogContent>
-        <DialogActions>
-          <button className="btn-light" onClick={() => setOpenDialog(false)}>
+        <DialogActions className="px-6 py-4">
+          <button 
+            className="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors" 
+            onClick={() => {
+              setOpenDialog(false);
+              setCurrentFAQ({ faq_id: "", question: "", answer: "", is_shown: 1 });
+            }}
+          >
             Cancel
           </button>
-          <button className="btn-primary" onClick={handleSave}>
-            Save
+          <button 
+            className="px-6 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-md hover:shadow-lg" 
+            onClick={handleSave}
+          >
+            {currentFAQ.faq_id ? "Update" : "Save"}
           </button>
         </DialogActions>
       </Dialog>
@@ -325,7 +392,7 @@ function FAQs() {
         isOpen={deleteModalOpen}
         handleClose={() => {
           setDeleteModalOpen(false);
-          setCurrentFAQ({ faq_id: "", question: "", answer: "" });
+          setCurrentFAQ({ faq_id: "", question: "", answer: "", is_shown: 1 });
         }}
         onConfirm={() => handleDelete(currentFAQ.faq_id, currentFAQ.question)}
         message="Are you sure you want to delete this FAQ?"

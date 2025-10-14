@@ -35,3 +35,7 @@ Non-Functional Requirements:
 - Dan Hebron Galano [[@Dan-Galano](https://github.com/Dan-Galano)]
 - Lance Jericho Salcedo [[@ljsalcedo-dev](https://github.com/ljsalcedo-dev)]
 - Melbraei Santiago [[@MB-Tiago](https://github.com/MB-Tiago)]
+- Francis Darang [[@HappyCodingss](https://github.com/francisdarang-maker)]
+- Mark Joseph Abano [[@MarkAbano](https://github.com/markabano)]
+- Rav Guzman [[@RavGuzman](https://github.com/Anonyyymouse)]
+

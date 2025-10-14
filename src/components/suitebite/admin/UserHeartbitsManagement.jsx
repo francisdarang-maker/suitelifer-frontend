@@ -7,28 +7,30 @@ import {
   FunnelIcon,
   XMarkIcon,
   CheckIcon,
-  TrashIcon,
   ArrowPathIcon,
   CogIcon,
   UserGroupIcon,
   HeartIcon,
+  ArrowDownIcon,
+  ArrowUpIcon,
   PlusIcon,
   MinusIcon,
-  PencilIcon,
-} from "@heroicons/react/24/outline";
-import { useStore } from "../../../store/authStore";
+  PencilIcon
+} from '@heroicons/react/24/outline';
+import { useStore } from '../../../store/authStore';
 import defaultAvatar from "../../../assets/images/defaultAvatar.svg";
-
 
 const UserHeartbitsManagement = () => {
   const currentUser = useStore((state) => state.user);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  //
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
+  //
   const [globalLimit, setGlobalLimit] = useState(1000);
   const [showGlobalLimitModal, setShowGlobalLimitModal] = useState(false);
   const [showBulkUpdateModal, setShowBulkUpdateModal] = useState(false);
@@ -59,6 +61,19 @@ const UserHeartbitsManagement = () => {
       setGlobalLimit(1000);
     }
   };
+  //
+  const defaultValues = {
+    selectedUsers: [],
+    searchTerm: "",
+    sortBy: "name",
+    sortOrder: "asc",
+  };
+  const showResetButton =
+    selectedUsers.length > 0 ||
+    searchTerm !== defaultValues.searchTerm ||
+    sortBy !== defaultValues.sortBy ||
+    sortOrder !== defaultValues.sortOrder;
+  //
 
   const showNotification = (type, message) => {
     setNotification({ show: true, type, message });
@@ -222,7 +237,7 @@ const UserHeartbitsManagement = () => {
     setSortBy("name");
     setSortOrder("asc");
     setSelectedUsers([]);
-    showNotification("info", "All filters and selections reset");
+    // showNotification("info", "All filters and selections reset");
   };
 
   // Simplified filtering logic
@@ -445,7 +460,9 @@ const UserHeartbitsManagement = () => {
   };
 
   return (
-    <div className="user-heartbits-management rounded-lg shadow-sm pb-32 px-6 pt-2">
+    // Added Feature
+    // Removed Shadow Botton Orig  'shadow-sm'
+    <div className="user-heartbits-management rounded-lg  pb-10 px-5 pt-2">
       {/* Notification */}
       {notification.show && (
         <div
@@ -464,8 +481,10 @@ const UserHeartbitsManagement = () => {
       )}
 
       {/* Concise Search and Filter Controls */}
-      <div className="bg-white rounded-lg border border-gray-200 p-1 mt-0 mb-0">
-        <div className="flex flex-wrap items-center gap-1">
+      {/* Added Feature*/}
+      {/* Removed Border-gray-200 */}
+      <div className="bg-white rounded-lg p-1 mt-0 mb-0">
+        <div className="flex flex-wrap items-center gap-3">
           {/* Search Section */}
           <div className="relative">
             <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -474,36 +493,101 @@ const UserHeartbitsManagement = () => {
               placeholder="Search users by name or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-56 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm"
+              // Added Feature
+              // Added focus:outline-none
+              className="w-56 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
             />
           </div>
           {/* Sort Controls */}
-          <label className="text-sm font-medium text-gray-700 ml-2">
+          {/* <label className="text-sm font-medium text-gray-700 ml-2">
             Sort:
-          </label>
+          </label> */}
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm"
+            // Added Feature
+            // Added focus:outline-none
+            className="px-2 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2  focus:outline-none  focus:ring-[#0097b2] focus:border-transparent text-sm"
             style={{ minWidth: "80px" }}
           >
-            <option value="name">Name</option>
-            <option value="points">Points</option>
+            <option value="name ">Sort by Name</option>
+            <option value="points ">Sort by Points</option>
           </select>
-          <button
+          {/* <button
             onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-            className="px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm font-medium flex items-center"
+            // Added Feature
+            // orig border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-[#0097b2] focus:border-transparent
+            className="px-2 py-2 text-sm font-medium flex items-center"
             title={sortOrder === "asc" ? "Ascending" : "Descending"}
           >
             {sortOrder === "asc" ? "↑" : "↓"}
-          </button>
-          <button
+          </button> */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="sortOrder" className="sr-only">
+              Sort Order
+            </label>
+            <button
+              id="sortOrder"
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              className="px-2 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+              style={{ minWidth: "120px" }}
+              title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
+            >
+              <div className="flex items-center justify-between">
+                <span>{sortOrder === "asc" ? "Ascending" : "Descending"}</span>
+                {sortOrder === "desc" ? (
+                  <ArrowDownIcon className="w-4 h-4 text-gray-500 ml-2" />
+                ) : (
+                  <ArrowUpIcon className="w-4 h-4 text-gray-500 ml-2" />
+                )}
+              </div>
+            </button>
+          </div>
+          {/* Added Feature */}
+          {/* Removed focus:ring-2 focus:ring-[#0097b2] focus:border-transparent */}
+          {/* orig */}
+          {/* <button
             onClick={resetFilters}
-            className="px-2 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm font-medium"
-          >
-            Reset
-          </button>
+            ArrowPathIcon 
+            className="px-2 py-2 border border-gray-300 rounded-lg  hover:bg-gray-50  text-sm font-medium"
+          ></button> */}
+          {/* new */}{" "}
           <button
+            onClick={selectAllUsers}
+            className={`px-2 py-2 border border-gray-300 rounded-lg text-sm font-medium flex items-center gap-2
+    hover:bg-gray-50
+    ${
+      selectedUsers.length === filteredUsers.length
+        ? "text-gray-700 border-primary focus:ring-2  focus:ring-[#0097b2]"
+        : ""
+    }
+  `}
+          >
+            <CheckIcon className="w-4 h-4" />
+            {selectedUsers.length === filteredUsers.length
+              ? "Deselect All"
+              : "Select All"}
+          </button>
+          {/* Old */}
+          {/* <button
+            onClick={resetFilters}
+            className="px-2 py-2    border border-gray-300  rounded-lg text-sm font-medium flex items-center gap-2"
+          >
+            <ArrowPathIcon className="w-5 h-5 text-black" />
+            Reset
+          </button> */}
+          {showResetButton && (
+            <button
+              onClick={resetFilters}
+              className="px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
+            >
+              Reset
+            </button>
+          )}
+          {/*  */}
+          {/* Added Feature */}
+          {/* Change ui of button */}
+          {/* <button
             onClick={selectAllUsers}
             className="px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium flex items-center gap-2"
           >
@@ -511,7 +595,7 @@ const UserHeartbitsManagement = () => {
             {selectedUsers.length === filteredUsers.length
               ? "Deselect All"
               : "Select All"}
-          </button>
+          </button> */}
           <button
             onClick={() => setShowGlobalLimitModal(true)}
             className="px-2 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-sm font-medium flex items-center gap-2"
@@ -523,40 +607,35 @@ const UserHeartbitsManagement = () => {
       </div>
 
       {/* Results Summary & Bulk Actions */}
-      <div className="mt-1 pt-1 border-t border-gray-200">
-        <div className="flex items-center justify-between text-sm text-gray-600">
-          {selectedUsers.length > 0 && (
-            <span className="text-[#0097b2] font-medium">
-              {selectedUsers.length} selected
-            </span>
-          )}
-        </div>
-
+      {/* Added Feature*/}
+      {/* Removed Border-gray-200 and border-t */}
+      <div className="mt-1 pt-1">
         {/* Compact Bulk Actions */}
-        <div className="flex flex-wrap items-center gap-3 mt-3">
-          {selectedUsers.length > 0 && (
-            <div className="flex-1 flex justify-end">
-              <button
-                onClick={() => setShowBulkUpdateModal(true)}
-                className="px-6 py-3 bg-[#0097b2] text-white rounded-xl shadow-lg hover:bg-[#007a8e] text-base font-bold transition-all duration-200 flex items-center gap-3"
-                style={{ minWidth: "220px" }}
-              >
-                <HeartIcon className="w-6 h-6" />
-                Give to Selected ({selectedUsers.length})
-              </button>
-            </div>
+        {/* Added Feature*/}
+        {/* Removed bg and hover bg */}
+        {/* Summary Box */}
+        <div className="w-full text-center py-4 text-lg font-medium text-gray-700">
+          {selectedUsers.length > 0 ? (
+            <>
+              {/* You have selected{" "}
+              <span className="text-purple-600">{selectedUsers.length}</span> to
+              be given heartbits */}
+            </>
+          ) : (
+            <>Select users to send Heartbits</>
           )}
         </div>
       </div>
 
       {/* Users Grid - Responsive */}
-      <div className="bg-white rounded-lg border border-gray-150 overflow-hidden">
+      {/* removed border-gray-150 */}
+      <div className="bg-gray-10 rounded-lg">
         <div
           className="users-table-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4"
           style={{
             overflowY: "auto",
-            background:
-              "linear-gradient(135deg, #B3D9FF 0%, #80BFFF 50%, #5B9BD5 100%)",
+            background: "",
+            // "linear-gradient(135deg, #B3D9FF 0%, #80BFFF 50%, #5B9BD5 100%)",
             borderRadius: "1rem",
           }}
         >
@@ -576,11 +655,13 @@ const UserHeartbitsManagement = () => {
             sortedUsers.map((user) => {
               const isSelected = selectedUsers.includes(user.user_id);
               return (
+                // user-heartbits-management rounded-lg shadow-sm pb-10 px-6 pt-2
                 <div
                   key={user.user_id}
-                  className={`relative bg-white rounded-xl shadow-lg p-3 sm:p-4 transition-all duration-200 border-2 border-gray-200 hover:border-purple-300 cursor-pointer ${
+                  className={`relative bg-white rounded-xl shadow-lg p-3 sm:p-4 transition-all duration-200 border-2 border-gray-200 hover:border-primary cursor-pointer ${
                     isSelected
-                      ? "ring-2 ring-purple-500 border-purple-400 bg-purple-50"
+                      ? // Original  ring-2 ring-purple-500 border-purple-400 bg-purple-50
+                        "ring-1 ring-primary bg-primary bg-primary"
                       : "hover:shadow-xl"
                   }`}
                   style={{ minHeight: "120px" }}
@@ -589,9 +670,10 @@ const UserHeartbitsManagement = () => {
                   {/* Checkbox circle */}
                   <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
                     <span
-                      className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2 border-purple-400 bg-white ${
+                      className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2 border-primary bg-white ${
                         isSelected
-                          ? "bg-gradient-to-br from-purple-500 to-pink-400 border-purple-500"
+                          ? // orig bg-gradient-to-br from-primary-500 to-primary-400 border-primary-500
+                            "bg-gradient-to-br from-primary to-primary border-primary"
                           : ""
                       }`}
                       style={{
@@ -613,22 +695,52 @@ const UserHeartbitsManagement = () => {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
+                        <svg
+                          className="w-3 h-3 sm:w-4 sm:h-4 text-white drop-shadow-lg"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
                       )}
                     </span>
                   </div>
+
 
                   {/* User Content - Responsive Layout */}
                   <div className="flex flex-col space-y-2">
                     {/* Avatar and Name Row */}
                     <div className="flex items-center space-x-3">
-                      <img
-                        src={user.avatar || defaultAvatar}
+                      {/* <img
+                        src={user.avatar || "/default-avatar.png"}
                         alt={`${user.first_name || ""} ${
                           user.last_name || ""
                         }`.trim()}
                         className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
+                      /> */}
+                      <img
+                        src={user.avatar || "/default-avatar.png"}
+                        alt={`${user.first_name || ""} ${
+                          user.last_name || ""
+                        }`.trim()}
+                        // xl:inline-block
+                        className="block lg:hidden xl:hidden 2xl:inline-block w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
+                        <div className="font-bold text-gray-900 text-sm sm:text-base truncate">
+                          {`${user.first_name || ""} ${
+                            user.last_name || ""
+                          }`.trim()}
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-600">
+                          {getRoleLabel(user.user_type)}
+                        </div>
                         <div className="font-bold text-gray-900 text-sm sm:text-base truncate">
                           {`${user.first_name || ""} ${
                             user.last_name || ""
@@ -640,13 +752,16 @@ const UserHeartbitsManagement = () => {
                       </div>
                     </div>
 
+
                     {/* Heartbits Row */}
-                    <div className="flex items-center justify-center sm:justify-start gap-2 pt-1">
-                      <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-pink-400 flex-shrink-0" />
+                    <div className="flex items-center justify-start sm:justify-start gap-2 pt-1">
+                      <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-pink-400 flex-shrink-0 " />
                       <span className="font-semibold text-[#0097b2] text-base sm:text-lg">
                         {user.heartbits_balance || 0}
                       </span>
-                      <span className="text-xs text-gray-500">heartbits</span>
+                      <span className="block lg:hidden xl:inline-block text-xs text-gray-500">
+                        Heartbits
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -654,18 +769,44 @@ const UserHeartbitsManagement = () => {
             })
           )}
         </div>
-        {/* Summary Box */}
-        <div className="w-full text-center py-4 text-lg font-medium text-gray-700">
-          {selectedUsers.length > 0 ? (
-            <>
-              You have selected{" "}
-              <span className="text-purple-600">{selectedUsers.length}</span> to
-              be given heartbits
-            </>
-          ) : (
-            <>Select users to send Heartbits</>
+        {/* <div className="flex items-center justify-between text-sm text-gray-600">
+          {selectedUsers.length > 0 && (
+            <span className="text-[#0097b2] font-medium">
+              {selectedUsers.length} selected
+            </span>
           )}
         </div>
+        <div className="flex flex-wrap items-center gap-3 mt-3 mb-3">
+          {selectedUsers.length > 0 && (
+            <div className="flex-1 flex justify-end">
+              <button
+                onClick={() => setShowBulkUpdateModal(true)}
+                className="px-6 py-3 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 text-base font-bold transition-all duration-200 flex items-center gap-3"
+                style={{ minWidth: "220px" }}
+              >
+                <HeartIcon className="w-6 h-6" />
+                Give to Selected ({selectedUsers.length})
+              </button>
+            </div>
+          )}
+        </div> */}
+        {selectedUsers.length > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-3 mt-3 mb-3 text-sm text-gray-600 w-full">
+            <span className="text-[#0097b2] font-medium">
+              {selectedUsers.length} selected
+            </span>
+            <div className="flex-1 flex justify-end">
+              <button
+                onClick={() => setShowBulkUpdateModal(true)}
+                className="px-6 py-3 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 text-base font-bold transition-all duration-200 flex items-center gap-3"
+                style={{ minWidth: "220px" }}
+              >
+                <HeartIcon className="w-6 h-6" />
+                Give to Selected ({selectedUsers.length})
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modals */}
@@ -726,7 +867,7 @@ const UserHeartbitsManagement = () => {
 
       {/* Bulk Update Modal */}
       {showBulkUpdateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur  ">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Give Heartbits to Selected Users

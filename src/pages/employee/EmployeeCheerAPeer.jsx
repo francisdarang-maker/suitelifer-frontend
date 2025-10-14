@@ -643,314 +643,352 @@ const CheerPage = () => {
   };
 
   return (
-    <div className="w-full" style={{ backgroundColor: "#ffffff" }}>
-      <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
+    // start
+
+    <div
+      className="w-full min-h-screen"
+      // style={{
+      //   background:
+      //     "linear-gradient(135deg, #f8fafc 0%, #e0f7fa 50%, #f8fafc 100%)",
+      // }}
+      style={{
+        backgroundColor: "#f8fafc",
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
-          {/* Left Column - Create Cheer & Heartbits */}
-          <div className="lg:col-span-1 space-y-4 sm:space-y-8">
-            {/* Create Cheer Form - Enhanced */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* LEFT COLUMN - Create Cheer & Heartbits */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* ENHANCED CREATE CHEER FORM */}
             <div
-              className="rounded-2xl shadow-lg p-4 sm:p-6 transition-all duration-300 hover:shadow-xl overflow-hidden min-w-0"
+              className="rounded-3xl shadow-2xl p-8 transition-all duration-300 hover:shadow-3xl overflow-hidden relative group"
               style={{
-                background:
-                  "linear-gradient(135deg, #e0f7fa 70%, #b3e0f2 100%)",
-                border: "2px solid #b3e0f2",
-                boxShadow: "0 10px 25px rgba(0, 151, 178, 0.10)",
+                background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                border: "1px solid #e2e8f0",
               }}
             >
-              <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-5">
-                <div
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
-                  }}
-                >
-                  <HeartIconSolid className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                </div>
-                <h2
-                  className="text-xs sm:text-sm lg:text-base font-bold break-words"
-                  style={{
-                    color: "#1a0202",
-                    fontFamily: "Avenir, sans-serif",
-                    minWidth: 0,
-                  }}
-                >
-                  Send Heartbits
-                </h2>
-              </div>
+              {/* Animated glow effect */}
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background:
+                    "radial-gradient(circle at top right, rgba(0, 151, 178, 0.1) 0%, transparent 70%)",
+                }}
+              />
 
-              <form
-                onSubmit={handleCheerSubmit}
-                className="space-y-4 sm:space-y-5 min-w-0"
-              >
-                {/* Enhanced Selected Users Display */}
-                {selectedUsers.length > 0 && (
-                  <div className="mb-3 sm:mb-4">
-                    <label
-                      className="block text-sm font-semibold mb-2"
+              <div className="relative">
+                {/* Header */}
+                <div className="flex items-center space-x-3 mb-6">
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
+                    }}
+                  >
+                    <HeartIconSolid className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h2
+                      className="text-2xl font-black"
                       style={{
                         color: "#1a0202",
                         fontFamily: "Avenir, sans-serif",
                       }}
                     >
-                      Selected Recipients ({selectedUsers.length}):
-                    </label>
-                    <div className="flex flex-wrap gap-2 max-h-24 sm:max-h-32 overflow-y-auto">
-                      {selectedUsers.map((user, index) => (
-                        <div
-                          key={user.user_id}
-                          className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-1 sm:py-2 rounded-lg transition-all duration-200 hover:scale-105 flex-shrink-0"
-                          style={{
-                            backgroundColor: "#f0f9ff",
-                            border: "1px solid #0097b2",
-                            boxShadow: "0 2px 4px rgba(0, 151, 178, 0.1)",
-                            minWidth: "fit-content",
-                          }}
-                        >
-                          <img
-                            src={user.avatar || defaultAvatar}
-                            alt={user.name}
-                            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full ring-1 ring-white flex-shrink-0"
-                          />
-                          <span
-                            className="text-xs font-semibold truncate max-w-16 sm:max-w-20"
-                            style={{
-                              color: "#1a0202",
-                              fontFamily: "Avenir, sans-serif",
-                            }}
-                          >
-                            {user.name}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSelectedUsers((prev) =>
-                                prev.filter((_, i) => i !== index)
-                              )
-                            }
-                            className="w-3 h-3 sm:w-4 sm:h-4 rounded-full flex items-center justify-center text-white hover:scale-110 transition-all duration-200 flex-shrink-0"
-                            style={{
-                              backgroundColor: "#ef4444",
-                              fontSize: "8px",
-                            }}
-                            aria-label={`Remove ${user.name}`}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                      Send Heartbits
+                    </h2>
+                    <p
+                      className="text-sm"
+                      style={{
+                        color: "#64748b",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      Recognize your peers
+                    </p>
                   </div>
-                )}
-
-                {/* Enhanced Search Input */}
-                <div className="relative" ref={dropdownRef}>
-                  <label
-                    className="block text-sm font-semibold mb-2"
-                    style={{
-                      color: "#1a0202",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    Search Peers
-                  </label>
-                  <input
-                    type="text"
-                    value={cheerText}
-                    onChange={handleCheerTextChange}
-                    placeholder="Type a name to search..."
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl transition-all duration-200 focus:ring-4 text-sm sm:text-base"
-                    style={{
-                      border: "2px solid #e2e8f0",
-                      backgroundColor: "#ffffff",
-                      fontFamily: "Avenir, sans-serif",
-                      color: "#1a0202",
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = "#0097b2";
-                      e.target.style.boxShadow =
-                        "0 0 0 4px rgba(0, 151, 178, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = "#e2e8f0";
-                      e.target.style.boxShadow = "none";
-                    }}
-                  />
-
-                  {/* Enhanced User Dropdown */}
-                  {showUserDropdown &&
-                    Array.isArray(searchResults) &&
-                    searchResults.length > 0 && (
-                      <div
-                        className="absolute z-20 w-full mt-2 rounded-xl shadow-2xl max-h-48 sm:max-h-64 overflow-y-auto"
-                        style={{
-                          backgroundColor: "#ffffff",
-                          border: "2px solid #e2e8f0",
-                          boxShadow:
-                            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                        }}
-                      >
-                        {searchResults
-                          .filter(
-                            (result) =>
-                              !selectedUsers.some(
-                                (selected) =>
-                                  selected.user_id === result.user_id
-                              )
-                          )
-                          .map((result) => (
-                            <button
-                              key={result.user_id}
-                              type="button"
-                              onClick={() => handleUserSelect(result)}
-                              className="w-full px-3 sm:px-5 py-3 sm:py-4 text-left flex items-center space-x-3 sm:space-x-4 transition-all duration-200 hover:scale-[1.02]"
-                              style={{
-                                borderBottom: "1px solid #f1f5f9",
-                                color: "#1a0202",
-                                fontFamily: "Avenir, sans-serif",
-                              }}
-                              onMouseEnter={(e) =>
-                                (e.target.style.backgroundColor = "#f0f9ff")
-                              }
-                              onMouseLeave={(e) =>
-                                (e.target.style.backgroundColor = "transparent")
-                              }
-                            >
-                              <img
-                                src={result?.avatar || defaultAvatar}
-                                alt={result.name}
-                                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full ring-2 ring-gray-200"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <p
-                                  className="font-semibold text-sm sm:text-base truncate"
-                                  style={{
-                                    color: "#1a0202",
-                                    fontFamily: "Avenir, sans-serif",
-                                  }}
-                                >
-                                  {result.name}
-                                </p>
-                                <p
-                                  className="text-xs sm:text-sm truncate"
-                                  style={{
-                                    color: "#64748b",
-                                    fontFamily: "Avenir, sans-serif",
-                                  }}
-                                >
-                                  {result.email}
-                                </p>
-                              </div>
-                            </button>
-                          ))}
-                      </div>
-                    )}
                 </div>
 
-                {/* Enhanced Message Input */}
-                <div>
-                  <label
-                    className="block text-sm font-semibold mb-2"
-                    style={{
-                      color: "#1a0202",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    Your Message <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    ref={textareaRef}
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    placeholder="Share why they deserve this cheer... 😊"
-                    className="w-full px-3 py-2 rounded-lg resize-none transition-all duration-200 focus:ring-4 text-sm sm:text-base"
-                    style={{
-                      border: "2px solid #e2e8f0",
-                      backgroundColor: "#ffffff",
-                      fontFamily: "Avenir, sans-serif",
-                      color: "#1a0202",
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = "#0097b2";
-                      e.target.style.boxShadow =
-                        "0 0 0 4px rgba(0, 151, 178, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = "#e2e8f0";
-                      e.target.style.boxShadow = "none";
-                    }}
-                    rows={3}
-                    required
-                  />
-                </div>
-
-                {/* Enhanced Controls - Mobile Responsive Layout */}
-                <div className="flex flex-col gap-3 pt-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center space-x-2">
+                <form onSubmit={handleCheerSubmit} className="space-y-6">
+                  {/* Selected Users Display */}
+                  {selectedUsers.length > 0 && (
+                    <div>
                       <label
-                        className="text-sm font-semibold whitespace-nowrap"
+                        className="block text-sm font-bold mb-3"
                         style={{
                           color: "#1a0202",
                           fontFamily: "Avenir, sans-serif",
                         }}
                       >
-                        Heartbits:
+                        Recipients ({selectedUsers.length})
                       </label>
-                      <div className="flex flex-col items-center">
-                        <input
-                          type="number"
-                          min="1"
-                          max={Math.min(100, availableHeartbits)}
-                          value={cheerPoints}
-                          onChange={(e) =>
-                            setCheerPoints(
-                              Math.min(
-                                Math.max(1, parseInt(e.target.value) || 1),
-                                Math.min(100, availableHeartbits)
-                              )
-                            )
-                          }
-                          className="w-14 sm:w-16 px-2 py-2 text-center rounded-lg font-bold transition-all duration-200 focus:ring-4 text-sm h-10"
+                      <div
+                        className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 rounded-xl"
+                        style={{ backgroundColor: "#f8fafc" }}
+                      >
+                        {selectedUsers.map((user, index) => (
+                          <div
+                            key={user.user_id}
+                            className="group/tag flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200 hover:scale-105"
+                            style={{
+                              background:
+                                "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
+                              border: "1px solid #3b82f6",
+                            }}
+                          >
+                            <img
+                              src={user.avatar || "/images/default-avatar.png"}
+                              alt={user.name}
+                              className="w-6 h-6 rounded-full ring-2 ring-white"
+                            />
+                            <span
+                              className="text-sm font-bold truncate max-w-24"
+                              style={{
+                                color: "#1e40af",
+                                fontFamily: "Avenir, sans-serif",
+                              }}
+                            >
+                              {user.name}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSelectedUsers((prev) =>
+                                  prev.filter((_, i) => i !== index)
+                                )
+                              }
+                              className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-125 opacity-70 group-hover/tag:opacity-100"
+                              style={{
+                                backgroundColor: "#ef4444",
+                                color: "#ffffff",
+                                fontSize: "12px",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Search Input */}
+                  <div className="relative" ref={dropdownRef}>
+                    <label
+                      className="block text-sm font-bold mb-2"
+                      style={{
+                        color: "#1a0202",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      Search Peers
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={cheerText}
+                        onChange={handleCheerTextChange}
+                        placeholder="Type a name..."
+                        className="w-full px-4 py-3 rounded-2xl transition-all duration-200 focus:ring-4 text-base"
+                        style={{
+                          border: "2px solid #e2e8f0",
+                          backgroundColor: "#ffffff",
+                          fontFamily: "Avenir, sans-serif",
+                          color: "#1a0202",
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = "#0097b2";
+                          e.target.style.boxShadow =
+                            "0 0 0 4px rgba(0, 151, 178, 0.1)";
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = "#e2e8f0";
+                          e.target.style.boxShadow = "none";
+                        }}
+                      />
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <svg
+                          className="w-5 h-5"
+                          style={{ color: "#94a3b8" }}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* User Dropdown */}
+                    {showUserDropdown &&
+                      Array.isArray(searchResults) &&
+                      searchResults.length > 0 && (
+                        <div
+                          className="absolute z-20 w-full mt-2 rounded-2xl shadow-2xl max-h-64 overflow-y-auto"
                           style={{
+                            backgroundColor: "#ffffff",
                             border: "2px solid #e2e8f0",
-                            fontFamily: "Avenir, sans-serif",
-                            color: "#1a0202",
-                            backgroundColor: "#f8fafc",
-                          }}
-                          onFocus={(e) => {
-                            e.target.style.borderColor = "#0097b2";
-                            e.target.style.boxShadow =
-                              "0 0 0 4px rgba(0, 151, 178, 0.1)";
-                          }}
-                          onBlur={(e) => {
-                            e.target.style.borderColor = "#e2e8f0";
-                            e.target.style.boxShadow = "none";
-                          }}
-                        />
-                        <span
-                          className="text-[0.6rem] sm:text-[0.7rem] font-bold mt-1 text-center"
-                          style={{
-                            color: "#1a0202",
-                            background: "none",
-                            fontFamily: "Avenir, sans-serif",
-                            letterSpacing: "1px",
-                            fontWeight: 700,
-                            boxShadow: "none",
-                            padding: 0,
                           }}
                         >
-                          <span style={{ fontWeight: 900 }}>MAX</span>{" "}
-                          <span style={{ fontWeight: 900 }}>
-                            {Math.min(100, availableHeartbits)}
-                          </span>
-                        </span>
+                          {searchResults
+                            .filter(
+                              (result) =>
+                                !selectedUsers.some(
+                                  (selected) =>
+                                    selected.user_id === result.user_id
+                                )
+                            )
+                            .map((result) => (
+                              <button
+                                key={result.user_id}
+                                type="button"
+                                onClick={() => handleUserSelect(result)}
+                                className="w-full px-5 py-4 text-left flex items-center space-x-4 transition-all duration-200 hover:scale-[1.02]"
+                                style={{
+                                  borderBottom: "1px solid #f1f5f9",
+                                }}
+                                onMouseEnter={(e) =>
+                                  (e.target.style.backgroundColor = "#f0f9ff")
+                                }
+                                onMouseLeave={(e) =>
+                                  (e.target.style.backgroundColor =
+                                    "transparent")
+                                }
+                              >
+                                <img
+                                  src={
+                                    result.avatar ||
+                                    "/images/default-avatar.png"
+                                  }
+                                  alt={result.name}
+                                  className="w-12 h-12 rounded-xl ring-2 ring-gray-200"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <p
+                                    className="font-bold text-base truncate"
+                                    style={{
+                                      color: "#1a0202",
+                                      fontFamily: "Avenir, sans-serif",
+                                    }}
+                                  >
+                                    {result.name}
+                                  </p>
+                                  <p
+                                    className="text-sm truncate"
+                                    style={{
+                                      color: "#64748b",
+                                      fontFamily: "Avenir, sans-serif",
+                                    }}
+                                  >
+                                    {result.email}
+                                  </p>
+                                </div>
+                              </button>
+                            ))}
+                        </div>
+                      )}
+                  </div>
+
+                  {/* Message Input */}
+                  <div>
+                    <label
+                      className="block text-sm font-bold mb-2"
+                      style={{
+                        color: "#1a0202",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      Your Message <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      ref={textareaRef}
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      placeholder="Share why they deserve recognition... 🌟"
+                      className="w-full px-4 py-3 rounded-2xl resize-none transition-all duration-200 focus:ring-4"
+                      style={{
+                        border: "2px solid #e2e8f0",
+                        backgroundColor: "#ffffff",
+                        fontFamily: "Avenir, sans-serif",
+                        color: "#1a0202",
+                        minHeight: "120px",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "#0097b2";
+                        e.target.style.boxShadow =
+                          "0 0 0 4px rgba(0, 151, 178, 0.1)";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "#e2e8f0";
+                        e.target.style.boxShadow = "none";
+                      }}
+                      required
+                    />
+                  </div>
+
+                  {/* Heartbits Amount */}
+                  <div>
+                    <label
+                      className="block text-sm font-bold mb-2"
+                      style={{
+                        color: "#1a0202",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      Heartbits Amount
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="1"
+                        max={Math.min(100, availableHeartbits)}
+                        value={cheerPoints}
+                        onChange={(e) =>
+                          setCheerPoints(parseInt(e.target.value))
+                        }
+                        className="flex-1 h-3 rounded-full appearance-none cursor-pointer"
+                        style={{
+                          background: `linear-gradient(to right, #0097b2 0%, #0097b2 ${
+                            (cheerPoints / Math.min(100, availableHeartbits)) *
+                            100
+                          }%, #e2e8f0 ${
+                            (cheerPoints / Math.min(100, availableHeartbits)) *
+                            100
+                          }%, #e2e8f0 100%)`,
+                        }}
+                      />
+                      <div className="text-center min-w-20">
+                        <div
+                          className="text-3xl font-black"
+                          style={{
+                            color: "#0097b2",
+                            fontFamily: "Avenir, sans-serif",
+                          }}
+                        >
+                          {cheerPoints}
+                        </div>
+                        <div
+                          className="text-xs font-semibold"
+                          style={{
+                            color: "#64748b",
+                            fontFamily: "Avenir, sans-serif",
+                          }}
+                        >
+                          MAX {Math.min(100, availableHeartbits)}
+                        </div>
                       </div>
                     </div>
                   </div>
 
+                  {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={
@@ -961,223 +999,235 @@ const CheerPage = () => {
                       bulkCheerMutation.isLoading ||
                       cheerPoints > availableHeartbits
                     }
-                    className="text-white py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 w-full text-sm"
+                    className="w-full text-white py-4 px-6 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed font-black text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95"
                     style={{
                       background:
                         "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
                       fontFamily: "Avenir, sans-serif",
-                      minHeight: "44px",
                     }}
                   >
                     {bulkCheerMutation.isLoading ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent"></div>
                         <span>Sending...</span>
                       </>
                     ) : (
                       <>
-                        <PaperAirplaneIcon className="w-4 h-4" />
+                        <PaperAirplaneIcon className="w-6 h-6" />
                         <span>Send Heartbits</span>
+                        <HeartIconSolid className="w-6 h-6" />
                       </>
                     )}
                   </button>
-                </div>
-              </form>
+                </form>
+              </div>
             </div>
 
-            {/* Enhanced Heartbits Widget */}
+            {/* ENHANCED HEARTBITS WIDGET */}
             <div
-              className="rounded-2xl shadow-lg p-4 sm:p-6 transition-all duration-300 hover:shadow-xl max-h-200 overflow-y-auto"
+              className="rounded-3xl shadow-2xl p-8 transition-all duration-300 hover:shadow-3xl"
               style={{
-                background:
-                  "linear-gradient(135deg, #e0f7fa 70%, #b3e0f2 100%)",
-                border: "2px solid #b3e0f2",
-                boxShadow: "0 10px 25px rgba(0, 151, 178, 0.10)",
+                background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                border: "1px solid #e2e8f0",
               }}
             >
-              <div className="flex items-center justify-start mb-4 sm:mb-5">
+              <div className="flex items-center space-x-3 mb-6">
                 <div
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shadow-lg"
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
                   style={{
                     background:
-                      "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
+                      "linear-gradient(135deg, #ec4899 0%, #be185d 100%)",
                   }}
                 >
-                  <HeartIconSolid className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  <HeartIconSolid className="w-7 h-7 text-white" />
                 </div>
-                <span
-                  className="ml-3 text-xs sm:text-sm lg:text-base font-bold"
-                  style={{ color: "#1a0202", fontFamily: "Avenir, sans-serif" }}
-                >
-                  Heartbits
-                </span>
+                <div>
+                  <h3
+                    className="text-2xl font-black"
+                    style={{
+                      color: "#1a0202",
+                      fontFamily: "Avenir, sans-serif",
+                    }}
+                  >
+                    Your Heartbits
+                  </h3>
+                </div>
               </div>
 
-              <div className="space-y-4 sm:space-y-5">
-                <div className="text-center">
+              <div className="space-y-6">
+                {/* Main Stats */}
+                <div className="grid grid-cols-2 gap-4">
                   <div
-                    className="flex justify-center items-center"
-                    style={{ minHeight: 60 }}
+                    className="text-center p-4 rounded-2xl"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
+                    }}
                   >
                     <div
-                      className="flex flex-col items-center"
-                      style={{ minWidth: 60 }}
-                    >
-                      <div
-                        className="text-3xl sm:text-4xl font-black mb-1"
-                        style={{
-                          color: "#0097b2",
-                          fontFamily: "Avenir, sans-serif",
-                          textShadow: "0 2px 4px rgba(0, 151, 178, 0.2)",
-                        }}
-                      >
-                        {availableHeartbits}
-                      </div>
-                      <div
-                        className="text-sm sm:text-base font-semibold"
-                        style={{
-                          color: "#64748b",
-                          fontFamily: "Avenir, sans-serif",
-                        }}
-                      >
-                        Remaining
-                      </div>
-                    </div>
-
-                    <div
+                      className="text-4xl font-black mb-1"
                       style={{
-                        width: 4,
-                        height: 45,
-                        background:
-                          "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
-                        margin: "0 20px",
-                        borderRadius: 2,
+                        color: "#1e40af",
+                        fontFamily: "Avenir, sans-serif",
                       }}
-                    />
-
-                    <div
-                      className="flex flex-col items-center"
-                      style={{ minWidth: 60 }}
                     >
-                      <div
-                        className="text-3xl sm:text-4xl font-black mb-1"
-                        style={{
-                          color: "#bfd1a0",
-                          fontFamily: "Avenir, sans-serif",
-                          textShadow: "0 2px 4px rgba(191, 209, 160, 0.2)",
-                        }}
-                      >
-                        {pointsData?.data?.monthlyReceivedHeartbits || 0}
-                      </div>
-                      <div
-                        className="text-sm sm:text-base font-semibold"
-                        style={{
-                          color: "#64748b",
-                          fontFamily: "Avenir, sans-serif",
-                        }}
-                      >
-                        Received
-                      </div>
+                      {availableHeartbits}
+                    </div>
+                    <div
+                      className="text-sm font-bold"
+                      style={{
+                        color: "#1e40af",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      Available
+                    </div>
+                  </div>
+
+                  <div
+                    className="text-center p-4 rounded-2xl"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)",
+                    }}
+                  >
+                    <div
+                      className="text-4xl font-black mb-1"
+                      style={{
+                        color: "#065f46",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      {pointsData?.data?.monthlyReceivedHeartbits || 0}
+                    </div>
+                    <div
+                      className="text-sm font-bold"
+                      style={{
+                        color: "#065f46",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      Received
                     </div>
                   </div>
                 </div>
 
-                <div
-                  className="pt-3 sm:pt-4 space-y-3"
-                  style={{ borderTop: "2px solid #f1f5f9" }}
-                >
-                  <div className="flex justify-between items-center">
+                {/* Progress Bar */}
+                <div>
+                  <div className="flex justify-between mb-2">
                     <span
-                      className="text-base sm:text-lg font-bold"
+                      className="text-sm font-bold"
                       style={{
                         color: "#1a0202",
                         fontFamily: "Avenir, sans-serif",
                       }}
                     >
-                      {pointsData?.data?.monthlyCheerUsed || 0} used
+                      Monthly Usage
                     </span>
                     <span
-                      className="text-xs px-2 sm:px-3 py-1 rounded-full font-semibold"
+                      className="text-sm font-bold"
                       style={{
-                        color: "#64748b",
-                        backgroundColor: "#f1f5f9",
+                        color: "#0097b2",
                         fontFamily: "Avenir, sans-serif",
                       }}
                     >
-                      out of {pointsData?.data?.monthlyCheerLimit || 100}
+                      {pointsData?.data?.monthlyCheerUsed || 0} /{" "}
+                      {pointsData?.data?.monthlyCheerLimit || 100}
                     </span>
                   </div>
 
-                  <div className="relative">
+                  <div
+                    className="relative h-4 rounded-full overflow-hidden"
+                    style={{ backgroundColor: "#e2e8f0" }}
+                  >
                     <div
-                      className="w-full rounded-full h-2 sm:h-3 shadow-inner"
-                      style={{ backgroundColor: "#f1f5f9" }}
+                      className="h-full transition-all duration-1000 relative overflow-hidden"
+                      style={{
+                        width: `${Math.min(
+                          ((pointsData?.data?.monthlyCheerUsed || 0) /
+                            (pointsData?.data?.monthlyCheerLimit || 100)) *
+                            100,
+                          100
+                        )}%`,
+                        background:
+                          "linear-gradient(90deg, #0097b2 0%, #4a6e7e 100%)",
+                      }}
                     >
                       <div
-                        className="h-2 sm:h-3 rounded-full transition-all duration-1000 shadow-lg"
+                        className="absolute inset-0"
                         style={{
-                          width: `${Math.min(
-                            ((pointsData?.data?.monthlyCheerUsed || 0) /
-                              (pointsData?.data?.monthlyCheerLimit || 100)) *
-                              100,
-                            100
-                          )}%`,
                           background:
-                            "linear-gradient(135deg, #0097b2 0%, #bfd1a0 100%)",
+                            "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
+                          animation: "shimmer 2s infinite",
                         }}
                       ></div>
                     </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span
-                        className="text-xs font-bold text-white mix-blend-difference"
-                        style={{ fontFamily: "Avenir, sans-serif" }}
-                      >
-                        {Math.round(
-                          ((pointsData?.data?.monthlyCheerUsed || 0) /
-                            (pointsData?.data?.monthlyCheerLimit || 100)) *
-                            100
-                        )}
-                        %
-                      </span>
-                    </div>
+                  </div>
+
+                  <div className="text-center mt-2">
+                    <span
+                      className="text-2xl font-black"
+                      style={{
+                        color: "#0097b2",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      {Math.round(
+                        ((pointsData?.data?.monthlyCheerUsed || 0) /
+                          (pointsData?.data?.monthlyCheerLimit || 100)) *
+                          100
+                      )}
+                      %
+                    </span>
+                    <span
+                      className="text-sm font-semibold ml-2"
+                      style={{
+                        color: "#64748b",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      Used
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
+          {/* una */}
           {/* Right Column - Feed & Leaderboard */}
-          <div className="lg:col-span-2 space-y-4 sm:space-y-8">
-            {/* Enhanced Cheer Feed with Header */}
+
+          <div className="lg:col-span-2 space-y-6">
+            {/* ENHANCED CHEER FEED */}
             <div
-              className="rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl cheer-feed-section"
+              className="rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl cheer-feed-section"
               style={{
-                background:
-                  "linear-gradient(135deg, #e0f7fa 70%, #b3e0f2 100%)",
-                border: "2px solid #b3e0f2",
-                boxShadow: "0 10px 25px rgba(0, 151, 178, 0.10)",
+                background: "#ffffff",
+                border: "1px solid #e2e8f0",
               }}
             >
-              {/* Enhanced Feed Header with Date Filter */}
+              {/* Feed Header with Date Filter */}
               <div
-                className="px-4 sm:px-6 py-3 sm:py-4 border-b-2"
-                style={{ borderColor: "#b3e0f2" }}
+                className="px-6 py-5 border-b border-gray-200"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
+                }}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-                  {/* Left side - Title and Icon */}
-                  <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  {/* Left side - Title */}
+                  <div className="flex items-center space-x-3">
                     <div
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110"
                       style={{
                         background:
-                          "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
+                          "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
                       }}
                     >
-                      <FireIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                      <FireIcon className="w-6 h-6 text-white" />
                     </div>
                     <div>
                       <h2
-                        className="text-xs sm:text-sm lg:text-base font-bold truncate"
+                        className="text-2xl font-black"
                         style={{
                           color: "#1a0202",
                           fontFamily: "Avenir, sans-serif",
@@ -1185,749 +1235,666 @@ const CheerPage = () => {
                       >
                         Recent Cheers
                       </h2>
+                      <p
+                        className="text-sm"
+                        style={{
+                          color: "#64748b",
+                          fontFamily: "Avenir, sans-serif",
+                        }}
+                      >
+                        {totalItems} total cheers
+                      </p>
                     </div>
                   </div>
 
-                  {/* Right side - Enhanced Date Filter */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                    <div className="flex items-center space-x-2 w-full sm:w-auto">
-                      <label
-                        htmlFor="cheer-date-picker"
-                        className="text-sm font-semibold whitespace-nowrap"
+                  {/* Right side - Date Filter */}
+                  <div className="flex items-center gap-3">
+                    <label
+                      htmlFor="cheer-date-picker"
+                      className="text-sm font-bold whitespace-nowrap"
+                      style={{
+                        color: "#1a0202",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      Filter by Date:
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="cheer-date-picker"
+                        type="date"
+                        className="px-4 py-2 rounded-xl text-sm transition-all duration-300 focus:ring-4 focus:outline-none"
                         style={{
+                          border: "2px solid #e2e8f0",
+                          backgroundColor: "#ffffff",
+                          fontFamily: "Avenir, sans-serif",
                           color: "#1a0202",
-                          fontFamily: "Avenir, sans-serif",
+                          cursor: "pointer",
                         }}
-                      >
-                        Filter:
-                      </label>
-                      <div className="relative flex-1 sm:flex-none">
-                        <div className="flex items-center">
-                          <div className="relative w-full sm:w-auto">
-                            <input
-                              id="cheer-date-picker"
-                              type="date"
-                              className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-sm transition-all duration-300 focus:ring-4 focus:outline-none appearance-none"
-                              style={{
-                                border: "2px solid #e2e8f0",
-                                backgroundColor: "#ffffff",
-                                fontFamily: "Avenir, sans-serif",
-                                color: "#1a0202",
-                                minWidth: "140px",
-                                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
-                                cursor: "pointer",
-                              }}
-                              value={selectedDate}
-                              max={new Date().toISOString().split("T")[0]}
-                              onChange={(e) => {
-                                setSelectedDate(e.target.value);
-                              }}
-                              onFocus={(e) => {
-                                e.target.style.borderColor = "#0097b2";
-                                e.target.style.boxShadow =
-                                  "0 0 0 4px rgba(0, 151, 178, 0.1), 0 4px 8px rgba(0, 151, 178, 0.15)";
-                                e.target.style.transform = "translateY(-1px)";
-                              }}
-                              onBlur={(e) => {
-                                e.target.style.borderColor = "#e2e8f0";
-                                e.target.style.boxShadow =
-                                  "0 2px 4px rgba(0, 0, 0, 0.05)";
-                                e.target.style.transform = "translateY(0)";
-                              }}
-                              onMouseEnter={(e) => {
-                                if (document.activeElement !== e.target) {
-                                  e.target.style.borderColor = "#0097b2";
-                                  e.target.style.boxShadow =
-                                    "0 4px 8px rgba(0, 151, 178, 0.1)";
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (document.activeElement !== e.target) {
-                                  e.target.style.borderColor = "#e2e8f0";
-                                  e.target.style.boxShadow =
-                                    "0 2px 4px rgba(0, 0, 0, 0.05)";
-                                }
-                              }}
-                            />
-                          </div>
+                        value={selectedDate}
+                        max={new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = "#0097b2";
+                          e.target.style.boxShadow =
+                            "0 0 0 4px rgba(0, 151, 178, 0.1)";
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = "#e2e8f0";
+                          e.target.style.boxShadow = "none";
+                        }}
+                      />
 
-                          {selectedDate && (
-                            <button
-                              className="ml-2 w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg"
-                              style={{
-                                background:
-                                  "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-                                color: "#ffffff",
-                                fontFamily: "Avenir, sans-serif",
-                                fontWeight: "bold",
-                                fontSize: "12px",
-                                boxShadow: "0 4px 8px rgba(239, 68, 68, 0.3)",
-                              }}
-                              onClick={() => setSelectedDate("")}
-                              aria-label="Clear date filter"
-                              title="Clear filter"
-                              onMouseEnter={(e) => {
-                                e.target.style.boxShadow =
-                                  "0 6px 12px rgba(239, 68, 68, 0.4)";
-                                e.target.style.transform = "translateY(-1px)";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.target.style.boxShadow =
-                                  "0 4px 8px rgba(239, 68, 68, 0.3)";
-                                e.target.style.transform = "translateY(0)";
-                              }}
-                            >
-                              ×
-                            </button>
-                          )}
-                        </div>
-                      </div>
+                      {selectedDate && (
+                        <button
+                          className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg"
+                          style={{
+                            background:
+                              "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+                            color: "#ffffff",
+                            fontWeight: "bold",
+                          }}
+                          onClick={() => setSelectedDate("")}
+                          title="Clear filter"
+                        >
+                          ×
+                        </button>
+                      )}
                     </div>
-
-                    {/* Filter Status Indicator */}
-                    {selectedDate && (
-                      <div
-                        className="flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-semibold w-fit"
-                        style={{
-                          backgroundColor: "#f0f9ff",
-                          color: "#0097b2",
-                          border: "1px solid #0097b2",
-                          fontFamily: "Avenir, sans-serif",
-                        }}
-                      >
-                        <span>📅</span>
-                        <span>
-                          {new Date(selectedDate).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
 
-              <div className="max-h-96 sm:max-h-90 overflow-y-auto">
+              {/* Feed Content */}
+              <div className="max-h-[600px] overflow-y-auto p-6">
                 {feedLoading ? (
-                  <div className="p-6 sm:p-8 text-center">
-                    <div className="relative mb-4">
-                      <div
-                        className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-4 border-transparent border-t-4 mx-auto"
-                        style={{ borderTopColor: "#0097b2" }}
-                      ></div>
-                      <SparklesIcon
-                        className="w-4 h-4 sm:w-5 sm:h-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                        style={{ color: "#0097b2" }}
-                      />
+                  <div className="p-12 text-center">
+                    <div className="relative w-16 h-16 mx-auto mb-6">
+                      <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
+                      <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-orange-500 border-r-yellow-500 animate-spin"></div>
                     </div>
                     <p
-                      className="text-sm sm:text-base font-medium"
+                      className="text-base font-medium"
                       style={{
                         color: "#64748b",
                         fontFamily: "Avenir, sans-serif",
                       }}
                     >
-                      Loading recent cheers...
+                      Loading cheers...
                     </p>
                   </div>
                 ) : feed.length > 0 ? (
-                  <div className="space-y-4 p-4">
-                    {feed.map((cheer, index) => (
+                  <div className="space-y-4">
+                    {feed.map((cheer) => (
                       <div
                         key={cheer.cheer_id}
-                        className="relative transition-all duration-200 hover:bg-gray-50 rounded-xl"
+                        className="group relative rounded-2xl transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
                         style={{
                           background:
-                            "linear-gradient(135deg, #f8fafc 60%, #e0f7fa 100%)",
-                          boxShadow:
-                            "0 4px 16px 0 rgba(52, 211, 153, 0.10), 0 1.5px 4px 0 rgba(96, 165, 250, 0.10)",
-                          border: "1.5px solid #e0e7ef",
+                            "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                          border: "1px solid #e2e8f0",
                           overflow: "hidden",
-                          marginBottom: "16px",
                         }}
                       >
-                        {/* Formatted Date - Bottom right */}
-                        <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-4 text-xs text-gray-500 font-medium z-10 bg-white/80 backdrop-blur-sm px-1.5 py-0.5 rounded-lg">
-                          {formatFullDateTime(
-                            cheer.createdAt || cheer.posted_at
-                          )}
-                        </div>
-                        {/* Shiny green accent bar */}
+                        {/* Accent bar */}
                         <div
+                          className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-300 group-hover:w-2"
                           style={{
-                            width: "6px",
-                            height: "80%",
-                            position: "absolute",
-                            left: "2px",
-                            top: "10%",
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderTopRightRadius: "8px",
-                            borderBottomRightRadius: "8px",
                             background:
-                              "linear-gradient(135deg, #34d399 0%, #60a5fa 100%)",
+                              "linear-gradient(180deg, #f59e0b 0%, #d97706 100%)",
                           }}
                         />
-                        <div
-                          className="flex space-x-2 sm:space-x-3 p-4 sm:p-6"
-                          style={{ marginLeft: "8px" }}
-                        >
-                          <img
-                            src={cheer.fromUser?.avatar || defaultAvatar}
-                            alt={cheer.fromUser?.name}
-                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full ring-2 ring-gray-200 flex-shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-2 gap-1 sm:gap-0">
-                              <span
-                                className="font-bold text-xs sm:text-sm lg:text-base truncate max-w-24 sm:max-w-32 lg:max-w-40"
-                                style={{
-                                  color: "#1a0202",
-                                  fontFamily: "Avenir, sans-serif",
-                                }}
-                              >
-                                {cheer.fromUser?.name}
-                              </span>
-                              <span
-                                className="text-gray-500 text-xs flex-shrink-0"
-                                style={{ fontFamily: "Avenir, sans-serif" }}
-                              >
-                                cheered
-                              </span>
-                              <span
-                                className="font-bold text-xs sm:text-sm lg:text-base truncate max-w-24 sm:max-w-32 lg:max-w-40"
-                                style={{
-                                  color: "#1a0202",
-                                  fontFamily: "Avenir, sans-serif",
-                                }}
-                              >
-                                {cheer.toUser?.name}
-                              </span>
-                              <span
-                                className="font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs text-white shadow-lg flex items-center w-fit flex-shrink-0"
-                                style={{
-                                  background:
-                                    "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
-                                  fontFamily: "Avenir, sans-serif",
-                                }}
-                              >
-                                +{cheer.points}
-                                <HeartIconSolid
-                                  className="w-2.5 h-2.5 sm:w-3 sm:h-3"
+
+                        {/* Content */}
+                        <div className="p-6 pl-8">
+                          <div className="flex gap-4">
+                            {/* Avatar */}
+                            <img
+                              src={
+                                cheer.fromUser?.avatar ||
+                                "/images/default-avatar.png"
+                              }
+                              alt={cheer.fromUser?.name}
+                              className="w-14 h-14 rounded-2xl ring-2 ring-gray-200 flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
+                            />
+
+                            {/* Main Content */}
+                            <div className="flex-1 min-w-0">
+                              {/* Header */}
+                              <div className="flex flex-wrap items-center gap-2 mb-3">
+                                <span
+                                  className="font-bold text-base truncate max-w-32"
                                   style={{
-                                    color: "#ef4444",
-                                    display: "inline",
-                                    marginLeft: "1px",
-                                    marginRight: "1px",
+                                    color: "#1a0202",
+                                    fontFamily: "Avenir, sans-serif",
                                   }}
-                                />
-                                bits
-                              </span>
-                            </div>
-
-                            {cheer.message && (
-                              <p
-                                className="mb-3 text-sm sm:text-base leading-relaxed"
-                                style={{
-                                  color: "#374151",
-                                  fontFamily: "Avenir, sans-serif",
-                                  fontWeight: 500,
-                                }}
-                              >
-                                {cheer.message}
-                              </p>
-                            )}
-
-                            <div className="flex items-center space-x-3 sm:space-x-4">
-                              <button
-                                onClick={() =>
-                                  likeMutation.mutate(cheer.cheer_id)
-                                }
-                                className="flex items-center space-x-1 transition-all duration-200 hover:scale-110 active:scale-95"
-                                style={{
-                                  background: "none",
-                                  border: "none",
-                                  outline: "none",
-                                  cursor: likeMutation.isLoading
-                                    ? "not-allowed"
-                                    : "pointer",
-                                  padding: 0,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  position: "relative",
-                                  zIndex: 2,
-                                  color: likedCheers.has(cheer.cheer_id)
-                                    ? "#ef4444"
-                                    : "#64748b",
-                                  fontFamily: "Avenir, sans-serif",
-                                  opacity: likeMutation.isLoading ? 0.6 : 1,
-                                }}
-                                disabled={likeMutation.isLoading}
-                              >
-                                {likeMutation.isLoading ? (
-                                  <div
-                                    className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-transparent border-t-2"
-                                    style={{
-                                      borderTopColor: likedCheers.has(
-                                        cheer.cheer_id
-                                      )
-                                        ? "#ef4444"
-                                        : "#64748b",
-                                    }}
-                                  ></div>
-                                ) : likedCheers.has(cheer.cheer_id) ? (
-                                  <HeartIconSolid className="w-4 h-4 sm:w-5 sm:h-5" />
-                                ) : (
-                                  <HeartIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-                                )}
-                                <span className="text-xs font-semibold">
-                                  {cheer.heartCount || cheer.likeCount || 0}
+                                >
+                                  {cheer.fromUser?.name}
                                 </span>
-                              </button>
-
-                              <button
-                                onClick={() =>
-                                  handleCommentClick(cheer.cheer_id)
-                                }
-                                className="flex items-center space-x-1 transition-all duration-200 hover:scale-110 active:scale-95"
-                                style={{
-                                  color: "#64748b",
-                                  fontFamily: "Avenir, sans-serif",
-                                }}
-                              >
-                                <ChatBubbleLeftEllipsisIcon
-                                  className="w-5 h-5 sm:w-6 sm:h-6"
-                                  style={{ color: "#22c55e" }}
-                                />
-                                <span className="text-xs font-semibold">
-                                  {cheer.commentCount || 0}
+                                <span className="text-gray-500 text-sm">
+                                  cheered
                                 </span>
-                              </button>
-
-                              <span
-                                className="text-xs"
-                                style={{
-                                  color: "#94a3b8",
-                                  fontFamily: "Avenir, sans-serif",
-                                }}
-                              >
-                                {formatTimeAgo(cheer.createdAt)}
-                              </span>
-                            </div>
-
-                            {commentingCheer === cheer.cheer_id && (
-                              <div
-                                className="mt-4 p-3 rounded-xl"
-                                style={{ backgroundColor: "#faf8ef" }}
-                              >
-                                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-3">
-                                  <input
-                                    type="text"
-                                    value={commentText}
-                                    onChange={(e) =>
-                                      setCommentText(e.target.value)
-                                    }
-                                    placeholder="Add a comment..."
-                                    className="flex-1 px-3 py-2 rounded-lg text-sm transition-all duration-200 focus:ring-4"
-                                    style={{
-                                      border: "2px solid #e2e8f0",
-                                      fontFamily: "Avenir, sans-serif",
-                                      color: "#1a0202",
-                                    }}
-                                    onFocus={(e) => {
-                                      e.target.style.borderColor = "#0097b2";
-                                      e.target.style.boxShadow =
-                                        "0 0 0 4px rgba(0, 151, 178, 0.1)";
-                                    }}
-                                    onBlur={(e) => {
-                                      e.target.style.borderColor = "#e2e8f0";
-                                      e.target.style.boxShadow = "none";
-                                    }}
-                                    onKeyPress={(e) => {
-                                      if (
-                                        e.key === "Enter" &&
-                                        commentText.trim()
-                                      ) {
-                                        commentMutation.mutate({
-                                          cheerId: cheer.cheer_id,
-                                          comment: commentText.trim(),
-                                        });
-                                      }
-                                    }}
+                                <span
+                                  className="font-bold text-base truncate max-w-32"
+                                  style={{
+                                    color: "#1a0202",
+                                    fontFamily: "Avenir, sans-serif",
+                                  }}
+                                >
+                                  {cheer.toUser?.name}
+                                </span>
+                                <div
+                                  className="px-3 py-1 rounded-full text-sm font-black shadow-md flex items-center gap-1"
+                                  style={{
+                                    background:
+                                      "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                                    color: "#ffffff",
+                                  }}
+                                >
+                                  <span>+{cheer.points}</span>
+                                  <HeartIconSolid
+                                    className="w-3 h-3"
+                                    style={{ color: "#ef4444" }}
                                   />
-                                  <button
-                                    onClick={() => {
-                                      if (commentText.trim()) {
-                                        commentMutation.mutate({
-                                          cheerId: cheer.cheer_id,
-                                          comment: commentText.trim(),
-                                        });
-                                      }
-                                    }}
-                                    disabled={
-                                      !commentText.trim() ||
-                                      commentMutation.isLoading
-                                    }
-                                    className="px-4 py-2 text-white rounded-lg text-xs font-bold disabled:opacity-50 transition-all duration-200 hover:scale-105 active:scale-95 w-full sm:w-auto"
-                                    style={{
-                                      background:
-                                        "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
-                                      fontFamily: "Avenir, sans-serif",
-                                    }}
-                                  >
-                                    {commentMutation.isLoading
-                                      ? "Posting..."
-                                      : "Post"}
-                                  </button>
+                                  <span>bits</span>
                                 </div>
+                              </div>
 
-                                <div className="space-y-2">
-                                  {loadingComments ? (
-                                    <div className="flex items-center justify-center py-4">
-                                      <div
-                                        className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-transparent border-t-2"
-                                        style={{ borderTopColor: "#0097b2" }}
-                                      ></div>
-                                      <span
-                                        className="ml-2 text-xs font-medium"
-                                        style={{
-                                          color: "#64748b",
-                                          fontFamily: "Avenir, sans-serif",
-                                        }}
-                                      >
-                                        Loading comments...
-                                      </span>
-                                    </div>
+                              {/* Message */}
+                              {cheer.message && (
+                                <p
+                                  className="mb-4 text-base leading-relaxed"
+                                  style={{
+                                    color: "#374151",
+                                    fontFamily: "Avenir, sans-serif",
+                                  }}
+                                >
+                                  {cheer.message}
+                                </p>
+                              )}
+
+                              {/* Actions */}
+                              <div className="flex items-center gap-4 mb-2">
+                                <button
+                                  onClick={() =>
+                                    likeMutation.mutate(cheer.cheer_id)
+                                  }
+                                  disabled={likeMutation.isLoading}
+                                  className="flex items-center gap-2 transition-all duration-200 hover:scale-110 active:scale-95 px-3 py-1.5 rounded-xl"
+                                  style={{
+                                    background: likedCheers.has(cheer.cheer_id)
+                                      ? "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)"
+                                      : "#f8fafc",
+                                    color: likedCheers.has(cheer.cheer_id)
+                                      ? "#dc2626"
+                                      : "#64748b",
+                                    fontFamily: "Avenir, sans-serif",
+                                    border: `1px solid ${
+                                      likedCheers.has(cheer.cheer_id)
+                                        ? "#fca5a5"
+                                        : "#e2e8f0"
+                                    }`,
+                                  }}
+                                >
+                                  {likedCheers.has(cheer.cheer_id) ? (
+                                    <HeartIconSolid className="w-5 h-5" />
                                   ) : (
-                                    (() => {
-                                      const commentData = cheerComments.get(
-                                        cheer.cheer_id
-                                      ) || { comments: [] };
-                                      const comments = commentData.comments;
-                                      if (
-                                        Array.isArray(comments) &&
-                                        comments.length > 0
-                                      ) {
-                                        return (
-                                          <>
-                                            {comments.map((comment, index) => {
-                                              const commentKey =
-                                                comment._id ||
-                                                comment.id ||
-                                                `comment-${cheer.cheer_id}-${index}`;
-                                              return (
-                                                <div
-                                                  key={commentKey}
-                                                  className="relative rounded-xl px-2 pt-1 pb-px transition-all duration-200 hover:scale-[1.02]"
-                                                  style={{
-                                                    background:
-                                                      "linear-gradient(135deg, #f8fafc 60%, #e0f7fa 100%)",
-                                                    boxShadow:
-                                                      "0 4px 16px 0 rgba(52, 211, 153, 0.10), 0 1.5px 4px 0 rgba(96, 165, 250, 0.10)",
-                                                    border:
-                                                      "1.5px solid #e0e7ef",
-                                                    borderRadius: "18px",
-                                                    position: "relative",
-                                                    zIndex: 1,
-                                                  }}
-                                                >
-                                                  <div className="flex items-start space-x-2">
-                                                  
-                                                      <img
-                                                        src={
-                                                          comment?.fromUser?.avatar || defaultAvatar
-                                                        }
-                                                        alt={
-                                                          comment.fromUser
-                                                            .name || "User"
-                                                        }
-                                                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full ring-1 ring-gray-200 flex-shrink-0"
-                                                      />
-                                                   
-                                                    <div className="flex-1 min-w-0">
-                                                      <div className="flex items-center space-x-1 mb-1">
-                                                        <span
-                                                          className="font-semibold text-xs sm:text-sm"
-                                                          style={{
-                                                            color: "#1a0202",
-                                                            fontFamily:
-                                                              "Avenir, sans-serif",
-                                                          }}
-                                                        >
-                                                          {comment.fromUser
-                                                            ?.name ||
-                                                            "Anonymous"}
-                                                        </span>
-                                                        <span
-                                                          className="text-xs"
-                                                          style={{
-                                                            color: "#94a3b8",
-                                                            fontFamily:
-                                                              "Avenir, sans-serif",
-                                                          }}
-                                                        >
-                                                          {formatTimeAgo(
-                                                            comment.createdAt
-                                                          )}
-                                                        </span>
-                                                      </div>
-                                                      {editingComment &&
-                                                      editingComment.cheerId ===
-                                                        cheer.cheer_id &&
-                                                      editingComment.commentId ===
-                                                        comment._id ? (
-                                                        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                                                          <input
-                                                            type="text"
-                                                            value={
-                                                              editCommentText
-                                                            }
-                                                            onChange={(e) =>
-                                                              setEditCommentText(
-                                                                e.target.value
-                                                              )
-                                                            }
-                                                            className="flex-1 px-2 py-1 rounded border text-sm"
-                                                            style={{
-                                                              fontFamily:
-                                                                "Avenir, sans-serif",
-                                                              color: "#1a0202",
-                                                            }}
-                                                            disabled={
-                                                              editCommentMutation.isLoading
-                                                            }
-                                                          />
-                                                          <div className="flex space-x-2 w-full sm:w-auto">
-                                                            <button
-                                                              className="text-xs px-2 py-1 rounded bg-green-500 text-white font-bold w-full sm:w-auto"
-                                                              style={{
-                                                                fontFamily:
-                                                                  "Avenir, sans-serif",
-                                                              }}
-                                                              disabled={
-                                                                editCommentMutation.isLoading ||
-                                                                !editCommentText.trim()
-                                                              }
-                                                              onClick={() =>
-                                                                editCommentMutation.mutate(
-                                                                  {
-                                                                    cheerId:
-                                                                      cheer.cheer_id,
-                                                                    commentId:
-                                                                      comment._id,
-                                                                    comment:
-                                                                      editCommentText.trim(),
-                                                                  }
-                                                                )
-                                                              }
-                                                            >
-                                                              Save
-                                                            </button>
-                                                            <button
-                                                              className="text-xs px-2 py-1 rounded bg-gray-300 text-gray-700 font-bold w-full sm:w-auto"
-                                                              style={{
-                                                                fontFamily:
-                                                                  "Avenir, sans-serif",
-                                                              }}
-                                                              disabled={
-                                                                editCommentMutation.isLoading
-                                                              }
-                                                              onClick={() => {
-                                                                setEditingComment(
-                                                                  null
-                                                                );
-                                                                setEditCommentText(
-                                                                  ""
-                                                                );
-                                                              }}
-                                                            >
-                                                              Cancel
-                                                            </button>
-                                                          </div>
-                                                        </div>
-                                                      ) : (
-                                                        <p
-                                                          className="text-sm sm:text-base"
-                                                          style={{
-                                                            color: "#374151",
-                                                            fontFamily:
-                                                              "Avenir, sans-serif",
-                                                          }}
-                                                        >
-                                                          {comment.comment}
-                                                        </p>
-                                                      )}
-                                                    </div>
-                                                  </div>
-                                                  {comment.fromUser?._id ===
-                                                    user.id &&
-                                                    !editingComment && (
-                                                      <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-1 mt-1">
-                                                        {confirmingDelete &&
-                                                        confirmingDelete.cheerId ===
-                                                          cheer.cheer_id &&
-                                                        confirmingDelete.commentId ===
-                                                          comment._id ? (
-                                                          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                                    <HeartIcon className="w-5 h-5" />
+                                  )}
+                                  <span className="text-sm font-bold">
+                                    {cheer.heartCount || cheer.likeCount || 0}
+                                  </span>
+                                </button>
+
+                                <button
+                                  onClick={() =>
+                                    handleCommentClick(cheer.cheer_id)
+                                  }
+                                  className="flex items-center gap-2 transition-all duration-200 hover:scale-110 active:scale-95 px-3 py-1.5 rounded-xl"
+                                  style={{
+                                    background:
+                                      commentingCheer === cheer.cheer_id
+                                        ? "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)"
+                                        : "#f8fafc",
+                                    color:
+                                      commentingCheer === cheer.cheer_id
+                                        ? "#065f46"
+                                        : "#64738b",
+                                    fontFamily: "Avenir, sans-serif",
+                                    border: `1px solid ${
+                                      commentingCheer === cheer.cheer_id
+                                        ? "#6ee7b7"
+                                        : "#e2e8f0"
+                                    }`,
+                                  }}
+                                >
+                                  <ChatBubbleLeftEllipsisIcon className="w-5 h-5" />
+                                  <span className="text-sm font-bold">
+                                    {cheer.commentCount || 0}
+                                  </span>
+                                </button>
+
+                                <span
+                                  className="text-sm font-medium ml-auto"
+                                  style={{
+                                    color: "#94a3b8",
+                                    fontFamily: "Avenir, sans-serif",
+                                  }}
+                                >
+                                  {formatTimeAgo(cheer.createdAt)}
+                                </span>
+                              </div>
+
+                              {/* Comments Section */}
+                              {commentingCheer === cheer.cheer_id && (
+                                <div
+                                  className="mt-4 p-4 rounded-2xl"
+                                  style={{
+                                    backgroundColor: "#f8fafc",
+                                    border: "1px solid #e2e8f0",
+                                  }}
+                                >
+                                  {/* Add Comment */}
+                                  <div className="flex gap-2 mb-4">
+                                    <input
+                                      type="text"
+                                      value={commentText}
+                                      onChange={(e) =>
+                                        setCommentText(e.target.value)
+                                      }
+                                      placeholder="Write a comment..."
+                                      className="flex-1 px-4 py-2 rounded-xl text-sm transition-all duration-200 focus:ring-4"
+                                      style={{
+                                        border: "2px solid #e2e8f0",
+                                        fontFamily: "Avenir, sans-serif",
+                                        color: "#1a0202",
+                                      }}
+                                      onFocus={(e) => {
+                                        e.target.style.borderColor = "#0097b2";
+                                        e.target.style.boxShadow =
+                                          "0 0 0 4px rgba(0, 151, 178, 0.1)";
+                                      }}
+                                      onBlur={(e) => {
+                                        e.target.style.borderColor = "#e2e8f0";
+                                        e.target.style.boxShadow = "none";
+                                      }}
+                                      onKeyPress={(e) => {
+                                        if (
+                                          e.key === "Enter" &&
+                                          commentText.trim()
+                                        ) {
+                                          commentMutation.mutate({
+                                            cheerId: cheer.cheer_id,
+                                            comment: commentText.trim(),
+                                          });
+                                        }
+                                      }}
+                                    />
+                                    <button
+                                      onClick={() => {
+                                        if (commentText.trim()) {
+                                          commentMutation.mutate({
+                                            cheerId: cheer.cheer_id,
+                                            comment: commentText.trim(),
+                                          });
+                                        }
+                                      }}
+                                      disabled={
+                                        !commentText.trim() ||
+                                        commentMutation.isLoading
+                                      }
+                                      className="px-4 py-2 rounded-xl text-sm font-bold disabled:opacity-50 transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                                      style={{
+                                        background:
+                                          "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
+                                        color: "#ffffff",
+                                        fontFamily: "Avenir, sans-serif",
+                                      }}
+                                    >
+                                      Post
+                                    </button>
+                                  </div>
+
+                                  {/* Comments List */}
+                                  <div className="space-y-3">
+                                    {loadingComments ? (
+                                      <div className="flex items-center justify-center py-4">
+                                        <div
+                                          className="animate-spin rounded-full h-5 w-5 border-2 border-transparent border-t-2"
+                                          style={{ borderTopColor: "#0097b2" }}
+                                        ></div>
+                                      </div>
+                                    ) : (
+                                      (() => {
+                                        const commentData = cheerComments.get(
+                                          cheer.cheer_id
+                                        ) || { comments: [] };
+                                        const comments = commentData.comments;
+                                        if (
+                                          Array.isArray(comments) &&
+                                          comments.length > 0
+                                        ) {
+                                          return (
+                                            <>
+                                              {comments.map(
+                                                (comment, index) => {
+                                                  const commentKey =
+                                                    comment._id ||
+                                                    comment.id ||
+                                                    `comment-${cheer.cheer_id}-${index}`;
+                                                  return (
+                                                    <div
+                                                      key={commentKey}
+                                                      className="rounded-xl p-3 transition-all duration-200 hover:scale-[1.01]"
+                                                      style={{
+                                                        background: "#ffffff",
+                                                        border:
+                                                          "1px solid #e2e8f0",
+                                                      }}
+                                                    >
+                                                      <div className="flex gap-3">
+                                                        <img
+                                                          src={
+                                                            comment.fromUser
+                                                              ?.avatar ||
+                                                            "/images/default-avatar.png"
+                                                          }
+                                                          alt={
+                                                            comment.fromUser
+                                                              ?.name || "User"
+                                                          }
+                                                          className="w-10 h-10 rounded-xl ring-1 ring-gray-200 flex-shrink-0"
+                                                        />
+                                                        <div className="flex-1 min-w-0">
+                                                          <div className="flex items-center gap-2 mb-1">
                                                             <span
-                                                              className="text-xs font-semibold"
+                                                              className="font-bold text-sm"
                                                               style={{
                                                                 color:
-                                                                  "#ef4444",
+                                                                  "#1a0202",
                                                                 fontFamily:
                                                                   "Avenir, sans-serif",
                                                               }}
                                                             >
-                                                              Are you sure?
+                                                              {comment.fromUser
+                                                                ?.name ||
+                                                                "Anonymous"}
                                                             </span>
-                                                            <div className="flex space-x-2 w-full sm:w-auto">
-                                                              <button
-                                                                className="text-xs px-2 py-1 rounded bg-red-500 text-white font-bold hover:bg-red-600 w-full sm:w-auto"
+                                                            <span
+                                                              className="text-xs"
+                                                              style={{
+                                                                color:
+                                                                  "#94a3b8",
+                                                                fontFamily:
+                                                                  "Avenir, sans-serif",
+                                                              }}
+                                                            >
+                                                              {formatTimeAgo(
+                                                                comment.createdAt
+                                                              )}
+                                                            </span>
+                                                          </div>
+
+                                                          {editingComment &&
+                                                          editingComment.cheerId ===
+                                                            cheer.cheer_id &&
+                                                          editingComment.commentId ===
+                                                            comment._id ? (
+                                                            <div className="flex items-center gap-2">
+                                                              <input
+                                                                type="text"
+                                                                value={
+                                                                  editCommentText
+                                                                }
+                                                                onChange={(e) =>
+                                                                  setEditCommentText(
+                                                                    e.target
+                                                                      .value
+                                                                  )
+                                                                }
+                                                                className="flex-1 px-3 py-1 rounded-lg border text-sm"
                                                                 style={{
                                                                   fontFamily:
                                                                     "Avenir, sans-serif",
                                                                 }}
                                                                 disabled={
-                                                                  editCommentMutation.isLoading ||
-                                                                  deleteCommentMutation.isLoading
+                                                                  editCommentMutation.isLoading
                                                                 }
-                                                                onClick={() => {
-                                                                  deleteCommentMutation.mutate(
+                                                              />
+                                                              <button
+                                                                className="px-3 py-1 rounded-lg text-xs font-bold transition-all hover:scale-105"
+                                                                style={{
+                                                                  background:
+                                                                    "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                                                                  color:
+                                                                    "#ffffff",
+                                                                }}
+                                                                disabled={
+                                                                  editCommentMutation.isLoading ||
+                                                                  !editCommentText.trim()
+                                                                }
+                                                                onClick={() =>
+                                                                  editCommentMutation.mutate(
                                                                     {
                                                                       cheerId:
                                                                         cheer.cheer_id,
                                                                       commentId:
                                                                         comment._id,
+                                                                      comment:
+                                                                        editCommentText.trim(),
                                                                     }
-                                                                  );
-                                                                  setConfirmingDelete(
-                                                                    null
-                                                                  );
-                                                                }}
-                                                              >
-                                                                Yes
-                                                              </button>
-                                                              <button
-                                                                className="text-xs px-2 py-1 rounded bg-gray-300 text-gray-700 font-bold w-full sm:w-auto"
-                                                                style={{
-                                                                  fontFamily:
-                                                                    "Avenir, sans-serif",
-                                                                }}
-                                                                disabled={
-                                                                  editCommentMutation.isLoading ||
-                                                                  deleteCommentMutation.isLoading
-                                                                }
-                                                                onClick={() =>
-                                                                  setConfirmingDelete(
-                                                                    null
                                                                   )
                                                                 }
                                                               >
-                                                                No
+                                                                Save
+                                                              </button>
+                                                              <button
+                                                                className="px-3 py-1 rounded-lg text-xs font-bold"
+                                                                style={{
+                                                                  background:
+                                                                    "#e2e8f0",
+                                                                  color:
+                                                                    "#64748b",
+                                                                }}
+                                                                onClick={() => {
+                                                                  setEditingComment(
+                                                                    null
+                                                                  );
+                                                                  setEditCommentText(
+                                                                    ""
+                                                                  );
+                                                                }}
+                                                              >
+                                                                Cancel
                                                               </button>
                                                             </div>
-                                                          </div>
-                                                        ) : (
-                                                          <>
-                                                            <button
-                                                              className="text-xs px-2 py-1 rounded bg-yellow-400 text-white font-bold hover:bg-yellow-500 w-full sm:w-auto"
+                                                          ) : (
+                                                            <p
+                                                              className="text-sm"
                                                               style={{
+                                                                color:
+                                                                  "#374151",
                                                                 fontFamily:
                                                                   "Avenir, sans-serif",
                                                               }}
-                                                              onClick={() => {
-                                                                setEditingComment(
-                                                                  {
-                                                                    cheerId:
-                                                                      cheer.cheer_id,
-                                                                    commentId:
-                                                                      comment._id,
-                                                                  }
-                                                                );
-                                                                setEditCommentText(
-                                                                  comment.comment
-                                                                );
-                                                              }}
-                                                              disabled={
-                                                                editCommentMutation.isLoading ||
-                                                                deleteCommentMutation.isLoading
-                                                              }
                                                             >
-                                                              Edit
-                                                            </button>
-                                                            <button
-                                                              className="text-xs px-2 py-1 rounded bg-red-500 text-white font-bold hover:bg-red-600 w-full sm:w-auto"
-                                                              style={{
-                                                                fontFamily:
-                                                                  "Avenir, sans-serif",
-                                                              }}
-                                                              onClick={() =>
-                                                                setConfirmingDelete(
-                                                                  {
-                                                                    cheerId:
-                                                                      cheer.cheer_id,
-                                                                    commentId:
-                                                                      comment._id,
-                                                                  }
-                                                                )
-                                                              }
-                                                              disabled={
-                                                                editCommentMutation.isLoading ||
-                                                                deleteCommentMutation.isLoading
-                                                              }
-                                                            >
-                                                              Delete
-                                                            </button>
-                                                          </>
-                                                        )}
+                                                              {comment.comment}
+                                                            </p>
+                                                          )}
+
+                                                          {/* Edit/Delete buttons */}
+                                                          {comment.fromUser
+                                                            ?._id === user.id &&
+                                                            !editingComment && (
+                                                              <div className="flex gap-2 mt-2">
+                                                                {confirmingDelete &&
+                                                                confirmingDelete.cheerId ===
+                                                                  cheer.cheer_id &&
+                                                                confirmingDelete.commentId ===
+                                                                  comment._id ? (
+                                                                  <>
+                                                                    <span
+                                                                      className="text-xs font-bold mr-2"
+                                                                      style={{
+                                                                        color:
+                                                                          "#ef4444",
+                                                                      }}
+                                                                    >
+                                                                      Delete?
+                                                                    </span>
+                                                                    <button
+                                                                      className="px-2 py-1 rounded-lg text-xs font-bold transition-all hover:scale-105"
+                                                                      style={{
+                                                                        background:
+                                                                          "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+                                                                        color:
+                                                                          "#ffffff",
+                                                                      }}
+                                                                      onClick={() => {
+                                                                        deleteCommentMutation.mutate(
+                                                                          {
+                                                                            cheerId:
+                                                                              cheer.cheer_id,
+                                                                            commentId:
+                                                                              comment._id,
+                                                                          }
+                                                                        );
+                                                                        setConfirmingDelete(
+                                                                          null
+                                                                        );
+                                                                      }}
+                                                                    >
+                                                                      Yes
+                                                                    </button>
+                                                                    <button
+                                                                      className="px-2 py-1 rounded-lg text-xs font-bold"
+                                                                      style={{
+                                                                        background:
+                                                                          "#e2e8f0",
+                                                                        color:
+                                                                          "#64748b",
+                                                                      }}
+                                                                      onClick={() =>
+                                                                        setConfirmingDelete(
+                                                                          null
+                                                                        )
+                                                                      }
+                                                                    >
+                                                                      No
+                                                                    </button>
+                                                                  </>
+                                                                ) : (
+                                                                  <>
+                                                                    <button
+                                                                      className="px-2 py-1 rounded-lg text-xs font-bold transition-all hover:scale-105"
+                                                                      style={{
+                                                                        background:
+                                                                          "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
+                                                                        color:
+                                                                          "#ffffff",
+                                                                      }}
+                                                                      onClick={() => {
+                                                                        setEditingComment(
+                                                                          {
+                                                                            cheerId:
+                                                                              cheer.cheer_id,
+                                                                            commentId:
+                                                                              comment._id,
+                                                                          }
+                                                                        );
+                                                                        setEditCommentText(
+                                                                          comment.comment
+                                                                        );
+                                                                      }}
+                                                                    >
+                                                                      Edit
+                                                                    </button>
+                                                                    <button
+                                                                      className="px-2 py-1 rounded-lg text-xs font-bold transition-all hover:scale-105"
+                                                                      style={{
+                                                                        background:
+                                                                          "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+                                                                        color:
+                                                                          "#ffffff",
+                                                                      }}
+                                                                      onClick={() =>
+                                                                        setConfirmingDelete(
+                                                                          {
+                                                                            cheerId:
+                                                                              cheer.cheer_id,
+                                                                            commentId:
+                                                                              comment._id,
+                                                                          }
+                                                                        )
+                                                                      }
+                                                                    >
+                                                                      Delete
+                                                                    </button>
+                                                                  </>
+                                                                )}
+                                                              </div>
+                                                            )}
+                                                        </div>
                                                       </div>
-                                                    )}
-                                                </div>
-                                              );
-                                            })}
-                                            {commentData.hasMore && (
-                                              <button
-                                                className="w-full py-2 text-xs font-semibold rounded-lg transition-all duration-200 hover:bg-white"
-                                                style={{
-                                                  color: "#0097b2",
-                                                  fontFamily:
-                                                    "Avenir, sans-serif",
-                                                }}
-                                                onClick={() =>
-                                                  fetchComments(
-                                                    cheer.cheer_id,
-                                                    true
-                                                  )
+                                                    </div>
+                                                  );
                                                 }
-                                                disabled={loadingComments}
-                                              >
-                                                {loadingComments
-                                                  ? "Loading..."
-                                                  : "Load more comments"}
-                                              </button>
-                                            )}
-                                          </>
-                                        );
-                                      } else {
-                                        return (
-                                          <p
-                                            className="text-xs text-center py-4 font-medium"
-                                            style={{
-                                              color: "#94a3b8",
-                                              fontFamily: "Avenir, sans-serif",
-                                            }}
-                                          >
-                                            No comments yet. Be the first to
-                                            comment!
-                                          </p>
-                                        );
-                                      }
-                                    })()
-                                  )}
+                                              )}
+                                              {commentData.hasMore && (
+                                                <button
+                                                  className="w-full py-2 text-sm font-bold rounded-xl transition-all hover:scale-105"
+                                                  style={{
+                                                    color: "#0097b2",
+                                                    background: "#f8fafc",
+                                                    border: "1px solid #e2e8f0",
+                                                    fontFamily:
+                                                      "Avenir, sans-serif",
+                                                  }}
+                                                  onClick={() =>
+                                                    fetchComments(
+                                                      cheer.cheer_id,
+                                                      true
+                                                    )
+                                                  }
+                                                >
+                                                  Load more
+                                                </button>
+                                              )}
+                                            </>
+                                          );
+                                        } else {
+                                          return (
+                                            <p
+                                              className="text-sm text-center py-4"
+                                              style={{
+                                                color: "#94a3b8",
+                                                fontFamily:
+                                                  "Avenir, sans-serif",
+                                              }}
+                                            >
+                                              No comments yet
+                                            </p>
+                                          );
+                                        }
+                                      })()
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Date stamp */}
+                          <div
+                            className="absolute bottom-3 right-4 text-xs font-medium px-2 py-1 rounded-lg"
+                            style={{
+                              backgroundColor: "rgba(255, 255, 255, 0.9)",
+                              color: "#94a3b8",
+                              fontFamily: "Avenir, sans-serif",
+                            }}
+                          >
+                            {formatFullDateTime(
+                              cheer.createdAt || cheer.posted_at
                             )}
                           </div>
                         </div>
@@ -1935,15 +1902,12 @@ const CheerPage = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="p-12 text-center">
-                    <div className="mb-4">
-                      <HeartIcon
-                        className="w-12 h-12 mx-auto mb-3"
-                        style={{ color: "#94a3b8" }}
-                      />
+                  <div className="p-16 text-center">
+                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                      <HeartIcon className="w-10 h-10 text-gray-400" />
                     </div>
                     <h3
-                      className="text-lg font-bold mb-2"
+                      className="text-xl font-bold mb-2"
                       style={{
                         color: "#64748b",
                         fontFamily: "Avenir, sans-serif",
@@ -1958,38 +1922,39 @@ const CheerPage = () => {
                         fontFamily: "Avenir, sans-serif",
                       }}
                     >
-                      Be the first to spread some positivity! 🌟
+                      Be the first to spread positivity! 🌟
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* Pagination Controls */}
+              {/* Pagination */}
               {totalPages > 1 && (
                 <div
-                  className="px-4 sm:px-6 py-3 sm:py-4 border-t-2"
-                  style={{ borderColor: "#b3e0f2" }}
+                  className="px-6 py-4 border-t border-gray-200"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                  }}
                 >
-                  <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2">
-                    {/* Previous button */}
+                  <div className="flex items-center justify-center gap-2">
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 w-full sm:w-auto"
+                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md"
                       style={{
-                        backgroundColor:
-                          currentPage === 1 ? "#f1f5f9" : "#0097b2",
+                        background:
+                          currentPage === 1
+                            ? "#f1f5f9"
+                            : "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
                         color: currentPage === 1 ? "#64748b" : "#ffffff",
                         fontFamily: "Avenir, sans-serif",
-                        border:
-                          currentPage === 1 ? "1px solid #e2e8f0" : "none",
                       }}
                     >
                       Previous
                     </button>
 
-                    {/* Page numbers */}
-                    <div className="flex items-center space-x-1">
+                    <div className="flex gap-1">
                       {Array.from(
                         { length: Math.min(5, totalPages) },
                         (_, i) => {
@@ -2008,22 +1973,22 @@ const CheerPage = () => {
                             <button
                               key={pageNum}
                               onClick={() => handlePageChange(pageNum)}
-                              disabled={currentPage === pageNum}
-                              className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95 disabled:cursor-not-allowed ${
-                                currentPage === pageNum
-                                  ? "text-white"
-                                  : "text-gray-700"
-                              }`}
+                              className="w-10 h-10 rounded-xl text-sm font-bold transition-all duration-200 hover:scale-110 active:scale-95 shadow-md"
                               style={{
-                                backgroundColor:
+                                background:
                                   currentPage === pageNum
-                                    ? "#0097b2"
-                                    : "#f1f5f9",
+                                    ? "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)"
+                                    : "#ffffff",
+                                color:
+                                  currentPage === pageNum
+                                    ? "#ffffff"
+                                    : "#475569",
                                 fontFamily: "Avenir, sans-serif",
-                                border:
+                                border: `1px solid ${
                                   currentPage === pageNum
-                                    ? "none"
-                                    : "1px solid #e2e8f0",
+                                    ? "transparent"
+                                    : "#e2e8f0"
+                                }`,
                               }}
                             >
                               {pageNum}
@@ -2033,21 +1998,18 @@ const CheerPage = () => {
                       )}
                     </div>
 
-                    {/* Next button */}
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 w-full sm:w-auto"
+                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md"
                       style={{
-                        backgroundColor:
-                          currentPage === totalPages ? "#f1f5f9" : "#0097b2",
+                        background:
+                          currentPage === totalPages
+                            ? "#f1f5f9"
+                            : "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
                         color:
                           currentPage === totalPages ? "#64748b" : "#ffffff",
                         fontFamily: "Avenir, sans-serif",
-                        border:
-                          currentPage === totalPages
-                            ? "1px solid #e2e8f0"
-                            : "none",
                       }}
                     >
                       Next
@@ -2057,31 +2019,29 @@ const CheerPage = () => {
               )}
             </div>
 
-            {/* Enhanced Leaderboard with Header */}
+            {/* ENHANCED LEADERBOARD */}
             <div
-              className="rounded-2xl shadow-lg p-4 sm:p-6 transition-all duration-300 hover:shadow-xl"
+              className="rounded-3xl shadow-2xl p-6 transition-all duration-300 hover:shadow-3xl"
               style={{
-                background:
-                  "linear-gradient(135deg, #e0f7fa 70%, #b3e0f2 100%)",
-                border: "2px solid #b3e0f2",
-                boxShadow: "0 10px 25px rgba(0, 151, 178, 0.10)",
+                background: "#ffffff",
+                border: "1px solid #e2e8f0",
               }}
             >
-              {/* Leaderboard Header with Buttons */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-5 gap-3 sm:gap-0">
-                <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+                <div className="flex items-center space-x-3">
                   <div
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110"
                     style={{
                       background:
-                        "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
+                        "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
                     }}
                   >
-                    <TrophyIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                    <TrophyIcon className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h2
-                      className="text-xs sm:text-sm lg:text-base font-bold truncate"
+                      className="text-2xl font-black"
                       style={{
                         color: "#1a0202",
                         fontFamily: "Avenir, sans-serif",
@@ -2089,24 +2049,35 @@ const CheerPage = () => {
                     >
                       Leaderboard
                     </h2>
+                    <p
+                      className="text-sm"
+                      style={{
+                        color: "#64748b",
+                        fontFamily: "Avenir, sans-serif",
+                      }}
+                    >
+                      Top performers
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex space-x-2">
+                {/* Period Tabs */}
+                <div className="flex gap-2">
                   {["weekly", "monthly", "alltime"].map((period) => (
                     <button
                       key={period}
                       onClick={() => setActiveTab(period)}
-                      className={`px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 hover:scale-105 active:scale-95`}
+                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md"
                       style={{
-                        backgroundColor:
-                          activeTab === period ? "#0097b2" : "#f1f5f9",
+                        background:
+                          activeTab === period
+                            ? "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)"
+                            : "#f8fafc",
                         color: activeTab === period ? "#ffffff" : "#64748b",
                         fontFamily: "Avenir, sans-serif",
-                        boxShadow:
-                          activeTab === period
-                            ? "0 2px 8px rgba(0, 151, 178, 0.3)"
-                            : "none",
+                        border: `1px solid ${
+                          activeTab === period ? "transparent" : "#e2e8f0"
+                        }`,
                       }}
                     >
                       {period === "alltime"
@@ -2117,224 +2088,254 @@ const CheerPage = () => {
                 </div>
               </div>
 
-              {/* Current User Position - Always Show */}
+              {/* Current User Position */}
               {user && currentUserLeaderboard && (
-                <div className="mb-4">
-                  <div className="text-sm text-gray-500 mb-2">
-                    Your Current Position
-                  </div>
-                  <div
-                    className="flex items-center space-x-2 sm:space-x-3 p-3 sm:p-4 rounded-xl transition-all duration-200 hover:scale-[1.02]"
-                    style={{
-                      backgroundColor: "#fafafa",
-                      border: "1px solid #e0e7ef",
-                      boxShadow:
-                        "0 4px 16px 0 rgba(52, 211, 153, 0.10), 0 1.5px 4px 0 rgba(96, 165, 250, 0.10)",
-                    }}
-                  >
-                    <div
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold text-sm sm:text-base shadow-sm flex-shrink-0"
-                      style={{
-                        background:
-                          currentUserLeaderboard.rank === 1
-                            ? "linear-gradient(135deg, #FFD700 0%, #FFF8DC 25%, #FFD700 50%, #B8860B 75%, #FFD700 100%)"
-                            : currentUserLeaderboard.rank === 2
-                            ? "linear-gradient(135deg, #C0C0C0 0%, #F8F8FF 25%, #C0C0C0 50%, #808080 75%, #C0C0C0 100%)"
-                            : currentUserLeaderboard.rank === 3
-                            ? "linear-gradient(135deg, #CD7F32 0%, #DEB887 25%, #CD7F32 50%, #8B4513 75%, #CD7F32 100%)"
-                            : "#f1f5f9",
-                        color:
-                          currentUserLeaderboard.rank <= 3
-                            ? "#ffffff"
-                            : "#0097b2",
-                        textShadow:
-                          currentUserLeaderboard.rank <= 3
-                            ? "0 2px 4px rgba(0, 0, 0, 0.5)"
-                            : "none",
-                      }}
-                    >
-                      {currentUserLeaderboard.rank}
-                    </div>
-                    <img
-                      src={
-                        currentUserLeaderboard.info?.avatar ||
-                        defaultAvatar
-                      }
-                      alt={currentUserLeaderboard.info?.name}
-                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl ring-1 ring-gray-200 flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm sm:text-base truncate">
-                        {currentUserLeaderboard.info?.name ||
-                          user.first_name + " " + user.last_name}
-                      </p>
-                    </div>
-                    <span className="font-bold text-sm sm:text-base">
-                      {currentUserLeaderboard.info?.totalPoints ||
-                        currentUserLeaderboard.totalPoints ||
-                        0}{" "}
-                      received
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Separator */}
-              <div
-                className="h-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent my-6"
-                style={{
-                  height: "2px",
-                  background:
-                    "linear-gradient(to right, transparent, #e2e8f0 20%, #e2e8f0 80%, transparent)",
-                }}
-              ></div>
-
-              {/* Main Leaderboard */}
-              <>
-                {leaderboardLoading ? (
-                  <div className="text-center py-8">
-                    <div className="relative mb-4">
-                      <div
-                        className="animate-spin rounded-full h-10 w-10 border-4 border-transparent border-t-4 mx-auto"
-                        style={{ borderTopColor: "#0097b2" }}
-                      ></div>
-                      <TrophyIcon
-                        className="w-5 h-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                        style={{ color: "#0097b2" }}
-                      />
-                    </div>
+                <>
+                  <div className="mb-4">
                     <p
-                      className="text-base font-medium"
+                      className="text-sm font-bold mb-2"
                       style={{
                         color: "#64748b",
                         fontFamily: "Avenir, sans-serif",
                       }}
                     >
-                      Loading leaderboard...
+                      Your Position
                     </p>
-                  </div>
-                ) : leaderboard.length > 0 ? (
-                  <div
-                    className="space-y-3 max-h-96 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 pr-2"
-                    style={{
-                      scrollbarWidth: "thin",
-                      scrollbarColor: "#d1d5db #f3f4f6",
-                    }}
-                  >
-                    {/* Show complete leaderboard without filtering */}
-                    {leaderboard
-                      .slice(0, showMoreLeaderboard ? 10 : 3)
-                      .map((entry) => (
-                        <div
-                          key={entry._id || entry.userId || entry.user_id}
-                          className="flex items-center space-x-2 sm:space-x-3 p-3 sm:p-4 rounded-xl transition-all duration-200 hover:scale-[1.02]"
+                    <div
+                      className="flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 hover:scale-[1.02]"
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+                        border: "2px solid #fbbf24",
+                      }}
+                    >
+                      <div
+                        className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shadow-lg"
+                        style={{
+                          background:
+                            currentUserLeaderboard.rank === 1
+                              ? "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)"
+                              : currentUserLeaderboard.rank === 2
+                              ? "linear-gradient(135deg, #C0C0C0 0%, #808080 100%)"
+                              : currentUserLeaderboard.rank === 3
+                              ? "linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)"
+                              : "linear-gradient(135deg, #94a3b8 0%, #64748b 100%)",
+                          color: "#ffffff",
+                          textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
+                        }}
+                      >
+                        {currentUserLeaderboard.rank}
+                      </div>
+                      <img
+                        src={
+                          currentUserLeaderboard.info?.avatar ||
+                          "/images/default-avatar.png"
+                        }
+                        alt={currentUserLeaderboard.info?.name}
+                        className="w-12 h-12 rounded-xl ring-2 ring-white"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="font-bold text-base truncate"
                           style={{
-                            backgroundColor: "#faf8ef",
-                            border: "1px solid #f0e68c",
+                            color: "#92400e",
+                            fontFamily: "Avenir, sans-serif",
                           }}
                         >
-                          <div
-                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold text-sm sm:text-base shadow-lg flex-shrink-0"
-                            style={{
-                              background:
-                                entry.rank === 1
-                                  ? "linear-gradient(135deg, #FFD700 0%, #FFF8DC 25%, #FFD700 50%, #B8860B 75%, #FFD700 100%)"
-                                  : entry.rank === 2
-                                  ? "linear-gradient(135deg, #C0C0C0 0%, #F8F8FF 25%, #C0C0C0 50%, #808080 75%, #C0C0C0 100%)"
-                                  : entry.rank === 3
-                                  ? "linear-gradient(135deg, #CD7F32 0%, #DEB887 25%, #CD7F32 50%, #8B4513 75%, #CD7F32 100%)"
-                                  : "linear-gradient(135deg, #8B4513 0%, #A0522D 100%)",
-                              color: "#ffffff",
-                              textShadow:
-                                entry.rank <= 3
-                                  ? "0 2px 4px rgba(0, 0, 0, 0.5)"
-                                  : "0 1px 2px rgba(0, 0, 0, 0.3)",
-                              boxShadow:
-                                entry.rank <= 3
-                                  ? "0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)"
-                                  : "none",
-                            }}
-                          >
-                            {entry.rank}
-                          </div>
-                          <img
-                            src={entry.avatar || defaultAvatar}
-                            alt={entry.name || entry.userName}
-                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl ring-2 ring-gray-200 flex-shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p
-                              className="font-bold text-sm sm:text-base truncate"
-                              style={{
-                                color: "#1a0202",
-                                fontFamily: "Avenir, sans-serif",
-                              }}
-                            >
-                              {entry.name || entry.userName}
-                            </p>
-                          </div>
-                          <span
-                            className="font-black text-base sm:text-lg px-2 sm:px-3 py-1 rounded-lg flex-shrink-0"
+                          {currentUserLeaderboard.info?.name ||
+                            user.first_name + " " + user.last_name}
+                        </p>
+                      </div>
+                      <span
+                        className="font-black text-lg"
+                        style={{
+                          color: "#92400e",
+                          fontFamily: "Avenir, sans-serif",
+                        }}
+                      >
+                        {currentUserLeaderboard.info?.totalPoints ||
+                          currentUserLeaderboard.totalPoints ||
+                          0}{" "}
+                        received
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div
+                    className="h-px my-6"
+                    style={{
+                      background:
+                        "linear-gradient(to right, transparent, #e2e8f0 20%, #e2e8f0 80%, transparent)",
+                    }}
+                  ></div>
+                </>
+              )}
+
+              {/* Leaderboard List */}
+              {leaderboardLoading ? (
+                <div className="text-center py-12">
+                  <div className="relative w-16 h-16 mx-auto mb-6">
+                    <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
+                    <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-yellow-500 border-r-orange-500 animate-spin"></div>
+                  </div>
+                  <p
+                    className="text-base font-medium"
+                    style={{
+                      color: "#64748b",
+                      fontFamily: "Avenir, sans-serif",
+                    }}
+                  >
+                    Loading leaderboard...
+                  </p>
+                </div>
+              ) : leaderboard.length > 0 ? (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {leaderboard
+                    .slice(0, showMoreLeaderboard ? 10 : 3)
+                    .map((entry) => (
+                      <div
+                        key={entry._id || entry.userId || entry.user_id}
+                        className="group flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                          border: "1px solid #e2e8f0",
+                        }}
+                      >
+                        {/* Rank Badge */}
+                        <div
+                          className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shadow-lg transform transition-transform duration-300 group-hover:scale-110"
+                          style={{
+                            background:
+                              entry.rank === 1
+                                ? "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)"
+                                : entry.rank === 2
+                                ? "linear-gradient(135deg, #C0C0C0 0%, #808080 100%)"
+                                : entry.rank === 3
+                                ? "linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)"
+                                : "linear-gradient(135deg, #94a3b8 0%, #64748b 100%)",
+                            color: "#ffffff",
+                            textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
+                          }}
+                        >
+                          {entry.rank}
+                        </div>
+
+                        {/* Avatar */}
+                        <img
+                          src={entry.avatar || "/images/default-avatar.png"}
+                          alt={entry.name || entry.userName}
+                          className="w-12 h-12 rounded-xl ring-2 ring-gray-200 transition-transform duration-300 group-hover:scale-110"
+                        />
+
+                        {/* Name */}
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="font-bold text-base truncate"
                             style={{
                               color: "#1a0202",
-                              backgroundColor: "transparent",
                               fontFamily: "Avenir, sans-serif",
                             }}
                           >
-                            {entry.totalPoints || entry.total_earned} received
-                          </span>
+                            {entry.name || entry.userName}
+                          </p>
+                          {entry.rank <= 3 && (
+                            <p
+                              className="text-xs font-semibold"
+                              style={{
+                                color: "#64748b",
+                                fontFamily: "Avenir, sans-serif",
+                              }}
+                            >
+                              {entry.rank === 1
+                                ? "🥇 Champion"
+                                : entry.rank === 2
+                                ? "🥈 Runner-up"
+                                : "🥉 3rd Place"}
+                            </p>
+                          )}
                         </div>
-                      ))}
 
-                    {/* Show More/Less Button */}
-                    {leaderboard.length > 3 && (
-                      <div className="flex justify-center pt-3">
-                        <button
-                          onClick={() =>
-                            setShowMoreLeaderboard(!showMoreLeaderboard)
-                          }
-                          className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
-                          style={{
-                            backgroundColor: "#f9f6e8",
-                            color: "#0097b2",
-                            fontFamily: "Avenir, sans-serif",
-                            border: "1px solid #f0e68c",
-                          }}
-                        >
-                          {showMoreLeaderboard ? "Show Less" : "Show More"}
-                        </button>
+                        {/* Points */}
+                        <div className="text-right">
+                          <div
+                            className="font-black text-lg"
+                            style={{
+                              color:
+                                entry.rank === 1
+                                  ? "#f59e0b"
+                                  : entry.rank === 2
+                                  ? "#94a3b8"
+                                  : entry.rank === 3
+                                  ? "#92400e"
+                                  : "#64738b",
+                              fontFamily: "Avenir, sans-serif",
+                            }}
+                          >
+                            {entry.totalPoints || entry.total_earned}
+                          </div>
+                          <div
+                            className="text-xs font-semibold"
+                            style={{
+                              color: "#94a3b8",
+                              fontFamily: "Avenir, sans-serif",
+                            }}
+                          >
+                            received
+                          </div>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <TrophyIcon
-                      className="w-12 h-12 mx-auto mb-4"
-                      style={{ color: "#94a3b8" }}
-                    />
-                    <h3
-                      className="text-lg font-bold mb-2"
+                    ))}
+
+                  {/* Show More/Less Button */}
+                  {leaderboard.length > 3 && (
+                    <button
+                      onClick={() =>
+                        setShowMoreLeaderboard(!showMoreLeaderboard)
+                      }
+                      className="w-full py-3 rounded-xl text-sm font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md mt-4"
                       style={{
-                        color: "#64748b",
+                        background:
+                          "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+                        color: "#0097b2",
                         fontFamily: "Avenir, sans-serif",
+                        border: "1px solid #e2e8f0",
                       }}
                     >
-                      No leaderboard data available
-                    </h3>
-                    <p
-                      className="text-base"
-                      style={{
-                        color: "#94a3b8",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Start sending cheers to see rankings! 🏆
-                    </p>
+                      {showMoreLeaderboard ? "↑ Show Less" : "↓ Show More"}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <TrophyIcon className="w-10 h-10 text-gray-400" />
                   </div>
-                )}
-              </>
+                  <h3
+                    className="text-xl font-bold mb-2"
+                    style={{
+                      color: "#64748b",
+                      fontFamily: "Avenir, sans-serif",
+                    }}
+                  >
+                    No rankings yet
+                  </h3>
+                  <p
+                    className="text-base"
+                    style={{
+                      color: "#94a3b8",
+                      fontFamily: "Avenir, sans-serif",
+                    }}
+                  >
+                    Start sending cheers to see who's on top! 🏆
+                  </p>
+                </div>
+              )}
             </div>
           </div>
+          {/* End of right column */}
+          {/* last */}
         </div>
       </div>
     </div>

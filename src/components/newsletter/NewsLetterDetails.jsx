@@ -1,16 +1,10 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Helmet } from "react-helmet-async";
-
 import MobileNav from "../../components/home/MobileNav";
 import TabletNav from "../../components/home/TabletNav";
 import DesktopNav from "../../components/home/DesktopNav";
 import Footer from "../footer/Footer";
-import BackToTop from "../buttons/BackToTop";
 import BackButton from "../buttons/BackButton";
-
-import React from "react";
-import api from "../../utils/axios";
 import LoadingArticleDetails from "../loader/LoadingArticleDetails";
 import formatTimestamp from "../../utils/formatTimestamp";
 import { readingTime } from "reading-time-estimator";

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 
-const Carousel = ({ images, isButtonOutside }) => {
+const Carousel = ({ images = [], isButtonOutside }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // console.log(images)
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
   };

@@ -517,193 +517,303 @@ const PointsDashboard = () => {
         <div className="flex items-center justify-between">
           {/* Header content can be added here if needed in the future */}
         </div>
-
         {/* Points Overview Cards */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Current Balance */}
+          {/* Current Balance - Blue (Trust, Stability) */}
           <div
-            className="rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
+            className="group relative rounded-xl p-6 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 overflow-hidden cursor-pointer"
             style={{
               background: "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
               borderRadius: "18px",
             }}
           >
-            <div className="flex items-center justify-between">
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background:
+                  "radial-gradient(circle at top right, rgba(59, 130, 246, 0.15) 0%, transparent 70%)",
+              }}
+            />
+
+            <div className="relative flex items-center justify-between">
               <div>
                 <p
-                  className="text-sm font-medium"
+                  className="text-sm font-bold mb-2 "
                   style={{ color: "#1e40af", fontFamily: "Avenir, sans-serif" }}
                 >
                   Current Balance
                 </p>
                 <p
-                  className="text-3xl font-bold"
+                  className="text-4xl font-black mb-1 transition-all duration-300 group-hover:scale-110 lg:text-md"
                   style={{
                     color: "#1e40af",
                     fontFamily: "Avenir, sans-serif",
-                    fontWeight: "800",
+                    fontWeight: "900",
                   }}
                 >
                   {pointsData?.data?.currentBalance || 0}
                 </p>
                 <p
-                  className="text-xs opacity-80"
+                  className="text-xs font-semibold opacity-80"
                   style={{ color: "#1e40af", fontFamily: "Avenir, sans-serif" }}
                 >
                   Points
                 </p>
               </div>
-              {/* Star icon for balance */}
-              <StarIconSolid
-                className="w-12 h-12"
-                style={{ color: "#1e40af" }}
-              />
+              <div className="relative">
+                <div className="absolute inset-0 bg-blue-400 rounded-full opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <StarIconSolid
+                  className="w-14 h-14 relative transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 lg:hidden 2xl:inline"
+                  style={{ color: "#1e40af" }}
+                />
+              </div>
             </div>
+
+            <div
+              className="absolute bottom-0 left-0 right-0 h-1 transition-all duration-500 group-hover:h-1.5"
+              style={{
+                background: "linear-gradient(90deg, #3b82f6 0%, #1e40af 100%)",
+              }}
+            />
           </div>
 
-          {/* Heartbits Remaining */}
+          {/* Heartbits Remaining - Pink/Rose (Emotional, Giving) */}
           <div
-            className="rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
+            className="group relative rounded-xl p-6 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 overflow-hidden cursor-pointer"
             style={{
-              background: "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)",
+              background: "linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)",
               borderRadius: "18px",
             }}
           >
-            <div className="flex items-center justify-between">
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background:
+                  "radial-gradient(circle at top right, rgba(236, 72, 153, 0.15) 0%, transparent 70%)",
+              }}
+            />
+
+            <div className="relative flex items-center justify-between">
               <div>
                 <p
-                  className="text-sm font-medium"
-                  style={{ color: "#059669", fontFamily: "Avenir, sans-serif" }}
+                  className="text-sm font-bold mb-2"
+                  style={{ color: "#be185d", fontFamily: "Avenir, sans-serif" }}
                 >
                   Heartbits Remaining
                 </p>
                 <p
-                  className="text-3xl font-bold"
+                  className="text-4xl font-black mb-1 transition-all duration-300 group-hover:scale-110"
                   style={{
-                    color: "#059669",
+                    color: "#be185d",
                     fontFamily: "Avenir, sans-serif",
-                    fontWeight: "800",
+                    fontWeight: "900",
                   }}
                 >
                   {(pointsData?.data?.monthlyCheerLimit || 100) -
                     (pointsData?.data?.monthlyCheerUsed || 0)}
                 </p>
                 <p
-                  className="text-xs opacity-80"
-                  style={{ color: "#059669", fontFamily: "Avenir, sans-serif" }}
+                  className="text-xs font-semibold opacity-80"
+                  style={{ color: "#be185d", fontFamily: "Avenir, sans-serif" }}
                 >
                   This Month
                 </p>
               </div>
-              <HeartIconSolid
-                className="w-12 h-12"
-                style={{ color: "#059669" }}
-              />
+              <div className="relative">
+                <div className="absolute inset-0 bg-pink-400 rounded-full opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <HeartIconSolid
+                  className="w-14 h-14 relative transition-transform duration-300 group-hover:scale-110 group-hover:animate-pulse lg:hidden 2xl:inline"
+                  style={{ color: "#be185d" }}
+                />
+              </div>
             </div>
+
+            <div
+              className="absolute bottom-0 left-0 right-0 h-1 transition-all duration-500 group-hover:h-1.5"
+              style={{
+                background: "linear-gradient(90deg, #ec4899 0%, #be185d 100%)",
+              }}
+            />
           </div>
 
-          {/* Total Earned */}
+          {/* Total Earned - Green (Growth, Success) */}
           <div
-            className="rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
+            className="group relative rounded-xl p-6 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 overflow-hidden cursor-pointer"
             style={{
-              background: "linear-gradient(135deg, #fed7aa 0%, #fdba74 100%)",
+              background: "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)",
               borderRadius: "18px",
             }}
           >
-            <div className="flex items-center justify-between">
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background:
+                  "radial-gradient(circle at top right, rgba(16, 185, 129, 0.15) 0%, transparent 70%)",
+              }}
+            />
+
+            <div className="relative flex items-center justify-between">
               <div>
                 <p
-                  className="text-sm font-medium"
-                  style={{ color: "#92400e", fontFamily: "Avenir, sans-serif" }}
+                  className="text-sm font-bold mb-2 lg:whitespace-normal"
+                  style={{ color: "#065f46", fontFamily: "Avenir, sans-serif" }}
                 >
-                  Total Earned
+                  Total{" "}
+                  <span className="hidden lg:inline xl:hidden">
+                    <br />
+                  </span>
+                  Earned
                 </p>
+
                 <p
-                  className="text-3xl font-bold"
+                  className="text-4xl font-black mb-1 transition-all duration-300 group-hover:scale-110"
                   style={{
-                    color: "#92400e",
+                    color: "#065f46",
                     fontFamily: "Avenir, sans-serif",
-                    fontWeight: "800",
+                    fontWeight: "900",
                   }}
                 >
                   {pointsData?.data?.totalEarned || 0}
                 </p>
                 <p
-                  className="text-xs opacity-80"
-                  style={{ color: "#92400e", fontFamily: "Avenir, sans-serif" }}
+                  className="text-xs font-semibold opacity-80"
+                  style={{ color: "#065f46", fontFamily: "Avenir, sans-serif" }}
                 >
                   All Time
                 </p>
               </div>
-              <TrophyIcon className="w-12 h-12" style={{ color: "#92400e" }} />
+              <div className="relative">
+                <div className="absolute inset-0 bg-green-400 rounded-full opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <TrophyIcon
+                  className="w-14 h-14 relative transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-12 lg:hidden 2xl:inline"
+                  style={{ color: "#065f46" }}
+                />
+              </div>
             </div>
+
+            <div
+              className="absolute bottom-0 left-0 right-0 h-1 transition-all duration-500 group-hover:h-1.5"
+              style={{
+                background: "linear-gradient(90deg, #10b981 0%, #065f46 100%)",
+              }}
+            />
           </div>
 
-          {/* Total Spent */}
+          {/* Total Spent - Orange/Amber (Active, Neutral) */}
           <div
-            className="rounded-xl p-6 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
+            className="group relative rounded-xl p-6 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 overflow-hidden cursor-pointer"
             style={{
-              background: "linear-gradient(135deg, #fecaca 0%, #fca5a5 100%)",
+              background: "linear-gradient(135deg, #fed7aa 0%, #fdba74 100%)",
               borderRadius: "18px",
             }}
           >
-            <div className="flex items-center justify-between">
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background:
+                  "radial-gradient(circle at top right, rgba(251, 146, 60, 0.15) 0%, transparent 70%)",
+              }}
+            />
+
+            <div className="relative flex items-center justify-between">
               <div>
                 <p
-                  className="text-sm font-medium"
-                  style={{ color: "#dc2626", fontFamily: "Avenir, sans-serif" }}
+                  className="text-sm font-bold mb-2 lg:whitespace-normal xl:whitespace-nowrap"
+                  style={{ color: "#92400e", fontFamily: "Avenir, sans-serif" }}
                 >
-                  Total Spent
+                  Total{" "}
+                  <span className="hidden lg:inline xl:hidden">
+                    <br />
+                  </span>
+                  Spent
                 </p>
+
                 <p
-                  className="text-3xl font-bold"
+                  className="text-4xl font-black mb-1 transition-all duration-300 group-hover:scale-110"
                   style={{
-                    color: "#dc2626",
+                    color: "#92400e",
                     fontFamily: "Avenir, sans-serif",
-                    fontWeight: "800",
+                    fontWeight: "900",
                   }}
                 >
                   {pointsData?.data?.totalSpent || 0}
                 </p>
                 <p
-                  className="text-xs opacity-80"
-                  style={{ color: "#dc2626", fontFamily: "Avenir, sans-serif" }}
+                  className="text-xs font-semibold opacity-80"
+                  style={{ color: "#92400e", fontFamily: "Avenir, sans-serif" }}
                 >
                   Points
                 </p>
               </div>
-              <GiftIcon className="w-12 h-12" style={{ color: "#dc2626" }} />
+              <div className="relative">
+                <div className="absolute inset-0 bg-orange-400 rounded-full opacity-20 blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <GiftIcon
+                  className="w-14 h-14 relative transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12 lg:hidden 2xl:inline"
+                  style={{ color: "#92400e" }}
+                />
+              </div>
             </div>
+
+            <div
+              className="absolute bottom-0 left-0 right-0 h-1 transition-all duration-500 group-hover:h-1.5"
+              style={{
+                background: "linear-gradient(90deg, #fb923c 0%, #92400e 100%)",
+              }}
+            />
           </div>
         </div>
-
         {/* Recent Activity */}
-        <div
-          className="rounded-xl shadow-sm transactions-section"
-          style={{
-            background: "linear-gradient(135deg, #e0f7fa 70%, #b3e0f2 100%)",
-            border: "2px solid #b3e0f2",
-          }}
-        >
+        {/* Replace */}
+        <div className="rounded-3xl overflow-hidden bg-gradient-to-br from-white via-gray-50 to-slate-100 shadow-2xl border border-white/20 backdrop-blur-xl transactions-section">
+          {/* Animated Header with Gradient */}
+          <div className="relative px-6 py-5 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10"></div>
+            <div className="absolute inset-0 bg-grid-white/[0.05]"></div>
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-8 bg-gradient-to-b from-cyan-500 to-blue-600 rounded-full"></div>
+                <h2
+                  className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900"
+                  style={{ fontFamily: "Avenir, sans-serif" }}
+                >
+                  Recent Activity
+                </h2>
+              </div>
+              <div className="px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-200/50">
+                <p
+                  className="text-xs font-bold text-cyan-600"
+                  style={{ fontFamily: "Avenir, sans-serif" }}
+                >
+                  {filteredTransactions.length} transactions
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Transactions List with Stagger Animation */}
           <div
             style={{
-              borderColor: "#b3e0f2",
               maxHeight: "600px",
               overflowY: "auto",
             }}
-            className="divide-y"
+            className="p-5 space-y-3"
           >
-            {/* divide-gray-200 replaced with inline style */}
             {historyLoading ? (
-              <div className="p-6 text-center">
-                <div
-                  className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"
-                  style={{ borderColor: "#0097b2" }}
-                ></div>
+              <div className="p-16 text-center">
+                <div className="relative w-16 h-16 mx-auto mb-6">
+                  <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
+                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-cyan-500 border-r-blue-500 animate-spin"></div>
+                </div>
+                <p
+                  className="text-gray-500 text-sm font-medium"
+                  style={{ fontFamily: "Avenir, sans-serif" }}
+                >
+                  Loading your activity...
+                </p>
               </div>
             ) : filteredTransactions.length > 0 ? (
               filteredTransactions.map((transaction, index) => {
-                // Check if this is an admin transaction (grant or deduct)
                 const isAdminTransaction =
                   transaction.type === "admin_grant" ||
                   transaction.type === "admin_added" ||
@@ -713,10 +823,8 @@ const PointsDashboard = () => {
                   ? "Admin"
                   : transaction.related_user || "Unknown";
 
-                // Handle transaction descriptions
                 let displayDescription = transaction.description;
 
-                // For received transactions, show "Heartbits" instead of "points"
                 if (
                   transaction.type === "received" &&
                   transaction.description &&
@@ -728,7 +836,6 @@ const PointsDashboard = () => {
                   );
                 }
 
-                // For received transactions, show the actual sender name instead of "Admin"
                 if (
                   transaction.type === "received" &&
                   transaction.description &&
@@ -740,17 +847,14 @@ const PointsDashboard = () => {
                   );
                 }
 
-                // For given transactions, ensure proper description
                 if (transaction.type === "given" && !displayDescription) {
                   displayDescription = `Cheered ${transaction.amount} heartbits`;
                 }
 
-                // For received transactions, ensure proper description
                 if (transaction.type === "received" && !displayDescription) {
                   displayDescription = `Received ${transaction.amount} heartbits`;
                 }
 
-                // For admin transactions, ensure proper description
                 if (isAdminTransaction && !displayDescription) {
                   if (transaction.type === "admin_deduct") {
                     displayDescription = `Deducted ${Math.abs(
@@ -761,230 +865,232 @@ const PointsDashboard = () => {
                   }
                 }
 
+                const isNegative =
+                  transaction.type === "purchase" ||
+                  transaction.type === "given" ||
+                  transaction.type === "admin_deduct";
+
                 return (
                   <div
                     key={index}
-                    className="relative p-4"
+                    className="group relative rounded-2xl transition-all duration-500 hover:shadow-2xl hover:scale-[1.02] cursor-pointer"
                     style={{
                       background:
-                        "linear-gradient(135deg, #f8fafc 60%, #e0f7fa 100%)",
-                      borderTopLeftRadius: "0px",
-                      borderTopRightRadius: "18px",
-                      borderBottomLeftRadius: "18px",
-                      borderBottomRightRadius: "18px",
+                        "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)",
+                      border: "1px solid rgba(226,232,240,0.8)",
                       overflow: "hidden",
-                      border: "1.5px solid #e0e7ef",
+                      animation: `slideIn 0.5s ease-out ${index * 0.05}s both`,
                     }}
                   >
-                    {/* Shiny green accent bar */}
+                    {/* Animated gradient accent bar */}
                     <div
+                      className="absolute left-0 top-0 bottom-0 transition-all duration-500 group-hover:w-2"
                       style={{
-                        width: "8px",
-                        height: "80%",
-                        position: "absolute",
-                        left: "2px",
-                        top: "10%",
-                        borderTopLeftRadius: 0,
-                        borderBottomLeftRadius: 0,
-                        borderTopRightRadius: "10px",
-                        borderBottomRightRadius: "10px",
-                        background:
-                          "linear-gradient(135deg, #34d399 0%, #60a5fa 100%)",
+                        width: "3px",
+                        background: isNegative
+                          ? "linear-gradient(180deg, #f87171 0%, #dc2626 50%, #991b1b 100%)"
+                          : "linear-gradient(180deg, #34d399 0%, #10b981 50%, #059669 100%)",
+                        boxShadow: isNegative
+                          ? "0 0 20px rgba(248, 113, 113, 0.3)"
+                          : "0 0 20px rgba(52, 211, 153, 0.3)",
                       }}
                     />
+
+                    {/* Hover glow effect */}
                     <div
-                      className="flex items-center justify-between"
-                      style={{ marginLeft: "10px" }}
-                    >
-                      <div className="flex items-center gap-3">
-                        {isAdminTransaction ? (
-                          <img
-                            src={logoFs}
-                            alt="Admin"
-                            className="w-14 h-14 rounded-full object-cover"
-                            style={{ border: "2px solid #0097b2" }}
-                          />
-                        ) : transaction.related_user ? (
-                          <img
-                            src={getUserAvatar(transaction)}
-                            alt={transaction.related_user}
-                            className="w-14 h-14 rounded-full object-cover"
-                            style={{ border: "2px solid #0097b2" }}
-                          />
-                        ) : (
-                          <span
-                            style={{
-                              fontSize: "2rem",
-                              color: "#0097b2",
-                              fontWeight: 900,
-                            }}
-                          >
-                            +
-                          </span>
-                        )}
-                        <div>
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{
+                        background: `radial-gradient(circle at top left, ${
+                          isNegative
+                            ? "rgba(248, 113, 113, 0.05)"
+                            : "rgba(52, 211, 153, 0.05)"
+                        } 0%, transparent 70%)`,
+                      }}
+                    />
+
+                    <div className="relative p-5 pl-7 flex items-start justify-between gap-4">
+                      {/* Left side - Avatar and Details */}
+                      <div className="flex items-start gap-4 flex-1 min-w-0">
+                        {/* Avatar with ring animation */}
+                        <div className="flex-shrink-0 relative">
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-blue-500/20 blur-lg group-hover:blur-xl transition-all duration-500"></div>
+                          {isAdminTransaction ? (
+                            <div className="relative">
+                              <img
+                                src={logoFs}
+                                alt="Admin"
+                                className="w-16 h-16 rounded-2xl object-cover shadow-xl transition-transform duration-500 group-hover:scale-110"
+                                style={{ border: "3px solid #0097b2" }}
+                              />
+                              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-full border-3 border-white flex items-center justify-center shadow-lg">
+                                <span className="text-white text-xs font-black">
+                                  A
+                                </span>
+                              </div>
+                            </div>
+                          ) : transaction.related_user ? (
+                            <img
+                              src={getUserAvatar(transaction)}
+                              alt={transaction.related_user}
+                              className="w-16 h-16 rounded-2xl object-cover shadow-xl ring-2 ring-gray-200/50 transition-transform duration-500 group-hover:scale-110 group-hover:ring-4 group-hover:ring-cyan-300/50"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 flex items-center justify-center shadow-xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
+                              <span className="text-white text-3xl font-black">
+                                +
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Transaction Details */}
+                        <div className="flex-1 min-w-0">
                           <p
-                            className="font-medium"
-                            style={{
-                              color: "#1a0202",
-                              fontFamily: "Avenir, sans-serif",
-                            }}
+                            className="font-bold text-gray-900 text-base mb-1 truncate transition-colors duration-300 group-hover:text-cyan-600"
+                            style={{ fontFamily: "Avenir, sans-serif" }}
                           >
                             {displayDescription ||
-                              transaction.type
-                                .replace("_", " ")
-                                .toUpperCase()}{" "}
-                            {transaction.related_user && (
-                              <>
-                                {transaction.type === "given" ? "to" : "from"}{" "}
-                                <span className="text-primary">
-                                  {senderLabel}
-                                </span>
-                              </>
-                            )}
+                              transaction.type.replace("_", " ").toUpperCase()}
                           </p>
-
                           <p
-                            className="text-sm"
-                            style={{
-                              color: "#4a6e7e",
-                              fontFamily: "Avenir, sans-serif",
-                            }}
+                            className="text-sm text-gray-500 mb-3 flex items-center gap-2"
+                            style={{ fontFamily: "Avenir, sans-serif" }}
                           >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
                             {formatDateSafely(
                               transaction.createdAt || transaction.created_at
                             )}
                           </p>
-                          {/* Show message for admin transactions, and for received/given cheers if message exists */}
+
+                          {/* Premium message bubble */}
                           {(isAdminTransaction ||
                             (["received", "given"].includes(transaction.type) &&
                               transaction.message)) && (
-                            <div
-                              className="mt-1 px-2 py-1 inline-block"
-                              style={{
-                                backgroundColor: "#eff6ff",
-                                border: "1px solid #3b82f6",
-                                borderTopLeftRadius: "0px",
-                                borderTopRightRadius: "6px",
-                                borderBottomLeftRadius: "6px",
-                                borderBottomRightRadius: "6px",
-                              }}
-                            >
-                              <p
-                                className="text-sm"
+                            <div className="mt-3 inline-block max-w-full">
+                              <div
+                                className="px-4 py-2.5 rounded-2xl text-sm backdrop-blur-sm shadow-lg border transition-all duration-300 hover:scale-105"
                                 style={{
-                                  color: "#1e40af",
+                                  background:
+                                    "linear-gradient(135deg, rgba(239, 246, 255, 0.9) 0%, rgba(219, 234, 254, 0.9) 100%)",
+                                  border: "1px solid rgba(59, 130, 246, 0.3)",
                                   fontFamily: "Avenir, sans-serif",
                                 }}
                               >
-                                &ldquo;{transaction.message || ""}&rdquo;
-                              </p>
+                                <p className="text-blue-700 font-medium italic">
+                                  &ldquo;{transaction.message || ""}&rdquo;
+                                </p>
+                              </div>
                             </div>
                           )}
                         </div>
                       </div>
-                      {isAdminTransaction && (
-                        <div className="text-right">
-                          <p
-                            className="font-semibold"
+
+                      {/* Right side - Amount badge with premium styling */}
+                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        <div
+                          className="relative px-4 py-2 rounded-2xl font-black text-lg shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:shadow-2xl"
+                          style={{
+                            background: isNegative
+                              ? "linear-gradient(135deg, #fee2e2 0%, #fecaca 50%, #fca5a5 100%)"
+                              : "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 50%, #6ee7b7 100%)",
+                            color: isNegative ? "#991b1b" : "#065f46",
+                            fontFamily: "Avenir, sans-serif",
+                          }}
+                        >
+                          <div
+                            className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                             style={{
-                              color:
-                                transaction.type === "purchase" ||
-                                transaction.type === "given" ||
-                                transaction.type === "admin_deduct"
-                                  ? "#ef4444"
-                                  : "#22c55e",
-                              fontFamily: "Avenir, sans-serif",
+                              boxShadow: isNegative
+                                ? "0 0 30px rgba(220, 38, 38, 0.4)"
+                                : "0 0 30px rgba(16, 185, 129, 0.4)",
                             }}
-                          >
-                            {transaction.type === "purchase" ||
-                            transaction.type === "given" ||
-                            transaction.type === "admin_deduct"
-                              ? "-"
-                              : "+"}
+                          />
+                          <span className="relative">
+                            {isNegative ? "-" : "+"}
                             {transaction.amount}
                             {transaction.type === "received" ||
                             transaction.type === "given"
                               ? " bits"
                               : " pts"}
-                          </p>
-                          <p
-                            className="text-xs mt-1"
-                            style={{
-                              color: "#dc2626",
-                              fontFamily: "Avenir, sans-serif",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            from Admin
-                          </p>
+                          </span>
                         </div>
-                      )}
-                      {!isAdminTransaction && (
-                        <div className="text-right">
-                          <p
-                            className="font-semibold"
-                            style={{
-                              color:
-                                transaction.type === "purchase" ||
-                                transaction.type === "given" ||
-                                transaction.type === "admin_deduct"
-                                  ? "#ef4444"
-                                  : "#22c55e",
-                              fontFamily: "Avenir, sans-serif",
-                            }}
-                          >
-                            {transaction.type === "purchase" ||
-                            transaction.type === "given" ||
-                            transaction.type === "admin_deduct"
-                              ? "-"
-                              : "+"}
-                            {transaction.amount}{" "}
-                            {transaction.type === "received" ||
-                            transaction.type === "given"
-                              ? transaction.amount < 2
-                                ? "bit"
-                                : "bits"
-                              : transaction.amount < 2
-                              ? "pt"
-                              : "pts"}
-                          </p>
-                        </div>
-                      )}
+
+                        {transaction.related_user && !isAdminTransaction && (
+                          <div className="px-3 py-1 rounded-full bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300/50">
+                            <p
+                              className="text-xs text-gray-600 font-bold"
+                              style={{ fontFamily: "Avenir, sans-serif" }}
+                            >
+                              {transaction.type === "given" ? "to" : "from"}{" "}
+                              {senderLabel}
+                            </p>
+                          </div>
+                        )}
+
+                        {isAdminTransaction && (
+                          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-200/50">
+                            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 animate-pulse"></div>
+                            <p
+                              className="text-xs font-black bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent"
+                              style={{ fontFamily: "Avenir, sans-serif" }}
+                            >
+                              from Admin
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <div className="p-8 text-center" style={{ color: "#4a6e7e" }}>
-                <ChartBarIcon
-                  className="w-12 h-12 mx-auto mb-3"
-                  style={{ color: "#eee3e3" }}
-                />
-                <p style={{ fontFamily: "Avenir, sans-serif" }}>
+              <div className="p-20 text-center">
+                <div className="relative w-24 h-24 mx-auto mb-6">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <ChartBarIcon className="w-12 h-12 text-gray-400" />
+                  </div>
+                </div>
+                <p
+                  className="text-gray-600 font-bold text-lg mb-2"
+                  style={{ fontFamily: "Avenir, sans-serif" }}
+                >
                   No recent activity
+                </p>
+                <p
+                  className="text-gray-400 text-sm"
+                  style={{ fontFamily: "Avenir, sans-serif" }}
+                >
+                  Your transactions will appear here
                 </p>
               </div>
             )}
           </div>
 
-          {/* Pagination Controls */}
+          {/* Premium Pagination */}
           {totalPages > 1 && (
-            <div
-              className="px-6 py-4 border-t-2"
-              style={{ borderColor: "#b3e0f2" }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div
-                    className="text-sm"
-                    style={{
-                      color: "#64748b",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
+            <div className="relative px-6 py-5 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-50/50 via-white/50 to-slate-50/50 backdrop-blur-sm"></div>
+              <div className="relative flex items-center justify-between">
+                <div className="px-4 py-2 rounded-xl bg-white/80 backdrop-blur-sm border border-gray-200/50 shadow-sm">
+                  <p
+                    className="text-sm font-bold text-gray-700"
+                    style={{ fontFamily: "Avenir, sans-serif" }}
                   >
-                    Page {currentPage} of {totalPages}
-                  </div>
+                    Showing {startIndex}-{endIndex} of {totalItems}
+                  </p>
                 </div>
 
                 <div className="flex items-center space-x-2">
@@ -992,20 +1098,21 @@ const PointsDashboard = () => {
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                    className="px-5 py-2.5 rounded-xl text-sm font-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl"
                     style={{
-                      backgroundColor:
-                        currentPage === 1 ? "#f1f5f9" : "#0097b2",
-                      color: currentPage === 1 ? "#64748b" : "#ffffff",
+                      background:
+                        currentPage === 1
+                          ? "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)"
+                          : "linear-gradient(135deg, #0097b2 0%, #007a92 100%)",
+                      color: currentPage === 1 ? "#94a3b8" : "#ffffff",
                       fontFamily: "Avenir, sans-serif",
-                      border: currentPage === 1 ? "1px solid #e2e8f0" : "none",
                     }}
                   >
                     Previous
                   </button>
 
                   {/* Page numbers */}
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center space-x-1.5">
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let pageNum;
                       if (totalPages <= 5) {
@@ -1022,14 +1129,14 @@ const PointsDashboard = () => {
                         <button
                           key={pageNum}
                           onClick={() => handlePageChange(pageNum)}
-                          className={`w-8 h-8 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 active:scale-95 ${
-                            currentPage === pageNum
-                              ? "text-white"
-                              : "text-gray-700"
-                          }`}
+                          className="w-11 h-11 rounded-xl text-sm font-black transition-all duration-300 hover:scale-110 active:scale-95 shadow-md hover:shadow-xl"
                           style={{
-                            backgroundColor:
-                              currentPage === pageNum ? "#0097b2" : "#f1f5f9",
+                            background:
+                              currentPage === pageNum
+                                ? "linear-gradient(135deg, #0097b2 0%, #007a92 100%)"
+                                : "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                            color:
+                              currentPage === pageNum ? "#ffffff" : "#475569",
                             fontFamily: "Avenir, sans-serif",
                             border:
                               currentPage === pageNum
@@ -1047,16 +1154,14 @@ const PointsDashboard = () => {
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                    className="px-5 py-2.5 rounded-xl text-sm font-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl"
                     style={{
-                      backgroundColor:
-                        currentPage === totalPages ? "#f1f5f9" : "#0097b2",
-                      color: currentPage === totalPages ? "#64748b" : "#ffffff",
-                      fontFamily: "Avenir, sans-serif",
-                      border:
+                      background:
                         currentPage === totalPages
-                          ? "1px solid #e2e8f0"
-                          : "none",
+                          ? "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)"
+                          : "linear-gradient(135deg, #0097b2 0%, #007a92 100%)",
+                      color: currentPage === totalPages ? "#94a3b8" : "#ffffff",
+                      fontFamily: "Avenir, sans-serif",
                     }}
                   >
                     Next
@@ -1066,7 +1171,7 @@ const PointsDashboard = () => {
             </div>
           )}
         </div>
-
+        {/* Replace */}
         {/* Send Heartbits Modal */}
         {cheerModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

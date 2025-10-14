@@ -21,13 +21,19 @@ import toast from "react-hot-toast";
 import ConfirmationDialog from "../admin/ConfirmationDialog";
 import Placeholder from "@tiptap/extension-placeholder";
 import { set } from "react-hook-form";
+import { Chip } from "@mui/material";
+import { ImageIcon, X } from "lucide-react";
 
 const ContentEditor = ({
+  files= [],
   editingData = null,
   handleFileChange = () => {},
   handleTitleChange = () => {},
   handleDescriptionChange = () => {},
-  handleSubmit = () => {},
+  handleSubmit = () => {
+    e.preventDefault()
+    console.log('Publish')
+  },
   type = "default",
   handleBackAfterSubmitForm = () => {},
   issueId = null,
@@ -136,9 +142,9 @@ const ContentEditor = ({
   const [toBeDeletedImageUrls, setToBeDeletedImageUrls] = useState([]);
   const [toBeAddedImagesFile, setToBeAddedImagesFile] = useState([]);
 
-  useEffect(() => {
-    console.log("editingData ETOOO BOIII", editingData);
-  }, []);
+  // useEffect(() => {
+  //   console.log("editingData ETOOO BOIII", editingData);
+  // }, []);
 
   useEffect(() => {
     return () => {
@@ -740,68 +746,120 @@ const ContentEditor = ({
             cancelBtnClass="p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-200 duration-500 text-gray-700"
             confirmBtnClass="p-2 px-4 cursor-pointer rounded-lg bg-red-700 hover:bg-red-800 duration-500 text-white"
           />
-        </div>
-      ) : type === "eblog" ? (
+        </div>     
         // END NA DITOOO FORMMMM FOR NEWSLETTER
-        <form onSubmit={handleSubmit} className="space-y-4">
+      ) : type === "eblog" ? (
+   
+  <form
+      onSubmit={handleSubmit}
+      className="max-w-2xl mx-auto bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-6 hover:shadow-md transition-all duration-300"
+    >
+      {/* Upload Section */}
+      <div>
+        <label className="block text-sm font-avenir-black text-gray-700 mb-2">
+          Upload Images
+        </label>
+        <div className="relative border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 hover:border-primary transition-all duration-300">
           <input
             type="file"
             accept="image/*"
-            onChange={handleFileOnChange}
-            className="border p-2 rounded w-full "
             multiple
+            onChange={handleFileChange}
+            className="absolute inset-0 opacity-0 cursor-pointer"
           />
+          <ImageIcon className="w-10 h-10 mx-auto text-gray-400 mb-3" />
+          <p className="text-gray-500 text-sm font-avenir">
+            Drag & drop your images here or{" "}
+            <span className="text-primary font-semibold">browse</span>
+          </p>
+        </div>
 
-          <input
-            type="text"
-            className="border p-2 font-avenir-black w-full rounded-md"
-            onChange={handleTitleOnChange}
-            style={{
-              fontSize: "1.17em",
-              margin: "0.75em 0",
-            }}
-            placeholder="Write your title here"
-          />
-          <div className="flex gap-3 mb-2 place-items-center">
-            <BoldIcon
-              className="size-5 cursor-pointer"
-              onClick={() => editor.chain().focus().toggleBold().run()}
-            />
-            <ItalicIcon
-              className="size-5 cursor-pointer"
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-            />
-            <UnderlineIcon
-              className="size-5 cursor-pointer"
-              onClick={() => editor.chain().focus().toggleUnderline().run()}
-            />
-            <ListBulletIcon
-              className="size-6 cursor-pointer"
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-            />
-            <NumberedListIcon
-              className="size-5 cursor-pointer"
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            />
+        {/* File Chips */}
+        {files?.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            {files.map((file, index) => (
+              <Chip
+                key={index}
+                label={file.name}
+                onDelete={() => {
+                  const updated = [...files];
+                  updated.splice(index, 1);
+                  handleFileChange({ target: { files: updated } });
+                }}
+                deleteIcon={<X size={16} />}
+                sx={{
+                  fontWeight: 600,
+                  fontFamily: "Avenir",
+                  background: "lightgreen",
+                  opacity: '0.5',
+                  color: "black",
+                  border: "1px solid #16a34a",
+                  "& .MuiChip-deleteIcon": {
+                    color: "#15803d",
+                    "&:hover": { color: "#065f46" },
+                  },
+                  "&:hover": {
+                    background: "linear-gradient(to right, #bbf7d0, #4ade80)",
+                  },
+                }}
+              />
+            ))}
           </div>
-          <EditorContent
-            editor={editor}
-            className="border p-2 rounded bg-[--color-accent-1] text-[--color-dark] 
-             font-avenir
-             [&_ul]:list-disc [&_ul]:pl-6 
-             [&_ol]:list-decimal [&_ol]:pl-6
-             [&_em]:font-inherit
-             [&_strong]:font-avenir-black
-             [&_strong_em]:font-inherit
-             [&_em_strong]:font-inherit"
-          />
+        )}
+      </div>
 
-          <section className="flex justify-center">
-            <button className="bg-primary p-3 rounded-md cursor-pointer w-full mx-auto text-white font-avenir-black">
-              Publish
-            </button>
-          </section>
-        </form>
+      {/* Title Input */}
+      <input
+        type="text"
+        onChange={(e) => handleTitleChange(e.target.value)}
+        placeholder="Write your blog title here..."
+        className="w-full border border-gray-300 rounded-md px-4 py-3 text-lg font-avenir-black
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+      />
+
+      {/* Toolbar */}
+      <div className="flex gap-4 items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+        {[BoldIcon, ItalicIcon, UnderlineIcon, ListBulletIcon, NumberedListIcon].map(
+          (Icon, i) => (
+            <Icon
+              key={i}
+              className="w-5 h-5 text-gray-500 cursor-pointer hover:text-primary transition-all duration-200"
+              onClick={() => {
+                if (Icon === BoldIcon) editor.chain().focus().toggleBold().run();
+                else if (Icon === ItalicIcon)
+                  editor.chain().focus().toggleItalic().run();
+                else if (Icon === UnderlineIcon)
+                  editor.chain().focus().toggleUnderline().run();
+                else if (Icon === ListBulletIcon)
+                  editor.chain().focus().toggleBulletList().run();
+                else if (Icon === NumberedListIcon)
+                  editor.chain().focus().toggleOrderedList().run();
+              }}
+            />
+          )
+        )}
+      </div>
+
+      {/* Editor */}
+      <EditorContent
+        editor={editor}
+        className="border border-gray-300 h-[220px] p-4 rounded-md bg-gray-50 text-gray-700 font-avenir overflow-y-auto
+                   focus-within:ring-2 focus-within:ring-primary transition-all duration-200
+                   [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_strong]:font-avenir-black"
+      />
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full bg-primary text-white py-3 rounded-lg font-avenir-black text-sm shadow-sm hover:bg-green-700 active:scale-[0.98]
+                   transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70"
+      >
+        {isLoading ? "Publishing..." : "Publish Blog"}
+      </button>
+    </form>
+
+
       ) : (
         <></>
       )}
