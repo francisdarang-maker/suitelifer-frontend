@@ -16,6 +16,7 @@ import {
   HeartIcon as HeartIconSolid,
 } from "@heroicons/react/24/solid";
 import logoFs from "../../assets/logos/logo-fs.svg";
+import defaultAvatar from "../../assets/images/defaultAvatar.svg";
 
 const PointsDashboard = () => {
   const user = useStore((state) => state.user);
@@ -54,7 +55,7 @@ const PointsDashboard = () => {
     if (transaction.related_user_avatar) {
       return transaction.related_user_avatar;
     }
-    return "/images/default-avatar.png"; // Default avatar fallback
+    return defaultAvatar; // Default avatar fallback
   };
 
   // Check for moderation notifications in transaction history

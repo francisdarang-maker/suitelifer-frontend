@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { suitebiteAPI } from '../../utils/suitebiteAPI';
-import { HeartIcon, UserIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect, useRef } from "react";
+import { suitebiteAPI } from "../../utils/suitebiteAPI";
+import { HeartIcon, UserIcon } from "@heroicons/react/24/outline";
 
 /**
  * CreateCheerPost Component
- * 
+ *
  * Allows users to create and send cheer posts to their colleagues.
  * Enhanced features include:
  * - User search with @ symbol and name search
@@ -12,18 +12,18 @@ import { HeartIcon, UserIcon } from '@heroicons/react/24/outline';
  * - Custom heartbits points selection
  * - Message composition with character limit
  * - Monthly sending limits tracking
- * 
+ *
  * @param {Function} onCheerPostCreated - Callback when cheer post is successfully created
  */
 const CreateCheerPost = ({ onCheerPostCreated }) => {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [selectedRecipients, setSelectedRecipients] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [heartbitsPerPerson, setHeartbitsPerPerson] = useState(5);
   const [loading, setLoading] = useState(false);
   const [monthlyLimit, setMonthlyLimit] = useState({ used: 0, limit: 0 });
-  const [mentionQuery, setMentionQuery] = useState('');
+  const [mentionQuery, setMentionQuery] = useState("");
   const [mentionStart, setMentionStart] = useState(null);
   const searchInputRef = useRef(null);
   const searchDropdownRef = useRef(null);
@@ -52,8 +52,8 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
         setShowSearchResults(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const loadUserData = async () => {
@@ -63,28 +63,33 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
         setMonthlyLimit(limitsResponse.limits);
       }
     } catch (error) {
-      console.error('Error loading user data:', error);
+      console.error("Error loading user data:", error);
     }
   };
 
   const performUserSearch = async (query) => {
     try {
-      const cleanSearchTerm = query.replace('@', '').trim();
+      const cleanSearchTerm = query.replace("@", "").trim();
       const response = await suitebiteAPI.searchUsers(cleanSearchTerm);
       if (response.success) {
         const filteredResults = response.users.filter(
-          (user) => !selectedRecipients.some((selected) => selected.user_id === user.user_id)
+          (user) =>
+            !selectedRecipients.some(
+              (selected) => selected.user_id === user.user_id
+            )
         );
         setSearchResults(filteredResults);
         setShowSearchResults(filteredResults.length > 0);
       }
     } catch (error) {
-      console.error('Error searching users:', error);
+      console.error("Error searching users:", error);
     }
   };
 
   const getInitials = (firstName, lastName) => {
-    return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`.toUpperCase();
+    return `${firstName?.charAt(0) || ""}${
+      lastName?.charAt(0) || ""
+    }`.toUpperCase();
   };
 
   const handleContentChange = (e) => {
@@ -92,8 +97,11 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
     setContent(value);
     const cursor = e.target.selectionStart;
     const textUpToCursor = value.slice(0, cursor);
-    const atIndex = textUpToCursor.lastIndexOf('@');
-    if (atIndex !== -1 && (atIndex === 0 || /\s/.test(textUpToCursor[atIndex - 1]))) {
+    const atIndex = textUpToCursor.lastIndexOf("@");
+    if (
+      atIndex !== -1 &&
+      (atIndex === 0 || /\s/.test(textUpToCursor[atIndex - 1]))
+    ) {
       const query = textUpToCursor.slice(atIndex + 1);
       if (query.length > 0) {
         setMentionQuery(query);
@@ -103,28 +111,27 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
       }
     }
     setShowSearchResults(false);
-    setMentionQuery('');
+    setMentionQuery("");
     setMentionStart(null);
   };
 
   const handleMentionSelect = (user) => {
     if (mentionStart !== null) {
       const before = content.slice(0, mentionStart);
-      const after = content.slice(
-        searchInputRef.current.selectionStart
-      );
+      const after = content.slice(searchInputRef.current.selectionStart);
       const mention = `@${user.first_name} ${user.last_name} `;
       setContent(before + mention + after);
       setSelectedRecipients((prev) =>
         prev.some((u) => u.user_id === user.user_id) ? prev : [...prev, user]
       );
       setShowSearchResults(false);
-      setMentionQuery('');
+      setMentionQuery("");
       setMentionStart(null);
       setTimeout(() => {
         if (searchInputRef.current) {
-          searchInputRef.current.selectionStart = searchInputRef.current.selectionEnd =
-            before.length + mention.length;
+          searchInputRef.current.selectionStart =
+            searchInputRef.current.selectionEnd =
+              before.length + mention.length;
           searchInputRef.current.focus();
         }
       }, 0);
@@ -143,8 +150,8 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
           peer_id: selectedRecipients[0].user_id,
           post_body: content.trim(),
           heartbits_given: heartbitsPerPerson,
-          hashtags: '',
-          additional_peers: []
+          hashtags: "",
+          additional_peers: [],
         });
       } else {
         const [mainRecipient, ...additionalRecipients] = selectedRecipients;
@@ -152,16 +159,18 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
           peer_id: mainRecipient.user_id,
           post_body: content.trim(),
           heartbits_given: heartbitsPerPerson,
-          hashtags: '',
-          additional_peers: additionalRecipients.map((recipient) => recipient.user_id)
+          hashtags: "",
+          additional_peers: additionalRecipients.map(
+            (recipient) => recipient.user_id
+          ),
         });
       }
-      setContent('');
+      setContent("");
       setSelectedRecipients([]);
       setHeartbitsPerPerson(5);
       onCheerPostCreated();
     } catch (error) {
-      console.error('Error creating cheer post:', error);
+      console.error("Error creating cheer post:", error);
     } finally {
       setLoading(false);
     }
@@ -180,7 +189,9 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
             <input
               type="number"
               value={heartbitsPerPerson}
-              onChange={(e) => setHeartbitsPerPerson(Number(e.target.value) || 0)}
+              onChange={(e) =>
+                setHeartbitsPerPerson(Number(e.target.value) || 0)
+              }
               min="1"
               placeholder="Heartbits per person"
               className="w-24 px-2 py-1 border-2 border-[#eee3e3] rounded-xl focus:ring-2 focus:ring-[#0097b2] focus:border-[#0097b2] text-sm font-medium transition-colors duration-200"
@@ -206,14 +217,14 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
               rows="4"
               maxLength="500"
               required
-              style={{ lineHeight: '1.5', fontFamily: 'inherit' }}
+              style={{ lineHeight: "1.5", fontFamily: "inherit" }}
             />
             {/* User search dropdown for @mentions */}
             {showSearchResults && (
               <div
                 ref={searchDropdownRef}
                 className="absolute z-50 bg-white border-2 border-[#eee3e3] rounded-xl shadow-lg max-h-60 overflow-y-auto w-full"
-                style={{ left: 0, right: 0, top: '100%' }}
+                style={{ left: 0, right: 0, top: "100%" }}
               >
                 {searchResults.length > 0 ? (
                   <div className="p-2">
@@ -231,7 +242,8 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
                             {user.first_name} {user.last_name}
                           </div>
                           <div className="text-sm text-[#4a6e7e] truncate">
-                            @{user.email?.split('@')[0]} • {user.job_title || 'Team Member'}
+                            @{user.email?.split("@")[0]} •{" "}
+                            {user.job_title || "Team Member"}
                           </div>
                         </div>
                       </div>
@@ -251,13 +263,15 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
               {content.length}/500 characters
             </span>
             <div className="flex items-center gap-2">
-              {content.includes('@') && (
+              {content.includes("@") && (
                 <span className="text-xs text-[#0097b2] font-medium">
                   ✨ @mentions included
                 </span>
               )}
               <span className="text-xs text-[#4a6e7e]">
-                {selectedRecipients.length > 1 ? 'Group cheer' : 'Individual cheer'}
+                {selectedRecipients.length > 1
+                  ? "Group cheer"
+                  : "Individual cheer"}
               </span>
             </div>
           </div>
@@ -265,7 +279,12 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
         {/* Send Cheer Button Section */}
         <button
           type="submit"
-          disabled={!content.trim() || selectedRecipients.length === 0 || loading || remainingLimit <= 0}
+          disabled={
+            !content.trim() ||
+            selectedRecipients.length === 0 ||
+            loading ||
+            remainingLimit <= 0
+          }
           className="submit-btn w-full bg-gradient-to-r from-[#0097b2] to-[#007a8e] text-white py-4 px-6 rounded-xl font-bold text-base hover:from-[#007a8e] hover:to-[#006775] transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
         >
           {loading ? (
@@ -277,7 +296,10 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
             <>
               <HeartIcon className="h-6 w-6 text-white" />
               <span className="text-white font-bold text-lg">
-                Send {selectedRecipients.length > 1 ? `${selectedRecipients.length} Cheers` : 'Cheer'}
+                Send{" "}
+                {selectedRecipients.length > 1
+                  ? `${selectedRecipients.length} Cheers`
+                  : "Cheer"}
               </span>
               {totalHeartbits > 0 && (
                 <span className="bg-white/20 text-white px-3 py-1 rounded-lg text-sm font-bold">
@@ -291,10 +313,12 @@ const CreateCheerPost = ({ onCheerPostCreated }) => {
         {monthlyLimit.limit > 0 && (
           <div className="text-center mt-2">
             <p className="text-xs text-[#4a6e7e]">
-              Monthly heartbits used: <b>{monthlyLimit.used}</b> / <b>{monthlyLimit.limit}</b> heartbits
+              Monthly heartbits used: <b>{monthlyLimit.used}</b> /{" "}
+              <b>{monthlyLimit.limit}</b> heartbits
             </p>
             <p className="text-xs text-[#4a6e7e]">
-              Remaining: <b>{monthlyLimit.limit - monthlyLimit.used}</b> heartbits
+              Remaining: <b>{monthlyLimit.limit - monthlyLimit.used}</b>{" "}
+              heartbits
             </p>
           </div>
         )}

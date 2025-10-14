@@ -78,12 +78,14 @@ import { Toaster } from "react-hot-toast";
 import ScrollToTop from "./components/buttons/ScrollToTop";
 import VerifyAccount from "./pages/auth/VerifyAccount";
 import DevelopersPage from "./pages/guest/Developers";
-import LaunchPodEventPage from "./pages/launchpod-event/LaunchPodEventPage";
-import Blogs from "./pages/guest/Blogs";
-import BlogDetails from "./components/blog/guest/BlogDetails";
 
-
-
+//Events
+import LaunchPodEventPage from "./pages/events/launchpod-event/LaunchPodEventPage";
+import FirechatEvent from "./pages/events/firechat-event/FirechatEvent";
+import ResetPasswordPage from "./pages/auth/reset-password/ResetPasswordPage";
+import ProfilePage from "./pages/employee/profile-page/ProfilePage";
+import { EmployeeDetailsProvider } from "./pages/employee/context/EmployeeDetailsContext";
+import Logout from "./pages/auth/Logout";
 
 const queryClient = new QueryClient();
 
@@ -97,8 +99,8 @@ function App() {
           {/* Routes that are publicly available (guest) */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/verify-account" element={<VerifyAccount />} />
+          {/* <Route path="/register" element={<Register />} /> */}
+          {/* <Route path="/verify-account" element={<VerifyAccount />} /> */}
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/careers/:slug" element={<CareersJobDetails />} />
@@ -113,10 +115,10 @@ function App() {
           />
 
           <Route path="/developers" element={<DevelopersPage />} />
-          <Route path="/events" element={<LaunchPodEventPage />} />
-          <Route path="/developer" element={<Navigate to="/developers"/>} />
-          <Route path="/dev" element={<Navigate to="/developers"/>} />
-          <Route path="/d" element={<Navigate to="/developers"/>} />
+          <Route path="/events" element={<FirechatEvent />} />
+          <Route path="/developer" element={<Navigate to="/developers" />} />
+          <Route path="/dev" element={<Navigate to="/developers" />} />
+          <Route path="/d" element={<Navigate to="/developers" />} />
           <Route path="/newsletter" element={<Newsletter />} />
           <Route path="/newsletter/:slug" element={<NewsletterDetails />} />
           <Route path="/blogs" element={<Blogs />} />
@@ -125,8 +127,9 @@ function App() {
           <Route path="/podcast" element={<Podcast />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-use" element={<TermsOfUse />} />
-          <Route path="/reset-password" element={<PasswordReset />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/account-deactivated" element={<DeactivatedPage />} />
+          <Route path="/logout" element={<Logout />} />
           <Route path="/page-not-found" element={<PageNotFound />} />
           <Route path="*" element={<Navigate to="/page-not-found" replace />} />
 
@@ -134,6 +137,14 @@ function App() {
           <Route element={<ProtectedRoutes />}>
             <Route path="/app" element={<RootLayout />}>
               <Route index element={<Navigate to="blogs-feed" replace />} />
+              <Route
+                path="my-profile"
+                element={
+                  <EmployeeDetailsProvider>
+                    <ProfilePage />
+                  </EmployeeDetailsProvider>
+                }
+              />
               <Route path="blogs-feed" element={<EmployeeBlogsFeed />} />
               <Route path="blogs-feed/blog/:id/:slug" element={<BlogView />} />
               <Route path="my-blogs" element={<EmployeeMyBlogs />} />
@@ -149,17 +160,23 @@ function App() {
                 path="personality-test"
                 element={<EmployeePersonalityTest />}
               />
-              
+
               {/* Suitebite Employee Routes */}
               <Route path="suitebite" element={<SuitebiteHome />} />
               <Route path="suitebite/cheer" element={<SuitebiteHome />} />
-              <Route path="suitebite/leaderboard" element={<SuitebiteLeaderboard />} />
+              <Route
+                path="suitebite/leaderboard"
+                element={<SuitebiteLeaderboard />}
+              />
 
               {/* Points Shop/Mood/Cheer/PointsDashboard Routes */}
               <Route path="mood" element={<MoodPage />} />
               {/* Remove old points and cheer routes, keep only the new ones */}
               <Route path="cheer-a-peer" element={<EmployeeCheerAPeer />} />
-              <Route path="points-dashboard" element={<EmployeePointsDashboard />} />
+              <Route
+                path="points-dashboard"
+                element={<EmployeePointsDashboard />}
+              />
 
               {/* SuitebiteShop moved to bottom */}
               <Route path="suitebite/shop" element={<SuitebiteShop />} />
@@ -172,7 +189,7 @@ function App() {
                   path="suitebite/new-suitebite"
                   element={<AdminNewsCreate />}
                 />
-                
+
                 <Route path="events" element={<AdminEvents />} />
                 <Route path="contents" element={<AdminContents />} />
                 <Route path="courses" element={<AdmimJobCourse />} />
@@ -183,7 +200,7 @@ function App() {
                 <Route path="audit-logs" element={<AuditLogs />} />
 
                 {/* Super Admin Protected Routes */}
-                <Route path="super" element={<SuperAdminProtectedRoutes />}>
+                {/* <Route path="super" element={<SuperAdminProtectedRoutes />}>
                   <Route
                     path="accounts-management"
                     element={<SuperAdminAccountManagement />}
@@ -192,7 +209,7 @@ function App() {
                     path="suitebite"
                     element={<SuperAdminSuitebite />}
                   />
-                </Route>
+                </Route> */}
               </Route>
             </Route>
           </Route>

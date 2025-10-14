@@ -12,6 +12,7 @@ import { useStore } from "../../store/authStore";
 import ContentButtons from "./ContentButtons";
 import Information from "./Information";
 import { useAddAuditLog } from "../../components/admin/UseAddAuditLog";
+import img_placeholder from "../../assets/images/img-placeholder.svg";
 
 const AboutPageContent = ({}) => {
   // USER DETAILS
@@ -137,7 +138,7 @@ const AboutPageContent = ({}) => {
       </div>
       <input
         name="textBanner"
-        value={aboutDetails.textBanner}
+        value={aboutDetails?.textBanner || ""}
         onChange={(e) => handleContentDetailsChange(e)}
         className="w-full p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary"
       />
@@ -170,19 +171,18 @@ const AboutPageContent = ({}) => {
             {/* REMINDERS END */}
 
             {files["aboutHeroImage"] === null ? (
-              aboutDetails.aboutHeroImage && (
-                <div className={`preview mt-4`}>
-                  <img
-                    className="h-72 mt-2 mx-auto"
-                    src={aboutDetails.aboutHeroImage}
-                    alt="Preview"
-                  />
-                </div>
-              )
+              <div className="preview mt-4">
+                <img
+                  className="h-72 mt-2 mx-auto"
+                  src={aboutDetails?.aboutHeroImage || img_placeholder}
+                  alt="Preview"
+                />
+              </div>
             ) : (
               <img
                 className="h-72 mt-2 mx-auto"
                 src={URL.createObjectURL(files["aboutHeroImage"])}
+                alt="Preview"
               />
             )}
           </div>
@@ -216,15 +216,13 @@ const AboutPageContent = ({}) => {
             {/* REMINDERS END */}
 
             {files["aboutBackgroundImage"] === null ? (
-              aboutDetails.aboutBackgroundImage && (
-                <div className={`preview mt-4`}>
-                  <img
-                    className="h-72 mt-2 mx-auto"
-                    src={aboutDetails.aboutBackgroundImage}
-                    alt="Preview"
-                  />
-                </div>
-              )
+              <div className={`preview mt-4`}>
+                <img
+                  className="h-72 mt-2 mx-auto"
+                  src={aboutDetails?.aboutBackgroundImage || img_placeholder}
+                  alt="Preview"
+                />
+              </div>
             ) : (
               <img
                 className="h-72 mt-2 mx-auto"
@@ -254,32 +252,35 @@ const AboutPageContent = ({}) => {
         }`}
       >
         <div className="w-full flex flex-col p-1">
-          {videoData.map((video) => (
-            <div key={video.key} className="mt-2">
-              <div className="flex flex-col gap-1 text-md">
-                <span className="font-avenir-black">{video.key}</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    name={video.name}
-                    value={aboutDetails[video.name]}
-                    onChange={(e) => handleContentDetailsChange(e)}
-                    className="flex-grow p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={aboutDetails[video.name].replace(
-                      "embed/",
-                      "watch?v="
+          {videoData.map((video) => {
+            const videoUrl = aboutDetails?.[video.name] || ""; // optional chaining here
+
+            return (
+              <div key={video.key} className="mt-2">
+                <div className="flex flex-col gap-1 text-md">
+                  <span className="font-avenir-black">{video.key}</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      name={video.name}
+                      value={videoUrl}
+                      onChange={(e) => handleContentDetailsChange(e)}
+                      className="flex-grow p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                    {videoUrl && (
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={videoUrl.replace("embed/", "watch?v=")}
+                      >
+                        <ArrowUpRightIcon height={25} />
+                      </a>
                     )}
-                  >
-                    <ArrowUpRightIcon height={25} />
-                  </a>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -287,32 +288,32 @@ const AboutPageContent = ({}) => {
         {[
           {
             label: "Mission Slogan",
-            value: aboutDetails.missionSlogan,
+            value: aboutDetails?.missionSlogan || "",
             name: "missionSlogan",
           },
           {
             label: "Vision Slogan",
-            value: aboutDetails.visionSlogan,
+            value: aboutDetails?.visionSlogan || "",
             name: "visionSlogan",
           },
           {
             label: "Mission",
-            value: aboutDetails.mission,
+            value: aboutDetails?.mission || "",
             name: "mission",
           },
           {
             label: "Vision",
-            value: aboutDetails.vision,
+            value: aboutDetails?.vision || "",
             name: "vision",
           },
           {
             label: "Mission Video",
-            value: aboutDetails.missionVideo,
+            value: aboutDetails?.missionVideo || "",
             name: "missionVideo",
           },
           {
             label: "Vision Video",
-            value: aboutDetails.visionVideo,
+            value: aboutDetails?.visionVideo || "",
             name: "visionVideo",
           },
         ].map(({ label, value, name }) => (
@@ -323,7 +324,7 @@ const AboutPageContent = ({}) => {
                 <input
                   type="text"
                   name={name}
-                  value={aboutDetails[name]}
+                  value={aboutDetails?.[name] || ""}
                   onChange={(e) => handleContentDetailsChange(e)}
                   className="w-full p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary"
                 />
@@ -351,7 +352,7 @@ const AboutPageContent = ({}) => {
       <input
         type="text"
         name="dayInPodUrl"
-        value={aboutDetails.dayInPodUrl}
+        value={aboutDetails?.dayInPodUrl || ""}
         onChange={(e) => handleContentDetailsChange(e)}
         className="w-full p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary mb-4"
       />

@@ -257,9 +257,7 @@ function AdminPersonalityTest() {
                       />
                       <ActionButtons
                         icon={<TrashIcon className="size-5" />}
-                        handleClick={() =>
-                          handleDeleteClick(params.data)
-                        }
+                        handleClick={() => handleDeleteClick(params.data)}
                       />
                     </div>
                   ),

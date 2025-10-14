@@ -7,12 +7,13 @@ import {
 import { Link } from "react-router-dom";
 import { toSlug } from "../../utils/slugUrl";
 import ModalFullImages from "../modals/ModalFullImages";
-import { Heart } from "lucide-react";
+import { DeleteIcon, Heart, Trash2Icon } from "lucide-react";
 import api from "../../utils/axios";
 
-const BlogCard = ({ blog }) => {
+const BlogCard = ({ blog, isMine = false }) => {
   const [isFullImages, setIsFullImages] = useState(false);
   const [isHeart, setIsHeart] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const handleViewImages = () => {
     setIsFullImages((prev) => !prev);
   };
@@ -30,6 +31,16 @@ const BlogCard = ({ blog }) => {
       blog.likeCount += newState ? -1 : 1;
     }
   };
+
+  const handleDeleteAction = async() => {
+    try {
+      console.log(blog.eblogId)
+      await api.delete(`/api/delete-employee-blog/${blog.eblogId}`)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
 
   useEffect(() => {
     const fetchLikeStatus = async () => {
@@ -68,12 +79,17 @@ const BlogCard = ({ blog }) => {
           </div>
         </div>
 
-        <Link
+        <div className="flex items-center justify-center">
+         {isMine ? (<Trash2Icon className="w-5 h-5 text-red-600 cursor-pointer mx-2" onClick={handleDeleteAction}/>): null} 
+          <Link
           to={`blog/${blog.eblogId}/${toSlug(blog.title)}`}
           state={{ previousPage: location.pathname }}
         >
           <ArrowUpRightIcon className="w-7 h-7 text-primary cursor-pointer" />
         </Link>
+        
+        </div>
+        
       </section>
       <section>
         <h3 className="font-avenir-black">{blog.title}</h3>
