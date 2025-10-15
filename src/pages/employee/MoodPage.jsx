@@ -357,8 +357,8 @@ const MoodPage = () => {
 
                 {/* Mood Slider */}
                 <div className="mb-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-4xl">😢</span>
+                  <div className="flex items-center justify-between mb-4 ">
+                    <span className="text-2xl sm:text-4xl">😢</span>
                     <input
                       type="range"
                       min="1"
@@ -367,12 +367,12 @@ const MoodPage = () => {
                       onChange={(e) =>
                         setCurrentMoodLevel(parseInt(e.target.value))
                       }
-                      className="flex-1 mx-4 h-3 rounded-full appearance-none cursor-pointer transition-all"
+                      className="flex-1 mx-1 h-3 rounded-full appearance-none cursor-pointer transition-all sm:mx-3"
                       style={{
                         background: `linear-gradient(to right, #dc2626 0%, #f59e0b 25%, #eab308 50%, #10b981 75%, #059669 100%)`,
                       }}
                     />
-                    <span className="text-4xl">😄</span>
+                    <span className="text-2xl sm:text-4xl">😄</span>
                   </div>
                 </div>
 
@@ -402,7 +402,7 @@ const MoodPage = () => {
                     fontFamily: "Avenir, sans-serif",
                   }}
                 >
-                  {sending ? "✨ Submitting..." : "🚀 Submit My Mood"}
+                  {sending ? "✨ Submitting..." : "Submit My Mood"}
                 </button>
               </div>
             </div>
@@ -422,15 +422,25 @@ const MoodPage = () => {
                 >
                   📈 Your Mood Journey
                 </h3>
-                <div className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200">
+                <div className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 flex flex-col items-center justify-center">
                   <span
-                    className="text-sm font-bold"
+                    className="text-lg font-bold leading-tight"
                     style={{
                       color: "#0097b2",
                       fontFamily: "Avenir, sans-serif",
                     }}
                   >
-                    {moodStats?.total_entries || 0} logs
+                    {moodStats?.total_entries || 0}
+                    <span className="hidden sm:block">logs</span>
+                  </span>
+                  <span
+                    className="text-xs font-semibold tracking-wide sm:hidden"
+                    style={{
+                      color: "#0097b2",
+                      fontFamily: "Avenir, sans-serif",
+                    }}
+                  >
+                    logs
                   </span>
                 </div>
               </div>
@@ -546,7 +556,7 @@ const MoodPage = () => {
                             display: true,
                             labels: {
                               font: { family: "Avenir, sans-serif", size: 12 },
-                              padding: 15,
+                              padding: 12,
                             },
                           },
                           tooltip: {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { suitebiteAPI } from "../../../utils/suitebiteAPI";
 import { pointsSystemApi } from "../../../api/pointsSystemApi";
-import { formatDate } from "../../../utils/dateHelpers";
+
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -460,8 +460,6 @@ const UserHeartbitsManagement = () => {
   };
 
   return (
-    // Added Feature
-    // Removed Shadow Botton Orig  'shadow-sm'
     <div className="user-heartbits-management rounded-lg  pb-10 px-5 pt-2">
       {/* Notification */}
       {notification.show && (
@@ -481,47 +479,76 @@ const UserHeartbitsManagement = () => {
       )}
 
       {/* Concise Search and Filter Controls */}
-      {/* Added Feature*/}
-      {/* Removed Border-gray-200 */}
-      <div className="bg-white rounded-lg p-1 mt-0 mb-0">
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Search Section */}
-          <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search users by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              // Added Feature
-              // Added focus:outline-none
-              className="w-56 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-            />
+
+      <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/60 mt-0 mb-0">
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Search Section - Enhanced Modern Design */}
+          <div className="relative group flex-1 min-w-[280px] max-w-md">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center">
+                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 group-focus-within:text-[#0097b2] transition-all duration-300 group-focus-within:scale-110" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search users by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-12 py-3.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
+            placeholder:text-gray-400 placeholder:font-normal
+            focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white 
+            hover:border-gray-300 hover:shadow-lg
+            transition-all duration-300"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-full transition-all duration-200 group/clear"
+                >
+                  <XMarkIcon className="h-4 w-4 text-gray-400 group-hover/clear:text-gray-600" />
+                </button>
+              )}
+              {!searchTerm && (
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex gap-1">
+                  {/* <kbd className="px-2 py-0.5 text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 rounded"></kbd> */}
+                </div>
+              )}
+            </div>
           </div>
-          {/* Sort Controls */}
-          {/* <label className="text-sm font-medium text-gray-700 ml-2">
-            Sort:
-          </label> */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            // Added Feature
-            // Added focus:outline-none
-            className="px-2 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2  focus:outline-none  focus:ring-[#0097b2] focus:border-transparent text-sm"
-            style={{ minWidth: "80px" }}
-          >
-            <option value="name ">Sort by Name</option>
-            <option value="points ">Sort by Points</option>
-          </select>
-          {/* <button
-            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-            // Added Feature
-            // orig border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-[#0097b2] focus:border-transparent
-            className="px-2 py-2 text-sm font-medium flex items-center"
-            title={sortOrder === "asc" ? "Ascending" : "Descending"}
-          >
-            {sortOrder === "asc" ? "↑" : "↓"}
-          </button> */}
+
+          {/* Sort Dropdown - Glassmorphic */}
+          <div className="relative group">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="appearance-none pl-5 pr-12 py-3.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
+          focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
+          text-sm font-semibold text-gray-700 cursor-pointer
+          hover:border-gray-300 hover:shadow-lg
+          transition-all duration-300"
+              style={{ minWidth: "170px" }}
+            >
+              <option value="name">Sort by Name</option>
+              <option value="points">Sort by Points</option>
+            </select>
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+              <svg
+                className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </div>
+
+          {/* Sort Order Toggle - Premium Pill */}
           <div className="flex items-center gap-2">
             <label htmlFor="sortOrder" className="sr-only">
               Sort Order
@@ -529,98 +556,101 @@ const UserHeartbitsManagement = () => {
             <button
               id="sortOrder"
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="px-2 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-              style={{ minWidth: "120px" }}
+              className="group px-5 py-3.5 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl 
+          text-sm font-semibold text-gray-700 
+          hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg hover:shadow-[#0097b2]/10
+          transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 
+          active:scale-95"
+              style={{ minWidth: "150px" }}
               title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
             >
-              <div className="flex items-center justify-between">
-                <span>{sortOrder === "asc" ? "Ascending" : "Descending"}</span>
+              <div className="flex items-center justify-between gap-3">
+                <span className="group-hover:text-[#0097b2] transition-colors">
+                  {sortOrder === "asc" ? "Ascending" : "Descending"}
+                </span>
                 {sortOrder === "desc" ? (
-                  <ArrowDownIcon className="w-4 h-4 text-gray-500 ml-2" />
+                  <ArrowDownIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:translate-y-0.5" />
                 ) : (
-                  <ArrowUpIcon className="w-4 h-4 text-gray-500 ml-2" />
+                  <ArrowUpIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:-translate-y-0.5" />
                 )}
               </div>
             </button>
           </div>
-          {/* Added Feature */}
-          {/* Removed focus:ring-2 focus:ring-[#0097b2] focus:border-transparent */}
-          {/* orig */}
-          {/* <button
-            onClick={resetFilters}
-            ArrowPathIcon 
-            className="px-2 py-2 border border-gray-300 rounded-lg  hover:bg-gray-50  text-sm font-medium"
-          ></button> */}
-          {/* new */}{" "}
+
+          {/* Select All - Modern Toggle */}
           <button
             onClick={selectAllUsers}
-            className={`px-2 py-2 border border-gray-300 rounded-lg text-sm font-medium flex items-center gap-2
-    hover:bg-gray-50
-    ${
-      selectedUsers.length === filteredUsers.length
-        ? "text-gray-700 border-primary focus:ring-2  focus:ring-[#0097b2]"
-        : ""
-    }
-  `}
+            className={`group px-5 py-3.5 rounded-2xl text-sm font-bold flex items-center gap-3
+        transition-all duration-300 active:scale-95 border-2
+        ${
+          selectedUsers.length === filteredUsers.length
+            ? "bg-gradient-to-br from-[#0097b2] to-[#0097b2]/80 text-white shadow-xl shadow-[#0097b2]/30 hover:shadow-2xl hover:shadow-[#0097b2]/40 border-transparent"
+            : "border-gray-200 bg-white/90 text-gray-700 hover:bg-gradient-to-br hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg"
+        }
+      `}
           >
-            <CheckIcon className="w-4 h-4" />
+            <div
+              className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all
+        ${
+          selectedUsers.length === filteredUsers.length
+            ? "bg-white/20"
+            : "bg-gray-100 border-2 border-gray-300 group-hover:border-[#0097b2]/50 group-hover:bg-[#0097b2]/5"
+        }`}
+            >
+              <CheckIcon
+                className={`w-4 h-4 font-bold ${
+                  selectedUsers.length === filteredUsers.length
+                    ? "text-white"
+                    : "text-transparent"
+                }`}
+              />
+            </div>
             {selectedUsers.length === filteredUsers.length
               ? "Deselect All"
               : "Select All"}
           </button>
-          {/* Old */}
-          {/* <button
-            onClick={resetFilters}
-            className="px-2 py-2    border border-gray-300  rounded-lg text-sm font-medium flex items-center gap-2"
-          >
-            <ArrowPathIcon className="w-5 h-5 text-black" />
-            Reset
-          </button> */}
+
+          {/* Reset Button - Subtle Alert Style */}
           {showResetButton && (
             <button
               onClick={resetFilters}
-              className="px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
+              className="px-5 py-3.5 bg-gradient-to-br from-rose-50 to-red-50 border-2 border-rose-200 rounded-2xl 
+          hover:from-rose-100 hover:to-red-100 hover:border-rose-300 hover:shadow-lg hover:shadow-rose-200/50
+          text-sm font-bold text-rose-700 
+          transition-all duration-300 active:scale-95
+          focus:outline-none focus:ring-4 focus:ring-rose-500/20"
             >
               Reset
             </button>
           )}
-          {/*  */}
-          {/* Added Feature */}
-          {/* Change ui of button */}
-          {/* <button
-            onClick={selectAllUsers}
-            className="px-2 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium flex items-center gap-2"
-          >
-            <CheckIcon className="w-4 h-4" />
-            {selectedUsers.length === filteredUsers.length
-              ? "Deselect All"
-              : "Select All"}
-          </button> */}
+
+          {/* Global Limit - Premium Badge */}
           <button
             onClick={() => setShowGlobalLimitModal(true)}
-            className="px-2 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-sm font-medium flex items-center gap-2"
+            className="px-5 py-3.5 bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 text-white rounded-2xl 
+        hover:from-purple-600 hover:via-purple-700 hover:to-indigo-700 
+        hover:shadow-xl hover:shadow-purple-500/40
+        text-sm font-bold flex items-center gap-3
+        transition-all duration-300 active:scale-95
+        focus:outline-none focus:ring-4 focus:ring-purple-500/30"
           >
-            <CogIcon className="w-4 h-4" />
-            Global Limit: {globalLimit}
+            <CogIcon className="w-5 h-5" />
+            <span className="flex items-center gap-2">
+              Global Limit:
+              <span className="px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-lg font-extrabold">
+                {globalLimit}
+              </span>
+            </span>
           </button>
         </div>
       </div>
 
       {/* Results Summary & Bulk Actions */}
-      {/* Added Feature*/}
-      {/* Removed Border-gray-200 and border-t */}
+
       <div className="mt-1 pt-1">
-        {/* Compact Bulk Actions */}
-        {/* Added Feature*/}
-        {/* Removed bg and hover bg */}
-        {/* Summary Box */}
         <div className="w-full text-center py-4 text-lg font-medium text-gray-700">
           {selectedUsers.length > 0 ? (
-            <>
-              {/* You have selected{" "}
-              <span className="text-purple-600">{selectedUsers.length}</span> to
-              be given heartbits */}
-            </>
+            <></>
           ) : (
             <>Select users to send Heartbits</>
           )}
@@ -628,7 +658,7 @@ const UserHeartbitsManagement = () => {
       </div>
 
       {/* Users Grid - Responsive */}
-      {/* removed border-gray-150 */}
+
       <div className="bg-gray-10 rounded-lg">
         <div
           className="users-table-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4"
@@ -655,13 +685,11 @@ const UserHeartbitsManagement = () => {
             sortedUsers.map((user) => {
               const isSelected = selectedUsers.includes(user.user_id);
               return (
-                // user-heartbits-management rounded-lg shadow-sm pb-10 px-6 pt-2
                 <div
                   key={user.user_id}
                   className={`relative bg-white rounded-xl shadow-lg p-3 sm:p-4 transition-all duration-200 border-2 border-gray-200 hover:border-primary cursor-pointer ${
                     isSelected
-                      ? // Original  ring-2 ring-purple-500 border-purple-400 bg-purple-50
-                        "ring-1 ring-primary bg-primary bg-primary"
+                      ? "ring-1 ring-primary bg-primary bg-primary"
                       : "hover:shadow-xl"
                   }`}
                   style={{ minHeight: "120px" }}
@@ -672,8 +700,7 @@ const UserHeartbitsManagement = () => {
                     <span
                       className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2 border-primary bg-white ${
                         isSelected
-                          ? // orig bg-gradient-to-br from-primary-500 to-primary-400 border-primary-500
-                            "bg-gradient-to-br from-primary to-primary border-primary"
+                          ? "bg-gradient-to-br from-primary to-primary border-primary"
                           : ""
                       }`}
                       style={{
@@ -706,19 +733,11 @@ const UserHeartbitsManagement = () => {
                   <div className="flex flex-col space-y-2">
                     {/* Avatar and Name Row */}
                     <div className="flex items-center space-x-3">
-                      {/* <img
-                        src={user.avatar || "/default-avatar.png"}
-                        alt={`${user.first_name || ""} ${
-                          user.last_name || ""
-                        }`.trim()}
-                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
-                      /> */}
                       <img
                         src={user.avatar || "/default-avatar.png"}
                         alt={`${user.first_name || ""} ${
                           user.last_name || ""
                         }`.trim()}
-                        // xl:inline-block
                         className="block lg:hidden xl:hidden 2xl:inline-block w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
@@ -758,27 +777,6 @@ const UserHeartbitsManagement = () => {
             })
           )}
         </div>
-        {/* <div className="flex items-center justify-between text-sm text-gray-600">
-          {selectedUsers.length > 0 && (
-            <span className="text-[#0097b2] font-medium">
-              {selectedUsers.length} selected
-            </span>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-3 mt-3 mb-3">
-          {selectedUsers.length > 0 && (
-            <div className="flex-1 flex justify-end">
-              <button
-                onClick={() => setShowBulkUpdateModal(true)}
-                className="px-6 py-3 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 text-base font-bold transition-all duration-200 flex items-center gap-3"
-                style={{ minWidth: "220px" }}
-              >
-                <HeartIcon className="w-6 h-6" />
-                Give to Selected ({selectedUsers.length})
-              </button>
-            </div>
-          )}
-        </div> */}
         {selectedUsers.length > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 mt-3 mb-3 text-sm text-gray-600 w-full">
             <span className="text-[#0097b2] font-medium">

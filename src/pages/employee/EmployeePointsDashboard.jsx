@@ -488,7 +488,7 @@ const PointsDashboard = () => {
                         } focus:outline-none focus:ring-2 focus:ring-offset-2`}
                       >
                         <svg
-                          className="w-3 h-3"
+                          className="w-4 h-4"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -763,8 +763,6 @@ const PointsDashboard = () => {
             />
           </div>
         </div>
-        {/* Recent Activity */}
-        {/* Replace */}
         <div className="rounded-3xl overflow-hidden bg-gradient-to-br from-white via-gray-50 to-slate-100 shadow-2xl border border-white/20 backdrop-blur-xl transactions-section">
           {/* Animated Header with Gradient */}
           <div className="relative px-6 py-5 overflow-hidden">
@@ -908,12 +906,12 @@ const PointsDashboard = () => {
                       }}
                     />
 
-                    <div className="relative p-5 pl-7 flex items-start justify-between gap-4">
+                    <div className="relative p-5 flex items-start justify-between gap-4 sm:p-5 sm:pl-7">
                       {/* Left side - Avatar and Details */}
-                      <div className="flex items-start gap-4 flex-1 min-w-0">
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
                         {/* Avatar with ring animation */}
-                        <div className="flex-shrink-0 relative">
-                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-blue-500/20 blur-lg group-hover:blur-xl transition-all duration-500"></div>
+                        <div className="flex-shrink-0 relative hidden sm:block">
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-blue-500/20 blur-lg group-hover:blur-xl transition-all duration-500 "></div>
                           {isAdminTransaction ? (
                             <div className="relative">
                               <img
@@ -944,7 +942,7 @@ const PointsDashboard = () => {
                         </div>
 
                         {/* Transaction Details */}
-                        <div className="flex-1 min-w-0">
+                        <div className="sm:flex-1 sm:min-w-0">
                           <p
                             className="font-bold text-gray-900 text-base mb-1 truncate transition-colors duration-300 group-hover:text-cyan-600"
                             style={{ fontFamily: "Avenir, sans-serif" }}
@@ -953,7 +951,7 @@ const PointsDashboard = () => {
                               transaction.type.replace("_", " ").toUpperCase()}
                           </p>
                           <p
-                            className="text-sm text-gray-500 mb-3 flex items-center gap-2"
+                            className="text-sm text-gray-500 mb-3 flex items-start gap-2"
                             style={{ fontFamily: "Avenir, sans-serif" }}
                           >
                             <svg
@@ -980,7 +978,7 @@ const PointsDashboard = () => {
                               transaction.message)) && (
                             <div className="mt-3 inline-block max-w-full">
                               <div
-                                className="px-4 py-2.5 rounded-2xl text-sm backdrop-blur-sm shadow-lg border transition-all duration-300 hover:scale-105"
+                                className="px-4 py-2.5 rounded-2xl text-sm backdrop-blur-sm shadow-lg border transition-all duration-300 hover:scale-105 "
                                 style={{
                                   background:
                                     "linear-gradient(135deg, rgba(239, 246, 255, 0.9) 0%, rgba(219, 234, 254, 0.9) 100%)",
@@ -998,7 +996,7 @@ const PointsDashboard = () => {
                       </div>
 
                       {/* Right side - Amount badge with premium styling */}
-                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                      <div className="flex flex-col items-end gap-2 flex-shrink-0 mt-40 sm:mt-0 ">
                         <div
                           className="relative px-4 py-2 rounded-2xl font-black text-lg shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:shadow-2xl"
                           style={{
