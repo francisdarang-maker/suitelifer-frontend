@@ -6,12 +6,12 @@ import {
 } from "@heroicons/react/20/solid";
 import { Link, useLocation } from "react-router-dom";
 import { toSlug } from "../../utils/slugUrl";
-import ModalFullImages from "../modals/ModalFullImages";
-import { Heart, Trash2Icon } from "lucide-react";
+import { Heart, Trash2 } from "lucide-react";
 import Loader from '../../components/loader/Loading'
 
 
 import api from "../../utils/axios";
+import ModalFullImages from "../../components/blog/ModalFullImages";
 
 const BlogCard = ({ blog, isMine = false, onDelete }) => {
   const [isFullImages, setIsFullImages] = useState(false);
@@ -32,7 +32,7 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
     if (feelingMatch) {
       return {
         cleanTitle: feelingMatch[1].trim(),
-        feeling: feelingMatch[2].trim()
+        feeling: feelingMatch[2].trim() 
       };
     }
     
