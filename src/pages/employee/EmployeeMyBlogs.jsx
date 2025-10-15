@@ -22,17 +22,6 @@ const EmployeeMyBlogs = () => {
   setIsLoading(false)
 }
 
-  // const handleDeleteBlog = async (eBlogId) => {
-  //   try {
-  //     setIsDeleting(true)
-
-  //     const deleteBlog = await api.delete(`api/delete-employee-blog/${blog.eblogId}`)
-
-  //   } catch (error) {
-      
-  //   }
-  // }
-
 useEffect( () => {
   fetchEmployeeBlogs()
 },[])
@@ -40,12 +29,6 @@ useEffect( () => {
 
   return (
     <>
-    {/* Delete Dialog */}
-    {/* <BlogDeleteDialog
-    deleteBlog={handleDeleteBlog}
-    /> */}
-
-
     <section className="mb-50">
       <div className="p-2 xl:p-3 ">
         <main>

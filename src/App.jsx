@@ -346,6 +346,7 @@ function App() {
           <Route path="/newsletter" element={<Newsletter />} />
           <Route path="/newsletter/:slug" element={<NewsletterDetails />} />
           <Route path="/blogs" element={<BlogsPage />} />
+          <Route path="blogs-feed/blog/:id/:slug" element={<BlogView />} />
           <Route path="/blogs/:slugs" element={<BlogDetails />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/podcast" element={<Podcast />} />
