@@ -7,7 +7,7 @@ import {
   ChatBubbleLeftEllipsisIcon,
   HeartIcon,
 } from "@heroicons/react/20/solid";
-import { Heart } from "lucide-react"; // 💡 add this
+import { Heart } from "lucide-react";
 import Loader from "../../components/loader/Loading";
 import Carousel from "../cms/Carousel";
 import api from "../../utils/axios";
@@ -32,7 +32,8 @@ const BlogView = () => {
     setIsLoading(true);
     try {
       const response = await api.get(`api/employee-blog/${id}`);
-      setBlog(response.data[0]);
+      setBlog(response.data);
+      setIsLoading(false)
     } catch (err) {
       console.error("Error fetching blog", err);
     } finally {
@@ -60,9 +61,9 @@ const BlogView = () => {
     }
   };
 
-  const fetchLikeStatus = async (eblogId) => {
+  const fetchLikeStatus = async () => {
     try {
-      const { data } = await api.get(`/api/${eblogId}/is-liked`);
+      const { data } = await api.get(`/api/${blog.eblogId}/is-liked`);
       setIsHeart(data.liked);
     } catch (err) {
       console.error("Error fetching like status:", err);
@@ -72,24 +73,38 @@ const BlogView = () => {
   const fetchComments = async() => {
       
     const comments = await api.get(`/api/show-comments/${blog.eblogId}`)
-    console.log(comments)
+    setComments(comments.data)
+
+    console.log(comments.data)
 
   }
 
-  const handleCommentSubmit = async () => {
+const handleCommentSubmit = async () => {
   if (!onComment.trim()) return;
 
-  setIsSubmitComment(true);
+  try {
+    setIsSubmitComment(true);
 
-  console.log("Submitting comment:", onComment);
+    const payload = {
+      eblogId: blog.eblogId, 
+      comment: onComment,
+    };
 
-  // simulate 1.5s delay like an API call
+    await api.post("/api/add-comment", payload);
 
-  toast("Comment submitted successfully!");
+    toast.success("Comment submitted successfully!");
 
-  setIsSubmitComment(false);
-  onCommentChange(""); 
+    onCommentChange("");
+
+    fetchComments()
+  } catch (error) {
+    console.error("Error submitting comment:", error);
+    toast.error("Failed to submit comment. Please try again.");
+  } finally {
+    setIsSubmitComment(false);
+  }
 };
+
 
 
   useEffect(() => {
@@ -99,7 +114,7 @@ const BlogView = () => {
 
   useEffect(() => {
     if (blog?.eblogId) {
-      fetchLikeStatus(blog.eblogId);
+      fetchLikeStatus();
       fetchComments();
     }
   }, [blog?.eblogId]);

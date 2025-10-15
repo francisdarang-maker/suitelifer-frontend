@@ -7,7 +7,10 @@ import {
 import { Link } from "react-router-dom";
 import { toSlug } from "../../utils/slugUrl";
 import ModalFullImages from "../modals/ModalFullImages";
-import { DeleteIcon, Heart, Trash2Icon } from "lucide-react";
+import { Heart, Trash2Icon } from "lucide-react";
+import Loader from '../../components/loader/Loading'
+
+
 import api from "../../utils/axios";
 
 const BlogCard = ({ blog, isMine = false }) => {
@@ -34,10 +37,13 @@ const BlogCard = ({ blog, isMine = false }) => {
 
   const handleDeleteAction = async() => {
     try {
-      console.log(blog.eblogId)
+      setIsDeleting(true)
       await api.delete(`/api/delete-employee-blog/${blog.eblogId}`)
     } catch (error) {
       console.error(error)
+    }
+    finally{
+      setIsDeleting(false)
     }
   }
 
@@ -51,11 +57,16 @@ const BlogCard = ({ blog, isMine = false }) => {
         console.error("Error fetching like status:", err);
       }
     };
+    console.log(blog.commentCount)
     fetchLikeStatus();
   }, [blog.eblogId]);
 
+  if(isDeleting){
+    return <Loader/>
+  }
 
   return (
+    
     <section className="rounded-lg p-5 xl:p-8 flex flex-col gap-6 border border-gray-100">
       <ModalFullImages
         viewFull={isFullImages}
