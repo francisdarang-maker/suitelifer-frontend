@@ -234,18 +234,38 @@ const MoodPage = () => {
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* LEFT COLUMN - Mood Input & Quick Stats */}
-            <div className="space-y-6">
-              {/* Mood Input Card */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-sm border border-blue-100 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  How are you feeling?
-                </h2>
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <h1
+            className="text-4xl font-black mb-2"
+            style={{ fontFamily: "Avenir, sans-serif", color: "#1a0202" }}
+          >
+            How are you feeling today?
+          </h1>
+        </div>
 
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* Left Column - Mood Input */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Mood Input Card */}
+            <div
+              className="rounded-3xl shadow-2xl p-8 overflow-hidden relative group"
+              style={{
+                background: getMoodGradient(currentMoodLevel),
+                border: "1px solid rgba(255,255,255,0.3)",
+              }}
+            >
+              {/* Animated glow */}
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background:
+                    "radial-gradient(circle at top right, rgba(255,255,255,0.2) 0%, transparent 70%)",
+                }}
+              />
+
+              <div className="relative">
                 {/* Mood Display */}
                 <div className="text-center mb-8 bg-white rounded-2xl p-6 shadow-sm">
                   <div className="text-8xl mb-4 transform transition-transform hover:scale-110">
@@ -261,30 +281,22 @@ const MoodPage = () => {
 
                 {/* Mood Slider */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Select your mood level
-                  </label>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-3xl">😢</span>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-4xl">😢</span>
                     <input
                       type="range"
                       min="1"
                       max="5"
                       value={currentMoodLevel}
-                      onChange={(e) => setCurrentMoodLevel(parseInt(e.target.value))}
-                      className="flex-1 mx-4 h-3 rounded-full appearance-none cursor-pointer"
+                      onChange={(e) =>
+                        setCurrentMoodLevel(parseInt(e.target.value))
+                      }
+                      className="flex-1 mx-4 h-3 rounded-full appearance-none cursor-pointer transition-all"
                       style={{
                         background: `linear-gradient(to right, #dc2626 0%, #f59e0b 25%, #eab308 50%, #10b981 75%, #059669 100%)`,
                       }}
                     />
-                    <span className="text-3xl">😄</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-500 px-8">
-                    <span>1</span>
-                    <span>2</span>
-                    <span>3</span>
-                    <span>4</span>
-                    <span>5</span>
+                    <span className="text-4xl">😄</span>
                   </div>
                 </div>
 
@@ -306,16 +318,15 @@ const MoodPage = () => {
                 <button
                   onClick={handleSubmitMood}
                   disabled={sending}
-                  className="w-full bg-primary text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                  className="w-full py-4 rounded-2xl font-black text-lg transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl disabled:opacity-50"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #0097b2 0%, #007a92 100%)",
+                    color: "#ffffff",
+                    fontFamily: "Avenir, sans-serif",
+                  }}
                 >
-                  {sending ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                      Submitting...
-                    </span>
-                  ) : (
-                    "Log My Mood"
-                  )}
+                  {sending ? "✨ Submitting..." : "🚀 Submit My Mood"}
                 </button>
               </div>
 
@@ -327,58 +338,18 @@ const MoodPage = () => {
                   </svg>
                   Your Statistics
                 </h3>
-
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
-                    <div className="text-3xl font-bold text-blue-700 mb-1">
-                      {moodHistory.length}
-                    </div>
-                    <div className="text-xs font-medium text-blue-600">
-                      Total Entries
-                    </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center border border-green-200">
-                    <div className="text-3xl font-bold text-green-700 mb-1">
-                      {avgMood}
-                    </div>
-                    <div className="text-xs font-medium text-green-600">
-                      Average Mood
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mood Distribution */}
-                <div>
-                  <p className="text-sm font-semibold text-gray-700 mb-3">Mood Distribution</p>
-                  <div className="space-y-3">
-                    {getMoodDistribution().map((item) => (
-                      <div key={item.level}>
-                        <div className="flex items-center justify-between mb-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-2xl">{item.emoji}</span>
-                            <span className="text-xs font-medium text-gray-700">
-                              {item.label}
-                            </span>
-                          </div>
-                          <span className="text-sm font-bold" style={{ color: item.color }}>
-                            {item.count}
-                          </span>
-                        </div>
-                        <div className="h-2 rounded-full overflow-hidden bg-gray-100">
-                          <div
-                            className="h-full transition-all duration-500 rounded-full"
-                            style={{
-                              width: `${moodHistory.length > 0 ? (item.count / moodHistory.length) * 100 : 0}%`,
-                              backgroundColor: item.color,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <div className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200">
+                  <span
+                    className="text-sm font-bold"
+                    style={{
+                      color: "#0097b2",
+                      fontFamily: "Avenir, sans-serif",
+                    }}
+                  >
+                    {moodStats?.total_entries || 0} logs
+                  </span>
                 </div>
               </div>
-            </div>
 
             {/* RIGHT COLUMN - Chart & History */}
             <div className="lg:col-span-2 space-y-6">
@@ -425,7 +396,13 @@ const MoodPage = () => {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                          legend: { display: false },
+                          legend: {
+                            display: true,
+                            labels: {
+                              font: { family: "Avenir, sans-serif", size: 12 },
+                              padding: 15,
+                            },
+                          },
                           tooltip: {
                             backgroundColor: "#ffffff",
                             titleColor: "#1f2937",

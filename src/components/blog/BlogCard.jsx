@@ -41,46 +41,36 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
 
   const { cleanTitle, feeling } = parseTitleAndFeeling(blog?.title);
 
-  // Format date helper function - converts UTC to user's local timezone
   const formatDate = (dateString) => {
     if (!dateString) return 'Just now';
     
-    // Parse the UTC date string
     const utcDate = new Date(dateString);
-    
-    // Check if date is valid
+
     if (isNaN(utcDate.getTime())) return 'Invalid date';
-    
-    // Get current time in user's local timezone
+
     const now = new Date();
-    
-    // Calculate difference (both dates are already in local timezone after parsing)
+
     const diffInSeconds = Math.floor((now - utcDate) / 1000);
     
-    // Less than a minute
     if (diffInSeconds < 60) {
       return 'Just now';
     }
     
-    // Less than an hour
     if (diffInSeconds < 3600) {
       const minutes = Math.floor(diffInSeconds / 60);
       return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
     }
     
-    // Less than a day
     if (diffInSeconds < 86400) {
       const hours = Math.floor(diffInSeconds / 3600);
       return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
     }
     
-    // Less than a week
     if (diffInSeconds < 604800) {
       const days = Math.floor(diffInSeconds / 86400);
       return `${days} ${days === 1 ? 'day' : 'days'} ago`;
     }
     
-    // More than a week - show actual date in user's local timezone
     const options = { 
       month: 'short', 
       day: 'numeric', 
@@ -102,7 +92,6 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
     const previousState = isHeart;
     const previousCount = likeCount;
 
-    // Optimistic update
     setIsHeart(newState);
     setLikeCount((prev) => prev + (newState ? 1 : -1));
 
@@ -121,31 +110,35 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = async () => {
-    if (!blog?.eblogId) return;
-    
-    setIsDeleting(true);
-    setShowDeleteModal(false);
-    
-    try {
-      await api.delete(`/api/delete-employee-blog/${blog.eblogId}`);
-      
-      // Call parent callback if provided
-      if (onDelete && typeof onDelete === 'function') {
-        onDelete(blog.eblogId);
-      } else {
-        // If no callback provided, force page refresh
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error("Error deleting blog:", error);
-      alert("Failed to delete the blog post. Please try again.");
-      setIsDeleting(false);
-    }
-    finally{
-      setIsDeleting(false)
-    }
+ const confirmDelete = async () => {
+  if (!blog?.eblogId) return;
+
+  setIsDeleting(true);
+  setShowDeleteModal(false);
+
+
+  try {
+  const [blogRes, imageRes] = await Promise.allSettled([
+    api.delete(`/api/delete-employee-blog/${blog.eblogId}`),
+    api.delete(`/api/delete-image-employee-blog/${blog.eblogId}`)
+  ]);
+
+  if (blogRes.status === "fulfilled") {
+    if (onDelete && typeof onDelete === "function") onDelete(blog.eblogId);
+    else window.location.reload();
   }
+
+  if (imageRes.status === "rejected") {
+    console.warn("⚠️ Failed to delete images, but blog was deleted.");
+  }
+
+} catch (error) {
+  console.error("❌ Error deleting blog:", error);
+  alert("Failed to delete the blog post. Please try again.");
+} finally {
+  setIsDeleting(false);
+}
+};
 
   const cancelDelete = () => {
     setShowDeleteModal(false);
@@ -166,21 +159,18 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
     fetchLikeStatus();
   }, [blog?.eblogId]);
 
-  // Sync like count with prop changes
   useEffect(() => {
     setLikeCount(blog?.likeCount || 0);
   }, [blog?.likeCount]);
 
-  // Dynamic image layout based on number of images
   const renderImageGrid = () => {
     const images = blog?.images || [];
-    // Filter out empty, null, or undefined image URLs
+
     const validImages = images.filter(img => img && img.trim() !== '');
     const imageCount = validImages.length;
 
     if (imageCount === 0) return null;
 
-    // Single image
     if (imageCount === 1) {
       return (
         <div 
