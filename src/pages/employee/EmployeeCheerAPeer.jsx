@@ -657,9 +657,9 @@ const CheerPage = () => {
     >
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* LEFT COLUMN - Create Cheer & Heartbits */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 xl:col-span-2 space-y-6">
             {/* ENHANCED CREATE CHEER FORM */}
             <div
               className="rounded-3xl shadow-2xl p-8 transition-all duration-300 hover:shadow-3xl overflow-hidden relative group"
@@ -700,7 +700,7 @@ const CheerPage = () => {
                       Send Heartbits
                     </h2>
                     <p
-                      className="text-sm"
+                      className="text-sm hidden sm:block"
                       style={{
                         color: "#64748b",
                         fontFamily: "Avenir, sans-serif",
@@ -912,7 +912,7 @@ const CheerPage = () => {
                       ref={textareaRef}
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
-                      placeholder="Share why they deserve recognition... 🌟"
+                      placeholder="Message here... 🌟"
                       className="w-full px-4 py-3 rounded-2xl resize-none transition-all duration-200 focus:ring-4"
                       style={{
                         border: "2px solid #e2e8f0",
@@ -1013,9 +1013,9 @@ const CheerPage = () => {
                       </>
                     ) : (
                       <>
-                        <PaperAirplaneIcon className="w-6 h-6" />
+                        {/* <PaperAirplaneIcon className="w-6 h-6 hidden sm:block" /> */}
                         <span>Send Heartbits</span>
-                        <HeartIconSolid className="w-6 h-6" />
+                        <HeartIconSolid className="w-6 h-6 hidden sm:block" />
                       </>
                     )}
                   </button>
@@ -1196,7 +1196,7 @@ const CheerPage = () => {
           {/* una */}
           {/* Right Column - Feed & Leaderboard */}
 
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 lg:space-y-3">
             {/* ENHANCED CHEER FEED */}
             <div
               className="rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl cheer-feed-section"
@@ -1207,15 +1207,15 @@ const CheerPage = () => {
             >
               {/* Feed Header with Date Filter */}
               <div
-                className="px-6 py-5 border-b border-gray-200"
+                className="px-6 py-5 border-b border-gray-200 lg:px-4 lg:py-0"
                 style={{
                   background:
                     "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
                 }}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 lg:gap-2">
                   {/* Left side - Title */}
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 lg:space-x-2">
                     <div
                       className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110"
                       style={{
@@ -1225,7 +1225,7 @@ const CheerPage = () => {
                     >
                       <FireIcon className="w-6 h-6 text-white" />
                     </div>
-                    <div>
+                    <div className="lg:mt-10">
                       <h2
                         className="text-2xl font-black"
                         style={{
@@ -1248,7 +1248,7 @@ const CheerPage = () => {
                   </div>
 
                   {/* Right side - Date Filter */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1 sm:gap-3 lg:gap-1">
                     <label
                       htmlFor="cheer-date-picker"
                       className="text-sm font-bold whitespace-nowrap"
@@ -1259,11 +1259,11 @@ const CheerPage = () => {
                     >
                       Filter by Date:
                     </label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <input
                         id="cheer-date-picker"
                         type="date"
-                        className="px-4 py-2 rounded-xl text-sm transition-all duration-300 focus:ring-4 focus:outline-none"
+                        className="px-1 py-2 sm:px-4 sm:py-2 rounded-xl text-sm transition-all duration-300 focus:ring-4 focus:outline-none"
                         style={{
                           border: "2px solid #e2e8f0",
                           backgroundColor: "#ffffff",
@@ -1355,7 +1355,7 @@ const CheerPage = () => {
                                 "/images/default-avatar.png"
                               }
                               alt={cheer.fromUser?.name}
-                              className="w-14 h-14 rounded-2xl ring-2 ring-gray-200 flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
+                              className="w-14 h-14 rounded-2xl ring-2 ring-gray-200 flex-shrink-0 transition-transform duration-300 group-hover:scale-110 hidden sm:block"
                             />
 
                             {/* Main Content */}
@@ -1475,7 +1475,7 @@ const CheerPage = () => {
                                 </button>
 
                                 <span
-                                  className="text-sm font-medium ml-auto"
+                                  className="text-sm font-medium ml-auto hidden sm:block"
                                   style={{
                                     color: "#94a3b8",
                                     fontFamily: "Avenir, sans-serif",
@@ -1941,7 +1941,7 @@ const CheerPage = () => {
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md"
+                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hidden sm:block"
                       style={{
                         background:
                           currentPage === 1
@@ -2001,7 +2001,7 @@ const CheerPage = () => {
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md"
+                      className="px-4 py-2  rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md hidden sm:block"
                       style={{
                         background:
                           currentPage === totalPages
@@ -2021,14 +2021,14 @@ const CheerPage = () => {
 
             {/* ENHANCED LEADERBOARD */}
             <div
-              className="rounded-3xl shadow-2xl p-6 transition-all duration-300 hover:shadow-3xl"
+              className="rounded-3xl shadow-2xl p-3 sm:p-6 transition-all duration-300 hover:shadow-3xl"
               style={{
                 background: "#ffffff",
                 border: "1px solid #e2e8f0",
               }}
             >
               {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-center mb-6 gap-4 xl:flex-row md:">
                 <div className="flex items-center space-x-3">
                   <div
                     className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110"
@@ -2050,7 +2050,7 @@ const CheerPage = () => {
                       Leaderboard
                     </h2>
                     <p
-                      className="text-sm"
+                      className="text-sm hidden sm:block"
                       style={{
                         color: "#64748b",
                         fontFamily: "Avenir, sans-serif",
@@ -2067,7 +2067,7 @@ const CheerPage = () => {
                     <button
                       key={period}
                       onClick={() => setActiveTab(period)}
-                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md"
+                      className="px-2 py-1 sm:px-4 sm:py-2 rounded-xl text-sm font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md"
                       style={{
                         background:
                           activeTab === period
@@ -2205,7 +2205,7 @@ const CheerPage = () => {
                       >
                         {/* Rank Badge */}
                         <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shadow-lg transform transition-transform duration-300 group-hover:scale-110"
+                          className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shadow-lg transform transition-transform duration-300 group-hover:scale-110 hidden sm:block"
                           style={{
                             background:
                               entry.rank === 1

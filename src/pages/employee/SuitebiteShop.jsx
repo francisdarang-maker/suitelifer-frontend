@@ -10,14 +10,17 @@ import OrderHistory from "../../components/suitebite/OrderHistory";
 
 import {
   MagnifyingGlassIcon,
-  FunnelIcon,
+  ChevronDownIcon,
   ShoppingBagIcon,
   ShoppingCartIcon,
   ClipboardDocumentListIcon,
   HeartIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 
 const SuitebiteShop = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   // Modal state for product details, add to cart, buy now
   const [modalProduct, setModalProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -415,6 +418,13 @@ const SuitebiteShop = () => {
     return Array.from(categories).sort();
   };
 
+  const isAnyFilterActive =
+    searchTerm !== "" ||
+    selectedCategory !== "all" ||
+    priceRange.min !== 1 ||
+    priceRange.max !== 10000 ||
+    sortOption !== "name-asc";
+
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedCategory("all");
@@ -483,166 +493,206 @@ const SuitebiteShop = () => {
   return (
     <div className="suitebite-shop-container h-full flex flex-col p-4">
       {/* Navigation Tabs - Fixed */}
-      <div className="tabs flex-shrink-0 mb-6">
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+      <div className="tabs flex-shrink-0 col-1 w-full   ">
+        <div className="flex space-x-1 bg-gradient-to-r from-gray-50 to-gray-100/50 p-1.5 rounded-xl border border-gray-200/50 backdrop-blur-sm justify-center sm:justify-start ">
           <button
             onClick={() => setActiveTab("products")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2.5 px-3 md:gap-2 md:px-4 md:py-2 rounded-lg text-sm font-semibold transition-all duration-300  ${
               activeTab === "products"
-                ? "bg-white text-[#0097b2] shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-[#0097b2] shadow-lg shadow-[#0097b2]/10 scale-105"
+                : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
             }`}
           >
-            <ShoppingBagIcon className="h-4 w-4" />
-            Products
+            <ShoppingBagIcon className="h-5 w-5" />
+            <span className="hidden sm:block xs:block">Products</span>
           </button>
           <button
             onClick={() => setActiveTab("cart")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2.5 px-3 ml-2  md:gap-2 md:px-4 md:py-2 rounded-lg text-sm font-semibold transition-all duration-300${
               activeTab === "cart"
-                ? "bg-white text-[#0097b2] shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-[#0097b2] shadow-lg shadow-[#0097b2]/10 scale-105"
+                : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
             }`}
           >
-            <ShoppingCartIcon className="h-4 w-4" />
-            Cart
+            <ShoppingCartIcon className="h-5 w-5" />
+            <span className="hidden sm:block">Cart</span>
+            {/* {cart.length > 0 && (
+              <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                {cart.length}
+              </span>
+            )} */}
           </button>
           <button
             onClick={() => setActiveTab("orders")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2.5 px-3 ml-2  md:gap-2 md:px-4 md:py-2 rounded-lg text-sm font-semibold transition-all duration-300 ${
               activeTab === "orders"
-                ? "bg-white text-[#0097b2] shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white text-[#0097b2] shadow-lg shadow-[#0097b2]/10 scale-105"
+                : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
             }`}
           >
-            <ClipboardDocumentListIcon className="h-4 w-4" />
-            Order History
+            <ClipboardDocumentListIcon className="h-5 w-5" />
+            <span className="hidden sm:block">Order History</span>
           </button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="content flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="mt-5">
+        {/* <div className="content flex-1 flex flex-col min-h-0 overflow-hidden"> */}
         {/* Products Tab */}
         {activeTab === "products" && (
           <div className="products-tab flex flex-col h-full min-h-0">
             {/* Filters - Fixed */}
-            <div className="filters flex-shrink-0 mb-6 bg-white rounded-lg shadow-sm border p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
-                {/* Search */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="backdrop-blur-xl bg-white/80 rounded-2xl shadow-xl border border-gray-200/50 p-4 sm:p-6">
+              {/* Always-visible Search */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5">
+                <div className="lg:col-span-2">
+                  <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
                     Search
                   </label>
-                  <div className="relative">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <div className="relative group">
+                    <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0097b2] transition-colors" />
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Search products..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+                      className="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0097b2]/50 focus:border-[#0097b2] focus:bg-white transition-all outline-none text-sm"
                     />
                   </div>
                 </div>
-                {/* Category Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category
-                  </label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+              </div>
+
+              {/* Expandable Filters */}
+              <div
+                className={`transition-all duration-500 overflow-hidden ${
+                  isExpanded ? "max-h-[1000px] mt-6" : "max-h-0"
+                }`}
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5">
+                  {/* Category Filter */}
+                  <div className="lg:col-span-1">
+                    <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+                      Category
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0097b2]/50 focus:border-[#0097b2] focus:bg-white transition-all outline-none text-sm cursor-pointer"
+                    >
+                      <option value="all">All Categories</option>
+                      {getCategories().map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Price Range */}
+                  <div className="lg:col-span-1">
+                    <label className="block text-xs font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+                      Price Range
+                    </label>
+                    <div className="flex flex-col flex-row gap-2 md:flex-row md:items-center sm:flex-row">
+                      <input
+                        type="number"
+                        min="1"
+                        value={priceRange.min || ""}
+                        onChange={(e) =>
+                          setPriceRange({
+                            ...priceRange,
+                            min: Number(e.target.value),
+                          })
+                        }
+                        className="w-20 px-3 py-2 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0097b2]/50 focus:border-[#0097b2] focus:bg-white transition-all outline-none text-sm"
+                        placeholder="Min"
+                      />
+                      <span className="px-1 text-gray-300 font-medium text-center">
+                        -
+                      </span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="100000"
+                        value={priceRange.max || ""}
+                        onChange={(e) =>
+                          setPriceRange({
+                            ...priceRange,
+                            max: Number(e.target.value),
+                          })
+                        }
+                        className="w-20 px-3 py-2 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0097b2]/50 focus:border-[#0097b2] focus:bg-white transition-all outline-none text-sm"
+                        placeholder="Max"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Sort By */}
+                  <div className="lg:col-span-1">
+                    <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+                      Sort By
+                    </label>
+                    <select
+                      value={sortOption}
+                      onChange={(e) => setSortOption(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0097b2]/50 focus:border-[#0097b2] focus:bg-white transition-all outline-none text-sm cursor-pointer"
+                    >
+                      <option value="name-asc">Name: A-Z</option>
+                      <option value="price-asc">Price: Low to High</option>
+                      <option value="price-desc">Price: High to Low</option>
+                      <option value="category-asc">Category: A-Z</option>
+                    </select>
+                  </div>
+
+                  {/* Reset & Balance */}
+                  <div
+                    className={`lg:col-span-1 ${
+                      isAnyFilterActive ? "space-y-2" : ""
+                    }`}
                   >
-                    <option value="all">All Categories</option>
-                    {getCategories().map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {/* Price Range Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Price Range
-                  </label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="number"
-                      min="1"
-                      value={priceRange.min}
-                      onChange={(e) =>
-                        setPriceRange({
-                          ...priceRange,
-                          min: Number(e.target.value),
-                        })
-                      }
-                      className="w-1/2 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                      placeholder="Min"
-                    />
-                    <span className="text-gray-400">-</span>
-                    <input
-                      type="number"
-                      min="1"
-                      max="100000"
-                      value={priceRange.max}
-                      onChange={(e) =>
-                        setPriceRange({
-                          ...priceRange,
-                          max: Number(e.target.value),
-                        })
-                      }
-                      className="w-1/2 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                      placeholder="Max"
-                    />
+                    {isAnyFilterActive && (
+                      <button
+                        onClick={resetFilters}
+                        className="w-full px-4 py-3 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 text-gray-700 rounded-xl transition-all font-medium text-sm flex items-center justify-center gap-2 group border border-gray-200"
+                      >
+                        <ArrowPathIcon className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+                        Reset
+                      </button>
+                    )}
+                    <div className="bg-gradient-to-br from-[#0097b2]/10 to-red-50/50 border border-[#0097b2]/20 rounded-xl px-4 py-2.5 flex items-center justify-between lg:mt-5 md:mt-5">
+                      <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                        Balance
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#0097b2] font-bold text-lg ml-1">
+                          {userHeartbits.toLocaleString()}
+                        </span>
+                        <HeartIcon className="w-4 h-4 text-red-500 fill-red-500" />
+                      </div>
+                    </div>
                   </div>
                 </div>
-                {/* Sort By */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Sort
-                  </label>
-                  <select
-                    value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                  >
-                    <option value="name-asc">Name: A-Z</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="category-asc">Category: A-Z</option>
-                  </select>
-                </div>
-                {/* Reset Filters */}
-                <div>
-                  <button
-                    onClick={resetFilters}
-                    className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Reset Filters
-                  </button>
-                </div>
-                {/* Heartbits Balance */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Balance
-                  </label>
-                  <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
-                    <span className="text-[#0097b2] font-bold text-lg">
-                      {userHeartbits}
-                    </span>
-                    <span className="text-red-600 text-lg">
-                      <HeartIcon className="w-4" />
-                    </span>
-                  </div>
-                </div>
+              </div>
+
+              {/* Toggle Button */}
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-[#0097b2] hover:text-[#007a8f] transition-colors flex items-center gap-1 text-sm font-medium"
+                >
+                  {isExpanded ? "Show Less" : "Show More"}
+                  <ChevronDownIcon
+                    className={`w-5 h-5 transform transition-transform duration-300 ${
+                      isExpanded ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
               </div>
             </div>
 
             {/* Products Grid - Scrollable only */}
-            <div className="products-grid-container flex-1 min-h-0 overflow-y-auto">
+            <div className="products-grid-container flex-1 min-h-0 overflow-y-auto mt-5">
               <div className="pr-1">
                 {loading ? (
                   <div className="text-center py-12">
@@ -660,7 +710,7 @@ const SuitebiteShop = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-8">
+                  <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-6 pb-8 sm:grid-cols-2 ">
                     {filteredAndSortedProducts.map((product) => {
                       const productWithImages = {
                         ...product,
