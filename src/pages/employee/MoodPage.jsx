@@ -32,7 +32,6 @@ const MoodPage = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [moodHistory, setMoodHistory] = useState([]);
   const [moodStats, setMoodStats] = useState(null);
-  const [weeklyStats, setWeeklyStats] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -43,20 +42,12 @@ const MoodPage = () => {
   const fetchAllData = async () => {
     try {
       setLoading(true);
-      const [historyData, , statsData, weeklyData, monthlyData, yearlyData] =
-        await Promise.all([
-          moodApi.getMoodHistory().catch(() => ({ data: [] })),
-          moodApi.getTodayMood().catch(() => ({ data: null })),
-          moodApi.getMoodStats().catch(() => ({ data: null })),
-          moodApi.getWeeklyStats().catch(() => ({ data: null })),
-          moodApi.getMonthlyStats().catch(() => ({ data: null })),
-          moodApi.getYearlyStats().catch(() => ({ data: null })),
-        ]);
+      const [historyData, statsData] = await Promise.all([
+        moodApi.getMoodHistory().catch(() => ({ data: [] })),
+        moodApi.getMoodStats().catch(() => ({ data: null })),
+      ]);
       setMoodHistory(historyData.data || []);
       setMoodStats(statsData.data);
-      setWeeklyStats(weeklyData.data);
-      setMonthlyStats(monthlyData.data);
-      setYearlyStats(yearlyData.data);
     } catch (error) {
       console.error("Error fetching mood data:", error);
     } finally {
@@ -117,17 +108,6 @@ const MoodPage = () => {
     return labels[level] || "Neutral";
   };
 
-  const getMoodGradient = (level) => {
-    const gradients = {
-      1: "linear-gradient(135deg, #fecaca 0%, #fca5a5 100%)",
-      2: "linear-gradient(135deg, #fed7aa 0%, #fdba74 100%)",
-      3: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
-      4: "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)",
-      5: "linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%)",
-    };
-    return gradients[level] || gradients[3];
-  };
-
   const getMoodColor = (level) => {
     const colors = {
       1: "#dc2626",
@@ -139,9 +119,23 @@ const MoodPage = () => {
     return colors[level] || colors[3];
   };
 
-  const formatMoodStats = (stats) => {
-    if (!stats || !stats.avg_mood) return "0";
-    return Math.round(parseFloat(stats.avg_mood));
+  const formatTimeAgo = (date) => {
+    try {
+      if (!date) return "Unknown time";
+      const now = new Date();
+      const dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) return "Invalid date";
+      const diffMs = now - dateObj;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+      if (diffMins < 1) return "Just now";
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      return `${diffDays}d ago`;
+    } catch (error) {
+      return "Invalid date";
+    }
   };
 
   const getMoodDistribution = () => {
@@ -151,102 +145,69 @@ const MoodPage = () => {
       distribution[mood.mood_level]++;
     });
     return [
-      {
-        level: 1,
-        count: distribution[1],
-        label: "Very Bad",
-        emoji: "😢",
-        color: "#dc2626",
-      },
-      {
-        level: 2,
-        count: distribution[2],
-        label: "Bad",
-        emoji: "😔",
-        color: "#f59e0b",
-      },
-      {
-        level: 3,
-        count: distribution[3],
-        label: "Neutral",
-        emoji: "😐",
-        color: "#eab308",
-      },
-      {
-        level: 4,
-        count: distribution[4],
-        label: "Good",
-        emoji: "😊",
-        color: "#10b981",
-      },
-      {
-        level: 5,
-        count: distribution[5],
-        label: "Excellent",
-        emoji: "😄",
-        color: "#059669",
-      },
+      { level: 1, count: distribution[1], label: "Very Bad", emoji: "😢", color: "#dc2626" },
+      { level: 2, count: distribution[2], label: "Bad", emoji: "😔", color: "#f59e0b" },
+      { level: 3, count: distribution[3], label: "Neutral", emoji: "😐", color: "#eab308" },
+      { level: 4, count: distribution[4], label: "Good", emoji: "😊", color: "#10b981" },
+      { level: 5, count: distribution[5], label: "Excellent", emoji: "😄", color: "#059669" },
     ];
   };
 
+  const avgMood = moodHistory.length > 0 
+    ? (moodHistory.reduce((sum, m) => sum + m.mood_level, 0) / moodHistory.length).toFixed(1)
+    : "0";
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
-          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-500 border-r-green-500 animate-spin"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg font-medium text-gray-700">Loading your mood data...</p>
         </div>
       </div>
     );
   }
 
+  // Prepare chart data
+  const last30Days = moodHistory.slice(0, 30).reverse();
+  const chartLabels = last30Days.map((mood) => {
+    const d = new Date(mood.created_at);
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  });
+  const chartData = last30Days.map(m => m.mood_level);
+
   return (
     <>
       {/* Delete Modal */}
       {showDeleteModal && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }}
-        >
-          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm mx-4 transform transition-all scale-100 animate-in">
-            <h4
-              className="text-xl font-bold mb-3"
-              style={{ color: "#1a0202", fontFamily: "Avenir, sans-serif" }}
-            >
-              Delete Mood Log?
-            </h4>
-            <p
-              className="mb-6 text-sm"
-              style={{ color: "#4a6e7e", fontFamily: "Avenir, sans-serif" }}
-            >
-              This action cannot be undone. Your mood entry will be permanently
-              removed.
-            </p>
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-md transform transition-all scale-100">
+            <div className="text-center mb-4">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <h4 className="text-xl font-semibold mb-2 text-gray-900">
+                Delete Mood Log?
+              </h4>
+              <p className="text-sm text-gray-600">
+                This action cannot be undone. Your mood entry will be permanently removed.
+              </p>
+            </div>
             <div className="flex gap-3">
               <button
                 onClick={() => {
                   setShowDeleteModal(false);
                   setDeleteId(null);
                 }}
-                className="flex-1 px-4 py-2.5 rounded-xl font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
-                  color: "#475569",
-                  fontFamily: "Avenir, sans-serif",
-                }}
+                className="flex-1 px-4 py-2.5 rounded-lg font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDeleteMood}
-                className="flex-1 px-4 py-2.5 rounded-xl font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #fecaca 0%, #fca5a5 100%)",
-                  color: "#dc2626",
-                  fontFamily: "Avenir, sans-serif",
-                }}
+                className="flex-1 px-4 py-2.5 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm"
               >
                 Delete
               </button>
@@ -256,578 +217,357 @@ const MoodPage = () => {
       )}
 
       {/* Main Content */}
-      <div
-        className="max-w-7xl mx-auto p-6 space-y-6 pb-20 rounded-2xl"
-        style={{ backgroundColor: "#f8fafc", minHeight: "100vh" }}
-      >
-        {/* Success Message */}
-        {showSuccessMessage && (
-          <div
-            className="rounded-2xl p-4 shadow-lg transform transition-all animate-in slide-in-from-top"
-            style={{
-              background: "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)",
-              border: "2px solid #10b981",
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                <svg
-                  className="h-5 w-5 text-white"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
+      <div className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Success Message */}
+          {showSuccessMessage && (
+            <div className="mb-6 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                <svg className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               </div>
-              <p
-                className="text-sm font-bold"
-                style={{ color: "#065f46", fontFamily: "Avenir, sans-serif" }}
-              >
-                🎉 Mood submitted successfully!
-              </p>
+              <div>
+                <p className="font-semibold text-green-900">Mood Submitted!</p>
+                <p className="text-sm text-green-700">Your mood has been logged successfully 🎉</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Header Section */}
-        <div className="text-center mb-8">
-          <h1
-            className="text-4xl font-black mb-2"
-            style={{ fontFamily: "Avenir, sans-serif", color: "#1a0202" }}
-          >
-            How are you feeling today?
-          </h1>
-        </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* LEFT COLUMN - Mood Input & Quick Stats */}
+            <div className="space-y-6">
+              {/* Mood Input Card */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-sm border border-blue-100 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  How are you feeling?
+                </h2>
 
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Left Column - Mood Input */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Mood Input Card */}
-            <div
-              className="rounded-3xl shadow-2xl p-8 overflow-hidden relative group"
-              style={{
-                background: getMoodGradient(currentMoodLevel),
-                border: "1px solid rgba(255,255,255,0.3)",
-              }}
-            >
-              {/* Animated glow */}
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{
-                  background:
-                    "radial-gradient(circle at top right, rgba(255,255,255,0.2) 0%, transparent 70%)",
-                }}
-              />
-
-              <div className="relative">
                 {/* Mood Display */}
-                <div className="text-center mb-8">
-                  <div
-                    className="text-9xl mb-4 transition-transform duration-300 hover:scale-110 inline-block"
-                    style={{
-                      filter: "drop-shadow(0 4px 20px rgba(0,0,0,0.1))",
-                    }}
-                  >
+                <div className="text-center mb-8 bg-white rounded-2xl p-6 shadow-sm">
+                  <div className="text-8xl mb-4 transform transition-transform hover:scale-110">
                     {getMoodEmoji(currentMoodLevel)}
                   </div>
-                  <div
-                    className="text-6xl font-black mb-2"
-                    style={{
-                      fontFamily: "Avenir, sans-serif",
-                      color: getMoodColor(currentMoodLevel),
-                    }}
-                  >
+                  <div className="text-4xl font-bold mb-2" style={{ color: getMoodColor(currentMoodLevel) }}>
                     {currentMoodLevel}.0
                   </div>
-                  <div
-                    className="text-2xl font-bold"
-                    style={{
-                      fontFamily: "Avenir, sans-serif",
-                      color: getMoodColor(currentMoodLevel),
-                    }}
-                  >
+                  <div className="text-lg font-semibold text-gray-600">
                     {getMoodLabel(currentMoodLevel)}
                   </div>
                 </div>
 
                 {/* Mood Slider */}
                 <div className="mb-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-4xl">😢</span>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Select your mood level
+                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-3xl">😢</span>
                     <input
                       type="range"
                       min="1"
                       max="5"
                       value={currentMoodLevel}
-                      onChange={(e) =>
-                        setCurrentMoodLevel(parseInt(e.target.value))
-                      }
-                      className="flex-1 mx-4 h-3 rounded-full appearance-none cursor-pointer transition-all"
+                      onChange={(e) => setCurrentMoodLevel(parseInt(e.target.value))}
+                      className="flex-1 mx-4 h-3 rounded-full appearance-none cursor-pointer"
                       style={{
                         background: `linear-gradient(to right, #dc2626 0%, #f59e0b 25%, #eab308 50%, #10b981 75%, #059669 100%)`,
                       }}
                     />
-                    <span className="text-4xl">😄</span>
+                    <span className="text-3xl">😄</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 px-8">
+                    <span>1</span>
+                    <span>2</span>
+                    <span>3</span>
+                    <span>4</span>
+                    <span>5</span>
                   </div>
                 </div>
 
                 {/* Note Input */}
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Share what's on your mind... (optional)"
-                  className="w-full rounded-2xl px-4 py-3 mb-4 resize-none transition-all duration-200 focus:scale-[1.02] shadow-lg"
-                  style={{
-                    fontFamily: "Avenir, sans-serif",
-                    border: "2px solid rgba(255,255,255,0.5)",
-                    backgroundColor: "rgba(255,255,255,0.9)",
-                    height: "100px",
-                  }}
-                />
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What's on your mind? (optional)
+                  </label>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Share your thoughts, feelings, or what made this moment special..."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none shadow-sm"
+                    rows="4"
+                  />
+                </div>
 
                 {/* Submit Button */}
                 <button
                   onClick={handleSubmitMood}
                   disabled={sending}
-                  className="w-full py-4 rounded-2xl font-black text-lg transition-all duration-300 hover:scale-105 active:scale-95 shadow-2xl disabled:opacity-50"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #0097b2 0%, #007a92 100%)",
-                    color: "#ffffff",
-                    fontFamily: "Avenir, sans-serif",
-                  }}
+                  className="w-full bg-primary text-white py-3 px-4 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                 >
-                  {sending ? "✨ Submitting..." : "🚀 Submit My Mood"}
+                  {sending ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                      Submitting...
+                    </span>
+                  ) : (
+                    "Log My Mood"
+                  )}
                 </button>
+              </div>
+
+              {/* Quick Stats Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Your Statistics
+                </h3>
+
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
+                    <div className="text-3xl font-bold text-blue-700 mb-1">
+                      {moodHistory.length}
+                    </div>
+                    <div className="text-xs font-medium text-blue-600">
+                      Total Entries
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center border border-green-200">
+                    <div className="text-3xl font-bold text-green-700 mb-1">
+                      {avgMood}
+                    </div>
+                    <div className="text-xs font-medium text-green-600">
+                      Average Mood
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mood Distribution */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 mb-3">Mood Distribution</p>
+                  <div className="space-y-3">
+                    {getMoodDistribution().map((item) => (
+                      <div key={item.level}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">{item.emoji}</span>
+                            <span className="text-xs font-medium text-gray-700">
+                              {item.label}
+                            </span>
+                          </div>
+                          <span className="text-sm font-bold" style={{ color: item.color }}>
+                            {item.count}
+                          </span>
+                        </div>
+                        <div className="h-2 rounded-full overflow-hidden bg-gray-100">
+                          <div
+                            className="h-full transition-all duration-500 rounded-full"
+                            style={{
+                              width: `${moodHistory.length > 0 ? (item.count / moodHistory.length) * 100 : 0}%`,
+                              backgroundColor: item.color,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Mood Trend Chart */}
-            <div
-              className="rounded-3xl shadow-xl p-6 overflow-hidden"
-              style={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3
-                  className="text-2xl font-black"
-                  style={{ color: "#1a0202", fontFamily: "Avenir, sans-serif" }}
-                >
-                  📈 Your Mood Journey
-                </h3>
-                <div className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200">
-                  <span
-                    className="text-sm font-bold"
-                    style={{
-                      color: "#0097b2",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    {moodStats?.total_entries || 0} logs
-                  </span>
+            {/* RIGHT COLUMN - Chart & History */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Chart Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                    </svg>
+                    Your Mood Journey
+                  </h3>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-full border border-blue-200">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-xs font-semibold text-blue-700">
+                      Last 30 days
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div
-                className="h-64 rounded-2xl p-4"
-                style={{ backgroundColor: "#f8fafc" }}
-              >
-                {(() => {
-                  const grouped = {};
-                  moodHistory.forEach((mood) => {
-                    const dateObj = new Date(mood.created_at);
-                    const isoDate = dateObj.toISOString().slice(0, 10);
-                    if (!grouped[isoDate]) grouped[isoDate] = [];
-                    grouped[isoDate].push(mood);
-                  });
-
-                  const sortedIsoDates = Object.keys(grouped).sort(
-                    (a, b) => new Date(a) - new Date(b)
-                  );
-                  const labels = sortedIsoDates.map((iso) => {
-                    const d = new Date(iso);
-                    return d.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    });
-                  });
-
-                  const positiveData = sortedIsoDates.map((date) => {
-                    const moods = grouped[date].filter(
-                      (m) => m.mood_level >= 4
-                    );
-                    if (moods.length === 0) return null;
-                    return (
-                      moods.reduce((sum, m) => sum + m.mood_level, 0) /
-                      moods.length
-                    );
-                  });
-
-                  const neutralData = sortedIsoDates.map((date) => {
-                    const moods = grouped[date].filter(
-                      (m) => m.mood_level === 3
-                    );
-                    if (moods.length === 0) return null;
-                    return (
-                      moods.reduce((sum, m) => sum + m.mood_level, 0) /
-                      moods.length
-                    );
-                  });
-
-                  const negativeData = sortedIsoDates.map((date) => {
-                    const moods = grouped[date].filter(
-                      (m) => m.mood_level <= 2
-                    );
-                    if (moods.length === 0) return null;
-                    return (
-                      moods.reduce((sum, m) => sum + m.mood_level, 0) /
-                      moods.length
-                    );
-                  });
-
-                  return (
+                <div className="h-72 bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-4">
+                  {moodHistory.length > 0 ? (
                     <Line
                       data={{
-                        labels,
-                        datasets: [
-                          {
-                            label: "😄 Positive (4-5)",
-                            data: positiveData,
-                            fill: false,
-                            borderColor: "#10b981",
-                            backgroundColor: "#10b981",
-                            tension: 0.4,
-                            pointRadius: 6,
-                            pointBackgroundColor: "#10b981",
-                            pointBorderColor: "#fff",
-                            pointBorderWidth: 2,
-                            pointHoverRadius: 8,
-                          },
-                          {
-                            label: "😐 Neutral (3)",
-                            data: neutralData,
-                            fill: false,
-                            borderColor: "#eab308",
-                            backgroundColor: "#eab308",
-                            tension: 0.4,
-                            pointRadius: 6,
-                            pointBackgroundColor: "#eab308",
-                            pointBorderColor: "#fff",
-                            pointBorderWidth: 2,
-                            pointHoverRadius: 8,
-                          },
-                          {
-                            label: "😢 Negative (1-2)",
-                            data: negativeData,
-                            fill: false,
-                            borderColor: "#dc2626",
-                            backgroundColor: "#dc2626",
-                            tension: 0.4,
-                            pointRadius: 6,
-                            pointBackgroundColor: "#dc2626",
-                            pointBorderColor: "#fff",
-                            pointBorderWidth: 2,
-                            pointHoverRadius: 8,
-                          },
-                        ],
+                        labels: chartLabels,
+                        datasets: [{
+                          label: "Mood Level",
+                          data: chartData,
+                          fill: true,
+                          borderColor: "#3b82f6",
+                          backgroundColor: "rgba(59, 130, 246, 0.1)",
+                          tension: 0.4,
+                          pointRadius: 5,
+                          pointBackgroundColor: "#3b82f6",
+                          pointBorderColor: "#fff",
+                          pointBorderWidth: 2,
+                          pointHoverRadius: 7,
+                          pointHoverBackgroundColor: "#2563eb",
+                        }],
                       }}
                       options={{
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                          legend: {
-                            display: true,
-                            labels: {
-                              font: { family: "Avenir, sans-serif", size: 12 },
-                              padding: 15,
-                            },
-                          },
+                          legend: { display: false },
                           tooltip: {
                             backgroundColor: "#ffffff",
-                            titleColor: "#1a0202",
-                            bodyColor: "#4a6e7e",
-                            borderColor: "#e2e8f0",
-                            borderWidth: 2,
+                            titleColor: "#1f2937",
+                            bodyColor: "#4b5563",
+                            borderColor: "#e5e7eb",
+                            borderWidth: 1,
                             padding: 12,
-                            bodyFont: { family: "Avenir, sans-serif" },
-                            titleFont: {
-                              family: "Avenir, sans-serif",
-                              weight: "bold",
-                            },
+                            displayColors: false,
+                            callbacks: {
+                              label: function(context) {
+                                const level = context.parsed.y;
+                                const labels = {1: "Very Bad", 2: "Bad", 3: "Neutral", 4: "Good", 5: "Excellent"};
+                                return `${labels[level]} (${level})`;
+                              }
+                            }
                           },
                         },
                         scales: {
                           y: {
-                            min: 1,
-                            max: 5,
-                            reverse: true,
+                            min: 0.5,
+                            max: 5.5,
                             ticks: {
                               stepSize: 1,
-                              color: "#4a6e7e",
-                              font: { family: "Avenir, sans-serif", size: 12 },
+                              color: "#6b7280",
+                              font: { size: 12, weight: '500' },
+                              callback: function(value) {
+                                return value >= 1 && value <= 5 ? value : '';
+                              }
                             },
-                            grid: { color: "#e2e8f0" },
+                            grid: { 
+                              color: "#e5e7eb",
+                              drawBorder: false,
+                            },
                           },
                           x: {
-                            ticks: {
-                              color: "#4a6e7e",
-                              font: { family: "Avenir, sans-serif", size: 11 },
+                            ticks: { 
+                              color: "#6b7280",
+                              font: { size: 11 },
+                              maxRotation: 45,
+                              minRotation: 45,
                             },
                             grid: { display: false },
                           },
                         },
                       }}
                     />
-                  );
-                })()}
-              </div>
-
-              {/* Average Display */}
-              <div className="mt-4 text-center">
-                <div
-                  className="inline-block px-6 py-3 rounded-2xl shadow-lg"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
-                  }}
-                >
-                  <span
-                    className="text-sm font-bold mr-2"
-                    style={{
-                      color: "#1e40af",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    Average Mood:
-                  </span>
-                  <span
-                    className="text-2xl font-black"
-                    style={{
-                      color: "#1e40af",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    {moodStats?.avg_mood
-                      ? parseFloat(moodStats.avg_mood).toFixed(1)
-                      : "N/A"}
-                  </span>
+                  ) : (
+                    <div className="h-full flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-5xl mb-3">📊</div>
+                        <p className="text-sm font-medium text-gray-600">
+                          No data yet
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Start logging your moods to see trends
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          </div>
-          {/* una */}
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* Recent Mood Logs */}
-            <div
-              className="rounded-3xl shadow-xl p-6 overflow-hidden"
-              style={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              <h3
-                className="text-xl font-black mb-4"
-                style={{ color: "#1a0202", fontFamily: "Avenir, sans-serif" }}
-              >
-                📝 Recent Logs
-              </h3>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {moodHistory.slice(0, 10).map((mood) => (
-                  <div
-                    key={mood.id}
-                    className="group rounded-2xl p-4 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg cursor-pointer"
-                    style={{
-                      background: getMoodGradient(mood.mood_level),
-                      border: "1px solid rgba(255,255,255,0.5)",
-                    }}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
-                        <div className="text-3xl transition-transform duration-200 group-hover:scale-110">
-                          {getMoodEmoji(mood.mood_level)}
-                        </div>
-                        <div className="flex-1">
-                          <div
-                            className="font-bold text-sm mb-1"
-                            style={{
-                              color: getMoodColor(mood.mood_level),
-                              fontFamily: "Avenir, sans-serif",
-                            }}
-                          >
-                            {getMoodLabel(mood.mood_level)} • Level{" "}
-                            {mood.mood_level}
-                          </div>
-                          <div
-                            className="text-xs mb-2"
-                            style={{
-                              color: getMoodColor(mood.mood_level),
-                              fontFamily: "Avenir, sans-serif",
-                              opacity: 0.8,
-                            }}
-                          >
-                            {new Date(mood.created_at).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              }
-                            )}
-                          </div>
-                          {mood.notes && (
-                            <div
-                              className="mt-2 p-2 rounded-xl"
-                              style={{
-                                backgroundColor: "rgba(255,255,255,0.7)",
-                              }}
-                            >
-                              <p
-                                className="text-xs italic"
-                                style={{
-                                  color: getMoodColor(mood.mood_level),
-                                  fontFamily: "Avenir, sans-serif",
-                                }}
-                              >
-                                "{mood.notes}"
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteMood(mood.id)}
-                        className="ml-2 px-3 py-1.5 text-xs rounded-xl font-bold transition-all duration-200 hover:scale-110 active:scale-95 shadow-md"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #fecaca 0%, #fca5a5 100%)",
-                          color: "#dc2626",
-                          fontFamily: "Avenir, sans-serif",
-                        }}
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {moodHistory.length === 0 && (
-                  <div className="text-center py-12">
-                    <div className="text-6xl mb-4">📊</div>
-                    <div
-                      className="text-sm font-medium"
-                      style={{
-                        color: "#4a6e7e",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      No mood logs yet
-                    </div>
-                    <div
-                      className="text-xs mt-1"
-                      style={{
-                        color: "#94a3b8",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Start tracking your mood today!
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
 
-            {/* Mood Distribution */}
-            <div
-              className="rounded-3xl shadow-xl p-6 overflow-hidden"
-              style={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              <h3
-                className="text-xl font-black mb-4"
-                style={{ color: "#1a0202", fontFamily: "Avenir, sans-serif" }}
-              >
-                📊 Mood Distribution
-              </h3>
-              <div className="space-y-3">
-                {getMoodDistribution().map((item) => (
-                  <div key={item.level} className="group">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl transition-transform duration-200 group-hover:scale-125">
-                          {item.emoji}
-                        </span>
-                        <span
-                          className="text-sm font-bold"
-                          style={{
-                            color: "#1a0202",
-                            fontFamily: "Avenir, sans-serif",
-                          }}
+              {/* Recent Logs Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
+                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Recent Entries
+                  </h3>
+                  <span className="text-sm font-medium text-gray-500">
+                    {moodHistory.length} total
+                  </span>
+                </div>
+                
+                <div className="max-h-[500px] overflow-y-auto p-6">
+                  {moodHistory.length > 0 ? (
+                    <div className="space-y-3">
+                      {moodHistory.slice(0, 20).map((mood) => (
+                        <div
+                          key={mood.id}
+                          className="group border border-gray-200 rounded-xl p-4 hover:border-blue-300 hover:shadow-md transition-all bg-gradient-to-r hover:from-blue-50 hover:to-transparent"
                         >
-                          {item.label}
-                        </span>
+                          <div className="flex items-start gap-4">
+                            <div className="text-4xl flex-shrink-0 transform group-hover:scale-110 transition-transform">
+                              {getMoodEmoji(mood.mood_level)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold text-white shadow-sm" style={{ backgroundColor: getMoodColor(mood.mood_level) }}>
+                                  <span>{getMoodLabel(mood.mood_level)}</span>
+                                </span>
+                                <span className="text-xs text-gray-500 font-medium">
+                                  {formatTimeAgo(mood.created_at)}
+                                </span>
+                              </div>
+                              <div className="text-xs text-gray-400 mb-2">
+                                {new Date(mood.created_at).toLocaleDateString("en-US", {
+                                  month: "long",
+                                  day: "numeric",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </div>
+                              {mood.notes && (
+                                <div className="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                  <p className="text-sm text-gray-700 leading-relaxed">
+                                    {mood.notes}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => handleDeleteMood(mood.id)}
+                              className="flex-shrink-0 p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                              title="Delete entry"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-16">
+                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
                       </div>
-                      <span
-                        className="text-sm font-black"
-                        style={{
-                          color: item.color,
-                          fontFamily: "Avenir, sans-serif",
-                        }}
-                      >
-                        {item.count}
-                      </span>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                        No entries yet
+                      </h4>
+                      <p className="text-sm text-gray-500">
+                        Start tracking your mood to see your entries here
+                      </p>
                     </div>
-                    <div
-                      className="h-2 rounded-full overflow-hidden"
-                      style={{ backgroundColor: "#e2e8f0" }}
-                    >
-                      <div
-                        className="h-full transition-all duration-500 rounded-full"
-                        style={{
-                          width: `${
-                            moodHistory.length > 0
-                              ? (item.count / moodHistory.length) * 100
-                              : 0
-                          }%`,
-                          backgroundColor: item.color,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Weekly Average */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <div className="text-center">
-                  <div
-                    className="text-sm font-bold mb-2"
-                    style={{
-                      color: "#4a6e7e",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    Weekly Average
-                  </div>
-                  <div
-                    className="text-4xl font-black"
-                    style={{
-                      color: "#0097b2",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    {formatMoodStats(weeklyStats)}
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

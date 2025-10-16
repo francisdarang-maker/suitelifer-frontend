@@ -5,14 +5,15 @@ const TopBarBlogs = () => {
   const navigate = useNavigate();
 
   return (
-    <span
-      onClick={() => {
-        navigate("/app/my-blogs/new-blog");
-      }}
-      className="font-avenir-black text-primary text-sm cursor-pointer"
-    >
-      + Create new blog
-    </span>
+    // <span
+    //   onClick={() => {
+    //     navigate("/app/my-blogs/new-blog");
+    //   }}
+    //   className="font-avenir-black text-primary text-sm cursor-pointer"
+    // >
+    //   + Create new blog
+    // </span>
+    <></>
   );
 };
 

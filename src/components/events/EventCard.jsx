@@ -1,49 +1,58 @@
 import React from "react";
-import { ListBulletIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { Clock, FileText } from "lucide-react";
 import { format } from "date-fns";
-//added yung onClick tsaka isToday
+
 const EventCard = ({ event, onClick, isToday }) => {
   const dayAbbreviation = format(new Date(event.start), "EEE");
   const dayOfMonth = format(new Date(event.start), "d");
+  const startTime = format(new Date(event.start), "h:mm a");
+  const endTime = format(new Date(event.end), "h:mm a");
 
   return (
     <section
-      //added to have click function
       onClick={onClick}
-      className={
-        "border border-gray-200 p-4 rounded-lg flex gap-4 items-center mt-3"
-      }
+      className="group relative bg-white border border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-primary hover:bg-gradient-to-br hover:from-primary/5 hover:to-transparent overflow-hidden"
     >
-      {isToday && (
-        <div
-          className={`flex-col items-center justify-center border-r pr-3 border-gray-300 flex`}
-        >
-          <span className="text-black text-base">{dayAbbreviation}</span>
-          <h1 className="font-avenir-black my-0! text-primary">{dayOfMonth}</h1>
-        </div>
-      )}
-      <div className="flex-1 min-w-0">
-        <span className="text-black text-base block truncate">
-          {event.title}
-        </span>
-        {event.description !== "" && event.description && (
-          <div className="flex items-start gap-3 mt-2">
-            <ListBulletIcon className="size-5 text-primary flex-shrink-0" />
-            <p className="line-clamp-2 text-sm overflow-hidden text-gray-400">
-              {event.description}
-            </p>
+      {/* Subtle background gradient on hover */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/0 transition-all duration-300 pointer-events-none" />
+
+      <div className="relative z-10 flex gap-4 items-start">
+        {/* Date Column - Only show when isToday */}
+        {isToday && (
+          <div className="flex flex-col items-center justify-center py-1 px-3 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/30 flex-shrink-0">
+            <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+              {dayAbbreviation}
+            </span>
+            <span className="text-2xl font-bold text-primary leading-none mt-1">
+              {dayOfMonth}
+            </span>
           </div>
         )}
 
-        <div className="flex items-start gap-3">
-          <ClockIcon className="size-5 text-primary flex-shrink-0" />
-          <div className="flex flex-col">
-            {/* <p className="line-clamp-2 text-sm overflow-hidden  text-gray-400">
-              {format(event.start, "MMM dd yyyy")}
-            </p> */}
-            <p className="line-clamp-2 text-sm overflow-hidden font-avenir-black text-gray-400">
-              {format(event.start, "h:mm a")} - {format(event.end, "h:mm a")}
-            </p>
+        {/* Content Section */}
+        <div className="flex-1 min-w-0">
+          {/* Title */}
+          <h3 className="text-base font-bold text-gray-900 truncate group-hover:text-primary transition-colors duration-200">
+            {event.title}
+          </h3>
+
+          {/* Description */}
+          {event.description && event.description.trim() !== "" && (
+            <div className="flex items-start gap-2 mt-2.5">
+              <FileText className="size-4 text-primary flex-shrink-0 mt-0.5 opacity-70" />
+              <p className="line-clamp-2 text-xs text-gray-600 leading-relaxed">
+                {event.description}
+              </p>
+            </div>
+          )}
+
+          {/* Time */}
+          <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-gray-100">
+            <Clock className="size-4 text-primary flex-shrink-0 opacity-70" />
+            <span className="text-xs font-semibold text-gray-700">
+              {startTime}{" "}
+              <span className="text-gray-400 font-normal">→</span> {endTime}
+            </span>
           </div>
         </div>
       </div>

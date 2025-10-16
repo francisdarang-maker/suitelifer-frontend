@@ -42,7 +42,14 @@ const EmployeeBlogsFeed = () => {
     setIsLoading(true);
     try {
       const employeeBlogs = await api.get("api/all-employee-blog");
-      setEmployeeblogs(employeeBlogs.data);
+      // Sort blogs by creation date in descending order (latest first)
+      const sortedBlogs = employeeBlogs.data.sort((a, b) => {
+        return (
+          new Date(b.created_at || b.createdAt || 0) -
+          new Date(a.created_at || a.createdAt || 0)
+        );
+      });
+      setEmployeeblogs(sortedBlogs);
     } catch (err) {
       console.error("Error fetching blogs:", err);
     } finally {
@@ -58,19 +65,22 @@ const EmployeeBlogsFeed = () => {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + "px";
     }
   }, [description]);
 
   // === File Handler ===
   const handleFileChange = (e) => {
     const selected = Array.from(e.target.files || []);
-    const validFiles = selected.filter(file => file.type.startsWith('image/'));
-    
+    const validFiles = selected.filter((file) =>
+      file.type.startsWith("image/")
+    );
+
     if (validFiles.length !== selected.length) {
       toast.error("Only image files are allowed");
     }
-    
+
     setFiles((prev) => [...prev, ...validFiles]);
   };
 
@@ -103,9 +113,11 @@ const EmployeeBlogsFeed = () => {
     try {
       // Build title with feeling
       let finalTitle = title.trim() || "Untitled Post";
-      
+
       if (selectedFeeling) {
-        finalTitle = `${finalTitle} - (feeling ${selectedFeeling.label.toLowerCase()} ${selectedFeeling.emoji})`;
+        finalTitle = `${finalTitle} - (feeling ${selectedFeeling.label.toLowerCase()} ${
+          selectedFeeling.emoji
+        })`;
       }
 
       const blogData = {
@@ -121,9 +133,13 @@ const EmployeeBlogsFeed = () => {
       if (files.length > 0) {
         const formData = new FormData();
         files.forEach((file) => formData.append("images", file));
-        await api.post(`/api/upload-save-image/eBlog/eblog/${eblogId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await api.post(
+          `/api/upload-save-image/eBlog/eblog/${eblogId}`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
       }
 
       toast.success("Post published successfully!");
@@ -143,7 +159,12 @@ const EmployeeBlogsFeed = () => {
 
   // === Cancel Post ===
   const handleCancel = () => {
-    if (description.trim() || files.length > 0 || title.trim() || selectedFeeling) {
+    if (
+      description.trim() ||
+      files.length > 0 ||
+      title.trim() ||
+      selectedFeeling
+    ) {
       if (window.confirm("Discard post?")) {
         setTitle("");
         setDescription("");
@@ -157,7 +178,7 @@ const EmployeeBlogsFeed = () => {
   };
 
   return (
-    <section className="p-3 xl:p-5 mb-20 bg-gray-50 min-h-screen">
+    <section className="px-50 mb-20 bg-white min-h-screen">
       {id ? (
         <Outlet />
       ) : (
@@ -206,10 +227,12 @@ const EmployeeBlogsFeed = () => {
                     className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all group"
                   >
                     <ImagePlus className="w-5 h-5 text-green-500 group-hover:scale-110 transition-transform" />
-                    <span className="text-sm font-medium text-gray-600">Photo/Video</span>
+                    <span className="text-sm font-medium text-gray-600">
+                      Photo/Video
+                    </span>
                   </button>
-                  
-                  <button 
+
+                  <button
                     onClick={() => {
                       setExpanded(true);
                       setTimeout(() => setShowFeelingPicker(true), 100);
@@ -217,7 +240,9 @@ const EmployeeBlogsFeed = () => {
                     className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all group"
                   >
                     <Smile className="w-5 h-5 text-yellow-500 group-hover:scale-110 transition-transform" />
-                    <span className="text-sm font-medium text-gray-600">Feeling</span>
+                    <span className="text-sm font-medium text-gray-600">
+                      Feeling
+                    </span>
                   </button>
                 </div>
               </div>
@@ -227,7 +252,9 @@ const EmployeeBlogsFeed = () => {
                 <form onSubmit={handlePostSubmit} className="flex flex-col">
                   {/* Header */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-800">Create post</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Create post
+                    </h3>
                     <button
                       type="button"
                       onClick={handleCancel}
@@ -246,10 +273,16 @@ const EmployeeBlogsFeed = () => {
                     />
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm font-semibold text-gray-800">Your Name</p>
+                        <p className="text-sm font-semibold text-gray-800">
+                          Your Name
+                        </p>
                         {selectedFeeling && (
                           <span className="text-sm text-gray-600">
-                            is feeling <span className="font-semibold">{selectedFeeling.label.toLowerCase()}</span> {selectedFeeling.emoji}
+                            is feeling{" "}
+                            <span className="font-semibold">
+                              {selectedFeeling.label.toLowerCase()}
+                            </span>{" "}
+                            {selectedFeeling.emoji}
                           </span>
                         )}
                       </div>
@@ -265,7 +298,8 @@ const EmployeeBlogsFeed = () => {
                     <div className="px-4 pt-2">
                       <div className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5">
                         <span className="text-sm">
-                          {selectedFeeling.emoji} Feeling {selectedFeeling.label.toLowerCase()}
+                          {selectedFeeling.emoji} Feeling{" "}
+                          {selectedFeeling.label.toLowerCase()}
                         </span>
                         <button
                           type="button"
@@ -303,26 +337,35 @@ const EmployeeBlogsFeed = () => {
                     {/* Image Previews */}
                     {files.length > 0 && (
                       <div className="mt-4 border border-gray-300 rounded-lg p-2 relative">
-                        <div className={`grid gap-1 ${
-                          files.length === 1 ? 'grid-cols-1' :
-                          files.length === 2 ? 'grid-cols-2' :
-                          files.length === 3 ? 'grid-cols-2' :
-                          'grid-cols-2'
-                        }`}>
+                        <div
+                          className={`grid gap-1 ${
+                            files.length === 1
+                              ? "grid-cols-1"
+                              : files.length === 2
+                              ? "grid-cols-2"
+                              : files.length === 3
+                              ? "grid-cols-2"
+                              : "grid-cols-2"
+                          }`}
+                        >
                           {files.slice(0, 4).map((file, idx) => (
                             <div
                               key={idx}
                               className={`relative group ${
-                                files.length === 3 && idx === 0 ? 'row-span-2' : ''
+                                files.length === 3 && idx === 0
+                                  ? "row-span-2"
+                                  : ""
                               }`}
                             >
                               <img
                                 src={URL.createObjectURL(file)}
                                 alt={`upload-${idx}`}
                                 className={`w-full object-cover rounded-lg ${
-                                  files.length === 1 ? 'h-[400px]' :
-                                  files.length === 3 && idx === 0 ? 'h-full' :
-                                  'h-48'
+                                  files.length === 1
+                                    ? "h-[400px]"
+                                    : files.length === 3 && idx === 0
+                                    ? "h-full"
+                                    : "h-48"
                                 }`}
                               />
                               <button
@@ -348,7 +391,9 @@ const EmployeeBlogsFeed = () => {
                           className="absolute top-2 left-2 px-3 py-1.5 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-all flex items-center gap-2"
                         >
                           <ImagePlus className="w-4 h-4 text-gray-700" />
-                          <span className="text-sm font-medium text-gray-700">Add Photos</span>
+                          <span className="text-sm font-medium text-gray-700">
+                            Add Photos
+                          </span>
                         </button>
                       </div>
                     )}
@@ -357,7 +402,9 @@ const EmployeeBlogsFeed = () => {
                   {/* Add to Post Section */}
                   <div className="px-4 py-3 border-t border-gray-200">
                     <div className="flex items-center justify-between p-3 border border-gray-300 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Add to your post</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Add to your post
+                      </span>
                       <div className="flex items-center gap-1">
                         <button
                           type="button"
@@ -371,7 +418,9 @@ const EmployeeBlogsFeed = () => {
                           type="button"
                           className="p-2 rounded-full hover:bg-gray-100 transition-all group"
                           title="Feeling/Activity"
-                          onClick={() => setShowFeelingPicker(!showFeelingPicker)}
+                          onClick={() =>
+                            setShowFeelingPicker(!showFeelingPicker)
+                          }
                         >
                           <Smile className="w-5 h-5 text-yellow-500 group-hover:scale-110 transition-transform" />
                         </button>
@@ -400,7 +449,9 @@ const EmployeeBlogsFeed = () => {
                   <div className="px-4 pb-4">
                     <button
                       type="submit"
-                      disabled={isPosting || (!description.trim() && files.length === 0)}
+                      disabled={
+                        isPosting || (!description.trim() && files.length === 0)
+                      }
                       className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-all ${
                         isPosting || (!description.trim() && files.length === 0)
                           ? "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -416,16 +467,18 @@ const EmployeeBlogsFeed = () => {
                 {showFeelingPicker && (
                   <>
                     {/* Backdrop */}
-                    <div 
+                    <div
                       className="fixed inset-0 bg-black/30 z-40"
                       onClick={() => setShowFeelingPicker(false)}
                     />
-                    
+
                     {/* Modal - Fixed Position */}
                     <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[500px] overflow-hidden mx-4">
                       <div className="p-4 border-b border-gray-200 bg-white">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-lg font-semibold text-gray-800">How are you feeling?</h4>
+                          <h4 className="text-lg font-semibold text-gray-800">
+                            How are you feeling?
+                          </h4>
                           <button
                             type="button"
                             onClick={() => setShowFeelingPicker(false)}
@@ -445,7 +498,9 @@ const EmployeeBlogsFeed = () => {
                               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all text-left border border-transparent hover:border-gray-300"
                             >
                               <span className="text-2xl">{feeling.emoji}</span>
-                              <span className="text-sm font-medium text-gray-700">{feeling.label}</span>
+                              <span className="text-sm font-medium text-gray-700">
+                                {feeling.label}
+                              </span>
                             </button>
                           ))}
                         </div>
@@ -460,33 +515,32 @@ const EmployeeBlogsFeed = () => {
           {/* Feed */}
           <main>
             {isLoading && <Loader />}
-            {eBlogs.length > 0 ? (
-              eBlogs.map((blog, index) => (
-                <div key={index} className="mb-4">
-                  <BlogCard blog={blog} />
-                </div>
-              ))
-            ) : (
-              !isLoading && (
-                <div className="flex flex-col items-center justify-center mt-20 text-center">
-                  <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 max-w-sm">
-                    <h3 className="text-xl font-avenir-black text-gray-700 mb-2">
-                      No Blog Posts Yet
-                    </h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">
-                      It looks a bit quiet here. Check back later for new stories and updates from your team.
-                    </p>
-                    <button
-                      onClick={fetchEmployeeBlogs}
-                      className="mt-6 px-5 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary/90 transition-all duration-300 flex items-center gap-2 mx-auto"
-                    >
-                      <RefreshCcw className="w-4 h-4" />
-                      Refresh
-                    </button>
+            {eBlogs.length > 0
+              ? eBlogs.map((blog, index) => (
+                  <div key={index} className="mb-4">
+                    <BlogCard blog={blog} />
                   </div>
-                </div>
-              )
-            )}
+                ))
+              : !isLoading && (
+                  <div className="flex flex-col items-center justify-center mt-20 text-center">
+                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 max-w-sm">
+                      <h3 className="text-xl font-avenir-black text-gray-700 mb-2">
+                        No Blog Posts Yet
+                      </h3>
+                      <p className="text-sm text-gray-500 leading-relaxed">
+                        It looks a bit quiet here. Check back later for new
+                        stories and updates from your team.
+                      </p>
+                      <button
+                        onClick={fetchEmployeeBlogs}
+                        className="mt-6 px-5 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary/90 transition-all duration-300 flex items-center gap-2 mx-auto"
+                      >
+                        <RefreshCcw className="w-4 h-4" />
+                        Refresh
+                      </button>
+                    </div>
+                  </div>
+                )}
           </main>
         </>
       )}
