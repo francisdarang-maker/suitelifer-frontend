@@ -205,7 +205,7 @@ const MoodPage = () => {
       {/* Delete Modal */}
       {showDeleteModal && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50"
+          className="fixed inset-0 flex items-center justify-center z-50 "
           style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }}
         >
           <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm mx-4 transform transition-all scale-100 animate-in">
@@ -304,7 +304,7 @@ const MoodPage = () => {
         </div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 px-30">
           {/* Left Column - Mood Input */}
           <div className="lg:col-span-2 space-y-6">
             {/* Mood Input Card */}

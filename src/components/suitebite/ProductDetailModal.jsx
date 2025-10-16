@@ -154,6 +154,9 @@ const ProductDetailModal = ({
       ...prev,
       [typeName]: optionId
     }));
+
+    console.log("Option Id",optionId)
+    console.log("Type Name",typeName)
   };
 
   /**

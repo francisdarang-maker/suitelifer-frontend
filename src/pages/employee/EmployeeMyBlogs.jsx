@@ -29,7 +29,7 @@ useEffect( () => {
 
   return (
     <>
-    <section className="mb-50">
+    <section className="mb-10 sm:px-5 md-px-8 lg:px-2 xl:px-50">
       <div className="p-2 xl:p-3 ">
         <main>
           {isLoading && (

@@ -157,13 +157,13 @@ const EmployeeBlogsFeed = () => {
   };
 
   return (
-    <section className="p-3 xl:p-5 mb-20 bg-gray-50 min-h-screen">
+<section className="px-4 sm:px-8 md:px-12 lg:px-10 xl:px-50 mb-20 pt-10 bg-gray-50 min-h-screen">
       {id ? (
         <Outlet />
       ) : (
         <>
           {/* Info banner */}
-          <div className="bg-primary rounded-md p-3 flex justify-between mb-5 lg:hidden">
+          <div className="bg-primary rounded-md p-3 flex justify-between mb-5 lg:hidden ">
             <div className="flex gap-2">
               <TicketIcon className="w-5 h-5 text-white" />
               <span className="text-white text-sm">3 events today</span>
@@ -178,7 +178,7 @@ const EmployeeBlogsFeed = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-4 overflow-hidden">
             {!expanded ? (
               // === COLLAPSED STATE - Compact ===
-              <div className="p-4">
+              <div className="p-4 ">
                 <div className="flex gap-3 items-center">
                   <img
                     src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
@@ -197,7 +197,7 @@ const EmployeeBlogsFeed = () => {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="flex items-center justify-around mt-3 pt-3 border-t border-gray-200">
+                <div className="flex items-center justify-around mt-3 pt-3 border-t border-gray-200 ">
                   <button
                     onClick={() => {
                       setExpanded(true);
