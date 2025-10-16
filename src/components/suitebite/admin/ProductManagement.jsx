@@ -485,7 +485,7 @@ const ProductManagement = () => {
           </div>
 
           {/* Add Product Button - Enhanced */}
-          <div className="hidden md:flex 2xl:hidden">
+          <div className=" ">
             <button
               onClick={handleAddProduct}
               className="group flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-2xl 
