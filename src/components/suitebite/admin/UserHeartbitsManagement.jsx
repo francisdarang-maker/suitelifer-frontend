@@ -749,14 +749,6 @@ const UserHeartbitsManagement = () => {
                         <div className="text-xs sm:text-sm text-gray-600">
                           {getRoleLabel(user.user_type)}
                         </div>
-                        <div className="font-bold text-gray-900 text-sm sm:text-base truncate">
-                          {`${user.first_name || ""} ${
-                            user.last_name || ""
-                          }`.trim()}
-                        </div>
-                        <div className="text-xs sm:text-sm text-gray-600">
-                          {getRoleLabel(user.user_type)}
-                        </div>
                       </div>
                     </div>
 

@@ -41,7 +41,8 @@ useEffect( () => {
 
   return (
     <>
-    <section className="mb-50 px-50">
+<section className="mb-12 sm:mb-16 md:mb-20 lg:mb-28 xl:mb-32 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
+
       <div className="p-2 xl:p-3 ">
         <main>
           {isLoading && (

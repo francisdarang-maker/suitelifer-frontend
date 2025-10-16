@@ -178,7 +178,7 @@ const EmployeeBlogsFeed = () => {
   };
 
   return (
-    <section className="px-50 mb-20 bg-white min-h-screen">
+    <section className="min-h-screen bg-white mb-2 mt-10 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
       {id ? (
         <Outlet />
       ) : (
