@@ -19,6 +19,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useStore } from '../../../store/authStore';
 import defaultAvatar from "../../../assets/images/defaultAvatar.svg";
+import Loading from "../../loader/Loading";
 
 const UserHeartbitsManagement = () => {
   const currentUser = useStore((state) => state.user);
@@ -90,6 +91,7 @@ const UserHeartbitsManagement = () => {
 
       if (response.success) {
         // Transform the data to match the expected format
+
         const transformedUsers = response.data.map((user) => ({
           user_id: user.user_id,
           first_name: user.userName ? user.userName.split(" ")[0] : "",
@@ -104,7 +106,8 @@ const UserHeartbitsManagement = () => {
           monthly_cheer_limit: user.monthly_cheer_limit || 100,
           monthly_cheer_used: user.monthly_cheer_used || 0,
           last_monthly_reset: user.last_monthly_reset,
-          user_type: user.user_type ? user.user_type.toLowerCase() : "employee", // Use actual role from DB, fallback to 'employee'
+          user_type: user.user_type ? user.user_type.toLowerCase() : "employee",
+          isActive: user.isActive
         }));
         setUsers(transformedUsers);
       } else {
@@ -293,6 +296,10 @@ const UserHeartbitsManagement = () => {
     };
 
     const hasChanges = heartbitsToGive > 0 && reason.trim();
+
+    if(isLoading){
+      return <Loading/>
+    }
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 ">
@@ -665,7 +672,6 @@ const UserHeartbitsManagement = () => {
           style={{
             overflowY: "auto",
             background: "",
-            // "linear-gradient(135deg, #B3D9FF 0%, #80BFFF 50%, #5B9BD5 100%)",
             borderRadius: "1rem",
           }}
         >
@@ -684,88 +690,109 @@ const UserHeartbitsManagement = () => {
           ) : (
             sortedUsers.map((user) => {
               const isSelected = selectedUsers.includes(user.user_id);
+              const isActive = user.isActive === 1 || user.isActive === true
               return (
                 <div
                   key={user.user_id}
-                  className={`relative bg-white rounded-xl shadow-lg p-3 sm:p-4 transition-all duration-200 border-2 border-gray-200 hover:border-primary cursor-pointer ${
-                    isSelected
-                      ? "ring-1 ring-primary bg-primary bg-primary"
-                      : "hover:shadow-xl"
-                  }`}
-                  style={{ minHeight: "120px" }}
-                  onClick={() => toggleUserSelection(user.user_id)}
+                  className={`
+                    relative group rounded-2xl border bg-white/80 backdrop-blur-sm 
+                    shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer
+                    flex flex-col p-4 sm:p-5
+                    ${
+                      isSelected
+                        ? "border-primary/60 ring-2 ring-primary/20 bg-primary/5"
+                        : "border-gray-200 hover:border-primary/30"
+                    }
+                    ${!isActive ? "opacity-50 grayscale cursor-not-allowed hover:shadow-none hover:border-gray-200" : ""}
+                  `}
+                  onClick={() => {
+                    if (isActive) toggleUserSelection(user.user_id);
+                  }}
                 >
-                  {/* Checkbox circle */}
-                  <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
+                  {/* ✅ Checkbox / Selection Indicator */}
+                  <div className="absolute top-3 right-3">
                     <span
-                      className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2 border-primary bg-white ${
-                        isSelected
-                          ? "bg-gradient-to-br from-primary to-primary border-primary"
-                          : ""
-                      }`}
-                      style={{
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                        transition: "background 0.2s",
-                      }}
+                      className={`
+                        w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2
+                        ${
+                          isSelected
+                            ? "border-primary bg-primary text-white shadow-md"
+                            : "border-gray-300 bg-white text-transparent"
+                        }
+                        transition-all duration-200
+                      `}
                     >
                       {isSelected && (
-                        <>
                         <svg
-                          className="w-3 h-3 sm:w-4 sm:h-4 text-white drop-shadow-lg"
+                          className="w-3.5 h-3.5"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="4"
+                          strokeWidth="3"
                           viewBox="0 0 24 24"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
-                        </>
                       )}
                     </span>
                   </div>
 
-
-                  {/* User Content - Responsive Layout */}
-                  <div className="flex flex-col space-y-2">
-                    {/* Avatar and Name Row */}
-                    <div className="flex items-center space-x-3">
+                  {/* 🧍 User Info Section */}
+                  <div className="flex items-center gap-4">
+                    {/* Avatar */}
+                    <div className="relative">
                       <img
                         src={user.avatar || "/default-avatar.png"}
-                        alt={`${user.first_name || ""} ${
-                          user.last_name || ""
-                        }`.trim()}
-                        className="block lg:hidden xl:hidden 2xl:inline-block w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover flex-shrink-0"
+                        alt={`${user.first_name || ""} ${user.last_name || ""}`.trim()}
+                        className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-100"
                       />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold text-gray-900 text-sm sm:text-base truncate">
-                          {`${user.first_name || ""} ${
-                            user.last_name || ""
-                          }`.trim()}
-                        </div>
-                        <div className="text-xs sm:text-sm text-gray-600">
-                          {getRoleLabel(user.user_type)}
-                        </div>
+                      {/* Status Indicator */}
+                      <span
+                        className={`
+                          absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white
+                          ${isActive ? "bg-green-500" : "bg-gray-400"}
+                        `}
+                      />
+                    </div>
+
+                    {/* Name and Role */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-base truncate">
+                        {`${user.first_name || ""} ${user.last_name || ""}`.trim()}
+                      </p>
+                      <p className="text-sm text-gray-500">{getRoleLabel(user.user_type)}</p>
+
+                      {/* Active Pill */}
+                      <div
+                        className={`flex items-center gap-1 px-2 py-0.5 mt-2 rounded-full text-xs font-medium w-fit
+                          ${
+                            isActive
+                              ? "bg-green-50 border border-green-300 text-green-700"
+                              : "bg-gray-100 border border-gray-300 text-gray-600"
+                          }
+                        `}
+                      >
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            isActive ? "bg-green-500" : "bg-gray-400"
+                          }`}
+                        ></span>
+                        {isActive ? "Active" : "Inactive"}
                       </div>
                     </div>
+                  </div>
 
-
-                    {/* Heartbits Row */}
-                    <div className="flex items-center justify-start sm:justify-start gap-2 pt-1">
-                      <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5 text-pink-400 flex-shrink-0 " />
-                      <span className="font-semibold text-[#0097b2] text-base sm:text-lg">
-                        {user.heartbits_balance || 0}
-                      </span>
-                      <span className="block lg:hidden xl:inline-block text-xs text-gray-500">
-                        Heartbits
-                      </span>
-                    </div>
+                  {/* ❤️ Heartbits Row */}
+                  <div className="flex items-center gap-2 mt-4 text-sm text-gray-600">
+                    <HeartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-pink-400" />
+                    <span className="font-semibold text-[#0097b2] text-base">
+                      {user.heartbits_balance || 0}
+                    </span>
+                    <span className="text-xs text-gray-500">Heartbits</span>
                   </div>
                 </div>
               );
+
+
             })
           )}
         </div>

@@ -25,6 +25,7 @@ import {
 } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import Loading from "../../loader/Loading";
 
 /**
  * OrderManagement Component - Admin Order Management
@@ -1029,10 +1030,7 @@ const OrderManagement = () => {
       <div className="orders-list-container max-h-[60vh] overflow-y-auto rounded-lg  bg-white">
         <div className="orders-list pb-16">
           {loading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0097b2] mx-auto mb-4"></div>
-              <p className="text-base text-gray-600">Loading orders...</p>
-            </div>
+            <Loading/>
           ) : filteredAndSortedOrders.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
               <ShoppingBagIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />

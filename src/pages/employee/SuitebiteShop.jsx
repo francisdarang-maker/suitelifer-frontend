@@ -17,6 +17,7 @@ import {
   HeartIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import Loading from "../../components/loader/Loading";
 
 const SuitebiteShop = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -696,8 +697,7 @@ const SuitebiteShop = () => {
               <div className="pr-1">
                 {loading ? (
                   <div className="text-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0097b2] mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading products...</p>
+                    <Loading/>
                   </div>
                 ) : filteredAndSortedProducts.length === 0 ? (
                   <div className="text-center py-12 bg-white rounded-lg shadow-sm border">

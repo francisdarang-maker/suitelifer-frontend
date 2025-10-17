@@ -2,7 +2,7 @@ import BlogCard from "../../components/blog/BlogCard";
 import { Outlet, useParams } from "react-router-dom";
 import { TicketIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import api from "../../utils/axios";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { RefreshCcw, ImagePlus, X, Smile, MapPin, Users } from "lucide-react";
 import Loader from "../../components/loader/Loading";
 import toast from "react-hot-toast";
@@ -20,6 +20,11 @@ const EmployeeBlogsFeed = () => {
   const [selectedFeeling, setSelectedFeeling] = useState(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  const observer = useRef()
+
 
   // Feelings data
   const feelings = [
@@ -38,28 +43,51 @@ const EmployeeBlogsFeed = () => {
   ];
 
   // === Fetch Blogs ===
-  const fetchEmployeeBlogs = async () => {
+  const fetchEmployeeBlogs = async (pageNum = 1) => {
     setIsLoading(true);
     try {
-      const employeeBlogs = await api.get("api/all-employee-blog");
-      // Sort blogs by creation date in descending order (latest first)
-      const sortedBlogs = employeeBlogs.data.sort((a, b) => {
-        return (
-          new Date(b.created_at || b.createdAt || 0) -
-          new Date(a.created_at || a.createdAt || 0)
-        );
-      });
-      setEmployeeblogs(sortedBlogs);
+      const { data } = await api.get(`/api/all-employee-blog?page=${pageNum}&limit=10`);
+      const sorted = data.blogs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      if (pageNum === 1) {
+        setEmployeeblogs(sorted);
+      } else {
+        setEmployeeblogs((prev) => [...prev, ...sorted]);
+      }
+
+      setHasMore(pageNum < data.totalPages);
     } catch (err) {
       console.error("Error fetching blogs:", err);
     } finally {
       setIsLoading(false);
     }
-  };
+};
 
-  useEffect(() => {
-    fetchEmployeeBlogs();
-  }, []);
+const lastBlogRef = useCallback(
+    (node) => {
+      if (isLoading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, hasMore]
+  );
+
+    useEffect(() => {
+      if (page === 1) return;
+      fetchEmployeeBlogs(page);
+    }, [page]);
+
+    useEffect(() => {
+      fetchEmployeeBlogs(1);
+    }, []);
+
 
   // === Auto-resize textarea ===
   useEffect(() => {
@@ -514,12 +542,27 @@ const EmployeeBlogsFeed = () => {
 
           {/* Feed */}
           <main>
-            {isLoading && <Loader />}
-            {eBlogs.length > 0
-              ? eBlogs.map((blog, index) => (
-                  <div key={index} className="mb-4">
-                    <BlogCard blog={blog} />
-                  </div>
+            {isLoading && (
+              <div className="flex justify-center mt-4">
+              <Loader />
+              </div>
+            )}
+            {eBlogs.length > 0 ? (
+                eBlogs.map((blog, index) => {
+                  if (index === eBlogs.length - 1) {
+                    return (
+                      <div ref={lastBlogRef} key={index} className="mb-4">
+                        <BlogCard blog={blog} />
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div key={index} className="mb-4">
+                        <BlogCard blog={blog} />
+                      </div>
+                    );
+                  }
+                }
                 ))
               : !isLoading && (
                   <div className="flex flex-col items-center justify-center mt-20 text-center">
@@ -541,6 +584,12 @@ const EmployeeBlogsFeed = () => {
                     </div>
                   </div>
                 )}
+
+                {!hasMore && !isLoading && (
+                <div className="text-center text-gray-500 py-6">
+                  🎉 You’ve reached the end of the feed.
+                </div>
+              )}
           </main>
         </>
       )}

@@ -18,6 +18,7 @@ import {
 } from "@heroicons/react/24/solid";
 import logoFs from "../../assets/logos/logo-fs.svg";
 import defaultAvatar from "../../assets/images/defaultAvatar.svg";
+import Loading from "../../components/loader/Loading";
 
 const PointsDashboard = () => {
   const user = useStore((state) => state.user);
@@ -199,26 +200,13 @@ const PointsDashboard = () => {
   // Early Returns
   if (!user?.id) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading user data...</p>
-        </div>
-      </div>
+      <Loading/>
     );
   }
 
   if (pointsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-blue-600 mx-auto mb-4"></div>
-            <StarIconSolid className="w-8 h-8 text-blue-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-          </div>
-          <p className="text-lg font-medium text-gray-700">Loading...</p>
-        </div>
-      </div>
+     <Loading/>
     );
   }
 

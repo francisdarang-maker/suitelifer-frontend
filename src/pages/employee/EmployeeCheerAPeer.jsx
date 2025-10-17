@@ -16,6 +16,7 @@ import {
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { formatFullDateTime } from "../../utils/dateHelpers";
 import defaultAvatar from "../../assets/images/defaultAvatar.svg";
+import Loading from "../../components/loader/Loading";
 
 const CheerPage = () => {
   const user = useStore((state) => state.user);
@@ -491,15 +492,7 @@ const CheerPage = () => {
 
   if (anyLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-blue-600 mx-auto mb-4"></div>
-            <SparklesIcon className="w-8 h-8 text-blue-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-          </div>
-          <p className="text-lg font-medium text-gray-700">Loading...</p>
-        </div>
-      </div>
+      <Loading/>
     );
   }
 
@@ -529,7 +522,7 @@ const CheerPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* LEFT: Send Cheer + Stats */}
-          <div className="space-y-4">
+          <div className="space-y-4 ">
             {/* Send Cheer Card */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">

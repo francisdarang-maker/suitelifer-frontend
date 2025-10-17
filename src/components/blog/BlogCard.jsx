@@ -116,29 +116,42 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
   setIsDeleting(true);
   setShowDeleteModal(false);
 
-
   try {
-  const [blogRes, imageRes] = await Promise.allSettled([
-    api.delete(`/api/delete-employee-blog/${blog.eblogId}`),
-    api.delete(`/api/delete-image-employee-blog/${blog.eblogId}`)
-  ]);
+    const hasImages = blog?.images && blog?.images > 0;
 
-  if (blogRes.status === "fulfilled") {
-    if (onDelete && typeof onDelete === "function") onDelete(blog.eblogId);
-    else window.location.reload();
+    let blogRes, imageRes;
+
+    if (hasImages) {
+      // 🧹 Delete both blog and images (in parallel)
+      [blogRes, imageRes] = await Promise.allSettled([
+        api.delete(`/api/delete-employee-blog/${blog.eblogId}`),
+        api.delete(`/api/delete-image-employee-blog/${blog.eblogId}`),
+      ]);
+    } else {
+      // 📝 Delete blog only
+      [blogRes] = await Promise.allSettled([
+        api.delete(`/api/delete-employee-blog/${blog.eblogId}`),
+      ]);
+    }
+
+    // ✅ Handle blog deletion success
+    if (blogRes.status === "fulfilled") {
+      if (onDelete && typeof onDelete === "function") onDelete(blog.eblogId);
+      else window.location.reload();
+    }
+
+    // ⚠️ Handle image deletion failure
+    if (imageRes?.status === "rejected") {
+      console.warn("⚠️ Failed to delete images, but blog was deleted.");
+    }
+  } catch (error) {
+    console.error("❌ Error deleting blog:", error);
+    alert("Failed to delete the blog post. Please try again.");
+  } finally {
+    setIsDeleting(false);
   }
-
-  if (imageRes.status === "rejected") {
-    console.warn("⚠️ Failed to delete images, but blog was deleted.");
-  }
-
-} catch (error) {
-  console.error("❌ Error deleting blog:", error);
-  alert("Failed to delete the blog post. Please try again.");
-} finally {
-  setIsDeleting(false);
-}
 };
+
 
   const cancelDelete = () => {
     setShowDeleteModal(false);
@@ -500,6 +513,13 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
             </span>
           </Link>
         </section>
+        {isDeleting && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm rounded-2xl z-50">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+            <p className="text-sm text-gray-700 font-medium">Deleting...</p>
+          </div>
+        )}
+
       </section>
     </>
   );
