@@ -275,7 +275,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, userHeartbits }) => {
         </div>
 
         {/* Total Cost Display */}
-        <div className="total-cost-display bg-gray-50 p-2 rounded-lg mb-3">
+        {/* <div className="total-cost-display bg-gray-50 p-2 rounded-lg mb-3">
           <div className="flex items-center justify-between text-xs sm:text-sm">
             <span className="text-gray-600">Total for {quantity}:</span>
             <span className="font-semibold text-gray-900 flex items-center gap-1">
@@ -283,7 +283,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, userHeartbits }) => {
               <HeartIcon className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
             </span>
           </div>
-        </div>
+        </div> */}
         <div className="action-buttons space-y-2">
           <button
             onClick={(e) => {

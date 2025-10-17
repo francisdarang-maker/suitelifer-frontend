@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { pointsSystemApi } from "../../api/pointsSystemApi";
 import { useStore } from "../../store/authStore";
@@ -213,13 +213,13 @@ const PointsDashboard = () => {
   if (pointsError) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <ExclamationTriangleIcon className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Points</h2>
-          <p className="text-gray-600 mb-6">{pointsError.message}</p>
+        <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center">
+          <ExclamationTriangleIcon className="w-12 h-12 text-red-500 mx-auto mb-3" />
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Error Loading Points</h2>
+          <p className="text-sm text-gray-600 mb-4">{pointsError.message}</p>
           <button
             onClick={() => window.location.reload()}
-            className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium"
+            className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
           >
             Retry
           </button>
@@ -284,11 +284,8 @@ const PointsDashboard = () => {
     const urlRegex = /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
     const parts = message.split(urlRegex);
     
-    // Check if message has media
-    const hasMedia = parts.some(part => urlRegex.test(part));
-    
     return (
-      <div className="w-full p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary">
+      <div className="w-full p-2 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary">
         {parts.map((part, index) => {
           const resetRegex = /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
           if (resetRegex.test(part)) {
@@ -298,7 +295,7 @@ const PointsDashboard = () => {
                   src={part}
                   alt="Shared content"
                   className="max-w-full h-auto rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-                  style={{ maxHeight: "300px" }}
+                  style={{ maxHeight: "200px" }}
                   onError={(e) => {
                     e.target.style.display = "none";
                     e.target.nextSibling.style.display = "block";
@@ -316,7 +313,7 @@ const PointsDashboard = () => {
             );
           }
           return part ? (
-            <p key={index} className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
+            <p key={index} className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
               {part}
             </p>
           ) : null;
@@ -327,7 +324,7 @@ const PointsDashboard = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
         {/* Moderation Notification */}
         {moderationNotification && (
           <ModerationBanner 
@@ -337,44 +334,44 @@ const PointsDashboard = () => {
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
           <StatCard
-            title="Current Balance"
+            title="Balance"
             value={pointsData?.data?.currentBalance || 0}
             label="Points"
-            icon={<StarIconSolid className="w-7 h-7 text-white" />}
+            icon={<StarIconSolid />}
             gradient="from-blue-50 to-blue-100"
-            iconBg="bg-blue-600"
+            iconBg="bg-blue-500"
             textColor="text-blue-600"
             valueColor="text-blue-900"
           />
           <StatCard
-            title="Heartbits Remaining"
+            title="Heartbits"
             value={(pointsData?.data?.monthlyCheerLimit || 100) - (pointsData?.data?.monthlyCheerUsed || 0)}
-            label="This Month"
-            icon={<HeartIconSolid className="w-7 h-7 text-white" />}
+            label="Left"
+            icon={<HeartIconSolid />}
             gradient="from-rose-50 to-rose-100"
-            iconBg="bg-rose-600"
+            iconBg="bg-rose-500"
             textColor="text-rose-600"
             valueColor="text-rose-900"
           />
           <StatCard
-            title="Total Earned"
+            title="Earned"
             value={pointsData?.data?.totalEarned || 0}
             label="All Time"
-            icon={<TrophyIcon className="w-7 h-7 text-white" />}
+            icon={<TrophyIcon />}
             gradient="from-green-50 to-green-100"
-            iconBg="bg-green-600"
+            iconBg="bg-green-500"
             textColor="text-green-600"
             valueColor="text-green-900"
           />
           <StatCard
-            title="Total Spent"
+            title="Spent"
             value={pointsData?.data?.totalSpent || 0}
             label="Points"
-            icon={<GiftIcon className="w-7 h-7 text-white" />}
+            icon={<GiftIcon />}
             gradient="from-amber-50 to-amber-100"
-            iconBg="bg-amber-600"
+            iconBg="bg-amber-500"
             textColor="text-amber-600"
             valueColor="text-amber-900"
           />
@@ -382,19 +379,19 @@ const PointsDashboard = () => {
 
         {/* Recent Activity */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 transactions-section">
-          <div className="px-5 py-4 border-b border-gray-200">
+          <div className="px-5 py-3.5 border-b border-gray-200">
             <div className="flex items-center gap-2">
               <ChartBarIcon className="w-5 h-5 text-blue-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
-              <span className="text-sm text-gray-500">({filteredTransactions.length})</span>
+              <h2 className="text-base font-semibold text-gray-900">Recent Activity</h2>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{filteredTransactions.length}</span>
             </div>
           </div>
 
-          <div className="max-h-[600px] overflow-y-auto p-5">
+          <div className="max-h-[550px] overflow-y-auto p-4">
             {historyLoading ? (
               <LoadingState />
             ) : filteredTransactions.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {filteredTransactions.map((transaction, index) => (
                   <TransactionCard
                     key={index}
@@ -447,15 +444,15 @@ const PointsDashboard = () => {
 
 // Sub-components
 const StatCard = ({ title, value, label, icon, gradient, iconBg, textColor, valueColor }) => (
-  <div className={`bg-gradient-to-br ${gradient} rounded-xl p-4 border border-gray-200 hover:shadow-lg transition-shadow`}>
-    <div className="flex items-center justify-between mb-2">
-      <div className={`w-10 h-10 ${iconBg} rounded-lg flex items-center justify-center`}>
-        {icon}
+  <div className={`bg-gradient-to-br ${gradient} rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all hover:scale-105`}>
+    <div className="flex items-center gap-2 mb-2">
+      <div className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center shadow-sm`}>
+        {React.cloneElement(icon, { className: 'w-5 h-5 text-white' })}
       </div>
+      <p className={`text-sm font-semibold ${textColor}`}>{title}</p>
     </div>
-    <p className={`text-xs font-medium ${textColor} mb-1`}>{title}</p>
-    <p className={`text-2xl font-bold ${valueColor}`}>{value}</p>
-    <p className={`text-xs ${textColor} mt-0.5`}>{label}</p>
+    <p className={`text-2xl font-bold ${valueColor} mb-1`}>{value}</p>
+    <p className={`text-xs ${textColor}`}>{label}</p>
   </div>
 );
 
@@ -493,25 +490,25 @@ const ModerationBanner = ({ notification, onDismiss }) => {
   const colors = colorClasses[notification.action] || colorClasses.default;
   
   return (
-    <div className="mb-6">
-      <div className={`relative overflow-hidden rounded-xl shadow-lg border-l-4 ${colors.bg} ${colors.border}`}>
-        <div className="p-4">
-          <div className="flex items-start gap-3">
-            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${colors.icon}`}>
-              <ExclamationTriangleIcon className="w-5 h-5" />
+    <div className="mb-4">
+      <div className={`relative overflow-hidden rounded-lg shadow-md border-l-4 ${colors.bg} ${colors.border}`}>
+        <div className="p-3">
+          <div className="flex items-start gap-2">
+            <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${colors.icon}`}>
+              <ExclamationTriangleIcon className="w-4 h-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className={`text-sm font-bold mb-1 ${colors.text}`}>
+              <h3 className={`text-xs font-bold mb-0.5 ${colors.text}`}>
                 {notification.action === "hidden" ? "Hidden Post" : notification.action === "deleted" ? "Deleted Post" : "Restored Post"}
               </h3>
-              <p className={`text-sm ${colors.subtext}`}>{notification.message}</p>
+              <p className={`text-xs ${colors.subtext}`}>{notification.message}</p>
               {notification.reason && (
-                <p className={`text-sm mt-1 ${colors.reason}`}>Reason: {notification.reason}</p>
+                <p className={`text-xs mt-0.5 ${colors.reason}`}>Reason: {notification.reason}</p>
               )}
             </div>
             <button
               onClick={onDismiss}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-lg font-medium text-sm text-white transition-colors ${colors.button}`}
+              className={`flex-shrink-0 px-2 py-1 rounded-md font-medium text-xs text-white transition-colors ${colors.button}`}
             >
               Got it
             </button>
@@ -526,32 +523,32 @@ const TransactionCard = ({ transaction, display, getUserAvatar, formatTimeAgo, r
   const { displayDescription, isNegative, isAdminTransaction, senderLabel } = display;
   
   return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+    <div className="border border-gray-200 rounded-lg p-3.5 hover:shadow-md transition-shadow">
       <div className="flex gap-3">
         <div className="flex-shrink-0">
           {isAdminTransaction ? (
             <div className="relative">
-              <img src={logoFs} alt="Admin" className="w-12 h-12 rounded-full object-cover border-2 border-blue-500" />
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
-                <span className="text-white text-xs font-bold">A</span>
+              <img src={logoFs} alt="Admin" className="w-10 h-10 rounded-full object-cover border-2 border-blue-500" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                <span className="text-white text-[9px] font-bold">A</span>
               </div>
             </div>
           ) : transaction.related_user ? (
-            <img src={getUserAvatar(transaction)} alt={transaction.related_user} className="w-12 h-12 rounded-full object-cover" />
+            <img src={getUserAvatar(transaction)} alt={transaction.related_user} className="w-10 h-10 rounded-full object-cover" />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-              <StarIconSolid className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+              <StarIconSolid className="w-5 h-5 text-white" />
             </div>
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex items-start justify-between gap-2 mb-1.5">
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm text-gray-900 truncate">
                 {displayDescription || transaction.type.replace("_", " ").toUpperCase()}
               </p>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-1.5 mt-1">
                 <ClockIcon className="w-3 h-3 text-gray-400" />
                 <span className="text-xs text-gray-500">{formatTimeAgo(transaction.createdAt || transaction.created_at)}</span>
                 {transaction.related_user && !isAdminTransaction && (
@@ -568,13 +565,13 @@ const TransactionCard = ({ transaction, display, getUserAvatar, formatTimeAgo, r
                 )}
               </div>
             </div>
-            <span className={`flex-shrink-0 px-3 py-1 rounded-full text-sm font-bold ${isNegative ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+            <span className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-bold ${isNegative ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
               {isNegative ? "-" : "+"}{transaction.amount}{["received", "given"].includes(transaction.type) ? " bits" : " pts"}
             </span>
           </div>
 
           {(isAdminTransaction || (["received", "given"].includes(transaction.type) && transaction.message)) && (
-            <div className="mt-3">{renderMessageWithMedia(transaction.message)}</div>
+            <div className="mt-2">{renderMessageWithMedia(transaction.message)}</div>
           )}
         </div>
       </div>
@@ -583,33 +580,33 @@ const TransactionCard = ({ transaction, display, getUserAvatar, formatTimeAgo, r
 };
 
 const LoadingState = () => (
-  <div className="text-center py-12">
-    <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-300 border-t-blue-600 mx-auto mb-3"></div>
-    <p className="text-sm text-gray-500">Loading activity...</p>
+  <div className="text-center py-8">
+    <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-blue-500 mx-auto mb-2"></div>
+    <p className="text-xs text-gray-500">Loading activity...</p>
   </div>
 );
 
 const EmptyState = () => (
-  <div className="text-center py-16">
-    <ChartBarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-    <h3 className="text-lg font-medium text-gray-900 mb-1">No recent activity</h3>
-    <p className="text-sm text-gray-500">Your transactions will appear here</p>
+  <div className="text-center py-12">
+    <ChartBarIcon className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+    <h3 className="text-base font-medium text-gray-900 mb-1">No recent activity</h3>
+    <p className="text-xs text-gray-500">Your transactions will appear here</p>
   </div>
 );
 
 const Pagination = ({ currentPage, totalPages, startIndex, endIndex, totalItems, onPageChange }) => (
-  <div className="px-5 py-3 border-t border-gray-200">
+  <div className="px-4 py-2.5 border-t border-gray-200">
     <div className="flex items-center justify-between">
-      <p className="text-sm text-gray-700">Showing {startIndex}-{endIndex} of {totalItems}</p>
+      <p className="text-xs text-gray-700">Showing {startIndex}-{endIndex} of {totalItems}</p>
       <div className="flex items-center gap-1">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-2.5 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           Previous
         </button>
-        <div className="flex gap-1 mx-2">
+        <div className="flex gap-1 mx-1">
           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
             let pageNum;
             if (totalPages <= 5) pageNum = i + 1;
@@ -621,8 +618,8 @@ const Pagination = ({ currentPage, totalPages, startIndex, endIndex, totalItems,
               <button
                 key={pageNum}
                 onClick={() => onPageChange(pageNum)}
-                className={`w-9 h-9 text-sm font-medium rounded-lg transition-colors ${
-                  currentPage === pageNum ? "bg-blue-600 text-white" : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                className={`w-7 h-7 text-xs font-medium rounded-md transition-colors ${
+                  currentPage === pageNum ? "bg-blue-500 text-white" : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                 }`}
               >
                 {pageNum}
@@ -633,7 +630,7 @@ const Pagination = ({ currentPage, totalPages, startIndex, endIndex, totalItems,
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="px-2.5 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           Next
         </button>
@@ -644,28 +641,28 @@ const Pagination = ({ currentPage, totalPages, startIndex, endIndex, totalItems,
 
 const CheerModal = ({ selectedUser, setSelectedUser, cheerAmount, setCheerAmount, cheerMessage, setCheerMessage, usersData, pointsData, onSubmit, onClose, isSubmitting }) => (
   <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-      <div className="px-6 py-4 border-b border-gray-200">
+    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+      <div className="px-5 py-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-rose-100 rounded-xl flex items-center justify-center">
-              <HeartIconSolid className="w-6 h-6 text-rose-600" />
+            <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
+              <HeartIconSolid className="w-5 h-5 text-rose-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900">Send Heartbits</h3>
+            <h3 className="text-lg font-bold text-gray-900">Send Heartbits</h3>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
             <XMarkIcon className="w-5 h-5 text-gray-500" />
           </button>
         </div>
       </div>
 
-      <form onSubmit={onSubmit} className="p-6 space-y-4">
+      <form onSubmit={onSubmit} className="p-5 space-y-3">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Select User</label>
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">Select User</label>
           <select
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             required
           >
             <option value="">Choose a user...</option>
@@ -676,9 +673,9 @@ const CheerModal = ({ selectedUser, setSelectedUser, cheerAmount, setCheerAmount
         </div>
 
         <div>
-          <div className="flex justify-between items-center mb-2">
-            <label className="text-sm font-semibold text-gray-700">Amount (Points)</label>
-            <span className="text-2xl font-bold text-blue-600">{cheerAmount}</span>
+          <div className="flex justify-between items-center mb-1.5">
+            <label className="text-xs font-semibold text-gray-700">Amount (Points)</label>
+            <span className="text-xl font-bold text-blue-600">{cheerAmount}</span>
           </div>
           <input
             type="range"
@@ -686,46 +683,46 @@ const CheerModal = ({ selectedUser, setSelectedUser, cheerAmount, setCheerAmount
             max={pointsData?.data?.currentBalance || 0}
             value={cheerAmount}
             onChange={(e) => setCheerAmount(parseInt(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
           />
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <div className="flex justify-between text-[10px] text-gray-500 mt-1">
             <span>1</span>
             <span>Max: {pointsData?.data?.currentBalance || 0}</span>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">Message (Optional)</label>
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">Message (Optional)</label>
           <textarea
             value={cheerMessage}
             onChange={(e) => setCheerMessage(e.target.value)}
             placeholder="Add a nice message..."
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
             rows="3"
           />
         </div>
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-2 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+            className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            className="flex-1 bg-blue-500 text-white px-3 py-2 rounded-lg font-medium hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1.5 text-sm"
           >
             {isSubmitting ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                 <span>Sending...</span>
               </>
             ) : (
               <>
-                <HeartIconSolid className="w-5 h-5" />
+                <HeartIconSolid className="w-4 h-4" />
                 <span>Send Heartbits</span>
               </>
             )}
