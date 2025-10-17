@@ -14,6 +14,7 @@ import {
   QueueListIcon,
   HeartIcon,
 } from "@heroicons/react/24/outline";
+import Loading from "../../loader/Loading";
 
 const CheerPostsManagement = () => {
   const [posts, setPosts] = useState([]);
@@ -602,12 +603,7 @@ const CheerPostsManagement = () => {
 
       {/* Posts List */}
       {loading ? (
-        <div className="loading-state flex items-center justify-center py-20">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-[#0097b2] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-500 font-medium">Loading cheer posts...</p>
-          </div>
-        </div>
+       <Loading/>
       ) : (
         <div className="posts-container space-y-4">
           {sortedPosts.map((post) => (

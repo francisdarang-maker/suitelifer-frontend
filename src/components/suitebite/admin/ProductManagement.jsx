@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import useCategoryStore from "../../../store/stores/categoryStore";
 import AddProductForm from "./AddProductForm";
+import Loading from "../../loader/Loading";
 
 /**
  * ProductManagement Component - Enhanced with Variations Support
@@ -506,10 +507,7 @@ const ProductManagement = () => {
       {/* Products Table */}
       <div className="products-table-container max-h-[80vh] overflow-hidden rounded-lg mx-6 ">
         {loading ? (
-          <div className="text-center py-8">
-            <div className="spinner mx-auto mb-4"></div>
-            <p className="text-gray-600 text-base">Loading products...</p>
-          </div>
+          <Loading/>
         ) : (
           <>
             {/* Header Container */}

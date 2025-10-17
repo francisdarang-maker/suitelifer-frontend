@@ -1,21 +1,18 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import BlogComment from "./BlogComment";
+import { ArrowLeftIcon, HeartIcon } from "@heroicons/react/20/solid";
 import {
-  ArrowLeftIcon,
-  HeartIcon,
-} from "@heroicons/react/20/solid";
-import { 
-  Heart, 
-  MessageCircle, 
-  Send, 
-  Share2, 
+  Heart,
+  MessageCircle,
+  Send,
+  Share2,
   Bookmark,
   BookmarkCheck,
   MoreHorizontal,
   Edit2,
   Trash2,
   Flag,
-  ArrowUpDown
+  ArrowUpDown,
 } from "lucide-react";
 import Loader from "../../components/loader/Loading";
 import Carousel from "../cms/Carousel";
@@ -183,13 +180,13 @@ const BlogView = () => {
       await api.post("/api/add-comment", payload);
       toast.success("Comment added!");
       onCommentChange("");
-      
+
       // Update comment count
       setBlog((prev) => ({
         ...prev,
         commentCount: prev.commentCount + 1,
       }));
-      
+
       fetchComments();
     } catch (error) {
       console.error("Error submitting comment:", error);
@@ -240,13 +237,13 @@ const BlogView = () => {
       try {
         await api.delete(`/api/comment/${commentId}`);
         toast.success("Comment deleted");
-        
+
         // Update comment count
         setBlog((prev) => ({
           ...prev,
           commentCount: Math.max(0, prev.commentCount - 1),
         }));
-        
+
         fetchComments();
       } catch (err) {
         console.error("Error deleting comment:", err);
@@ -351,7 +348,10 @@ const BlogView = () => {
         {/* Author Info */}
         <div className="p-4 flex items-center gap-3">
           <img
-            src={blog.userPic || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
+            src={
+              blog.userPic ||
+              "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            }
             alt={blog.firstName}
             className="w-12 h-12 object-cover rounded-full ring-2 ring-gray-100"
           />
@@ -389,7 +389,8 @@ const BlogView = () => {
               {blog.likeCount} {blog.likeCount === 1 ? "like" : "likes"}
             </button>
             <button className="hover:underline">
-              {blog.commentCount} {blog.commentCount === 1 ? "comment" : "comments"}
+              {blog.commentCount}{" "}
+              {blog.commentCount === 1 ? "comment" : "comments"}
             </button>
           </div>
         </div>
@@ -426,7 +427,7 @@ const BlogView = () => {
             <span className="text-sm font-semibold">Share</span>
           </button>
 
-          <button
+          {/* <button
             onClick={handleSaveClick}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all ${
               isSaved ? "text-blue-600" : "text-gray-600"
@@ -438,13 +439,16 @@ const BlogView = () => {
               <Bookmark className="w-6 h-6" />
             )}
             <span className="text-sm font-semibold">Save</span>
-          </button>
+          </button> */}
         </div>
 
         {/* Comment Input */}
         <div className="p-4 flex items-start gap-3 bg-gray-50">
           <img
-            src={blog.userPic || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
+            src={
+              blog.userPic ||
+              "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            }
             alt="Your avatar"
             className="w-10 h-10 object-cover rounded-full ring-2 ring-gray-100"
           />
