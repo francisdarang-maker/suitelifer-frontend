@@ -634,9 +634,9 @@ const UserHeartbitsManagement = () => {
           {/* Global Limit - Premium Badge */}
           <button
             onClick={() => setShowGlobalLimitModal(true)}
-            className="px-5 py-3.5 bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 text-white rounded-2xl 
+            className="px-5 py-3.5 bg-primary text-white rounded-2xl 
         hover:from-purple-600 hover:via-purple-700 hover:to-indigo-700 
-        hover:shadow-xl hover:shadow-purple-500/40
+        hover:shadow-xl 
         text-sm font-bold flex items-center gap-3
         transition-all duration-300 active:scale-95
         focus:outline-none focus:ring-4 focus:ring-purple-500/30"
