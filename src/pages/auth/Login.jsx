@@ -57,26 +57,25 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
 
       // //then proceed if yes...
       // if (token) {
-        const response = await api.post("/api/login", {
-          email,
-          recaptchaToken,
+      const response = await api.post("/api/login", {
+        email,
+        recaptchaToken,
+      });
+
+      const user = await getUserFromCookie();
+      if (response.data.accessToken) {
+        // Store token in localStorage for Suitebite API compatibility
+        localStorage.setItem("token", response.data.accessToken);
+        console.log("tokeeeen: ", response.data.accessToken);
+        toast.success(`Welcome back ${user?.first_name || ""}!`, {
+          icon: <CheckCircleIcon className="w-5 h-5 text-primary" />,
         });
 
-        const user = await getUserFromCookie();
-        if (response.data.accessToken) {
-          // Store token in localStorage for Suitebite API compatibility
-          localStorage.setItem("token", response.data.accessToken);
-          console.log("tokeeeen: ", response.data.accessToken);
-          toast.success(`Welcome back ${user?.first_name || ""}!`, {
-            icon: <CheckCircleIcon className="w-5 h-5 text-primary" />,
-          });
-
-          navigate("/app/blogs-feed");
-        } else if (response.data.recaptchaError) {
-          toast.success(response.data.message);
-        } else {
-          toast.error("Login failed. Please check your credentials.");
-        }
+        navigate("/app/blogs-feed");
+      } else if (response.data.recaptchaError) {
+        toast.success(response.data.message);
+      } else {
+        toast.error("Login failed. Please check your credentials.");
       }
     } catch (error) {
       setLoading(false);

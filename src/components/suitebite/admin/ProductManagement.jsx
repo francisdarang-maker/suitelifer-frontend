@@ -500,14 +500,14 @@ const ProductManagement = () => {
               </div>
               <span>Add</span>
             </button>
-          </div> */}
+          </div>
         </div>
       </div>
 
       {/* Products Table */}
       <div className="products-table-container max-h-[80vh] overflow-hidden rounded-lg mx-6 ">
         {loading ? (
-          <Loading/>
+          <Loading />
         ) : (
           <>
             {/* Header Container */}
