@@ -121,8 +121,8 @@ const ResetPasswordPage = () => {
   return (
     <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
       <div
-        // id="vanta-bg"
-        className="flex items-center justify-center h-screen bg-primary p-6"
+        id="vanta-bg"
+        className="flex max items-center justify-center h-screen bg-primary p-6"
       >
         <div
           className="dark w-full max-w-md space-y-6 p-10 py-16 rounded-2xl shadow-xl border border-white/20 bg-white/10 backdrop-blur-md mx-auto"

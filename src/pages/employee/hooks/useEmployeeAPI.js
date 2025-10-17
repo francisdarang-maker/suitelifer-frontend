@@ -5,6 +5,7 @@ import { useStore } from "../../../store/authStore";
 import { getUserFromCookie } from "../../../utils/cookie";
 import { editEmployeePersonalDetailsSuiteliferAPI } from "../../../api/suitelifer/employeeSuiteliferAPI";
 
+import { useQuery } from "@tanstack/react-query";
 export const useFetchEmployeeDetailsAPI = (userId) => {
     const {
         setUser,
@@ -20,53 +21,61 @@ export const useFetchEmployeeDetailsAPI = (userId) => {
         setNotFound,
     } = useContext(EmployeeDetailsContext);
 
+    const {
+        data,
+        error,
+        isLoading,
+        isError,
+        refetch,
+    } = useQuery({
+        queryKey: ["employee-details", userId],
+        queryFn: async () => {
+            if (!userId) return null;
+            const data = await fetchEmployeeDetailsAPI({ user_id: userId });
+            return data;
+        },
+        enabled: !!userId, // only fetch when userId exists
+        staleTime: 5 * 60 * 1000, // optional: cache for 5 min
+    });
+
+    // Sync fetched data into context
     useEffect(() => {
-        const fetchUser = async () => {
-            if (!userId) return;
-            setLoading(true);
+        setLoading(isLoading);
 
-            try {
-                const data = await fetchEmployeeDetailsAPI({ user_id: userId });
-                console.log("Fetched user details from hriiiiis:", data);
-                if (data == 404) {
-                    setNotFound(true);
-                }
+        if (isError) {
+            console.error("Failed to fetch user details:", error);
+            setLoading(false);
+            return;
+        }
 
-                if (data?.user) {
-                    const user = data.user;
+        if (data === 404) {
+            setNotFound(true);
+            setLoading(false);
+            return;
+        }
 
-                    setUser(user);
-                    setPersonalInfo(user.HrisUserInfo);
-                    setDesignations(user.HrisUserDesignations?.[0] || {});
-                    setEmploymentInfo(user.HrisUserEmploymentInfo);
-                    setSalaryInfo(user.HrisUserSalary);
-                    setHr201(user.HrisUserHr201);
-                    setGovernmentIds(user.HrisUserGovernmentIds);
-                    setAddresses(user.HrisUserAddresses);
-                    setEmergencyContacts(user.HrisUserEmergencyContacts);
-                }
-            } catch (error) {
-                console.error("Failed to fetch user details:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        if (data?.user) {
+            const user = data.user;
 
-        fetchUser();
-    }, [
-        userId,
-        setUser,
-        setLoading,
-        setPersonalInfo,
-        setDesignations,
-        setEmploymentInfo,
-        setSalaryInfo,
-        setHr201,
-        setGovernmentIds,
-        setAddresses,
-        setEmergencyContacts,
-        setNotFound,
-    ]);
+            setUser(user);
+            setPersonalInfo(user.HrisUserInfo);
+            setDesignations(user.HrisUserDesignations?.[0] || {});
+            setEmploymentInfo(user.HrisUserEmploymentInfo);
+            setSalaryInfo(user.HrisUserSalary);
+            setHr201(user.HrisUserHr201);
+            setGovernmentIds(user.HrisUserGovernmentIds);
+            setAddresses(user.HrisUserAddresses);
+            setEmergencyContacts(user.HrisUserEmergencyContacts);
+        }
+    }, [data, isLoading, isError, error]);
+
+    return {
+        data,
+        error,
+        isLoading,
+        isError,
+        refetch, // 🔁 allows manual reload
+    };
 };
 
 
@@ -263,43 +272,43 @@ export const useEditEmployeeContactInfoAPI = () => {
 //edit emergency contacts
 
 export const useEditEmployeeEmergencyContactsAPI = () => {
-  const { setUser, setEmergencyContacts } = useContext(EmployeeDetailsContext);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    const { setUser, setEmergencyContacts } = useContext(EmployeeDetailsContext);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-  const editEmployeeEmergencyContacts = async (user_id, emergency_contacts) => {
-    setLoading(true);
-    setError(null);
+    const editEmployeeEmergencyContacts = async (user_id, emergency_contacts) => {
+        setLoading(true);
+        setError(null);
 
-    try {
-      const updatedContacts = await editEmployeeEmergencyContactsAPI(
-        user_id,
-        emergency_contacts
-      );
+        try {
+            const updatedContacts = await editEmployeeEmergencyContactsAPI(
+                user_id,
+                emergency_contacts
+            );
 
-      const refreshedData = await fetchEmployeeDetailsAPI({ user_id });
+            const refreshedData = await fetchEmployeeDetailsAPI({ user_id });
 
-      if (refreshedData !== 404 && refreshedData.user) {
-        setUser(refreshedData.user);
-        setEmergencyContacts(
-          refreshedData.user.HrisUserEmergencyContacts || []
-        );
-      }
+            if (refreshedData !== 404 && refreshedData.user) {
+                setUser(refreshedData.user);
+                setEmergencyContacts(
+                    refreshedData.user.HrisUserEmergencyContacts || []
+                );
+            }
 
 
-      console.log(
-        "Employee Emergency Contacts updated successfully:",
-        updatedContacts
-      );
-      return updatedContacts;
-    } catch (err) {
-      console.error("Failed to update Employee Emergency Contacts:", err);
-      setError(err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+            console.log(
+                "Employee Emergency Contacts updated successfully:",
+                updatedContacts
+            );
+            return updatedContacts;
+        } catch (err) {
+            console.error("Failed to update Employee Emergency Contacts:", err);
+            setError(err);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return { editEmployeeEmergencyContacts, loading, error };
+    return { editEmployeeEmergencyContacts, loading, error };
 };

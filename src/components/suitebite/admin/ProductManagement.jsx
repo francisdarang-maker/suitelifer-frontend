@@ -431,7 +431,7 @@ const ProductManagement = () => {
           </div>
 
           {/* Add Product Button - moved here */}
-          {/* <div className="flex justify-end md:col-span-1 lg:col-span-1">
+          <div className="flex justify-end md:col-span-1 lg:col-span-1">
             <button
               onClick={handleAddProduct}
               className=" bg-[#0097b2] text-white px-4 py-1.5 rounded-lg hover:bg-[#007a8e] transition-colors duration-200 flex items-center gap-2 w-full md:w-auto text-base"
@@ -439,14 +439,14 @@ const ProductManagement = () => {
               <PlusIcon className="h-5 w-5" />
               Add Product
             </button>
-          </div> */}
+          </div>
 
-          <div className="hidden md:flex 2xl:hidden">
-            <button className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#0097b2] text-white hover:bg-[#007a8e] transition-colors duration-200 text-base">
+          {/* <div className="hidden md:flex 2xl:hidden">
+            <button className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#0097b2] text-white hover:bg-[#007a8e] transition-colors duration-200 text-base" >
               <PlusIcon className="h-5 w-5" />
               <span>Add</span>
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 

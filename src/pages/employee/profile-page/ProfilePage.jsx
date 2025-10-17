@@ -30,6 +30,7 @@ import { InfoIcon } from "lucide-react";
 import api from "../../../utils/axios";
 import { formatAddressesPayload } from "./utils/addressFormatter";
 import Remittances from "./components/Remittances";
+import sessionTimeout from "../../../assets/images/session-timeout.webp";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("personal");
@@ -38,7 +39,7 @@ const ProfilePage = () => {
   const userLoggedIn = useStore((state) => state.user);
   const setUser = useStore((state) => state.setUser);
 
-  useFetchEmployeeDetailsAPI(userLoggedIn?.id);
+  const { refetch } = useFetchEmployeeDetailsAPI(userLoggedIn?.id);
 
   const {
     user: currentUser,
@@ -148,7 +149,7 @@ const ProfilePage = () => {
           last_name: data.lastName,
         });
       }
-
+      refetch();
       toast.success(`Personal Info updated successfully!`);
     } catch (err) {
       toast.error(`Failed to update Personal Details. Please try again.`);
@@ -195,6 +196,7 @@ const ProfilePage = () => {
 
         setUser({ ...userLoggedIn, profile_pic: generatedImageUrl });
       }
+      refetch();
 
       toast.success("Profile picture updated successfully!");
     } catch (err) {
@@ -216,6 +218,7 @@ const ProfilePage = () => {
 
       const response = await editEmployeeAddresses(user_id, payload);
       console.log("responseeee: ", response);
+      refetch();
 
       toast.success("Addresses updated successfully!");
     } catch (err) {
@@ -274,6 +277,7 @@ const ProfilePage = () => {
       const cleanData = sanitizeData(changedFields);
 
       await editEmployeeContactInfo(user_id, cleanData);
+      refetch();
 
       toast.success(`Contact Info updated successfully!`);
     } catch (err) {
@@ -346,6 +350,7 @@ const ProfilePage = () => {
         cleanPayload
       );
       console.log("responseeee: ", response);
+      refetch();
 
       toast.success(`Emergency Contacts updated successfully!`);
     } catch (err) {
@@ -491,13 +496,17 @@ const ProfilePage = () => {
   if (!currentUser) {
     return (
       <section className="min-h-screen">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-white p-8 text-center">
-            <h2 className="text-2xl font-semibold text-gray-600 mb-4">
-              No Profile Data Available
-            </h2>
-            <p className="text-gray-500">
-              Please check back later or contact support.
+        <div className="min-h-fit mt-40 flex flex-col justify-center items-center">
+          <img
+            src={sessionTimeout}
+            alt="session timeout"
+            className="w-40 h-40 grayscale"
+          />
+          <div className="p-8 text-center">
+            <h3 className="text-gray-600 mb-4">Session Expired</h3>
+            <p className="text-gray-500 text-xs md:text-sm">
+              Your session for this page has expired. Please sign in again to
+              manage your profile.
             </p>
           </div>
         </div>
@@ -506,65 +515,64 @@ const ProfilePage = () => {
   }
 
   return (
-  <section className="p-2 xl:p-3 mb-20 flex-1 w-full max-w-full">
-  <div className="bg-white rounded-md overflow-hidden">
-    <ProfileHeader
-      user={currentUser}
-      onEditProfilePic={() => setActiveModal("profilePic")}
-    />
+    <section className="p-2 xl:p-3 mb-20 flex-1 w-full max-w-full">
+      <div className="bg-white rounded-md overflow-hidden">
+        <ProfileHeader
+          user={currentUser}
+          onEditProfilePic={() => setActiveModal("profilePic")}
+        />
 
-    <TabNavigation
-      tabs={tabs}
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-    />
+        <TabNavigation
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
 
-    <div className="p-6">
-      {activeTab === "personal" && (
-        <PersonalInfo
-          user={currentUser}
-          onEdit={() => setActiveModal("personalDetails")}
-        />
-      )}
-      {activeTab === "address" && (
-        <AddressInfo
-          user={currentUser}
-          onEdit={() => setActiveModal("address")}
-        />
-      )}
-      {activeTab === "contact" && (
-        <ContactInfo
-          user={currentUser}
-          onEditContact={() => setActiveModal("contact")}
-          onEditEmergencyContacts={() =>
-            setActiveModal("emergencyContacts")
-          }
-        />
-      )}
-      {activeTab === "remittances" && (
-        <Remittances
-          user={currentUser}
-          onOpen={() => setActiveModal("viewOnlyRemittances")}
-        />
-      )}
-      {activeTab === "employment" && (
-        <EmploymentInfo
-          user={currentUser}
-          onOpen={() => setActiveModal("viewOnlyEmploymentInfo")}
-        />
-      )}
-      {activeTab === "documents" && (
-        <Documents
-          user={currentUser}
-          onOpen={() => setActiveModal("viewOnlyDocuments")}
-        />
-      )}
-    </div>
-  </div>
+        <div className="p-6">
+          {activeTab === "personal" && (
+            <PersonalInfo
+              user={currentUser}
+              onEdit={() => setActiveModal("personalDetails")}
+            />
+          )}
+          {activeTab === "address" && (
+            <AddressInfo
+              user={currentUser}
+              onEdit={() => setActiveModal("address")}
+            />
+          )}
+          {activeTab === "contact" && (
+            <ContactInfo
+              user={currentUser}
+              onEditContact={() => setActiveModal("contact")}
+              onEditEmergencyContacts={() =>
+                setActiveModal("emergencyContacts")
+              }
+            />
+          )}
+          {activeTab === "remittances" && (
+            <Remittances
+              user={currentUser}
+              onOpen={() => setActiveModal("viewOnlyRemittances")}
+            />
+          )}
+          {activeTab === "employment" && (
+            <EmploymentInfo
+              user={currentUser}
+              onOpen={() => setActiveModal("viewOnlyEmploymentInfo")}
+            />
+          )}
+          {activeTab === "documents" && (
+            <Documents
+              user={currentUser}
+              onOpen={() => setActiveModal("viewOnlyDocuments")}
+            />
+          )}
+        </div>
+      </div>
 
-  {activeModal && modals[activeModal]}
-</section>
-
+      {activeModal && modals[activeModal]}
+    </section>
   );
 };
 

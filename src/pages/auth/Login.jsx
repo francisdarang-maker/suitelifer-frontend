@@ -17,6 +17,7 @@ import { ModalResetPassword } from "../../components/modals/ModalResetPassword";
 import { Link } from "react-router-dom";
 import sendVerification from "../../utils/sendVerification";
 import { useLoginUserAPIhris } from "../../api/auth/useAuthAPI";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
 const LoginForm = ({ email, password, setEmail, setPassword }) => {
   const navigate = useNavigate();
@@ -61,11 +62,15 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
           recaptchaToken,
         });
 
+        const user = await getUserFromCookie();
         if (response.data.accessToken) {
           // Store token in localStorage for Suitebite API compatibility
           localStorage.setItem("token", response.data.accessToken);
           console.log("tokeeeen: ", response.data.accessToken);
-          toast.success("Welcome back! You have successfully logged in.");
+          toast.success(`Welcome back ${user?.first_name || ""}!`, {
+            icon: <CheckCircleIcon className="w-5 h-5 text-primary" />,
+          });
+
           navigate("/app/blogs-feed");
         } else if (response.data.recaptchaError) {
           toast.success(response.data.message);
@@ -156,7 +161,7 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
         className="text-xs text-white text-center select-none cursor-pointer"
         onClick={() => navigate("/")}
       >
-        Back
+        Exit
       </p>
     </form>
   );
@@ -223,8 +228,8 @@ const Login = () => {
   return (
     <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
       <div
-        // id="vanta-bg"
-        className="dark min-h-screen bg-primary overflow-y-auto"
+        id="vanta-bg"
+        className="dark max min-h-screen bg-primary overflow-y-auto"
       >
         {/* <ModalResetPassword
           isOpen={isResetModal}

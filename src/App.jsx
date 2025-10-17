@@ -86,6 +86,8 @@ import ResetPasswordPage from "./pages/auth/reset-password/ResetPasswordPage";
 import ProfilePage from "./pages/employee/profile-page/ProfilePage";
 import { EmployeeDetailsProvider } from "./pages/employee/context/EmployeeDetailsContext";
 import Logout from "./pages/auth/Logout";
+import BlogDetails from "./components/blog/guest/BlogDetails";
+import Blogs from "./pages/guest/Blogs";
 
 const queryClient = new QueryClient();
 
