@@ -468,23 +468,6 @@ const SuitebiteShop = () => {
 
   return (
     <div className="suitebite-shop-container h-full flex flex-col bg-gray-50">
-      {/* Premium Header Bar */}
-      <div className="bg-white border-b border-gray-100 px-4 sm:px-6 py-3 flex-shrink-0">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-lg font-semibold text-gray-900">Suitebite</h1>
-          </div>
-
-          {/* Balance Badge - Minimal */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200">
-            <HeartIcon className="w-4 h-4 text-red-500 fill-red-500" />
-            <span className="text-sm font-semibold text-gray-900">
-              {userHeartbits.toLocaleString()}
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Navigation Tabs - Minimal */}
       <div className="bg-white border-b border-gray-100 px-4 sm:px-6 flex-shrink-0">
         <div className="max-w-7xl mx-auto">

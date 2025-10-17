@@ -514,16 +514,7 @@ function AdminNewsLetterToggle() {
         {(!selectedMonthlyIssue || selectedMonthlyIssue.month === undefined) &&
         !isOpenArticleForm ? (
           <>
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-primary rounded-lg shadow-lg">
-                  <Notebook className="w-6 h-6 text-white" />
-                </div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                  Newsletter Management
-                </h1>
-              </div>
-            </div>
+            
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">

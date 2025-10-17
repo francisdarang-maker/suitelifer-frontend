@@ -154,20 +154,9 @@ function AdminBlogs() {
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gradient-to-br bg-primary rounded-lg shadow-lg">
-              <NotebookPen className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-              Blog Management
-            </h1>
-            <CircleAlert className="text-primary h-5 w-5" />
-          </div>
-        </div>
-
+       
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 ">
+        <div className="grid md:grid-cols-3 gap-6 mb-8 ">
           <BlogStatsCards blogs={blogs} />
         </div>
 

@@ -45,7 +45,7 @@ const EmployeeEvents = () => {
 
   return (
     <div className="bg-white p-4">
-      <h2 className="text-xl font-bold mb-4">Events Calendar</h2>
+     
 
       <div className="rounded-md p-4">
         <EventCalendar
