@@ -245,7 +245,6 @@ const AdminEvents = () => {
   );
 };
 
-// Add/Edit Event Modal Component
 const AddEditEventModal = ({
   open,
   onClose,
@@ -254,125 +253,294 @@ const AddEditEventModal = ({
   gdriveError,
   onEventChange,
   onSubmit,
-}) => (
-  <Modal open={open} onClose={onClose}>
-    <Box sx={modalStyle}>
-      <Box sx={headerStyle}>
-        <Typography variant="h5" sx={titleStyle}>
-          {isEditing ? "Edit Event" : "Create New Event"}
-        </Typography>
-        <Typography variant="body2" sx={subtitleStyle}>
-          {isEditing
-            ? "Update your event details"
-            : "Fill in the details below"}
-        </Typography>
-      </Box>
+}) => {
+  if (!open) return null;
 
-      <Box sx={contentStyle}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-          <TextField
-            select
-            fullWidth
-            label="Category"
-            name="category"
-            value={eventDetails.category}
-            onChange={(e) => onEventChange(e, false)}
-            slotProps={{ select: { native: true } }}
-            size="small"
+  return (
+    <Modal open={open} onClose={onClose}>
+      <Box sx={modalStyle}>
+        {/* Header */}
+        <div className="relative px-6 pt-6 pb-5 bg-gradient-to-br from-cyan-50 via-white to-blue-50 border-b border-gray-100">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-white/80 rounded-lg transition-all"
           >
-            {Object.keys(CATEGORY_COLORS).map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </option>
-            ))}
-          </TextField>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
 
-          <TextField
-            fullWidth
-            required
-            label="Event Title"
-            name="title"
-            value={eventDetails.title}
-            onChange={(e) => onEventChange(e, false)}
-            placeholder="e.g., Team Building Activity"
-            size="small"
-          />
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+              {isEditing ? "Edit Event" : "Create New Event"}
+            </h2>
+            <p className="text-gray-500 text-xs">
+              {isEditing
+                ? "Update your event details"
+                : "Fill in the details below"}
+            </p>
+          </div>
+        </div>
 
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-              gap: 2,
-            }}
-          >
-            <TextField
-              fullWidth
-              required
-              label="Start Date"
-              type="datetime-local"
-              value={moment(eventDetails.start).format("YYYY-MM-DDTHH:mm")}
-              name="start"
-              onChange={(e) => onEventChange(e, true)}
-              size="small"
-            />
-            <TextField
-              fullWidth
-              label="End Date"
-              type="datetime-local"
-              value={moment(eventDetails.end).format("YYYY-MM-DDTHH:mm")}
-              name="end"
-              onChange={(e) => onEventChange(e, true)}
-              size="small"
-            />
-          </Box>
+        {/* Content - Compact Grid Layout */}
+        <div className="px-6 py-5">
+          <div className="grid grid-cols-2 gap-4">
+            {/* Category - Full Width */}
+            <div className="col-span-2 space-y-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <svg
+                  className="w-3.5 h-3.5 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                  />
+                </svg>
+                Category
+              </label>
+              <div className="relative">
+                <select
+                  name="category"
+                  value={eventDetails.category}
+                  onChange={(e) => onEventChange(e, false)}
+                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all appearance-none cursor-pointer hover:bg-gray-100"
+                  style={{
+                    backgroundImage: `linear-gradient(to right, ${
+                      CATEGORY_COLORS[eventDetails.category]
+                    }20, transparent)`,
+                  }}
+                >
+                  {Object.keys(CATEGORY_COLORS).map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg
+                    className="w-4 h-4 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
 
-          <TextField
-            fullWidth
-            label="Description"
-            multiline
-            rows={3}
-            value={eventDetails.description}
-            name="description"
-            onChange={(e) => onEventChange(e, false)}
-            placeholder="Add event details..."
-            size="small"
-          />
+            {/* Event Title - Full Width */}
+            <div className="col-span-2 space-y-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <svg
+                  className="w-3.5 h-3.5 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                Event Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={eventDetails.title}
+                onChange={(e) => onEventChange(e, false)}
+                placeholder="e.g., Team Building Activity"
+                required
+                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all"
+              />
+            </div>
 
-          <TextField
-            fullWidth
-            label="Google Drive Link (Optional)"
-            placeholder="https://drive.google.com/..."
-            value={eventDetails.gdriveLink}
-            name="gdriveLink"
-            onChange={(e) => onEventChange(e, false)}
-            error={!!gdriveError}
-            helperText={gdriveError}
-            size="small"
-            InputProps={{
-              startAdornment: <Box sx={{ mr: 1, fontSize: "1.25rem" }}>📂</Box>,
-            }}
-          />
-        </Box>
+            {/* Start Date */}
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <svg
+                  className="w-3.5 h-3.5 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                Start <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="datetime-local"
+                name="start"
+                value={moment(eventDetails.start).format("YYYY-MM-DDTHH:mm")}
+                onChange={(e) => onEventChange(e, true)}
+                required
+                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all"
+              />
+            </div>
+
+            {/* End Date */}
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <svg
+                  className="w-3.5 h-3.5 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                End
+              </label>
+              <input
+                type="datetime-local"
+                name="end"
+                value={moment(eventDetails.end).format("YYYY-MM-DDTHH:mm")}
+                onChange={(e) => onEventChange(e, true)}
+                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all"
+              />
+            </div>
+
+            {/* Description - Full Width */}
+            <div className="col-span-2 space-y-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <svg
+                  className="w-3.5 h-3.5 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h7"
+                  />
+                </svg>
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={eventDetails.description}
+                onChange={(e) => onEventChange(e, false)}
+                placeholder="Add event details..."
+                rows={2}
+                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all resize-none"
+              />
+            </div>
+
+            {/* Google Drive Link - Full Width */}
+            <div className="col-span-2 space-y-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <svg
+                  className="w-3.5 h-3.5 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+                Google Drive Link
+                <span className="text-xs font-normal text-gray-400">
+                  (Optional)
+                </span>
+              </label>
+              <div className="relative">
+                <input
+                  type="url"
+                  name="gdriveLink"
+                  value={eventDetails.gdriveLink}
+                  onChange={(e) => onEventChange(e, false)}
+                  placeholder="https://drive.google.com/..."
+                  className={`w-full pl-10 pr-3 py-2.5 bg-gray-50 border rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 transition-all ${
+                    gdriveError
+                      ? "border-red-300 focus:ring-red-500/50 focus:border-red-500"
+                      : "border-gray-200 focus:ring-cyan-500/50 focus:border-cyan-500"
+                  }`}
+                />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-base">
+                  📂
+                </div>
+              </div>
+              {gdriveError && (
+                <p className="text-xs text-red-600 flex items-center gap-1 mt-1">
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {gdriveError}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={onClose}
+              className="px-5 py-2.5 text-sm text-gray-700 font-semibold bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all shadow-sm"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onSubmit}
+              disabled={!!gdriveError}
+              className="px-5 py-2.5 text-sm bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold rounded-lg hover:from-cyan-700 hover:to-cyan-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              {isEditing ? "Update Event" : "Create Event"}
+            </button>
+          </div>
+        </div>
       </Box>
-
-      <Box sx={footerStyle}>
-        <button
-          onClick={onClose}
-          className="flex-1 sm:flex-none px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={onSubmit}
-          disabled={!!gdriveError}
-          className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white rounded-lg font-medium hover:from-cyan-700 hover:to-cyan-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isEditing ? "Update Event" : "Create Event"}
-        </button>
-      </Box>
-    </Box>
-  </Modal>
-);
+    </Modal>
+  );
+};
 
 // Event Details Modal Component
 const EventDetailsModal = ({ open, onClose, event, onEdit, onDelete }) => {
@@ -380,155 +548,175 @@ const EventDetailsModal = ({ open, onClose, event, onEdit, onDelete }) => {
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={detailsModalStyle(CATEGORY_COLORS[event.category])}>
-        <Box
-          sx={{
-            ...headerStyle,
-            background: CATEGORY_COLORS[event.category] || "#6B7280",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-            }}
-          >
-            <Box sx={{ flex: 1, pr: 2 }}>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: "1.125rem", sm: "1.25rem" },
-                  lineHeight: 1.3,
-                  mb: 1,
-                }}
-              >
-                {event.title}
-              </Typography>
-              <Box
-                sx={{
-                  display: "inline-block",
-                  px: 2,
-                  py: 0.5,
-                  borderRadius: "12px",
-                  backgroundColor: "rgba(255, 255, 255, 0.25)",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                }}
-              >
-                {event.category}
-              </Box>
-            </Box>
-            <button
-              onClick={onClose}
-              className="text-white hover:bg-white/20 transition-colors rounded-full p-1.5 -mt-1"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </Box>
-        </Box>
-
-        <Box sx={contentStyle}>
-          <DetailSection
-            icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            title="Schedule"
-          >
-            <Typography sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
-              <span className="font-medium text-gray-700">Starts:</span>{" "}
-              {moment(event.start).format("MMM D, YYYY • h:mm A")}
-            </Typography>
-            <Typography sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
-              <span className="font-medium text-gray-700">Ends:</span>{" "}
-              {moment(event.end).format("MMM D, YYYY • h:mm A")}
-            </Typography>
-          </DetailSection>
-
-          <DetailSection icon="M4 6h16M4 12h16M4 18h7" title="Description">
-            <Typography
-              sx={{
-                fontSize: "0.875rem",
-                color: "#6B7280",
-                lineHeight: 1.6,
-              }}
-            >
-              {event.description || (
-                <span style={{ fontStyle: "italic", color: "#9CA3AF" }}>
-                  No description provided
-                </span>
-              )}
-            </Typography>
-          </DetailSection>
-
-          <DetailSection
-            icon="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-            title="Attachments"
-          >
-            {event.gdriveLink || event.gdrive_link ? (
-              <a
-                href={event.gdriveLink || event.gdrive_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors text-sm font-medium"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  className="w-5 h-5"
-                >
-                  <path fill="#4285F4" d="M12 2L3.5 17h5.5l8.5-15h-5.5z" />
-                  <path fill="#34A853" d="M3.5 17L8.5 22H20L15 17H3.5z" />
-                  <path fill="#FBBC05" d="M20 22l-8.5-15h5.5L24 17l-4 5z" />
-                </svg>
-                Open in Drive
-              </a>
-            ) : (
-              <Typography
-                sx={{
-                  fontSize: "0.875rem",
-                  color: "#9CA3AF",
-                  fontStyle: "italic",
-                }}
-              >
-                No files attached
-              </Typography>
-            )}
-          </DetailSection>
-        </Box>
-
-        <Box sx={footerStyle}>
+      <Box sx={modalStyle}>
+        {/* Header */}
+        <div className="relative px-6 pt-6 pb-5 bg-gradient-to-br from-cyan-50 via-white to-blue-50 border-b border-gray-100">
           <button
             onClick={onClose}
-            className="flex-1 sm:flex-none px-5 py-2.5 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-white/80 rounded-lg transition-all"
           >
-            Close
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
           </button>
-          <button
-            onClick={onEdit}
-            className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white rounded-lg font-medium hover:from-cyan-700 hover:to-cyan-800 transition-all shadow-md hover:shadow-lg"
-          >
-            Edit Event
-          </button>
-          <button
-            onClick={onDelete}
-            className="flex-1 sm:flex-none px-5 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-all shadow-md hover:shadow-lg"
-          >
-            Delete
-          </button>
-        </Box>
+
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight pr-8">
+              {event.title}
+            </h2>
+            <div
+              className="inline-block px-3 py-1 rounded-lg text-xs font-semibold text-white"
+              style={{
+                background: CATEGORY_COLORS[event.category] || "#6B7280",
+              }}
+            >
+              {event.category.charAt(0).toUpperCase() + event.category.slice(1)}
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-6 py-5">
+          <div className="space-y-5">
+            {/* Schedule */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <svg
+                  className="w-3.5 h-3.5 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                Schedule
+              </label>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 space-y-1.5">
+                <div className="text-sm text-gray-600">
+                  <span className="font-medium text-gray-700">Starts:</span>{" "}
+                  {moment(event.start).format("MMM D, YYYY • h:mm A")}
+                </div>
+                <div className="text-sm text-gray-600">
+                  <span className="font-medium text-gray-700">Ends:</span>{" "}
+                  {moment(event.end).format("MMM D, YYYY • h:mm A")}
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <svg
+                  className="w-3.5 h-3.5 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h7"
+                  />
+                </svg>
+                Description
+              </label>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {event.description || (
+                    <span className="italic text-gray-400">
+                      No description provided
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {/* Attachments */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+                <svg
+                  className="w-3.5 h-3.5 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+                Attachments
+              </label>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+                {event.gdriveLink || event.gdrive_link ? (
+                  <a
+                    href={event.gdriveLink || event.gdrive_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors text-sm font-medium border border-blue-200"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="w-5 h-5"
+                    >
+                      <path fill="#4285F4" d="M12 2L3.5 17h5.5l8.5-15h-5.5z" />
+                      <path fill="#34A853" d="M3.5 17L8.5 22H20L15 17H3.5z" />
+                      <path fill="#FBBC05" d="M20 22l-8.5-15h5.5L24 17l-4 5z" />
+                    </svg>
+                    Open in Drive
+                  </a>
+                ) : (
+                  <p className="text-sm text-gray-400 italic">
+                    No files attached
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row gap-3 justify-end">
+            <button
+              onClick={onClose}
+              className="px-5 py-2.5 text-sm text-gray-700 font-semibold bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all shadow-sm"
+            >
+              Close
+            </button>
+            <button
+              onClick={onEdit}
+              className="px-5 py-2.5 text-sm bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold rounded-lg hover:from-cyan-700 hover:to-cyan-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Edit Event
+            </button>
+            <button
+              onClick={onDelete}
+              className="px-5 py-2.5 text-sm bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
       </Box>
     </Modal>
   );

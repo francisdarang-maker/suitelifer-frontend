@@ -526,7 +526,7 @@ const CheerPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* LEFT: Send Cheer + Stats */}
           <div className="space-y-4">
@@ -871,15 +871,15 @@ const CheerPage = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 cheer-feed-section">
               {/* Header */}
-              <div className="px-5 py-4 border-b border-gray-200">
+              <div className="px-4 py-3.5 border-b border-gray-200">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <FireIcon className="w-5 h-5 text-orange-500" />
-                    <h2 className="text-lg font-semibold text-gray-900">
+                    <h2 className="text-base font-semibold text-gray-900">
                       Recent Cheers
                     </h2>
-                    <span className="text-sm text-gray-500">
-                      ({totalItems})
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                      {totalItems}
                     </span>
                   </div>
 
@@ -906,18 +906,18 @@ const CheerPage = () => {
               </div>
 
               {/* Feed Content */}
-              <div className="max-h-[670px] overflow-y-auto p-5">
+              <div className="max-h-[1108px] overflow-y-auto p-4">
                 {feedLoading ? (
-                  <div className="text-center py-12">
+                  <div className="text-center py-10">
                     <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-300 border-t-blue-600 mx-auto mb-3"></div>
                     <p className="text-sm text-gray-500">Loading cheers...</p>
                   </div>
                 ) : feed.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {feed.map((cheer) => (
                       <div
                         key={cheer.cheer_id}
-                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                        className="border border-gray-200 rounded-lg p-3.5 hover:shadow-md transition-shadow"
                       >
                         <div className="flex gap-3">
                           <img
@@ -958,7 +958,7 @@ const CheerPage = () => {
 
                             {/* Message */}
                             {cheer.message && (
-                              <div className="mb-3">
+                              <div className="w-full p-2 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary">
                                 {(() => {
                                   // Detect GIF/image URLs in the message
                                   const urlRegex =
@@ -974,7 +974,7 @@ const CheerPage = () => {
                                             src={part}
                                             alt="Shared content"
                                             className="max-w-full h-auto rounded-lg border border-gray-200 shadow-sm"
-                                            style={{ maxHeight: "300px" }}
+                                            style={{ maxHeight: "250px" }}
                                             onError={(e) => {
                                               // If image fails to load, show the URL instead
                                               e.target.style.display = "none";
@@ -1009,7 +1009,7 @@ const CheerPage = () => {
                             )}
 
                             {/* Actions */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                               <button
                                 onClick={() =>
                                   likeMutation.mutate(cheer.cheer_id)
@@ -1132,9 +1132,9 @@ const CheerPage = () => {
                                               return (
                                                 <div
                                                   key={commentKey}
-                                                  className="group bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors duration-200"
+                                                  className="group bg-gray-50 rounded-lg p-2.5 hover:bg-gray-100 transition-colors duration-200"
                                                 >
-                                                  <div className="flex gap-2.5">
+                                                  <div className="flex gap-2">
                                                     <img
                                                       src={
                                                         comment.fromUser
@@ -1182,7 +1182,7 @@ const CheerPage = () => {
                                                                 title="Edit comment"
                                                               >
                                                                 <svg
-                                                                  className="w-4 h-4 text-amber-600"
+                                                                  className="w-3.5 h-3.5 text-amber-600"
                                                                   fill="none"
                                                                   stroke="currentColor"
                                                                   viewBox="0 0 24 24"
@@ -1212,7 +1212,7 @@ const CheerPage = () => {
                                                                 title="Delete comment"
                                                               >
                                                                 <svg
-                                                                  className="w-4 h-4 text-red-600"
+                                                                  className="w-3.5 h-3.5 text-red-600"
                                                                   fill="none"
                                                                   stroke="currentColor"
                                                                   viewBox="0 0 24 24"
@@ -1242,7 +1242,7 @@ const CheerPage = () => {
                                                                 e.target.value
                                                               )
                                                             }
-                                                            className="w-full px-3 py-2 text-xs border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                                            className="w-full px-2.5 py-2 text-xs border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                                             rows="2"
                                                             disabled={
                                                               editCommentMutation.isLoading
@@ -1250,7 +1250,7 @@ const CheerPage = () => {
                                                           />
                                                           <div className="flex gap-2">
                                                             <button
-                                                              className="flex-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                                              className="flex-1 px-2.5 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
                                                               disabled={
                                                                 editCommentMutation.isLoading ||
                                                                 !editCommentText.trim()
@@ -1273,7 +1273,7 @@ const CheerPage = () => {
                                                                 : "Save"}
                                                             </button>
                                                             <button
-                                                              className="flex-1 px-3 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-400 transition-colors"
+                                                              className="flex-1 px-2.5 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-400 transition-colors"
                                                               onClick={() => {
                                                                 setEditingComment(
                                                                   null
@@ -1302,7 +1302,7 @@ const CheerPage = () => {
                                                           </p>
                                                           <div className="flex gap-2">
                                                             <button
-                                                              className="flex-1 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 transition-colors"
+                                                              className="flex-1 px-2.5 py-1.5 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 transition-colors"
                                                               onClick={() => {
                                                                 deleteCommentMutation.mutate(
                                                                   {
@@ -1320,7 +1320,7 @@ const CheerPage = () => {
                                                               Delete
                                                             </button>
                                                             <button
-                                                              className="flex-1 px-3 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-400 transition-colors"
+                                                              className="flex-1 px-2.5 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-400 transition-colors"
                                                               onClick={() =>
                                                                 setConfirmingDelete(
                                                                   null
@@ -1370,9 +1370,9 @@ const CheerPage = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-16">
-                    <HeartIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">
+                  <div className="text-center py-12">
+                    <HeartIcon className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <h3 className="text-base font-medium text-gray-900 mb-1">
                       No cheers yet
                     </h3>
                     <p className="text-sm text-gray-500">
