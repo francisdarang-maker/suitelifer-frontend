@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import useCategoryStore from "../../../store/stores/categoryStore";
 import AddProductForm from "./AddProductForm";
+import Loading from "../../loader/Loading";
 
 /**
  * ProductManagement Component - Enhanced with Variations Support
@@ -348,102 +349,155 @@ const ProductManagement = () => {
   return (
     // Added Feature
     // Removed Shadow Botton Orig  'shadow-md'
-    <div className="product-management-container bg-white rounded-lg ">
-      {/* Toast Notification */}
+    <div className="product-management-container bg-white rounded-lg">
+      {/* Toast Notification - Enhanced */}
       {notification.show && (
         <div
-          className={`notification-toast fixed top-20 right-4 z-50 p-4 rounded-lg shadow-lg text-base font-medium max-w-sm ${
+          className={`notification-toast fixed top-20 right-4 z-50 p-4 rounded-2xl shadow-2xl border-2 text-base font-semibold max-w-sm backdrop-blur-sm transition-all duration-300 ${
             notification.type === "success"
-              ? "bg-green-50 text-green-800 border border-green-200"
+              ? "bg-green-50/90 text-green-800 border-green-300"
               : notification.type === "error"
-              ? "bg-red-50 text-red-800 border border-red-200"
-              : "bg-blue-50 text-blue-800 border border-blue-200"
+              ? "bg-red-50/90 text-red-800 border-red-300"
+              : "bg-blue-50/90 text-blue-800 border-blue-300"
           }`}
         >
           {notification.message}
         </div>
       )}
 
-      {/* Filters and Search */}
-      <div className="filters-section sticky top-0 z-10 bg-white pb-5 px-6 pt-3">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
-          {/* Search */}
+      {/* Filters and Search - Modernized */}
+      <div className="filters-section sticky top-0 z-10 bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl shadow-lg border border-white/60 pb-6 px-6 pt-5 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+          {/* Search - Enhanced */}
           <div className="search-field">
-            <div className="relative">
-              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
-              />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative">
+                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-[#0097b2] transition-all duration-300 group-focus-within:scale-110" />
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-11 pr-4 py-2.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
+                placeholder:text-gray-400 placeholder:font-normal
+                focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white 
+                hover:border-gray-300 hover:shadow-lg
+                transition-all duration-300"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Category Filter */}
+          {/* Category Filter - Glassmorphic */}
           <div className="category-filter">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg  focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
-            >
-              {categories.map(renderCategoryOption)}
-            </select>
+            <div className="relative group">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full appearance-none px-4 pr-10 py-2.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
+              focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
+              text-sm font-semibold text-gray-700 cursor-pointer
+              hover:border-gray-300 hover:shadow-lg
+              transition-all duration-300"
+              >
+                {categories.map(renderCategoryOption)}
+              </select>
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg
+                  className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
           </div>
 
-          {/* Sort By */}
+          {/* Sort By - Glassmorphic */}
           <div className="sort-field">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-base"
-            >
-              <option key="name" value="name">
-                Sort by Name
-              </option>
-              <option key="price_points" value="price_points">
-                Sort by Price
-              </option>
-              <option key="category" value="category">
-                Sort by Category
-              </option>
-            </select>
+            <div className="relative group">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full appearance-none px-4 pr-10 py-2.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
+              focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
+              text-sm font-semibold text-gray-700 cursor-pointer
+              hover:border-gray-300 hover:shadow-lg
+              transition-all duration-300"
+              >
+                <option key="name" value="name">
+                  Sort by Name
+                </option>
+                <option key="price_points" value="price_points">
+                  Sort by Price
+                </option>
+                <option key="category" value="category">
+                  Sort by Category
+                </option>
+              </select>
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg
+                  className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
           </div>
 
-          {/* Sort Order */}
+          {/* Sort Order - Premium Pill */}
           <div className="sort-order">
-            {/* <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label> */}
             <button
               onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-base text-gray-700 hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+              className="group w-full px-4 py-2.5 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl 
+            text-sm font-semibold text-gray-700 
+            hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg hover:shadow-[#0097b2]/10
+            transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 
+            active:scale-95"
               title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
             >
               <div className="flex items-center justify-between">
-                <span>{sortOrder === "asc" ? "Ascending" : "Descending"}</span>
+                <span className="group-hover:text-[#0097b2] transition-colors">
+                  {sortOrder === "asc" ? "Ascending" : "Descending"}
+                </span>
                 {sortOrder === "desc" ? (
-                  <ArrowDownIcon className="w-5 h-5 text-gray-500" />
+                  <ArrowDownIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:translate-y-0.5" />
                 ) : (
-                  <ArrowUpIcon className="w-5 h-5 text-gray-500" />
+                  <ArrowUpIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:-translate-y-0.5" />
                 )}
               </div>
             </button>
           </div>
 
-          {/* Add Product Button - moved here */}
-          <div className="flex justify-end md:col-span-1 lg:col-span-1">
+          {/* Add Product Button - Enhanced */}
+          <div className=" ">
             <button
               onClick={handleAddProduct}
-              className=" bg-[#0097b2] text-white px-4 py-1.5 rounded-lg hover:bg-[#007a8e] transition-colors duration-200 flex items-center gap-2 w-full md:w-auto text-base"
+              className="group flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-2xl 
+            bg-gradient-to-br from-[#0097b2] to-[#0097b2]/80 text-white font-bold text-sm
+            hover:from-[#007a8e] hover:to-[#007a8e]/80 hover:shadow-xl hover:shadow-[#0097b2]/30
+            transition-all duration-300 active:scale-95
+            focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20"
             >
-              <PlusIcon className="h-5 w-5" />
-              Add Product
-            </button>
-          </div>
-
-          {/* <div className="hidden md:flex 2xl:hidden">
-            <button className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-[#0097b2] text-white hover:bg-[#007a8e] transition-colors duration-200 text-base" >
-              <PlusIcon className="h-5 w-5" />
+              <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/20">
+                <PlusIcon className="h-4 w-4" />
+              </div>
               <span>Add</span>
             </button>
           </div> */}
@@ -451,40 +505,34 @@ const ProductManagement = () => {
       </div>
 
       {/* Products Table */}
-      {/* Added Feature */}
-      {/* Orig   border border-gray-300 */}
       <div className="products-table-container max-h-[80vh] overflow-hidden rounded-lg mx-6 ">
         {loading ? (
-          <div className="text-center py-8">
-            <div className="spinner mx-auto mb-4"></div>
-            <p className="text-gray-600 text-base">Loading products...</p>
-          </div>
+          <Loading/>
         ) : (
           <>
             {/* Header Container */}
             <div className="overflow-x-auto">
-              {/* */}
-              <table className="w-full border-collapse ">
+              <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-gray-100 rounded-lg">
+                  <tr className="bg-gradient-to-r from-gray-100 via-gray-50 to-blue-50/30 rounded-2xl">
                     {/* Image column – hidden on small screens */}
-                    <th className="hidden sm:w-2 sm:max-w-500px md:table-cell md:w-20 md:pr-9  xl:w-24 2xl:w-28 relative text-left pl-2 py-3 font-medium text-gray-700 text-base after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                    <th className="hidden sm:w-2 sm:max-w-500px md:table-cell md:w-20 md:pr-9 xl:w-24 2xl:w-28 relative text-left pl-4 py-4 font-bold text-gray-700 text-sm uppercase tracking-wide after:absolute after:top-3 after:bottom-3 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-gray-300 after:to-transparent">
                       Image
                     </th>
                     {/* Name column */}
-                    <th className="w-40 sm:pr-100  md:w-60 md:pr-1 xl:w-[580px] 2xl:w-[600px] relative text-left pl-2 py-3 font-medium text-gray-700 text-base after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                    <th className="w-40 sm:pr-100 md:w-60 md:pr-1 xl:w-[580px] 2xl:w-[600px] relative text-left pl-4 py-4 font-bold text-gray-700 text-sm uppercase tracking-wide after:absolute after:top-3 after:bottom-3 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-gray-300 after:to-transparent">
                       Name
                     </th>
                     {/* Category column – hidden on small screens */}
-                    <th className="hidden md:table-cell md:w-32 xl:w-[172px] relative text-left pl-2 py-3 font-medium text-gray-700 text-base after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                    <th className="hidden md:table-cell md:w-32 xl:w-[172px] relative text-left pl-4 py-4 font-bold text-gray-700 text-sm uppercase tracking-wide after:absolute after:top-3 after:bottom-3 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-gray-300 after:to-transparent">
                       Category
                     </th>
                     {/* Price column */}
-                    <th className="hidden w-20 md:w-24 md:inline-block xl:w-[140px] relative text-left pl-2 py-3 font-medium text-gray-700 text-base after:absolute after:top-2 after:bottom-2 after:right-0 after:w-px after:bg-gray-300">
+                    <th className="hidden w-20 md:w-24 md:inline-block xl:w-[140px] relative text-left pl-4 py-4 font-bold text-gray-700 text-sm uppercase tracking-wide after:absolute after:top-3 after:bottom-3 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-gray-300 after:to-transparent">
                       Price
                     </th>
                     {/* Actions column */}
-                    <th className="w-20 md:w-24 xl:w-[140px] relative text-left pl-2 py-3 font-medium text-gray-700 text-base">
+                    <th className="w-20 md:w-24 xl:w-[140px] relative text-left pl-4 py-4 font-bold text-gray-700 text-sm uppercase tracking-wide">
                       Actions
                     </th>
                   </tr>

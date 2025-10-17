@@ -11,27 +11,28 @@ const EmployeeMyBlogs = () => {
   const [myBlogs, setMyBlogs] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchEmployeeBlogs = async () => {
-  setIsLoading(true)
+const fetchEmployeeBlogs = async () => {
+  try {
+    setIsLoading(true);
 
-  const blogs = await api.get(`api/employee-blog`)
-  setMyBlogs(blogs.data)
+    const response = await api.get(`api/employee-blog`);
+    const blogs = response.data;
 
-  console.log(blogs)
+    // Detect proper date field dynamically (fallback to created_at)
+    const sortedBlogs = [...blogs].sort((a, b) => {
+      const dateA = new Date(a.createdAt || a.created_at || a.date_created || 0);
+      const dateB = new Date(b.createdAt || b.created_at || b.date_created || 0);
+      return dateB - dateA; // latest first
+    });
 
-  setIsLoading(false)
-}
+    setMyBlogs(sortedBlogs);
+  } catch (error) {
+    console.error("Error fetching blogs:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-  // const handleDeleteBlog = async (eBlogId) => {
-  //   try {
-  //     setIsDeleting(true)
-
-  //     const deleteBlog = await api.delete(`api/delete-employee-blog/${blog.eblogId}`)
-
-  //   } catch (error) {
-      
-  //   }
-  // }
 
 useEffect( () => {
   fetchEmployeeBlogs()
@@ -40,13 +41,8 @@ useEffect( () => {
 
   return (
     <>
-    {/* Delete Dialog */}
-    {/* <BlogDeleteDialog
-    deleteBlog={handleDeleteBlog}
-    /> */}
+<section className="mb-12 sm:mb-16 md:mb-20 lg:mb-28 xl:mb-32 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
 
-
-    <section className="mb-50">
       <div className="p-2 xl:p-3 ">
         <main>
           {isLoading && (

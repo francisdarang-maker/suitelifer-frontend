@@ -25,7 +25,7 @@ const CMSTopNavigation = () => {
 
   return (
     <nav className="hidden lg:block px-3 xl:pt-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between ">
         <div className="flex items-center gap-2">
           <h3 className="font-avenir-black text-gray-600">{formatTitle(currentPage)}</h3>
           {/* <span className="text-sm text-gray-500 font-avenir-roman">(6)</span> */}

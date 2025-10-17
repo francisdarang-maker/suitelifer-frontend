@@ -11,13 +11,12 @@ import {
   PaperAirplaneIcon,
   SparklesIcon,
   FireIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { formatFullDateTime } from "../../utils/dateHelpers";
-// Remove import { motion, AnimatePresence } from 'framer-motion';
-// Remove confettiAnimating state and all setConfettiAnimating logic
-// Remove confettiColor function
 import defaultAvatar from "../../assets/images/defaultAvatar.svg";
+import Loading from "../../components/loader/Loading";
 
 const CheerPage = () => {
   const user = useStore((state) => state.user);
@@ -31,7 +30,6 @@ const CheerPage = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Feed interaction state
@@ -44,37 +42,30 @@ const CheerPage = () => {
   const [showMoreLeaderboard, setShowMoreLeaderboard] = useState(false);
   const COMMENTS_PAGE_SIZE = 20;
 
-  // Simplified state for cheer feed
   const [allCheers, setAllCheers] = useState([]);
-
   const textareaRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // Add state for date filter
   const [selectedDate, setSelectedDate] = useState("");
-
-  // Add pagination state for cheer feed
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(30);
 
-  // Reset cheers and pagination when date changes
+  const [editingComment, setEditingComment] = useState(null);
+  const [editCommentText, setEditCommentText] = useState("");
+  const [confirmingDelete, setConfirmingDelete] = useState(null);
+
   useEffect(() => {
     setAllCheers([]);
     setCurrentPage(1);
   }, [selectedDate]);
 
-  // Fetch cheer statistics
   const { isLoading: statsLoading } = useQuery({
-    // Fetch cheer statistics (removed unused variable)
-    //const { isLoading: statsLoading } = useQuery({
-
     queryKey: ["cheer-stats"],
     queryFn: pointsSystemApi.getCheerStats,
     staleTime: 2 * 60 * 1000,
     enabled: !!user && Object.keys(user).length > 0,
   });
 
-  // Fetch user points
   const { data: pointsData, isLoading: pointsLoading } = useQuery({
     queryKey: ["points"],
     queryFn: pointsSystemApi.getPoints,
@@ -82,7 +73,6 @@ const CheerPage = () => {
     enabled: !!user && Object.keys(user).length > 0,
   });
 
-  // Simplified cheer feed query - load all recent posts first
   const {
     data: cheerFeed,
     isLoading: feedLoading,
@@ -91,17 +81,10 @@ const CheerPage = () => {
     queryKey: ["cheer-feed", selectedDate, currentPage, itemsPerPage],
     queryFn: async () => {
       const offset = (currentPage - 1) * itemsPerPage;
-
       if (selectedDate) {
-        // Create date boundaries in UTC to avoid timezone issues
         const [year, month, day] = selectedDate.split("-").map(Number);
-
-        // Start of day in UTC (00:00:00.000)
         const from = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-
-        // End of day in UTC (23:59:59.999)
         const to = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
-
         return pointsSystemApi.getCheerFeed(
           itemsPerPage,
           from.toISOString(),
@@ -109,7 +92,6 @@ const CheerPage = () => {
           offset
         );
       } else {
-        // For all cheers, request a large amount to get comprehensive data
         return pointsSystemApi.getCheerFeed(1000, null, null, 0);
       }
     },
@@ -119,12 +101,8 @@ const CheerPage = () => {
       const allCheers = data?.data?.cheers || data?.cheers || [];
       setAllCheers(allCheers);
     },
-    onError: (error) => {
-      console.error("Cheer feed error:", error);
-    },
   });
 
-  // Fetch leaderboard
   const { data: leaderboardData, isLoading: leaderboardLoading } = useQuery({
     queryKey: ["leaderboard", activeTab, user?.id],
     queryFn: () => pointsSystemApi.getLeaderboard(activeTab, user?.id),
@@ -132,11 +110,9 @@ const CheerPage = () => {
     enabled: !!user && Object.keys(user).length > 0,
   });
 
-  // Process leaderboard data
   const leaderboard = leaderboardData?.data || [];
   const currentUserLeaderboard = leaderboardData?.currentUser || null;
 
-  // User search for @ mentions
   const { data: searchResults = [] } = useQuery({
     queryKey: ["user-search", searchQuery],
     queryFn: () => pointsSystemApi.searchUsers(searchQuery),
@@ -144,27 +120,21 @@ const CheerPage = () => {
     staleTime: 30 * 1000,
   });
 
-  // Bulk cheer mutation for multiple recipients
   const bulkCheerMutation = useMutation({
     mutationFn: ({ recipientId, amount, message }) => {
       return pointsSystemApi.sendCheer(recipientId, amount, message);
     },
   });
 
-  // Heart cheer mutation
   const likeMutation = useMutation({
     mutationFn: (cheerId) => pointsSystemApi.toggleCheerLike(cheerId),
     onSuccess: (data, cheerId) => {
-      // Extract the actual like status from the response
       const likeStatus =
         data.liked !== undefined ? data.liked : data.data && data.data.liked;
-
-      // Fallback: if likeStatus is undefined, check if it was previously liked
       const wasPreviouslyLiked = likedCheers.has(cheerId);
       const finalLikeStatus =
         likeStatus !== undefined ? likeStatus : !wasPreviouslyLiked;
 
-      // Update localStorage based on server response
       const currentLikes = JSON.parse(
         localStorage.getItem("likedCheers") || "[]"
       );
@@ -180,7 +150,6 @@ const CheerPage = () => {
       }
       localStorage.setItem("likedCheers", JSON.stringify(currentLikes));
 
-      // Update state based on server response, not localStorage
       setLikedCheers((prev) => {
         const newSet = new Set(prev);
         if (finalLikeStatus === true) {
@@ -192,16 +161,13 @@ const CheerPage = () => {
       });
 
       queryClient.invalidateQueries(["cheer-feed"]);
-      // Refresh the current page to get updated like status
       refetchCheerFeed();
     },
-    onError: (error) => {
-      console.error("likeMutation.onError", error);
+    onError: () => {
       toast.error("Failed to update heart");
     },
   });
 
-  // Comment mutation
   const commentMutation = useMutation({
     mutationFn: ({ cheerId, comment }) =>
       pointsSystemApi.addCheerComment(cheerId, comment),
@@ -211,7 +177,6 @@ const CheerPage = () => {
         const newComments = new Map(prev);
         const existing = newComments.get(variables.cheerId);
         const existingArray = Array.isArray(existing) ? existing : [];
-
         const newComment = {
           _id: data.id || data._id,
           comment: data.comment,
@@ -226,21 +191,14 @@ const CheerPage = () => {
         return newComments;
       });
       queryClient.invalidateQueries(["cheer-feed"]);
-      // Refresh the current page to get updated comment count
       refetchCheerFeed();
       toast.success("Comment added!");
     },
-    onError: (error) => {
-      console.error("Comment error:", error);
+    onError: () => {
       toast.error("Failed to add comment");
     },
   });
 
-  // Add state for editing comments
-  const [editingComment, setEditingComment] = useState(null); // {cheerId, commentId}
-  const [editCommentText, setEditCommentText] = useState("");
-
-  // Edit comment mutation
   const editCommentMutation = useMutation({
     mutationFn: ({ cheerId, commentId, comment }) =>
       pointsSystemApi.updateCheerComment(cheerId, commentId, comment),
@@ -264,7 +222,6 @@ const CheerPage = () => {
     onError: () => toast.error("Failed to update comment"),
   });
 
-  // Delete comment mutation
   const deleteCommentMutation = useMutation({
     mutationFn: ({ cheerId, commentId }) =>
       pointsSystemApi.deleteCheerComment(cheerId, commentId),
@@ -284,10 +241,6 @@ const CheerPage = () => {
     onError: () => toast.error("Failed to delete comment"),
   });
 
-  // Add state for delete confirmation
-  const [confirmingDelete, setConfirmingDelete] = useState(null); // {cheerId, commentId}
-
-  // Load persisted likes from localStorage on component mount
   useEffect(() => {
     const persistedLikes = JSON.parse(
       localStorage.getItem("likedCheers") || "[]"
@@ -295,14 +248,10 @@ const CheerPage = () => {
     if (persistedLikes.length > 0) {
       setLikedCheers(new Set(persistedLikes));
     }
-
-    // Cleanup function to clear likes when component unmounts
     return () => {
-      // Optionally clear old likes after a certain time period
       const lastCleared = localStorage.getItem("likedCheersLastCleared");
       const now = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
+      const oneDay = 24 * 60 * 60 * 1000;
       if (!lastCleared || now - parseInt(lastCleared) > oneDay) {
         localStorage.removeItem("likedCheers");
         localStorage.setItem("likedCheersLastCleared", now.toString());
@@ -310,14 +259,11 @@ const CheerPage = () => {
     };
   }, []);
 
-  // Initialize hearted cheers state when feed data loads
   useEffect(() => {
     if (allCheers && Array.isArray(allCheers)) {
       const likedCheerIds = new Set();
       const serverLikedCheerIds = new Set();
-
       allCheers.forEach((cheer) => {
-        // Check for both userLiked and userHearted fields, handling both boolean and numeric values
         const isLiked =
           cheer.userLiked === true ||
           cheer.userLiked === 1 ||
@@ -326,27 +272,20 @@ const CheerPage = () => {
           cheer.userHearted === true ||
           cheer.userHearted === 1 ||
           cheer.userHearted === "1";
-
         if (isLiked || isHearted) {
           likedCheerIds.add(cheer.cheer_id);
           serverLikedCheerIds.add(cheer.cheer_id);
         }
       });
-
-      // Only add persisted likes for cheers that don't have server data
       const persistedLikes = JSON.parse(
         localStorage.getItem("likedCheers") || "[]"
       );
       persistedLikes.forEach((cheerId) => {
-        // Only add if server doesn't have data for this cheer
         if (!serverLikedCheerIds.has(cheerId)) {
           likedCheerIds.add(cheerId);
         }
       });
-
       setLikedCheers(likedCheerIds);
-
-      // Clean up localStorage to remove stale data for cheers that have server data
       if (serverLikedCheerIds.size > 0) {
         const currentPersistedLikes = JSON.parse(
           localStorage.getItem("likedCheers") || "[]"
@@ -362,19 +301,16 @@ const CheerPage = () => {
     }
   }, [allCheers]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowUserDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Function to fetch comments for a specific cheer (with pagination)
   const fetchComments = async (cheerId, append = false) => {
     setLoadingComments(true);
     try {
@@ -405,7 +341,6 @@ const CheerPage = () => {
         });
       });
     } catch (error) {
-      console.error("Error loading comments:", error);
       toast.error("Failed to load comments");
       setCheerComments((prevMap) =>
         new Map(prevMap).set(cheerId, {
@@ -419,7 +354,6 @@ const CheerPage = () => {
     }
   };
 
-  // Handle comment button click
   const handleCommentClick = (cheerId) => {
     const isOpening = commentingCheer !== cheerId;
     setCommentingCheer(isOpening ? cheerId : null);
@@ -428,11 +362,9 @@ const CheerPage = () => {
     }
   };
 
-  // Handle @ mention search in textarea
   const handleCheerTextChange = (e) => {
     const value = e.target.value;
     setCheerText(value);
-
     if (value.trim().length > 0) {
       setSearchQuery(value);
       setShowUserDropdown(true);
@@ -462,7 +394,7 @@ const CheerPage = () => {
     const totalHeartbitsNeeded = cheerPoints * selectedUsers.length;
     if (totalHeartbitsNeeded > availableHeartbits) {
       toast.error(
-        `Not enough heartbits available. You need ${totalHeartbitsNeeded} heartbits to send ${cheerPoints} to ${selectedUsers.length} recipients, but you only have ${availableHeartbits} remaining.`
+        `Not enough heartbits available. You need ${totalHeartbitsNeeded} heartbits but you only have ${availableHeartbits} remaining.`
       );
       return;
     }
@@ -482,14 +414,10 @@ const CheerPage = () => {
           successCount++;
         } catch (error) {
           errorCount++;
-          console.error(`❌ Failed to send cheer to ${user.name}:`, error);
         }
       }
-
       if (errorCount === 0) {
-        toast.success(
-          `Cheers sent successfully to ${successCount} recipients! 🎉`
-        );
+        toast.success(`Cheers sent to ${successCount} recipients! 🎉`);
         setSelectedUsers([]);
         setCheerText("");
         setMessageText("");
@@ -497,7 +425,6 @@ const CheerPage = () => {
         queryClient.invalidateQueries(["points"]);
         queryClient.invalidateQueries(["cheer-feed"]);
         queryClient.invalidateQueries(["leaderboard"]);
-        // Reset and reload feed
         setAllCheers([]);
       } else if (successCount > 0) {
         toast.warning(`Sent ${successCount} cheers, but ${errorCount} failed.`);
@@ -508,7 +435,6 @@ const CheerPage = () => {
 
     sendCheersSequentially()
       .catch((error) => {
-        console.error("Cheer submission failed:", error);
         const backendMsg =
           error?.response?.data?.message ||
           error?.message ||
@@ -523,48 +449,39 @@ const CheerPage = () => {
   const formatTimeAgo = (date) => {
     try {
       if (!date) return "Unknown time";
-
       const now = new Date();
       const dateObj = new Date(date);
-
       if (isNaN(dateObj.getTime())) return "Invalid date";
-
       const diffMs = now - dateObj;
       const diffMins = Math.floor(diffMs / 60000);
       const diffHours = Math.floor(diffMs / 3600000);
       const diffDays = Math.floor(diffMs / 86400000);
-
       if (diffMins < 1) return "Just now";
       if (diffMins < 60) return `${diffMins}m ago`;
       if (diffHours < 24) return `${diffHours}h ago`;
       return `${diffDays}d ago`;
     } catch (error) {
-      console.error("Time formatting error:", error, "for date:", date);
       return "Invalid date";
     }
   };
 
-  // Show authentication debug info if user object is empty or undefined
   if (!user || Object.keys(user).length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full mx-4">
-          <div className="text-center">
-            <HeartIconSolid className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Authentication Required
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Please ensure you are logged in to access the Cheer a Peer
-              feature.
-            </p>
-            <button
-              onClick={() => (window.location.href = "/login")}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Go to Login
-            </button>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+          <HeartIconSolid className="w-16 h-16 text-orange-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+            Authentication Required
+          </h2>
+          <p className="text-gray-600 mb-6 text-center">
+            Please log in to access Cheer a Peer.
+          </p>
+          <button
+            onClick={() => (window.location.href = "/login")}
+            className="w-full bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-medium"
+          >
+            Go to Login
+          </button>
         </div>
       </div>
     );
@@ -575,29 +492,7 @@ const CheerPage = () => {
 
   if (anyLoading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: "#ffffff" }}
-      >
-        <div className="text-center">
-          <div className="relative">
-            <div
-              className="animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-4 mx-auto mb-4"
-              style={{ borderTopColor: "#0097b2" }}
-            ></div>
-            <SparklesIcon
-              className="w-8 h-8 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-              style={{ color: "#0097b2" }}
-            />
-          </div>
-          <p
-            className="text-lg font-medium"
-            style={{ color: "#4a6e7e", fontFamily: "Avenir, sans-serif" }}
-          >
-            Loading your cheer dashboard...
-          </p>
-        </div>
-      </div>
+      <Loading/>
     );
   }
 
@@ -605,1296 +500,862 @@ const CheerPage = () => {
     (pointsData?.data?.monthlyCheerLimit || 100) -
     (pointsData?.data?.monthlyCheerUsed || 0);
 
-  // Get all data from API response and paginate client-side
   const allData = cheerFeed?.data?.cheers || cheerFeed?.cheers || [];
   const pageStartIndex = (currentPage - 1) * itemsPerPage;
   const pageEndIndex = pageStartIndex + itemsPerPage;
   const feed = allData.slice(pageStartIndex, pageEndIndex);
 
-  // Get pagination data - handle different API response structures
-  const paginationData = cheerFeed?.pagination || cheerFeed?.data?.pagination;
   const totalItems = allData.length || 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
 
-  // Calculate display indices
-  const startIndex = totalItems > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
-  const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
-
-  // Handle page change with error handling
   const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages) {
-      console.warn("Invalid page number:", page);
-      return;
-    }
-
+    if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
-
-    // Scroll to top of feed section for better UX
     const feedSection = document.querySelector(".cheer-feed-section");
     if (feedSection) {
       feedSection.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  // Handle items per page change (currently not used but kept for future flexibility)
-  const handleItemsPerPageChange = (newItemsPerPage) => {
-    setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page when changing items per page
-  };
-
   return (
-    // start
+    <div className="min-h-screen bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* LEFT: Send Cheer + Stats */}
+          <div className="space-y-4 ">
+            {/* Send Cheer Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <PaperAirplaneIcon className="w-5 h-5 text-blue-600" />
+                Send Heartbits
+              </h2>
 
-    <div
-      className="w-full min-h-screen"
-      // style={{
-      //   background:
-      //     "linear-gradient(135deg, #f8fafc 0%, #e0f7fa 50%, #f8fafc 100%)",
-      // }}
-      style={{
-        backgroundColor: "#f8fafc",
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT COLUMN - Create Cheer & Heartbits */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* ENHANCED CREATE CHEER FORM */}
-            <div
-              className="rounded-3xl shadow-2xl p-8 transition-all duration-300 hover:shadow-3xl overflow-hidden relative group"
-              style={{
-                background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              {/* Animated glow effect */}
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{
-                  background:
-                    "radial-gradient(circle at top right, rgba(0, 151, 178, 0.1) 0%, transparent 70%)",
-                }}
-              />
-
-              <div className="relative">
-                {/* Header */}
-                <div className="flex items-center space-x-3 mb-6">
-                  <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:scale-110"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
-                    }}
-                  >
-                    <HeartIconSolid className="w-7 h-7 text-white" />
-                  </div>
+              <form onSubmit={handleCheerSubmit} className="space-y-4">
+                {/* Selected Users */}
+                {selectedUsers.length > 0 && (
                   <div>
-                    <h2
-                      className="text-2xl font-black"
-                      style={{
-                        color: "#1a0202",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Send Heartbits
-                    </h2>
-                    <p
-                      className="text-sm"
-                      style={{
-                        color: "#64748b",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Recognize your peers
-                    </p>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Recipients ({selectedUsers.length})
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedUsers.map((user, index) => (
+                        <span
+                          key={user.user_id}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200"
+                        >
+                          <img
+                            src={user.avatar || "/images/default-avatar.png"}
+                            alt={user.name}
+                            className="w-5 h-5 rounded-full"
+                          />
+                          <span className="max-w-24 truncate">{user.name}</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedUsers((prev) =>
+                                prev.filter((_, i) => i !== index)
+                              )
+                            }
+                            className="ml-1 hover:text-blue-900"
+                          >
+                            <XMarkIcon className="w-4 h-4" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
                   </div>
+                )}
+
+                {/* Search */}
+                <div className="relative" ref={dropdownRef}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Search Peers
+                  </label>
+                  <input
+                    type="text"
+                    value={cheerText}
+                    onChange={handleCheerTextChange}
+                    placeholder="Type a name..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                  {showUserDropdown &&
+                    Array.isArray(searchResults) &&
+                    searchResults.length > 0 && (
+                      <div className="absolute z-20 w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+                        {searchResults
+                          .filter(
+                            (result) =>
+                              !selectedUsers.some(
+                                (selected) =>
+                                  selected.user_id === result.user_id
+                              )
+                          )
+                          .map((result) => (
+                            <button
+                              key={result.user_id}
+                              type="button"
+                              onClick={() => handleUserSelect(result)}
+                              className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+                            >
+                              <img
+                                src={
+                                  result.avatar || "/images/default-avatar.png"
+                                }
+                                alt={result.name}
+                                className="w-10 h-10 rounded-full"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm text-gray-900 truncate">
+                                  {result.name}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {result.email}
+                                </p>
+                              </div>
+                            </button>
+                          ))}
+                      </div>
+                    )}
                 </div>
 
-                <form onSubmit={handleCheerSubmit} className="space-y-6">
-                  {/* Selected Users Display */}
-                  {selectedUsers.length > 0 && (
-                    <div>
-                      <label
-                        className="block text-sm font-bold mb-3"
-                        style={{
-                          color: "#1a0202",
-                          fontFamily: "Avenir, sans-serif",
-                        }}
-                      >
-                        Recipients ({selectedUsers.length})
-                      </label>
-                      <div
-                        className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 rounded-xl"
-                        style={{ backgroundColor: "#f8fafc" }}
-                      >
-                        {selectedUsers.map((user, index) => (
-                          <div
-                            key={user.user_id}
-                            className="group/tag flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200 hover:scale-105"
-                            style={{
-                              background:
-                                "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
-                              border: "1px solid #3b82f6",
-                            }}
-                          >
-                            <img
-                              src={user.avatar || "/images/default-avatar.png"}
-                              alt={user.name}
-                              className="w-6 h-6 rounded-full ring-2 ring-white"
-                            />
-                            <span
-                              className="text-sm font-bold truncate max-w-24"
-                              style={{
-                                color: "#1e40af",
-                                fontFamily: "Avenir, sans-serif",
-                              }}
-                            >
-                              {user.name}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setSelectedUsers((prev) =>
-                                  prev.filter((_, i) => i !== index)
-                                )
-                              }
-                              className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-125 opacity-70 group-hover/tag:opacity-100"
-                              style={{
-                                backgroundColor: "#ef4444",
-                                color: "#ffffff",
-                                fontSize: "12px",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                {/* Message */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Message <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    ref={textareaRef}
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    placeholder="Share why they deserve recognition..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
+                    rows="3"
+                    required
+                  />
+                </div>
 
-                  {/* Search Input */}
-                  <div className="relative" ref={dropdownRef}>
-                    <label
-                      className="block text-sm font-bold mb-2"
-                      style={{
-                        color: "#1a0202",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Search Peers
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={cheerText}
-                        onChange={handleCheerTextChange}
-                        placeholder="Type a name..."
-                        className="w-full px-4 py-3 rounded-2xl transition-all duration-200 focus:ring-4 text-base"
-                        style={{
-                          border: "2px solid #e2e8f0",
-                          backgroundColor: "#ffffff",
-                          fontFamily: "Avenir, sans-serif",
-                          color: "#1a0202",
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = "#0097b2";
-                          e.target.style.boxShadow =
-                            "0 0 0 4px rgba(0, 151, 178, 0.1)";
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = "#e2e8f0";
-                          e.target.style.boxShadow = "none";
-                        }}
-                      />
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <svg
-                          className="w-5 h-5"
-                          style={{ color: "#94a3b8" }}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* User Dropdown */}
-                    {showUserDropdown &&
-                      Array.isArray(searchResults) &&
-                      searchResults.length > 0 && (
-                        <div
-                          className="absolute z-20 w-full mt-2 rounded-2xl shadow-2xl max-h-64 overflow-y-auto"
-                          style={{
-                            backgroundColor: "#ffffff",
-                            border: "2px solid #e2e8f0",
-                          }}
-                        >
-                          {searchResults
-                            .filter(
-                              (result) =>
-                                !selectedUsers.some(
-                                  (selected) =>
-                                    selected.user_id === result.user_id
-                                )
-                            )
-                            .map((result) => (
-                              <button
-                                key={result.user_id}
-                                type="button"
-                                onClick={() => handleUserSelect(result)}
-                                className="w-full px-5 py-4 text-left flex items-center space-x-4 transition-all duration-200 hover:scale-[1.02]"
-                                style={{
-                                  borderBottom: "1px solid #f1f5f9",
-                                }}
-                                onMouseEnter={(e) =>
-                                  (e.target.style.backgroundColor = "#f0f9ff")
-                                }
-                                onMouseLeave={(e) =>
-                                  (e.target.style.backgroundColor =
-                                    "transparent")
-                                }
-                              >
-                                <img
-                                  src={
-                                    result.avatar ||
-                                    "/images/default-avatar.png"
-                                  }
-                                  alt={result.name}
-                                  className="w-12 h-12 rounded-xl ring-2 ring-gray-200"
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <p
-                                    className="font-bold text-base truncate"
-                                    style={{
-                                      color: "#1a0202",
-                                      fontFamily: "Avenir, sans-serif",
-                                    }}
-                                  >
-                                    {result.name}
-                                  </p>
-                                  <p
-                                    className="text-sm truncate"
-                                    style={{
-                                      color: "#64748b",
-                                      fontFamily: "Avenir, sans-serif",
-                                    }}
-                                  >
-                                    {result.email}
-                                  </p>
-                                </div>
-                              </button>
-                            ))}
-                        </div>
-                      )}
-                  </div>
-
-                  {/* Message Input */}
-                  <div>
-                    <label
-                      className="block text-sm font-bold mb-2"
-                      style={{
-                        color: "#1a0202",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Your Message <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      ref={textareaRef}
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      placeholder="Share why they deserve recognition... 🌟"
-                      className="w-full px-4 py-3 rounded-2xl resize-none transition-all duration-200 focus:ring-4"
-                      style={{
-                        border: "2px solid #e2e8f0",
-                        backgroundColor: "#ffffff",
-                        fontFamily: "Avenir, sans-serif",
-                        color: "#1a0202",
-                        minHeight: "120px",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = "#0097b2";
-                        e.target.style.boxShadow =
-                          "0 0 0 4px rgba(0, 151, 178, 0.1)";
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = "#e2e8f0";
-                        e.target.style.boxShadow = "none";
-                      }}
-                      required
-                    />
-                  </div>
-
-                  {/* Heartbits Amount */}
-                  <div>
-                    <label
-                      className="block text-sm font-bold mb-2"
-                      style={{
-                        color: "#1a0202",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
+                {/* Points Slider */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-sm font-medium text-gray-700">
                       Heartbits Amount
                     </label>
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="range"
-                        min="1"
-                        max={Math.min(100, availableHeartbits)}
-                        value={cheerPoints}
-                        onChange={(e) =>
-                          setCheerPoints(parseInt(e.target.value))
-                        }
-                        className="flex-1 h-3 rounded-full appearance-none cursor-pointer"
-                        style={{
-                          background: `linear-gradient(to right, #0097b2 0%, #0097b2 ${
-                            (cheerPoints / Math.min(100, availableHeartbits)) *
-                            100
-                          }%, #e2e8f0 ${
-                            (cheerPoints / Math.min(100, availableHeartbits)) *
-                            100
-                          }%, #e2e8f0 100%)`,
-                        }}
-                      />
-                      <div className="text-center min-w-20">
-                        <div
-                          className="text-3xl font-black"
-                          style={{
-                            color: "#0097b2",
-                            fontFamily: "Avenir, sans-serif",
-                          }}
-                        >
-                          {cheerPoints}
-                        </div>
-                        <div
-                          className="text-xs font-semibold"
-                          style={{
-                            color: "#64748b",
-                            fontFamily: "Avenir, sans-serif",
-                          }}
-                        >
-                          MAX {Math.min(100, availableHeartbits)}
-                        </div>
-                      </div>
-                    </div>
+                    <span className="text-2xl font-bold text-blue-600">
+                      {cheerPoints}
+                    </span>
                   </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max={Math.min(100, availableHeartbits)}
+                    value={cheerPoints}
+                    onChange={(e) => setCheerPoints(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>1</span>
+                    <span>Max: {Math.min(100, availableHeartbits)}</span>
+                  </div>
+                </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={
-                      anyLoading ||
-                      isSubmitting ||
-                      selectedUsers.length === 0 ||
-                      !messageText.trim() ||
-                      bulkCheerMutation.isLoading ||
-                      cheerPoints > availableHeartbits
-                    }
-                    className="w-full text-white py-4 px-6 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed font-black text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    {bulkCheerMutation.isLoading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent"></div>
-                        <span>Sending...</span>
-                      </>
-                    ) : (
-                      <>
-                        <PaperAirplaneIcon className="w-6 h-6" />
-                        <span>Send Heartbits</span>
-                        <HeartIconSolid className="w-6 h-6" />
-                      </>
-                    )}
-                  </button>
-                </form>
-              </div>
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={
+                    anyLoading ||
+                    isSubmitting ||
+                    selectedUsers.length === 0 ||
+                    !messageText.trim() ||
+                    bulkCheerMutation.isLoading ||
+                    cheerPoints > availableHeartbits
+                  }
+                  className="w-full bg-primary text-white py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                >
+                  {bulkCheerMutation.isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <PaperAirplaneIcon className="w-5 h-5" />
+                      <span>Send Heartbits</span>
+                    </>
+                  )}
+                </button>
+              </form>
             </div>
 
-            {/* ENHANCED HEARTBITS WIDGET */}
-            <div
-              className="rounded-3xl shadow-2xl p-8 transition-all duration-300 hover:shadow-3xl"
-              style={{
-                background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              <div className="flex items-center space-x-3 mb-6">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #ec4899 0%, #be185d 100%)",
-                  }}
-                >
-                  <HeartIconSolid className="w-7 h-7 text-white" />
+            {/* Stats Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <HeartIconSolid className="w-5 h-5 text-rose-500" />
+                Your Heartbits
+              </h3>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-blue-50 rounded-lg p-3 text-center border border-blue-100">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {availableHeartbits}
+                  </div>
+                  <div className="text-xs text-blue-600 font-medium mt-0.5">
+                    Available
+                  </div>
                 </div>
-                <div>
-                  <h3
-                    className="text-2xl font-black"
-                    style={{
-                      color: "#1a0202",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    Your Heartbits
-                  </h3>
+                <div className="bg-green-50 rounded-lg p-3 text-center border border-green-100">
+                  <div className="text-2xl font-bold text-green-600">
+                    {pointsData?.data?.monthlyReceivedHeartbits || 0}
+                  </div>
+                  <div className="text-xs text-green-600 font-medium mt-0.5">
+                    Received
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-6">
-                {/* Main Stats */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div
-                    className="text-center p-4 rounded-2xl"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
-                    }}
-                  >
-                    <div
-                      className="text-4xl font-black mb-1"
-                      style={{
-                        color: "#1e40af",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      {availableHeartbits}
-                    </div>
-                    <div
-                      className="text-sm font-bold"
-                      style={{
-                        color: "#1e40af",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Available
-                    </div>
-                  </div>
-
-                  <div
-                    className="text-center p-4 rounded-2xl"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)",
-                    }}
-                  >
-                    <div
-                      className="text-4xl font-black mb-1"
-                      style={{
-                        color: "#065f46",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      {pointsData?.data?.monthlyReceivedHeartbits || 0}
-                    </div>
-                    <div
-                      className="text-sm font-bold"
-                      style={{
-                        color: "#065f46",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Received
-                    </div>
-                  </div>
+              <div>
+                <div className="flex justify-between text-xs text-gray-600 mb-1.5">
+                  <span>Monthly Usage</span>
+                  <span className="font-medium">
+                    {pointsData?.data?.monthlyCheerUsed || 0} /{" "}
+                    {pointsData?.data?.monthlyCheerLimit || 100}
+                  </span>
                 </div>
-
-                {/* Progress Bar */}
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <span
-                      className="text-sm font-bold"
-                      style={{
-                        color: "#1a0202",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Monthly Usage
-                    </span>
-                    <span
-                      className="text-sm font-bold"
-                      style={{
-                        color: "#0097b2",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      {pointsData?.data?.monthlyCheerUsed || 0} /{" "}
-                      {pointsData?.data?.monthlyCheerLimit || 100}
-                    </span>
-                  </div>
-
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
-                    className="relative h-4 rounded-full overflow-hidden"
-                    style={{ backgroundColor: "#e2e8f0" }}
-                  >
-                    <div
-                      className="h-full transition-all duration-1000 relative overflow-hidden"
-                      style={{
-                        width: `${Math.min(
-                          ((pointsData?.data?.monthlyCheerUsed || 0) /
-                            (pointsData?.data?.monthlyCheerLimit || 100)) *
-                            100,
-                          100
-                        )}%`,
-                        background:
-                          "linear-gradient(90deg, #0097b2 0%, #4a6e7e 100%)",
-                      }}
-                    >
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          background:
-                            "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
-                          animation: "shimmer 2s infinite",
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  <div className="text-center mt-2">
-                    <span
-                      className="text-2xl font-black"
-                      style={{
-                        color: "#0097b2",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      {Math.round(
+                    className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
+                    style={{
+                      width: `${Math.min(
                         ((pointsData?.data?.monthlyCheerUsed || 0) /
                           (pointsData?.data?.monthlyCheerLimit || 100)) *
-                          100
-                      )}
-                      %
-                    </span>
-                    <span
-                      className="text-sm font-semibold ml-2"
-                      style={{
-                        color: "#64748b",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Used
-                    </span>
-                  </div>
+                          100,
+                        100
+                      )}%`,
+                    }}
+                  ></div>
                 </div>
               </div>
             </div>
-          </div>
-          {/* una */}
-          {/* Right Column - Feed & Leaderboard */}
 
-          <div className="lg:col-span-2 space-y-6">
-            {/* ENHANCED CHEER FEED */}
-            <div
-              className="rounded-3xl shadow-2xl overflow-hidden transition-all duration-300 hover:shadow-3xl cheer-feed-section"
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              {/* Feed Header with Date Filter */}
-              <div
-                className="px-6 py-5 border-b border-gray-200"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)",
-                }}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  {/* Left side - Title */}
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110"
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-                      }}
-                    >
-                      <FireIcon className="w-6 h-6 text-white" />
+            {/* Leaderboard Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                  <TrophyIcon className="w-5 h-5 text-amber-500" />
+                  Leaderboard
+                </h3>
+              </div>
+
+              {/* Tabs */}
+              <div className="flex gap-1 mb-4 bg-gray-100 p-1 rounded-lg">
+                {["weekly", "monthly", "alltime"].map((period) => (
+                  <button
+                    key={period}
+                    onClick={() => setActiveTab(period)}
+                    className={`flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                      activeTab === period
+                        ? "bg-white text-gray-900 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    {period === "alltime"
+                      ? "All Time"
+                      : period.charAt(0).toUpperCase() + period.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Current User */}
+              {user && currentUserLeaderboard && (
+                <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                  <p className="text-xs font-medium text-amber-700 mb-2">
+                    Your Position
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                      {currentUserLeaderboard.rank}
                     </div>
-                    <div>
-                      <h2
-                        className="text-2xl font-black"
-                        style={{
-                          color: "#1a0202",
-                          fontFamily: "Avenir, sans-serif",
-                        }}
-                      >
-                        Recent Cheers
-                      </h2>
-                      <p
-                        className="text-sm"
-                        style={{
-                          color: "#64748b",
-                          fontFamily: "Avenir, sans-serif",
-                        }}
-                      >
-                        {totalItems} total cheers
+                    <img
+                      src={
+                        currentUserLeaderboard.info?.avatar ||
+                        "/images/default-avatar.png"
+                      }
+                      alt={currentUserLeaderboard.info?.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm text-gray-900 truncate">
+                        {currentUserLeaderboard.info?.name ||
+                          user.first_name + " " + user.last_name}
                       </p>
                     </div>
+                    <span className="font-bold text-sm text-amber-700">
+                      {currentUserLeaderboard.info?.totalPoints ||
+                        currentUserLeaderboard.totalPoints ||
+                        0}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Leaderboard List */}
+              {leaderboardLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-blue-600 mx-auto"></div>
+                </div>
+              ) : leaderboard.length > 0 ? (
+                <div className="space-y-2">
+                  {leaderboard
+                    .slice(0, showMoreLeaderboard ? 10 : 5)
+                    .map((entry) => (
+                      <div
+                        key={entry._id || entry.userId || entry.user_id}
+                        className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs text-white shadow-sm ${
+                            entry.rank === 1
+                              ? "bg-gradient-to-br from-amber-400 to-amber-500"
+                              : entry.rank === 2
+                              ? "bg-gradient-to-br from-gray-400 to-gray-500"
+                              : entry.rank === 3
+                              ? "bg-gradient-to-br from-orange-400 to-orange-500"
+                              : "bg-gray-400"
+                          }`}
+                        >
+                          {entry.rank}
+                        </div>
+                        <img
+                          src={entry.avatar || "/images/default-avatar.png"}
+                          alt={entry.name || entry.userName}
+                          className="w-8 h-8 rounded-full"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-gray-900 truncate">
+                            {entry.name || entry.userName}
+                          </p>
+                        </div>
+                        <span className="font-bold text-sm text-gray-700">
+                          {entry.totalPoints || entry.total_earned}
+                        </span>
+                      </div>
+                    ))}
+
+                  {leaderboard.length > 5 && (
+                    <button
+                      onClick={() =>
+                        setShowMoreLeaderboard(!showMoreLeaderboard)
+                      }
+                      className="w-full py-2 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      {showMoreLeaderboard ? "Show Less" : "Show More"}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <TrophyIcon className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">No rankings yet</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* RIGHT: Feed */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 cheer-feed-section">
+              {/* Header */}
+              <div className="px-4 py-3.5 border-b border-gray-200">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <FireIcon className="w-5 h-5 text-orange-500" />
+                    <h2 className="text-base font-semibold text-gray-900">
+                      Recent Cheers
+                    </h2>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                      {totalItems}
+                    </span>
                   </div>
 
-                  {/* Right side - Date Filter */}
-                  <div className="flex items-center gap-3">
-                    <label
-                      htmlFor="cheer-date-picker"
-                      className="text-sm font-bold whitespace-nowrap"
-                      style={{
-                        color: "#1a0202",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Filter by Date:
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        id="cheer-date-picker"
-                        type="date"
-                        className="px-4 py-2 rounded-xl text-sm transition-all duration-300 focus:ring-4 focus:outline-none"
-                        style={{
-                          border: "2px solid #e2e8f0",
-                          backgroundColor: "#ffffff",
-                          fontFamily: "Avenir, sans-serif",
-                          color: "#1a0202",
-                          cursor: "pointer",
-                        }}
-                        value={selectedDate}
-                        max={new Date().toISOString().split("T")[0]}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = "#0097b2";
-                          e.target.style.boxShadow =
-                            "0 0 0 4px rgba(0, 151, 178, 0.1)";
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = "#e2e8f0";
-                          e.target.style.boxShadow = "none";
-                        }}
-                      />
-
-                      {selectedDate && (
-                        <button
-                          className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-lg"
-                          style={{
-                            background:
-                              "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-                            color: "#ffffff",
-                            fontWeight: "bold",
-                          }}
-                          onClick={() => setSelectedDate("")}
-                          title="Clear filter"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </div>
+                  {/* Date Filter */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="date"
+                      className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={selectedDate}
+                      max={new Date().toISOString().split("T")[0]}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                    />
+                    {selectedDate && (
+                      <button
+                        className="p-1.5 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                        onClick={() => setSelectedDate("")}
+                        title="Clear filter"
+                      >
+                        <XMarkIcon className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Feed Content */}
-              <div className="max-h-[600px] overflow-y-auto p-6">
+              <div className="max-h-[1108px] overflow-y-auto p-4">
                 {feedLoading ? (
-                  <div className="p-12 text-center">
-                    <div className="relative w-16 h-16 mx-auto mb-6">
-                      <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
-                      <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-orange-500 border-r-yellow-500 animate-spin"></div>
-                    </div>
-                    <p
-                      className="text-base font-medium"
-                      style={{
-                        color: "#64748b",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Loading cheers...
-                    </p>
+                  <div className="text-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-300 border-t-blue-600 mx-auto mb-3"></div>
+                    <p className="text-sm text-gray-500">Loading cheers...</p>
                   </div>
                 ) : feed.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-2.5">
                     {feed.map((cheer) => (
                       <div
                         key={cheer.cheer_id}
-                        className="group relative rounded-2xl transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                          border: "1px solid #e2e8f0",
-                          overflow: "hidden",
-                        }}
+                        className="border border-gray-200 rounded-lg p-3.5 hover:shadow-md transition-shadow"
                       >
-                        {/* Accent bar */}
-                        <div
-                          className="absolute left-0 top-0 bottom-0 w-1 transition-all duration-300 group-hover:w-2"
-                          style={{
-                            background:
-                              "linear-gradient(180deg, #f59e0b 0%, #d97706 100%)",
-                          }}
-                        />
+                        <div className="flex gap-3">
+                          <img
+                            src={
+                              cheer.fromUser?.avatar ||
+                              "/images/default-avatar.png"
+                            }
+                            alt={cheer.fromUser?.name}
+                            className="w-10 h-10 rounded-full flex-shrink-0"
+                          />
 
-                        {/* Content */}
-                        <div className="p-6 pl-8">
-                          <div className="flex gap-4">
-                            {/* Avatar */}
-                            <img
-                              src={
-                                cheer.fromUser?.avatar ||
-                                "/images/default-avatar.png"
-                              }
-                              alt={cheer.fromUser?.name}
-                              className="w-14 h-14 rounded-2xl ring-2 ring-gray-200 flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
-                            />
+                          <div className="flex-1 min-w-0">
+                            {/* Header */}
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <span
+                                className="font-semibold text-sm text-gray-900 hover:text-blue-600 cursor-pointer"
+                                title={cheer.fromUser?.name}
+                              >
+                                {cheer.fromUser?.name}
+                              </span>
+                              <span className="text-gray-500 text-xs">
+                                cheered
+                              </span>
+                              <span
+                                className="font-semibold text-sm text-gray-900 hover:text-blue-600 cursor-pointer"
+                                title={cheer.toUser?.name}
+                              >
+                                {cheer.toUser?.name}
+                              </span>
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-bold flex-shrink-0">
+                                +{cheer.points}
+                                <HeartIconSolid className="w-3 h-3 text-red-500" />
+                              </span>
+                              <span className="ml-auto text-xs text-gray-400 flex-shrink-0">
+                                {formatTimeAgo(cheer.createdAt)}
+                              </span>
+                            </div>
 
-                            {/* Main Content */}
-                            <div className="flex-1 min-w-0">
-                              {/* Header */}
-                              <div className="flex flex-wrap items-center gap-2 mb-3">
-                                <span
-                                  className="font-bold text-base truncate max-w-32"
-                                  style={{
-                                    color: "#1a0202",
-                                    fontFamily: "Avenir, sans-serif",
-                                  }}
-                                >
-                                  {cheer.fromUser?.name}
+                            {/* Message */}
+                            {cheer.message && (
+                              <div className="w-full p-2 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary">
+                                {(() => {
+                                  // Detect GIF/image URLs in the message
+                                  const urlRegex =
+                                    /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
+                                  const parts = cheer.message.split(urlRegex);
+
+                                  return parts.map((part, index) => {
+                                    // Check if this part is a URL
+                                    if (urlRegex.test(part)) {
+                                      return (
+                                        <div key={index} className="my-2">
+                                          <img
+                                            src={part}
+                                            alt="Shared content"
+                                            className="max-w-full h-auto rounded-lg border border-gray-200 shadow-sm"
+                                            style={{ maxHeight: "250px" }}
+                                            onError={(e) => {
+                                              // If image fails to load, show the URL instead
+                                              e.target.style.display = "none";
+                                              e.target.nextSibling.style.display =
+                                                "block";
+                                            }}
+                                          />
+                                          <a
+                                            href={part}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs text-blue-600 hover:text-blue-700 underline break-all"
+                                            style={{ display: "none" }}
+                                          >
+                                            {part}
+                                          </a>
+                                        </div>
+                                      );
+                                    }
+                                    // Regular text
+                                    return part ? (
+                                      <p
+                                        key={index}
+                                        className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
+                                      >
+                                        {part}
+                                      </p>
+                                    ) : null;
+                                  });
+                                })()}
+                              </div>
+                            )}
+
+                            {/* Actions */}
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() =>
+                                  likeMutation.mutate(cheer.cheer_id)
+                                }
+                                disabled={likeMutation.isLoading}
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                                  likedCheers.has(cheer.cheer_id)
+                                    ? "bg-red-50 text-red-600"
+                                    : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                }`}
+                              >
+                                {likedCheers.has(cheer.cheer_id) ? (
+                                  <HeartIconSolid className="w-4 h-4" />
+                                ) : (
+                                  <HeartIcon className="w-4 h-4" />
+                                )}
+                                <span>
+                                  {cheer.heartCount || cheer.likeCount || 0}
                                 </span>
-                                <span className="text-gray-500 text-sm">
-                                  cheered
-                                </span>
-                                <span
-                                  className="font-bold text-base truncate max-w-32"
-                                  style={{
-                                    color: "#1a0202",
-                                    fontFamily: "Avenir, sans-serif",
-                                  }}
-                                >
-                                  {cheer.toUser?.name}
-                                </span>
-                                <div
-                                  className="px-3 py-1 rounded-full text-sm font-black shadow-md flex items-center gap-1"
-                                  style={{
-                                    background:
-                                      "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-                                    color: "#ffffff",
-                                  }}
-                                >
-                                  <span>+{cheer.points}</span>
-                                  <HeartIconSolid
-                                    className="w-3 h-3"
-                                    style={{ color: "#ef4444" }}
+                              </button>
+
+                              <button
+                                onClick={() =>
+                                  handleCommentClick(cheer.cheer_id)
+                                }
+                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                                  commentingCheer === cheer.cheer_id
+                                    ? "bg-green-50 text-green-600"
+                                    : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                }`}
+                              >
+                                <ChatBubbleLeftEllipsisIcon className="w-4 h-4" />
+                                <span>{cheer.commentCount || 0}</span>
+                              </button>
+                            </div>
+
+                            {/* Comments */}
+                            {commentingCheer === cheer.cheer_id && (
+                              <div className="mt-3 pt-3 border-t border-gray-100">
+                                {/* Add Comment */}
+                                <div className="flex gap-2 mb-3">
+                                  <input
+                                    type="text"
+                                    value={commentText}
+                                    onChange={(e) =>
+                                      setCommentText(e.target.value)
+                                    }
+                                    placeholder="Write a comment..."
+                                    className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    onKeyPress={(e) => {
+                                      if (
+                                        e.key === "Enter" &&
+                                        commentText.trim()
+                                      ) {
+                                        commentMutation.mutate({
+                                          cheerId: cheer.cheer_id,
+                                          comment: commentText.trim(),
+                                        });
+                                      }
+                                    }}
                                   />
-                                  <span>bits</span>
+                                  <button
+                                    onClick={() => {
+                                      if (commentText.trim()) {
+                                        commentMutation.mutate({
+                                          cheerId: cheer.cheer_id,
+                                          comment: commentText.trim(),
+                                        });
+                                      }
+                                    }}
+                                    disabled={
+                                      !commentText.trim() ||
+                                      commentMutation.isLoading
+                                    }
+                                    className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                  >
+                                    Post
+                                  </button>
                                 </div>
-                              </div>
 
-                              {/* Message */}
-                              {cheer.message && (
-                                <p
-                                  className="mb-4 text-base leading-relaxed"
-                                  style={{
-                                    color: "#374151",
-                                    fontFamily: "Avenir, sans-serif",
-                                  }}
-                                >
-                                  {cheer.message}
-                                </p>
-                              )}
-
-                              {/* Actions */}
-                              <div className="flex items-center gap-4 mb-2">
-                                <button
-                                  onClick={() =>
-                                    likeMutation.mutate(cheer.cheer_id)
-                                  }
-                                  disabled={likeMutation.isLoading}
-                                  className="flex items-center gap-2 transition-all duration-200 hover:scale-110 active:scale-95 px-3 py-1.5 rounded-xl"
-                                  style={{
-                                    background: likedCheers.has(cheer.cheer_id)
-                                      ? "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)"
-                                      : "#f8fafc",
-                                    color: likedCheers.has(cheer.cheer_id)
-                                      ? "#dc2626"
-                                      : "#64748b",
-                                    fontFamily: "Avenir, sans-serif",
-                                    border: `1px solid ${
-                                      likedCheers.has(cheer.cheer_id)
-                                        ? "#fca5a5"
-                                        : "#e2e8f0"
-                                    }`,
-                                  }}
-                                >
-                                  {likedCheers.has(cheer.cheer_id) ? (
-                                    <HeartIconSolid className="w-5 h-5" />
+                                {/* Comments List */}
+                                <div className="space-y-2">
+                                  {loadingComments ? (
+                                    <div className="flex justify-center py-3">
+                                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-300 border-t-blue-600"></div>
+                                    </div>
                                   ) : (
-                                    <HeartIcon className="w-5 h-5" />
-                                  )}
-                                  <span className="text-sm font-bold">
-                                    {cheer.heartCount || cheer.likeCount || 0}
-                                  </span>
-                                </button>
+                                    (() => {
+                                      const commentData = cheerComments.get(
+                                        cheer.cheer_id
+                                      ) || { comments: [] };
+                                      const comments = commentData.comments;
+                                      if (
+                                        Array.isArray(comments) &&
+                                        comments.length > 0
+                                      ) {
+                                        return (
+                                          <>
+                                            {comments.map((comment, index) => {
+                                              const commentKey =
+                                                comment._id ||
+                                                comment.id ||
+                                                `comment-${cheer.cheer_id}-${index}`;
+                                              const isEditing =
+                                                editingComment &&
+                                                editingComment.cheerId ===
+                                                  cheer.cheer_id &&
+                                                editingComment.commentId ===
+                                                  comment._id;
+                                              const isDeleting =
+                                                confirmingDelete &&
+                                                confirmingDelete.cheerId ===
+                                                  cheer.cheer_id &&
+                                                confirmingDelete.commentId ===
+                                                  comment._id;
+                                              const isOwnComment =
+                                                comment.fromUser?._id ===
+                                                user.id;
 
-                                <button
-                                  onClick={() =>
-                                    handleCommentClick(cheer.cheer_id)
-                                  }
-                                  className="flex items-center gap-2 transition-all duration-200 hover:scale-110 active:scale-95 px-3 py-1.5 rounded-xl"
-                                  style={{
-                                    background:
-                                      commentingCheer === cheer.cheer_id
-                                        ? "linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)"
-                                        : "#f8fafc",
-                                    color:
-                                      commentingCheer === cheer.cheer_id
-                                        ? "#065f46"
-                                        : "#64738b",
-                                    fontFamily: "Avenir, sans-serif",
-                                    border: `1px solid ${
-                                      commentingCheer === cheer.cheer_id
-                                        ? "#6ee7b7"
-                                        : "#e2e8f0"
-                                    }`,
-                                  }}
-                                >
-                                  <ChatBubbleLeftEllipsisIcon className="w-5 h-5" />
-                                  <span className="text-sm font-bold">
-                                    {cheer.commentCount || 0}
-                                  </span>
-                                </button>
-
-                                <span
-                                  className="text-sm font-medium ml-auto"
-                                  style={{
-                                    color: "#94a3b8",
-                                    fontFamily: "Avenir, sans-serif",
-                                  }}
-                                >
-                                  {formatTimeAgo(cheer.createdAt)}
-                                </span>
-                              </div>
-
-                              {/* Comments Section */}
-                              {commentingCheer === cheer.cheer_id && (
-                                <div
-                                  className="mt-4 p-4 rounded-2xl"
-                                  style={{
-                                    backgroundColor: "#f8fafc",
-                                    border: "1px solid #e2e8f0",
-                                  }}
-                                >
-                                  {/* Add Comment */}
-                                  <div className="flex gap-2 mb-4">
-                                    <input
-                                      type="text"
-                                      value={commentText}
-                                      onChange={(e) =>
-                                        setCommentText(e.target.value)
-                                      }
-                                      placeholder="Write a comment..."
-                                      className="flex-1 px-4 py-2 rounded-xl text-sm transition-all duration-200 focus:ring-4"
-                                      style={{
-                                        border: "2px solid #e2e8f0",
-                                        fontFamily: "Avenir, sans-serif",
-                                        color: "#1a0202",
-                                      }}
-                                      onFocus={(e) => {
-                                        e.target.style.borderColor = "#0097b2";
-                                        e.target.style.boxShadow =
-                                          "0 0 0 4px rgba(0, 151, 178, 0.1)";
-                                      }}
-                                      onBlur={(e) => {
-                                        e.target.style.borderColor = "#e2e8f0";
-                                        e.target.style.boxShadow = "none";
-                                      }}
-                                      onKeyPress={(e) => {
-                                        if (
-                                          e.key === "Enter" &&
-                                          commentText.trim()
-                                        ) {
-                                          commentMutation.mutate({
-                                            cheerId: cheer.cheer_id,
-                                            comment: commentText.trim(),
-                                          });
-                                        }
-                                      }}
-                                    />
-                                    <button
-                                      onClick={() => {
-                                        if (commentText.trim()) {
-                                          commentMutation.mutate({
-                                            cheerId: cheer.cheer_id,
-                                            comment: commentText.trim(),
-                                          });
-                                        }
-                                      }}
-                                      disabled={
-                                        !commentText.trim() ||
-                                        commentMutation.isLoading
-                                      }
-                                      className="px-4 py-2 rounded-xl text-sm font-bold disabled:opacity-50 transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
-                                      style={{
-                                        background:
-                                          "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
-                                        color: "#ffffff",
-                                        fontFamily: "Avenir, sans-serif",
-                                      }}
-                                    >
-                                      Post
-                                    </button>
-                                  </div>
-
-                                  {/* Comments List */}
-                                  <div className="space-y-3">
-                                    {loadingComments ? (
-                                      <div className="flex items-center justify-center py-4">
-                                        <div
-                                          className="animate-spin rounded-full h-5 w-5 border-2 border-transparent border-t-2"
-                                          style={{ borderTopColor: "#0097b2" }}
-                                        ></div>
-                                      </div>
-                                    ) : (
-                                      (() => {
-                                        const commentData = cheerComments.get(
-                                          cheer.cheer_id
-                                        ) || { comments: [] };
-                                        const comments = commentData.comments;
-                                        if (
-                                          Array.isArray(comments) &&
-                                          comments.length > 0
-                                        ) {
-                                          return (
-                                            <>
-                                              {comments.map(
-                                                (comment, index) => {
-                                                  const commentKey =
-                                                    comment._id ||
-                                                    comment.id ||
-                                                    `comment-${cheer.cheer_id}-${index}`;
-                                                  return (
-                                                    <div
-                                                      key={commentKey}
-                                                      className="rounded-xl p-3 transition-all duration-200 hover:scale-[1.01]"
-                                                      style={{
-                                                        background: "#ffffff",
-                                                        border:
-                                                          "1px solid #e2e8f0",
-                                                      }}
-                                                    >
-                                                      <div className="flex gap-3">
-                                                        <img
-                                                          src={
-                                                            comment.fromUser
-                                                              ?.avatar ||
-                                                            "/images/default-avatar.png"
-                                                          }
-                                                          alt={
-                                                            comment.fromUser
-                                                              ?.name || "User"
-                                                          }
-                                                          className="w-10 h-10 rounded-xl ring-1 ring-gray-200 flex-shrink-0"
-                                                        />
-                                                        <div className="flex-1 min-w-0">
-                                                          <div className="flex items-center gap-2 mb-1">
-                                                            <span
-                                                              className="font-bold text-sm"
-                                                              style={{
-                                                                color:
-                                                                  "#1a0202",
-                                                                fontFamily:
-                                                                  "Avenir, sans-serif",
-                                                              }}
-                                                            >
-                                                              {comment.fromUser
-                                                                ?.name ||
-                                                                "Anonymous"}
-                                                            </span>
-                                                            <span
-                                                              className="text-xs"
-                                                              style={{
-                                                                color:
-                                                                  "#94a3b8",
-                                                                fontFamily:
-                                                                  "Avenir, sans-serif",
-                                                              }}
-                                                            >
-                                                              {formatTimeAgo(
-                                                                comment.createdAt
-                                                              )}
-                                                            </span>
-                                                          </div>
-
-                                                          {editingComment &&
-                                                          editingComment.cheerId ===
-                                                            cheer.cheer_id &&
-                                                          editingComment.commentId ===
-                                                            comment._id ? (
-                                                            <div className="flex items-center gap-2">
-                                                              <input
-                                                                type="text"
-                                                                value={
-                                                                  editCommentText
-                                                                }
-                                                                onChange={(e) =>
-                                                                  setEditCommentText(
-                                                                    e.target
-                                                                      .value
-                                                                  )
-                                                                }
-                                                                className="flex-1 px-3 py-1 rounded-lg border text-sm"
-                                                                style={{
-                                                                  fontFamily:
-                                                                    "Avenir, sans-serif",
-                                                                }}
-                                                                disabled={
-                                                                  editCommentMutation.isLoading
-                                                                }
-                                                              />
+                                              return (
+                                                <div
+                                                  key={commentKey}
+                                                  className="group bg-gray-50 rounded-lg p-2.5 hover:bg-gray-100 transition-colors duration-200"
+                                                >
+                                                  <div className="flex gap-2">
+                                                    <img
+                                                      src={
+                                                        comment.fromUser
+                                                          ?.avatar ||
+                                                        "/images/default-avatar.png"
+                                                      }
+                                                      alt={
+                                                        comment.fromUser
+                                                          ?.name || "User"
+                                                      }
+                                                      className="w-7 h-7 rounded-full flex-shrink-0"
+                                                    />
+                                                    <div className="flex-1 min-w-0">
+                                                      <div className="flex items-center justify-between mb-1">
+                                                        <div className="flex items-center gap-2">
+                                                          <span className="font-medium text-xs text-gray-900">
+                                                            {comment.fromUser
+                                                              ?.name ||
+                                                              "Anonymous"}
+                                                          </span>
+                                                          <span className="text-xs text-gray-400">
+                                                            {formatTimeAgo(
+                                                              comment.createdAt
+                                                            )}
+                                                          </span>
+                                                        </div>
+                                                        {isOwnComment &&
+                                                          !isEditing && (
+                                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                               <button
-                                                                className="px-3 py-1 rounded-lg text-xs font-bold transition-all hover:scale-105"
-                                                                style={{
-                                                                  background:
-                                                                    "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                                                                  color:
-                                                                    "#ffffff",
-                                                                }}
-                                                                disabled={
-                                                                  editCommentMutation.isLoading ||
-                                                                  !editCommentText.trim()
-                                                                }
-                                                                onClick={() =>
-                                                                  editCommentMutation.mutate(
+                                                                className="p-1 hover:bg-amber-100 rounded transition-colors"
+                                                                onClick={() => {
+                                                                  setEditingComment(
                                                                     {
                                                                       cheerId:
                                                                         cheer.cheer_id,
                                                                       commentId:
                                                                         comment._id,
-                                                                      comment:
-                                                                        editCommentText.trim(),
+                                                                    }
+                                                                  );
+                                                                  setEditCommentText(
+                                                                    comment.comment
+                                                                  );
+                                                                }}
+                                                                title="Edit comment"
+                                                              >
+                                                                <svg
+                                                                  className="w-3.5 h-3.5 text-amber-600"
+                                                                  fill="none"
+                                                                  stroke="currentColor"
+                                                                  viewBox="0 0 24 24"
+                                                                >
+                                                                  <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={
+                                                                      2
+                                                                    }
+                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                                                  />
+                                                                </svg>
+                                                              </button>
+                                                              <button
+                                                                className="p-1 hover:bg-red-100 rounded transition-colors"
+                                                                onClick={() =>
+                                                                  setConfirmingDelete(
+                                                                    {
+                                                                      cheerId:
+                                                                        cheer.cheer_id,
+                                                                      commentId:
+                                                                        comment._id,
                                                                     }
                                                                   )
                                                                 }
+                                                                title="Delete comment"
                                                               >
-                                                                Save
-                                                              </button>
-                                                              <button
-                                                                className="px-3 py-1 rounded-lg text-xs font-bold"
-                                                                style={{
-                                                                  background:
-                                                                    "#e2e8f0",
-                                                                  color:
-                                                                    "#64748b",
-                                                                }}
-                                                                onClick={() => {
-                                                                  setEditingComment(
-                                                                    null
-                                                                  );
-                                                                  setEditCommentText(
-                                                                    ""
-                                                                  );
-                                                                }}
-                                                              >
-                                                                Cancel
+                                                                <svg
+                                                                  className="w-3.5 h-3.5 text-red-600"
+                                                                  fill="none"
+                                                                  stroke="currentColor"
+                                                                  viewBox="0 0 24 24"
+                                                                >
+                                                                  <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={
+                                                                      2
+                                                                    }
+                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                                  />
+                                                                </svg>
                                                               </button>
                                                             </div>
-                                                          ) : (
-                                                            <p
-                                                              className="text-sm"
-                                                              style={{
-                                                                color:
-                                                                  "#374151",
-                                                                fontFamily:
-                                                                  "Avenir, sans-serif",
+                                                          )}
+                                                      </div>
+
+                                                      {isEditing ? (
+                                                        <div className="space-y-2">
+                                                          <textarea
+                                                            value={
+                                                              editCommentText
+                                                            }
+                                                            onChange={(e) =>
+                                                              setEditCommentText(
+                                                                e.target.value
+                                                              )
+                                                            }
+                                                            className="w-full px-2.5 py-2 text-xs border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                                            rows="2"
+                                                            disabled={
+                                                              editCommentMutation.isLoading
+                                                            }
+                                                          />
+                                                          <div className="flex gap-2">
+                                                            <button
+                                                              className="flex-1 px-2.5 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                                              disabled={
+                                                                editCommentMutation.isLoading ||
+                                                                !editCommentText.trim()
+                                                              }
+                                                              onClick={() =>
+                                                                editCommentMutation.mutate(
+                                                                  {
+                                                                    cheerId:
+                                                                      cheer.cheer_id,
+                                                                    commentId:
+                                                                      comment._id,
+                                                                    comment:
+                                                                      editCommentText.trim(),
+                                                                  }
+                                                                )
+                                                              }
+                                                            >
+                                                              {editCommentMutation.isLoading
+                                                                ? "Saving..."
+                                                                : "Save"}
+                                                            </button>
+                                                            <button
+                                                              className="flex-1 px-2.5 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-400 transition-colors"
+                                                              onClick={() => {
+                                                                setEditingComment(
+                                                                  null
+                                                                );
+                                                                setEditCommentText(
+                                                                  ""
+                                                                );
                                                               }}
                                                             >
-                                                              {comment.comment}
-                                                            </p>
-                                                          )}
-
-                                                          {/* Edit/Delete buttons */}
-                                                          {comment.fromUser
-                                                            ?._id === user.id &&
-                                                            !editingComment && (
-                                                              <div className="flex gap-2 mt-2">
-                                                                {confirmingDelete &&
-                                                                confirmingDelete.cheerId ===
-                                                                  cheer.cheer_id &&
-                                                                confirmingDelete.commentId ===
-                                                                  comment._id ? (
-                                                                  <>
-                                                                    <span
-                                                                      className="text-xs font-bold mr-2"
-                                                                      style={{
-                                                                        color:
-                                                                          "#ef4444",
-                                                                      }}
-                                                                    >
-                                                                      Delete?
-                                                                    </span>
-                                                                    <button
-                                                                      className="px-2 py-1 rounded-lg text-xs font-bold transition-all hover:scale-105"
-                                                                      style={{
-                                                                        background:
-                                                                          "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-                                                                        color:
-                                                                          "#ffffff",
-                                                                      }}
-                                                                      onClick={() => {
-                                                                        deleteCommentMutation.mutate(
-                                                                          {
-                                                                            cheerId:
-                                                                              cheer.cheer_id,
-                                                                            commentId:
-                                                                              comment._id,
-                                                                          }
-                                                                        );
-                                                                        setConfirmingDelete(
-                                                                          null
-                                                                        );
-                                                                      }}
-                                                                    >
-                                                                      Yes
-                                                                    </button>
-                                                                    <button
-                                                                      className="px-2 py-1 rounded-lg text-xs font-bold"
-                                                                      style={{
-                                                                        background:
-                                                                          "#e2e8f0",
-                                                                        color:
-                                                                          "#64748b",
-                                                                      }}
-                                                                      onClick={() =>
-                                                                        setConfirmingDelete(
-                                                                          null
-                                                                        )
-                                                                      }
-                                                                    >
-                                                                      No
-                                                                    </button>
-                                                                  </>
-                                                                ) : (
-                                                                  <>
-                                                                    <button
-                                                                      className="px-2 py-1 rounded-lg text-xs font-bold transition-all hover:scale-105"
-                                                                      style={{
-                                                                        background:
-                                                                          "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
-                                                                        color:
-                                                                          "#ffffff",
-                                                                      }}
-                                                                      onClick={() => {
-                                                                        setEditingComment(
-                                                                          {
-                                                                            cheerId:
-                                                                              cheer.cheer_id,
-                                                                            commentId:
-                                                                              comment._id,
-                                                                          }
-                                                                        );
-                                                                        setEditCommentText(
-                                                                          comment.comment
-                                                                        );
-                                                                      }}
-                                                                    >
-                                                                      Edit
-                                                                    </button>
-                                                                    <button
-                                                                      className="px-2 py-1 rounded-lg text-xs font-bold transition-all hover:scale-105"
-                                                                      style={{
-                                                                        background:
-                                                                          "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-                                                                        color:
-                                                                          "#ffffff",
-                                                                      }}
-                                                                      onClick={() =>
-                                                                        setConfirmingDelete(
-                                                                          {
-                                                                            cheerId:
-                                                                              cheer.cheer_id,
-                                                                            commentId:
-                                                                              comment._id,
-                                                                          }
-                                                                        )
-                                                                      }
-                                                                    >
-                                                                      Delete
-                                                                    </button>
-                                                                  </>
-                                                                )}
-                                                              </div>
-                                                            )}
+                                                              Cancel
+                                                            </button>
+                                                          </div>
                                                         </div>
-                                                      </div>
-                                                    </div>
-                                                  );
-                                                }
-                                              )}
-                                              {commentData.hasMore && (
-                                                <button
-                                                  className="w-full py-2 text-sm font-bold rounded-xl transition-all hover:scale-105"
-                                                  style={{
-                                                    color: "#0097b2",
-                                                    background: "#f8fafc",
-                                                    border: "1px solid #e2e8f0",
-                                                    fontFamily:
-                                                      "Avenir, sans-serif",
-                                                  }}
-                                                  onClick={() =>
-                                                    fetchComments(
-                                                      cheer.cheer_id,
-                                                      true
-                                                    )
-                                                  }
-                                                >
-                                                  Load more
-                                                </button>
-                                              )}
-                                            </>
-                                          );
-                                        } else {
-                                          return (
-                                            <p
-                                              className="text-sm text-center py-4"
-                                              style={{
-                                                color: "#94a3b8",
-                                                fontFamily:
-                                                  "Avenir, sans-serif",
-                                              }}
-                                            >
-                                              No comments yet
-                                            </p>
-                                          );
-                                        }
-                                      })()
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                                                      ) : (
+                                                        <p className="text-xs text-gray-700 leading-relaxed">
+                                                          {comment.comment}
+                                                        </p>
+                                                      )}
 
-                          {/* Date stamp */}
-                          <div
-                            className="absolute bottom-3 right-4 text-xs font-medium px-2 py-1 rounded-lg"
-                            style={{
-                              backgroundColor: "rgba(255, 255, 255, 0.9)",
-                              color: "#94a3b8",
-                              fontFamily: "Avenir, sans-serif",
-                            }}
-                          >
-                            {formatFullDateTime(
-                              cheer.createdAt || cheer.posted_at
+                                                      {isDeleting && (
+                                                        <div className="mt-2 p-2 bg-red-50 rounded-lg border border-red-200">
+                                                          <p className="text-xs text-red-800 font-medium mb-2">
+                                                            Are you sure you
+                                                            want to delete this
+                                                            comment?
+                                                          </p>
+                                                          <div className="flex gap-2">
+                                                            <button
+                                                              className="flex-1 px-2.5 py-1.5 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 transition-colors"
+                                                              onClick={() => {
+                                                                deleteCommentMutation.mutate(
+                                                                  {
+                                                                    cheerId:
+                                                                      cheer.cheer_id,
+                                                                    commentId:
+                                                                      comment._id,
+                                                                  }
+                                                                );
+                                                                setConfirmingDelete(
+                                                                  null
+                                                                );
+                                                              }}
+                                                            >
+                                                              Delete
+                                                            </button>
+                                                            <button
+                                                              className="flex-1 px-2.5 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-400 transition-colors"
+                                                              onClick={() =>
+                                                                setConfirmingDelete(
+                                                                  null
+                                                                )
+                                                              }
+                                                            >
+                                                              Cancel
+                                                            </button>
+                                                          </div>
+                                                        </div>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              );
+                                            })}
+                                            {commentData.hasMore && (
+                                              <button
+                                                className="w-full py-2 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                onClick={() =>
+                                                  fetchComments(
+                                                    cheer.cheer_id,
+                                                    true
+                                                  )
+                                                }
+                                              >
+                                                Load more
+                                              </button>
+                                            )}
+                                          </>
+                                        );
+                                      } else {
+                                        return (
+                                          <p className="text-xs text-gray-500 text-center py-2">
+                                            No comments yet
+                                          </p>
+                                        );
+                                      }
+                                    })()
+                                  )}
+                                </div>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -1902,26 +1363,12 @@ const CheerPage = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="p-16 text-center">
-                    <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                      <HeartIcon className="w-10 h-10 text-gray-400" />
-                    </div>
-                    <h3
-                      className="text-xl font-bold mb-2"
-                      style={{
-                        color: "#64748b",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
+                  <div className="text-center py-12">
+                    <HeartIcon className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <h3 className="text-base font-medium text-gray-900 mb-1">
                       No cheers yet
                     </h3>
-                    <p
-                      className="text-base"
-                      style={{
-                        color: "#94a3b8",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
+                    <p className="text-sm text-gray-500">
                       Be the first to spread positivity! 🌟
                     </p>
                   </div>
@@ -1930,31 +1377,17 @@ const CheerPage = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div
-                  className="px-6 py-4 border-t border-gray-200"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                  }}
-                >
-                  <div className="flex items-center justify-center gap-2">
+                <div className="px-5 py-3 border-t border-gray-200">
+                  <div className="flex items-center justify-center gap-1">
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md"
-                      style={{
-                        background:
-                          currentPage === 1
-                            ? "#f1f5f9"
-                            : "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
-                        color: currentPage === 1 ? "#64748b" : "#ffffff",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
+                      className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Previous
                     </button>
 
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 mx-2">
                       {Array.from(
                         { length: Math.min(5, totalPages) },
                         (_, i) => {
@@ -1973,23 +1406,11 @@ const CheerPage = () => {
                             <button
                               key={pageNum}
                               onClick={() => handlePageChange(pageNum)}
-                              className="w-10 h-10 rounded-xl text-sm font-bold transition-all duration-200 hover:scale-110 active:scale-95 shadow-md"
-                              style={{
-                                background:
-                                  currentPage === pageNum
-                                    ? "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)"
-                                    : "#ffffff",
-                                color:
-                                  currentPage === pageNum
-                                    ? "#ffffff"
-                                    : "#475569",
-                                fontFamily: "Avenir, sans-serif",
-                                border: `1px solid ${
-                                  currentPage === pageNum
-                                    ? "transparent"
-                                    : "#e2e8f0"
-                                }`,
-                              }}
+                              className={`w-9 h-9 text-sm font-medium rounded-lg transition-colors ${
+                                currentPage === pageNum
+                                  ? "bg-primary text-white"
+                                  : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                              }`}
                             >
                               {pageNum}
                             </button>
@@ -2001,16 +1422,7 @@ const CheerPage = () => {
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 hover:scale-105 active:scale-95 shadow-md"
-                      style={{
-                        background:
-                          currentPage === totalPages
-                            ? "#f1f5f9"
-                            : "linear-gradient(135deg, #0097b2 0%, #4a6e7e 100%)",
-                        color:
-                          currentPage === totalPages ? "#64748b" : "#ffffff",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
+                      className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Next
                     </button>
@@ -2018,324 +1430,7 @@ const CheerPage = () => {
                 </div>
               )}
             </div>
-
-            {/* ENHANCED LEADERBOARD */}
-            <div
-              className="rounded-3xl shadow-2xl p-6 transition-all duration-300 hover:shadow-3xl"
-              style={{
-                background: "#ffffff",
-                border: "1px solid #e2e8f0",
-              }}
-            >
-              {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-                <div className="flex items-center space-x-3">
-                  <div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)",
-                    }}
-                  >
-                    <TrophyIcon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2
-                      className="text-2xl font-black"
-                      style={{
-                        color: "#1a0202",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Leaderboard
-                    </h2>
-                    <p
-                      className="text-sm"
-                      style={{
-                        color: "#64748b",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Top performers
-                    </p>
-                  </div>
-                </div>
-
-                {/* Period Tabs */}
-                <div className="flex gap-2">
-                  {["weekly", "monthly", "alltime"].map((period) => (
-                    <button
-                      key={period}
-                      onClick={() => setActiveTab(period)}
-                      className="px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md"
-                      style={{
-                        background:
-                          activeTab === period
-                            ? "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)"
-                            : "#f8fafc",
-                        color: activeTab === period ? "#ffffff" : "#64748b",
-                        fontFamily: "Avenir, sans-serif",
-                        border: `1px solid ${
-                          activeTab === period ? "transparent" : "#e2e8f0"
-                        }`,
-                      }}
-                    >
-                      {period === "alltime"
-                        ? "All Time"
-                        : period.charAt(0).toUpperCase() + period.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Current User Position */}
-              {user && currentUserLeaderboard && (
-                <>
-                  <div className="mb-4">
-                    <p
-                      className="text-sm font-bold mb-2"
-                      style={{
-                        color: "#64748b",
-                        fontFamily: "Avenir, sans-serif",
-                      }}
-                    >
-                      Your Position
-                    </p>
-                    <div
-                      className="flex items-center gap-4 p-4 rounded-2xl transition-all duration-200 hover:scale-[1.02]"
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
-                        border: "2px solid #fbbf24",
-                      }}
-                    >
-                      <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shadow-lg"
-                        style={{
-                          background:
-                            currentUserLeaderboard.rank === 1
-                              ? "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)"
-                              : currentUserLeaderboard.rank === 2
-                              ? "linear-gradient(135deg, #C0C0C0 0%, #808080 100%)"
-                              : currentUserLeaderboard.rank === 3
-                              ? "linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)"
-                              : "linear-gradient(135deg, #94a3b8 0%, #64748b 100%)",
-                          color: "#ffffff",
-                          textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
-                        }}
-                      >
-                        {currentUserLeaderboard.rank}
-                      </div>
-                      <img
-                        src={
-                          currentUserLeaderboard.info?.avatar ||
-                          "/images/default-avatar.png"
-                        }
-                        alt={currentUserLeaderboard.info?.name}
-                        className="w-12 h-12 rounded-xl ring-2 ring-white"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="font-bold text-base truncate"
-                          style={{
-                            color: "#92400e",
-                            fontFamily: "Avenir, sans-serif",
-                          }}
-                        >
-                          {currentUserLeaderboard.info?.name ||
-                            user.first_name + " " + user.last_name}
-                        </p>
-                      </div>
-                      <span
-                        className="font-black text-lg"
-                        style={{
-                          color: "#92400e",
-                          fontFamily: "Avenir, sans-serif",
-                        }}
-                      >
-                        {currentUserLeaderboard.info?.totalPoints ||
-                          currentUserLeaderboard.totalPoints ||
-                          0}{" "}
-                        received
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Divider */}
-                  <div
-                    className="h-px my-6"
-                    style={{
-                      background:
-                        "linear-gradient(to right, transparent, #e2e8f0 20%, #e2e8f0 80%, transparent)",
-                    }}
-                  ></div>
-                </>
-              )}
-
-              {/* Leaderboard List */}
-              {leaderboardLoading ? (
-                <div className="text-center py-12">
-                  <div className="relative w-16 h-16 mx-auto mb-6">
-                    <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
-                    <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-yellow-500 border-r-orange-500 animate-spin"></div>
-                  </div>
-                  <p
-                    className="text-base font-medium"
-                    style={{
-                      color: "#64748b",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    Loading leaderboard...
-                  </p>
-                </div>
-              ) : leaderboard.length > 0 ? (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {leaderboard
-                    .slice(0, showMoreLeaderboard ? 10 : 3)
-                    .map((entry) => (
-                      <div
-                        key={entry._id || entry.userId || entry.user_id}
-                        className="group flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                          border: "1px solid #e2e8f0",
-                        }}
-                      >
-                        {/* Rank Badge */}
-                        <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shadow-lg transform transition-transform duration-300 group-hover:scale-110"
-                          style={{
-                            background:
-                              entry.rank === 1
-                                ? "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)"
-                                : entry.rank === 2
-                                ? "linear-gradient(135deg, #C0C0C0 0%, #808080 100%)"
-                                : entry.rank === 3
-                                ? "linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)"
-                                : "linear-gradient(135deg, #94a3b8 0%, #64748b 100%)",
-                            color: "#ffffff",
-                            textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
-                          }}
-                        >
-                          {entry.rank}
-                        </div>
-
-                        {/* Avatar */}
-                        <img
-                          src={entry.avatar || "/images/default-avatar.png"}
-                          alt={entry.name || entry.userName}
-                          className="w-12 h-12 rounded-xl ring-2 ring-gray-200 transition-transform duration-300 group-hover:scale-110"
-                        />
-
-                        {/* Name */}
-                        <div className="flex-1 min-w-0">
-                          <p
-                            className="font-bold text-base truncate"
-                            style={{
-                              color: "#1a0202",
-                              fontFamily: "Avenir, sans-serif",
-                            }}
-                          >
-                            {entry.name || entry.userName}
-                          </p>
-                          {entry.rank <= 3 && (
-                            <p
-                              className="text-xs font-semibold"
-                              style={{
-                                color: "#64748b",
-                                fontFamily: "Avenir, sans-serif",
-                              }}
-                            >
-                              {entry.rank === 1
-                                ? "🥇 Champion"
-                                : entry.rank === 2
-                                ? "🥈 Runner-up"
-                                : "🥉 3rd Place"}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Points */}
-                        <div className="text-right">
-                          <div
-                            className="font-black text-lg"
-                            style={{
-                              color:
-                                entry.rank === 1
-                                  ? "#f59e0b"
-                                  : entry.rank === 2
-                                  ? "#94a3b8"
-                                  : entry.rank === 3
-                                  ? "#92400e"
-                                  : "#64738b",
-                              fontFamily: "Avenir, sans-serif",
-                            }}
-                          >
-                            {entry.totalPoints || entry.total_earned}
-                          </div>
-                          <div
-                            className="text-xs font-semibold"
-                            style={{
-                              color: "#94a3b8",
-                              fontFamily: "Avenir, sans-serif",
-                            }}
-                          >
-                            received
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                  {/* Show More/Less Button */}
-                  {leaderboard.length > 3 && (
-                    <button
-                      onClick={() =>
-                        setShowMoreLeaderboard(!showMoreLeaderboard)
-                      }
-                      className="w-full py-3 rounded-xl text-sm font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-md mt-4"
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                        color: "#0097b2",
-                        fontFamily: "Avenir, sans-serif",
-                        border: "1px solid #e2e8f0",
-                      }}
-                    >
-                      {showMoreLeaderboard ? "↑ Show Less" : "↓ Show More"}
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <TrophyIcon className="w-10 h-10 text-gray-400" />
-                  </div>
-                  <h3
-                    className="text-xl font-bold mb-2"
-                    style={{
-                      color: "#64748b",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    No rankings yet
-                  </h3>
-                  <p
-                    className="text-base"
-                    style={{
-                      color: "#94a3b8",
-                      fontFamily: "Avenir, sans-serif",
-                    }}
-                  >
-                    Start sending cheers to see who's on top! 🏆
-                  </p>
-                </div>
-              )}
-            </div>
           </div>
-          {/* End of right column */}
-          {/* last */}
         </div>
       </div>
     </div>

@@ -182,9 +182,9 @@ const AuditLogs = () => {
           </div>
           <div className="flex flex-col flex-1 min-w-0">
             <p
-              className="font-avenir-black text-gray-900 leading-relaxed"
+              className="font-avenir-regular text-gray-900 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: log.description }}
-            ></p>
+            />
             <div className="flex items-center gap-2 mt-1">
               <span className="text-gray-400 text-xs">•</span>
               <p className="text-gray-500 text-xs font-medium">

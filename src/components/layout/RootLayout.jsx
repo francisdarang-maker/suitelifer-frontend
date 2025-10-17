@@ -7,20 +7,21 @@ import EmployeeDrawer from "../../components/employee/EmployeeDrawer";
 import CMSNavigation from "../navigation/CMSNavigation";
 import CMSTopNavigation from "../navigation/CMSTopNavigation";
 import { useStore } from "../../store/authStore";
-
+import { useLocation } from "react-router-dom";
 const RootLayout = () => {
   const drawerRef = useRef();
   const user = useStore((state) => state.user);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
+  const location = useLocation()
   const handleDrawer = (location) => {
     drawerRef.current.style.top = location;
   };
-
   const handleSidebarCollapse = (collapsed) => {
     setIsSidebarCollapsed(collapsed);
   };
-
+    const hideCalendar = location.pathname.includes("company-events");
+  //added
+  const hideCalendarforAdmin = location.pathname.includes("events");
 return (
   <section className="flex flex-col lg:flex-row h-screen gap-4 max-w-[1800px] mx-auto px-4 lg:px-0 overflow-hidden">
     {/* Drawer (mobile) */}
@@ -30,17 +31,15 @@ return (
     >
       <EmployeeDrawer onClose={handleDrawer} user={user} />
     </section>
-
     {/* Left Sidebar - Made smaller */}
     <section
-      className={` 
-        hidden lg:block overflow-y-auto transition-all duration-300 
+      className={`
+        hidden lg:block overflow-y-auto transition-all duration-300
         ${isSidebarCollapsed ? "w-16 flex-shrink-0" : "w-[210px] flex-shrink-0"}
       `}
     >
       <CMSNavigation user={user} onCollapseChange={handleSidebarCollapse} />
     </section>
-
     {/* Top bar (mobile only) */}
     <section className="lg:hidden flex justify-between pt-5 px-2">
       <div className="w-20 h-auto">
@@ -51,7 +50,6 @@ return (
         onClick={() => handleDrawer("0%")}
       />
     </section>
-
     {/* Main Content */}
     <section
       className={`
@@ -64,13 +62,13 @@ return (
         <Outlet />
       </main>
     </section>
-
     {/* Right Sidebar - Kept at 300px */}
-    <section className="hidden lg:flex-shrink-0 lg:block lg:w-[300px] overflow-y-auto">
-      <EmployeeAside />
-    </section>
+    {!hideCalendar && !hideCalendarforAdmin && (
+      <section className="hidden lg:flex-shrink-0 lg:block lg:w-[300px] overflow-y-auto">
+            <EmployeeAside />
+      </section>
+    )}
   </section>
 );
 };
-
 export default RootLayout;

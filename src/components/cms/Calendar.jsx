@@ -28,10 +28,8 @@ const Calendar = ({
   const startDate = startOfWeek(startOfMonth(currentMonth));
   const endDate = endOfWeek(endOfMonth(currentMonth));
   const days = eachDayOfInterval({ start: startDate, end: endDate });
-  // Added for click event
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // for click day event
   const handleDayClick = (day) => {
     const clickedDate = format(day, "yyyy-MM-dd");
     setSelectedDate(clickedDate);
@@ -40,78 +38,93 @@ const Calendar = ({
       (event) => format(new Date(event.start), "yyyy-MM-dd") === clickedDate
     );
   };
-  // End of additional
+
   return (
-    <div className="w-full max-w-md mx-auto rounded-lg">
-      <div className="flex justify-between items-center mb-4 px-5">
+    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
         <button
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-          className="text-gray-600 cursor-pointer"
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+          aria-label="Previous month"
         >
-          <ChevronLeftIcon className="text-gray-500 w-5 h-5" />
+          <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
         </button>
-        <span className="text-primary">
+        <h3 className="text-base font-semibold text-gray-800">
           {format(currentMonth, "MMMM yyyy")}
-        </span>
+        </h3>
         <button
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-          className="text-gray-600 cursor-pointer"
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+          aria-label="Next month"
         >
-          <ChevronRightIcon className="text-gray-500 w-5 h-5" />
+          <ChevronRightIcon className="w-5 h-5 text-gray-600" />
         </button>
       </div>
 
       {/* Days of the Week */}
-      <div className="grid grid-cols-7 text-center font-medium text-gray-600">
+      <div className="grid grid-cols-7 gap-1 mb-2">
         {daysOfWeek.map((day) => (
-          <div key={day} className="py-2">
+          <div
+            key={day}
+            className="text-center text-xs font-medium text-gray-500 py-2"
+          >
             {day}
           </div>
         ))}
       </div>
 
       {/* Calendar Days */}
-      <div className="grid grid-cols-7 text-center">
+      <div className="grid grid-cols-7 gap-1">
         {days.map((day) => {
           const isCurrentMonth = isSameMonth(day, currentMonth);
+          const isToday = isSameDay(day, new Date());
+          const dateString = format(day, "yyyy-MM-dd");
+          const isSelected = dateString === selectedDate;
+          const hasEvent = events[dateString];
+
           return (
-            // <div
-            //   key={day}
-            //   onClick={() => handleDayClick(day)}
-            //   className={`grid place-items-center w-9 h-9 relative rounded-full ${
-            //     isCurrentMonth ? "text-black" : "text-gray-300"
-            //   } ${isSameDay(day, new Date()) && "bg-primary text-white"}
-            //   `}
-            // >
-            // added for change for selected date
-            <div
-              key={day}
+            <button
+              key={day.toString()}
               onClick={() => handleDayClick(day)}
-              className={`cursor-pointer grid place-items-center w-9 h-9 relative rounded-full transition-all duration-200
-  ${isCurrentMonth ? "text-black" : "text-gray-300"}
-  ${
-    format(day, "yyyy-MM-dd") === selectedDate
-      ? isSameDay(day, new Date())
-        ? "bg-primary text-white border-2 border-primary"
-        : "bg-white text-primary border-2 border-primary"
-      : isSameDay(day, new Date())
-      ? "bg-primary text-white"
-      : ""
-  }
-`}
+              className={`
+                relative h-10 w-full rounded-lg text-sm font-medium
+                transition-all duration-200 ease-in-out
+                ${!isCurrentMonth && "text-gray-300"}
+                ${
+                  isCurrentMonth &&
+                  !isSelected &&
+                  !isToday &&
+                  "text-gray-700 hover:bg-gray-50"
+                }
+                ${
+                  isToday &&
+                  !isSelected &&
+                  "bg-primary text-white hover:bg-primary"
+                }
+                ${
+                  isSelected &&
+                  isToday &&
+                  "bg-primary text-white ring-2 ring-primary"
+                }
+                ${
+                  isSelected &&
+                  !isToday &&
+                  "bg-primary-50 text-primary-600 ring-2 ring-primary"
+                }
+              `}
             >
-              {format(day, "d")}
-              {events[format(day, "yyyy-MM-dd")] && (
-                <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full"></div>
-              )}
-              {events[format(day, "yyyy-MM-dd")] && (
+              <span className="relative z-10">{format(day, "d")}</span>
+              {hasEvent && (
                 <div
-                  className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 rounded-full ${
-                    isSameDay(day, new Date()) ? "bg-white" : "bg-primary"
-                  }`}
-                ></div>
+                  className={`
+                    absolute bottom-1.5 left-1/2 transform -translate-x-1/2 
+                    w-1 h-1 rounded-full
+                    ${isToday || isSelected ? "bg-white" : "bg-primary"}
+                  `}
+                />
               )}
-            </div>
+            </button>
           );
         })}
       </div>

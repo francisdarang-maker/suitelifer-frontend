@@ -1,6 +1,231 @@
+// import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// // Guest Pages
+// import Home from "./pages/guest/Home";
+// import AboutUs from "./pages/guest/AboutUs";
+// import Careers from "./pages/guest/Careers";
+// import CareersAll from "./pages/guest/CareersAll";
+// import Newsletter from "./pages/guest/Newsletter";
+// import NewsletterDetails from "./components/newsletter/NewsLetterDetails";
+// import Contact from "./pages/guest/Contact";
+// import Podcast from "./pages/guest/Podcast";
+// import TermsOfUse from "./pages/guest/TermsOfUse";
+// import PrivacyPolicy from "./pages/guest/PrivacyPolicy";
+// import ApplicationForm from "./pages/guest/ApplicationForm";
+// import CongratsApplicationForm from "./pages/guest/CongratsApplicationForm";
+// import PageNotFound from "./pages/guest/PageNotFound";
+// import CareersJobDetails from "./pages/guest/CareersJobDetails";
+
+// // Regular Pages
+// import EmployeeBlogsFeed from "./pages/employee/EmployeeBlogsFeed";
+// import EmployeeMyBlogs from "./pages/employee/EmployeeMyBlogs";
+// import BlogView from "./components/blog/BlogView";
+// import EmployeeThreads from "./pages/employee/EmployeeThreads";
+// import EmployeeEvents from "./pages/employee/EmployeeEvents";
+// import EmployeeWorkshops from "./pages/employee/EmployeeWorkshops";
+// import EmployeePersonalityTest from "./pages/employee/EmployeePersonalityTest";
+// import BlogCreate from "./components/blog/BlogCreate";
+// // Employee Pages
+// import EmployeeCheerAPeer from "./pages/employee/EmployeeCheerAPeer";
+// import EmployeePointsDashboard from "./pages/employee/EmployeePointsDashboard";
+// import MoodPage from "./pages/employee/MoodPage";
+
+// // Points Shop Pages (optional - uncomment when needed)
+// // import PointsShopDashboard from "./pages/employee/PointsShopDashboard";
+// // import CheerAPeerPage from "./pages/employee/CheerAPeerPage";
+// // import PointsPage from "./pages/employee/PointsPage";
+// // import ShopPage from "./pages/employee/ShopPage";
+// import SuitebiteHome from "./pages/employee/SuitebiteHome";
+// import SuitebiteShop from "./pages/employee/SuitebiteShop";
+// import SuitebiteLeaderboard from "./pages/employee/SuitebiteLeaderboard";
+
+// // Admin Pages
+// // import AdminPointsDashboard from "./pages/admin/AdminPointsDashboard";
+// // import AdminPointsUsers from "./pages/admin/AdminPointsUsers";
+// // import AdminPointsProducts from "./pages/admin/AdminPointsProducts";
+// // import AdminPointsOrders from "./pages/admin/AdminPointsOrders";
+
+// // Super/Admin Pages
+// //import AdminBlogs from "./pages/admin/AdminBlogs";
+
+// import AdminEvents from "./pages/admin/AdminEvents";
+// import AdminContents from "./pages/admin/AdminContents";
+// import AdminNewsCreate from "./pages/admin/AdminNewsCreate";
+// import SuperAdminAccountManagement from "./pages/superadmin/SuperAdminAccountManagement";
+// import AuditLogs from "./pages/admin/AuditLogs";
+// import AdmimJobCourse from "./components/admin/AdmimJobCourse";
+// import AdminPersonalityTest from "./components/admin/AdminPersonalityTest";
+// import AdminSuitebite from "./pages/admin/AdminSuitebite";
+// import SuperAdminSuitebite from "./pages/admin/SuperAdminSuitebite";
+
+// // Route Management
+// import ProtectedRoutes from "./routes/ProtectedRoutes";
+// import AdminProtectedRoutes from "./routes/AdminProtectedRoutes";
+// import SuperAdminProtectedRoutes from "./routes/SuperAdminProtectedRoutes";
+// import DeactivatedPage from "./pages/auth/Deactivated";
+
+// // Layout
+// import RootLayout from "./components/layout/RootLayout";
+
+// // Auth Pages
+// import Login from "./pages/auth/Login";
+// import PasswordReset from "./pages/auth/PasswordReset";
+// import Register from "./pages/auth/Register";
+
+// // Others
+// import { Toaster } from "react-hot-toast";
+// import ScrollToTop from "./components/buttons/ScrollToTop";
+// import VerifyAccount from "./pages/auth/VerifyAccount";
+// import DevelopersPage from "./pages/guest/Developers";
+// // import LaunchPodEventPage from "./pages/launchpod-event/LaunchPodEventPage";
+// import BlogsPage from "./pages/guest/Blogs";
+
+
+
+
+// const queryClient = new QueryClient();
+
+// function App() {
+//   return (
+//     <QueryClientProvider client={queryClient}>
+//       <BrowserRouter>
+//         <ScrollToTop />
+//         <Toaster position="top-center" reverseOrder={false} />
+//         <Routes>
+//           {/* Routes that are publicly available (guest) */}
+//           <Route path="/" element={<Home />} />
+//           <Route path="/login" element={<Login />} />
+//           {/* <Route path="/register" element={<Register />} /> */}
+//           {/* <Route path="/verify-account" element={<VerifyAccount />} /> */}
+//           <Route path="/about-us" element={<AboutUs />} />
+//           <Route path="/careers" element={<Careers />} />
+//           <Route path="/careers/:slug" element={<CareersJobDetails />} />
+//           <Route path="/careers-all" element={<CareersAll />} />
+//           <Route
+//             path="careers/application-form/:id/:jobPosition"
+//             element={<ApplicationForm />}
+//           />
+//           <Route
+//             path="/congrats-application-form"
+//             element={<CongratsApplicationForm />}
+//           />
+
+//           <Route path="/developers" element={<DevelopersPage />} />
+//           <Route path="/events" element={<FirechatEvent />} />
+//           <Route path="/developer" element={<Navigate to="/developers" />} />
+//           <Route path="/dev" element={<Navigate to="/developers" />} />
+//           <Route path="/d" element={<Navigate to="/developers" />} />
+//           <Route path="/newsletter" element={<Newsletter />} />
+//           <Route path="/newsletter/:slug" element={<NewsletterDetails />} />
+//           <Route path="/blogs" element={<BlogsPage />} />
+//           <Route path="/blogs/:slugs" element={<BlogDetails />} />
+//           <Route path="/contact" element={<Contact />} />
+//           <Route path="/podcast" element={<Podcast />} />
+//           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+//           <Route path="/terms-of-use" element={<TermsOfUse />} />
+//           <Route path="/reset-password" element={<ResetPasswordPage />} />
+//           <Route path="/account-deactivated" element={<DeactivatedPage />} />
+//           <Route path="/logout" element={<Logout />} />
+//           <Route path="/page-not-found" element={<PageNotFound />} />
+//           <Route path="*" element={<Navigate to="/page-not-found" replace />} />
+
+//           {/* Routes that are avaialable to admins and employees (guest) */}
+//           <Route element={<ProtectedRoutes />}>
+//             <Route path="/app" element={<RootLayout />}>
+//               <Route index element={<Navigate to="blogs-feed" replace />} />
+//               <Route
+//                 path="my-profile"
+//                 element={
+//                   <EmployeeDetailsProvider>
+//                     <ProfilePage />
+//                   </EmployeeDetailsProvider>
+//                 }
+//               />
+//               <Route path="blogs-feed" element={<EmployeeBlogsFeed />} />
+//               <Route path="blogs-feed/blog/:id/:slug" element={<BlogView />} />
+//               <Route path="my-blogs" element={<EmployeeMyBlogs />} />
+//               <Route path="my-blogs/blog/:id/:slug" element={<BlogView />} />
+//               <Route path="my-blogs/new-blog" element={<BlogCreate />} />
+//               <Route path="cheer" element={<EmployeeCheerAPeer />} />
+//               <Route path="points" element={<EmployeePointsDashboard />} />
+
+//               <Route path="threads" element={<EmployeeThreads />} />
+//               <Route path="company-events" element={<EmployeeEvents />} />
+//               <Route path="courses" element={<EmployeeWorkshops />} />
+//               <Route
+//                 path="personality-test"
+//                 element={<EmployeePersonalityTest />}
+//               />
+
+//               {/* Suitebite Employee Routes */}
+//               <Route path="suitebite" element={<SuitebiteHome />} />
+//               <Route path="suitebite/cheer" element={<SuitebiteHome />} />
+//               <Route
+//                 path="suitebite/leaderboard"
+//                 element={<SuitebiteLeaderboard />}
+//               />
+
+//               {/* Points Shop/Mood/Cheer/PointsDashboard Routes */}
+//               <Route path="mood" element={<MoodPage />} />
+//               {/* Remove old points and cheer routes, keep only the new ones */}
+//               <Route path="cheer-a-peer" element={<EmployeeCheerAPeer />} />
+//               <Route
+//                 path="points-dashboard"
+//                 element={<EmployeePointsDashboard />}
+//               />
+
+//               {/* SuitebiteShop moved to bottom */}
+//               <Route path="suitebite/shop" element={<SuitebiteShop />} />
+
+//               {/* Admin Protected Routes */}
+//               <Route path="admin-tools" element={<AdminProtectedRoutes />}>
+//                 <Route index element={<Navigate to="suitebite" replace />} />
+//                 <Route path="suitebite" element={<AdminSuitebite />} />
+//                 <Route
+//                   path="suitebite/new-suitebite"
+//                   element={<AdminNewsCreate />}
+//                 />
+
+//                 <Route path="events" element={<AdminEvents />} />
+//                 <Route path="contents" element={<AdminContents />} />
+//                 <Route path="courses" element={<AdmimJobCourse />} />
+//                 <Route
+//                   path="personality-test"
+//                   element={<AdminPersonalityTest />}
+//                 />
+//                 <Route path="audit-logs" element={<AuditLogs />} />
+
+//                 {/* Super Admin Protected Routes */}
+//                 {/* <Route path="super" element={<SuperAdminProtectedRoutes />}>
+//                   <Route
+//                     path="accounts-management"
+//                     element={<SuperAdminAccountManagement />}
+//                   />
+//                   <Route
+//                     path="suitebite"
+//                     element={<SuperAdminSuitebite />}
+//                   />
+//                 </Route> */}
+//               </Route>
+//             </Route>
+//           </Route>
+
+//           {/* UI Demo Routes */}
+//           {/* <Route path="/ui-demo/cheer" element={<CheerPage />} />
+//           <Route path="/ui-demo/points" element={<PointsDashboard />} /> */}
+//         </Routes>
+//       </BrowserRouter>
+//     </QueryClientProvider>
+//   );
+// }
+
+// export default App;
+
+
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
 // Guest Pages
 import Home from "./pages/guest/Home";
 import AboutUs from "./pages/guest/AboutUs";
@@ -16,7 +241,6 @@ import ApplicationForm from "./pages/guest/ApplicationForm";
 import CongratsApplicationForm from "./pages/guest/CongratsApplicationForm";
 import PageNotFound from "./pages/guest/PageNotFound";
 import CareersJobDetails from "./pages/guest/CareersJobDetails";
-
 // Regular Pages
 import EmployeeBlogsFeed from "./pages/employee/EmployeeBlogsFeed";
 import EmployeeMyBlogs from "./pages/employee/EmployeeMyBlogs";
@@ -30,7 +254,6 @@ import BlogCreate from "./components/blog/BlogCreate";
 import EmployeeCheerAPeer from "./pages/employee/EmployeeCheerAPeer";
 import EmployeePointsDashboard from "./pages/employee/EmployeePointsDashboard";
 import MoodPage from "./pages/employee/MoodPage";
-
 // Points Shop Pages (optional - uncomment when needed)
 // import PointsShopDashboard from "./pages/employee/PointsShopDashboard";
 // import CheerAPeerPage from "./pages/employee/CheerAPeerPage";
@@ -39,16 +262,13 @@ import MoodPage from "./pages/employee/MoodPage";
 import SuitebiteHome from "./pages/employee/SuitebiteHome";
 import SuitebiteShop from "./pages/employee/SuitebiteShop";
 import SuitebiteLeaderboard from "./pages/employee/SuitebiteLeaderboard";
-
 // Admin Pages
 // import AdminPointsDashboard from "./pages/admin/AdminPointsDashboard";
 // import AdminPointsUsers from "./pages/admin/AdminPointsUsers";
 // import AdminPointsProducts from "./pages/admin/AdminPointsProducts";
 // import AdminPointsOrders from "./pages/admin/AdminPointsOrders";
-
 // Super/Admin Pages
 //import AdminBlogs from "./pages/admin/AdminBlogs";
-
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminContents from "./pages/admin/AdminContents";
 import AdminNewsCreate from "./pages/admin/AdminNewsCreate";
@@ -58,21 +278,17 @@ import AdmimJobCourse from "./components/admin/AdmimJobCourse";
 import AdminPersonalityTest from "./components/admin/AdminPersonalityTest";
 import AdminSuitebite from "./pages/admin/AdminSuitebite";
 import SuperAdminSuitebite from "./pages/admin/SuperAdminSuitebite";
-
 // Route Management
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 import AdminProtectedRoutes from "./routes/AdminProtectedRoutes";
 import SuperAdminProtectedRoutes from "./routes/SuperAdminProtectedRoutes";
 import DeactivatedPage from "./pages/auth/Deactivated";
-
 // Layout
 import RootLayout from "./components/layout/RootLayout";
-
 // Auth Pages
 import Login from "./pages/auth/Login";
 import PasswordReset from "./pages/auth/PasswordReset";
 import Register from "./pages/auth/Register";
-
 // Others
 import { Toaster } from "react-hot-toast";
 import ScrollToTop from "./components/buttons/ScrollToTop";
@@ -80,8 +296,16 @@ import VerifyAccount from "./pages/auth/VerifyAccount";
 import DevelopersPage from "./pages/guest/Developers";
 
 //Events
-import LaunchPodEventPage from "./pages/events/launchpod-event/LaunchPodEventPage";
+// import LaunchPodEventPage from "./pages/events/launchpod-event/LaunchPodEventPage";
 import FirechatEvent from "./pages/events/firechat-event/FirechatEvent";
+// import ResetPasswordPage from "./pages/auth/reset-password/ResetPasswordPage";
+// import ProfilePage from "./pages/employee/profile-page/ProfilePage";
+// import { EmployeeDetailsProvider } from "./pages/employee/context/EmployeeDetailsContext";
+// import Logout from "./pages/auth/Logout";
+
+
+//Events
+import LaunchPodEventPage from "./pages/events/launchpod-event/LaunchPodEventPage";
 import ResetPasswordPage from "./pages/auth/reset-password/ResetPasswordPage";
 import ProfilePage from "./pages/employee/profile-page/ProfilePage";
 import { EmployeeDetailsProvider } from "./pages/employee/context/EmployeeDetailsContext";
@@ -90,7 +314,6 @@ import BlogDetails from "./components/blog/guest/BlogDetails";
 import Blogs from "./pages/guest/Blogs";
 
 const queryClient = new QueryClient();
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -115,7 +338,6 @@ function App() {
             path="/congrats-application-form"
             element={<CongratsApplicationForm />}
           />
-
           <Route path="/developers" element={<DevelopersPage />} />
           <Route path="/events" element={<FirechatEvent />} />
           <Route path="/developer" element={<Navigate to="/developers" />} />
@@ -123,7 +345,8 @@ function App() {
           <Route path="/d" element={<Navigate to="/developers" />} />
           <Route path="/newsletter" element={<Newsletter />} />
           <Route path="/newsletter/:slug" element={<NewsletterDetails />} />
-          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/blogs" element={<BlogsPage />} />
+          <Route path="blogs-feed/blog/:id/:slug" element={<BlogView />} />
           <Route path="/blogs/:slugs" element={<BlogDetails />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/podcast" element={<Podcast />} />
@@ -134,7 +357,6 @@ function App() {
           <Route path="/logout" element={<Logout />} />
           <Route path="/page-not-found" element={<PageNotFound />} />
           <Route path="*" element={<Navigate to="/page-not-found" replace />} />
-
           {/* Routes that are avaialable to admins and employees (guest) */}
           <Route element={<ProtectedRoutes />}>
             <Route path="/app" element={<RootLayout />}>
@@ -154,7 +376,6 @@ function App() {
               <Route path="my-blogs/new-blog" element={<BlogCreate />} />
               <Route path="cheer" element={<EmployeeCheerAPeer />} />
               <Route path="points" element={<EmployeePointsDashboard />} />
-
               <Route path="threads" element={<EmployeeThreads />} />
               <Route path="company-events" element={<EmployeeEvents />} />
               <Route path="courses" element={<EmployeeWorkshops />} />
@@ -162,6 +383,15 @@ function App() {
                 path="personality-test"
                 element={<EmployeePersonalityTest />}
               />
+
+              {/* Suitebite Employee Routes */}
+              <Route path="suitebite" element={<SuitebiteHome />} />
+              <Route path="suitebite/cheer" element={<SuitebiteHome />} />
+              <Route
+                path="suitebite/leaderboard"
+                element={<SuitebiteLeaderboard />}
+              />
+
 
               {/* Suitebite Employee Routes */}
               <Route path="suitebite" element={<SuitebiteHome />} />
@@ -180,9 +410,13 @@ function App() {
                 element={<EmployeePointsDashboard />}
               />
 
+              <Route
+                path="points-dashboard"
+                element={<EmployeePointsDashboard />}
+              />
+
               {/* SuitebiteShop moved to bottom */}
               <Route path="suitebite/shop" element={<SuitebiteShop />} />
-
               {/* Admin Protected Routes */}
               <Route path="admin-tools" element={<AdminProtectedRoutes />}>
                 <Route index element={<Navigate to="suitebite" replace />} />
@@ -200,7 +434,6 @@ function App() {
                   element={<AdminPersonalityTest />}
                 />
                 <Route path="audit-logs" element={<AuditLogs />} />
-
                 {/* Super Admin Protected Routes */}
                 {/* <Route path="super" element={<SuperAdminProtectedRoutes />}>
                   <Route
@@ -215,7 +448,6 @@ function App() {
               </Route>
             </Route>
           </Route>
-
           {/* UI Demo Routes */}
           {/* <Route path="/ui-demo/cheer" element={<CheerPage />} />
           <Route path="/ui-demo/points" element={<PointsDashboard />} /> */}
@@ -224,5 +456,10 @@ function App() {
     </QueryClientProvider>
   );
 }
-
 export default App;
+
+
+
+
+
+

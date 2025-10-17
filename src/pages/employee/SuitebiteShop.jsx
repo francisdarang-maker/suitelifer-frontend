@@ -10,18 +10,22 @@ import OrderHistory from "../../components/suitebite/OrderHistory";
 
 import {
   MagnifyingGlassIcon,
-  FunnelIcon,
+  ChevronDownIcon,
   ShoppingBagIcon,
   ShoppingCartIcon,
   ClipboardDocumentListIcon,
   HeartIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import Loading from "../../components/loader/Loading";
 
 const SuitebiteShop = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   // Modal state for product details, add to cart, buy now
   const [modalProduct, setModalProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState("view-details"); // 'add-to-cart' | 'buy-now' | 'view-details'
+  const [modalMode, setModalMode] = useState("view-details");
   const [modalInitialQuantity, setModalInitialQuantity] = useState(1);
   const [modalInitialSelectedOptions, setModalInitialSelectedOptions] =
     useState({});
@@ -40,7 +44,6 @@ const SuitebiteShop = () => {
   const [activeTab, setActiveTab] = useState("products");
   const [loading, setLoading] = useState(false);
   const [lastLoadTime, setLastLoadTime] = useState(0);
-  // Remove showCart, use activeTab === 'cart' instead
 
   const [notification, setNotification] = useState({
     show: false,
@@ -57,7 +60,6 @@ const SuitebiteShop = () => {
   const [variationTypes, setVariationTypes] = useState([]);
 
   useEffect(() => {
-    // Only load data if we don't have products or if it's been more than 5 minutes
     const shouldLoadData =
       products.length === 0 || Date.now() - lastLoadTime > 5 * 60 * 1000;
 
@@ -65,7 +67,6 @@ const SuitebiteShop = () => {
       loadShopData();
     }
 
-    // Fetch variation options and types on mount
     const fetchVariationData = async () => {
       try {
         const optionsRes = await suitebiteAPI.getVariationOptions();
@@ -93,13 +94,12 @@ const SuitebiteShop = () => {
 
       const [productsResponse, cartResponse, heartbitsResponse] =
         await Promise.all([
-          suitebiteAPI.getProductsWithVariations("true"), // Get products with variations for shop
+          suitebiteAPI.getProductsWithVariations("true"),
           suitebiteAPI.getCart(),
           suitebiteAPI.getUserHeartbits(),
         ]);
 
       if (productsResponse.success) {
-        // Map backend product data to match expected frontend structure
         const mappedProducts = productsResponse.products.map((product) => ({
           product_id: product.product_id,
           name: product.name || product.product_name,
@@ -118,7 +118,6 @@ const SuitebiteShop = () => {
         }));
 
         setProducts(mappedProducts);
-        // Sync categories from loaded products
         syncCategoriesFromProducts(mappedProducts);
       } else {
         showNotification("error", "Failed to load products");
@@ -126,21 +125,20 @@ const SuitebiteShop = () => {
       }
 
       if (cartResponse.success) {
-        // Map backend cart data to match expected frontend structure
         const backendCartItems = cartResponse.data?.cartItems || [];
 
         const mappedCart = backendCartItems.map((item) => {
           return {
-            cart_item_id: item.cart_item_id, // Use the correct unique identifier
+            cart_item_id: item.cart_item_id,
             product_id: item.product_id,
             product_name: item.product_name || item.name,
             points_cost: item.price_points || item.points_cost || item.price,
             quantity: item.quantity,
             image_url: item.image_url,
-            images: item.images, // Include images array for cart items
-            product_images: item.product_images, // Include product_images from backend
+            images: item.images,
+            product_images: item.product_images,
             variation_id: item.variation_id,
-            variations: item.variations, // Add support for new variation format
+            variations: item.variations,
             variation_details: item.variation_details,
           };
         });
@@ -148,7 +146,6 @@ const SuitebiteShop = () => {
         setCart(mappedCart);
       } else {
         console.warn("⚠️ Cart response failed:", cartResponse);
-        // Set empty cart on failure
         setCart([]);
       }
 
@@ -159,23 +156,20 @@ const SuitebiteShop = () => {
       } else {
         console.error("❌ Heartbits response failed:", heartbitsResponse);
         showNotification("error", "Failed to load heartbits balance");
-        // Set 0 heartbits as fallback
         setUserHeartbits(0);
       }
     } catch (error) {
       console.error("Error loading shop data:", error);
       showNotification("error", "Failed to load shop data");
-      // Set fallback values on error
       setProducts([]);
       setCart([]);
       setUserHeartbits(0);
     } finally {
       setLoading(false);
-      setLastLoadTime(Date.now()); // Update last load time
+      setLastLoadTime(Date.now());
     }
   };
 
-  // Optimized functions for updating specific data (for performance)
   const updateCartAndHeartbits = async () => {
     try {
       const [cartResponse, heartbitsResponse] = await Promise.all([
@@ -211,9 +205,8 @@ const SuitebiteShop = () => {
     }
   };
 
-  // Add a function to refresh data when needed (e.g., after cart operations)
   const refreshShopData = async () => {
-    setLastLoadTime(0); // Reset cache
+    setLastLoadTime(0);
     await loadShopData();
   };
 
@@ -230,7 +223,6 @@ const SuitebiteShop = () => {
     }
   };
 
-  // Fix: Remove the logic that opens the modal if isModalOpen is true
   const handleAddToCart = async (
     productId,
     quantity = 1,
@@ -249,7 +241,7 @@ const SuitebiteShop = () => {
 
       if (response.success) {
         showNotification("success", "Item added to cart! 🛒");
-        await updateCartAndHeartbits(); // Only update cart and heartbits, not products
+        await updateCartAndHeartbits();
       } else {
         showNotification(
           "error",
@@ -274,7 +266,6 @@ const SuitebiteShop = () => {
       });
 
       if (response.success) {
-        // Update cart locally
         setCart((prevCart) =>
           prevCart.map((item) =>
             item.cart_item_id === itemId
@@ -300,7 +291,6 @@ const SuitebiteShop = () => {
       const response = await suitebiteAPI.removeFromCart(itemId);
 
       if (response.success) {
-        // Remove item from cart locally
         setCart((prevCart) =>
           prevCart.filter((item) => item.cart_item_id !== itemId)
         );
@@ -322,7 +312,6 @@ const SuitebiteShop = () => {
       });
 
       if (response.success) {
-        // Refresh cart from backend instead of clearing it
         await updateCartAndHeartbits();
 
         showNotification(
@@ -337,7 +326,6 @@ const SuitebiteShop = () => {
       console.error("Error response:", error.response?.data);
       console.error("Error status:", error.response?.status);
 
-      // Show specific error message from backend
       if (error.response?.data?.message) {
         showNotification("error", error.response.data.message);
       } else {
@@ -346,7 +334,6 @@ const SuitebiteShop = () => {
     }
   };
 
-  // Enhanced: Open modal and fetch full product details for Buy Now
   const handleBuyNow = async (
     productId,
     quantity = 1,
@@ -363,7 +350,6 @@ const SuitebiteShop = () => {
     });
 
     try {
-      // Fetch full product details including all images
       const res = await suitebiteAPI.getProductById(productId);
       let product =
         res.success && res.product
@@ -371,7 +357,6 @@ const SuitebiteShop = () => {
           : products.find((p) => p.product_id === productId);
 
       if (product) {
-        // Always provide images array - ensure we get all product images
         product = {
           ...product,
           images:
@@ -389,7 +374,6 @@ const SuitebiteShop = () => {
         setModalMode("buy-now");
         setModalInitialQuantity(quantity);
 
-        // Handle initial selected options from variations array
         const initialOptions = {};
         if (variations && variations.length > 0) {
           variations.forEach((variation) => {
@@ -415,6 +399,13 @@ const SuitebiteShop = () => {
     return Array.from(categories).sort();
   };
 
+  const isAnyFilterActive =
+    searchTerm !== "" ||
+    selectedCategory !== "all" ||
+    priceRange.min !== 1 ||
+    priceRange.max !== 10000 ||
+    sortOption !== "name-asc";
+
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedCategory("all");
@@ -422,10 +413,8 @@ const SuitebiteShop = () => {
     setPriceRange({ min: 1, max: 10000 });
   };
 
-  // Filter and sort products
   const filteredAndSortedProducts = products
     .filter((product) => {
-      // Search filter
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
         const matchesName = product.name.toLowerCase().includes(searchLower);
@@ -439,11 +428,9 @@ const SuitebiteShop = () => {
           return false;
       }
 
-      // Category filter
       if (selectedCategory !== "all" && product.category !== selectedCategory)
         return false;
 
-      // Price range filter
       if (
         product.price_points < priceRange.min ||
         product.price_points > priceRange.max
@@ -453,7 +440,6 @@ const SuitebiteShop = () => {
       return true;
     })
     .sort((a, b) => {
-      // Fallbacks for missing fields
       const aName = a.name ?? "";
       const bName = b.name ?? "";
       const aPrice = a.price_points ?? 0;
@@ -481,186 +467,207 @@ const SuitebiteShop = () => {
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="suitebite-shop-container h-full flex flex-col p-4">
-      {/* Navigation Tabs - Fixed */}
-      <div className="tabs flex-shrink-0 mb-6">
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-          <button
-            onClick={() => setActiveTab("products")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === "products"
-                ? "bg-white text-[#0097b2] shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            <ShoppingBagIcon className="h-4 w-4" />
-            Products
-          </button>
-          <button
-            onClick={() => setActiveTab("cart")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === "cart"
-                ? "bg-white text-[#0097b2] shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            <ShoppingCartIcon className="h-4 w-4" />
-            Cart
-          </button>
-          <button
-            onClick={() => setActiveTab("orders")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === "orders"
-                ? "bg-white text-[#0097b2] shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            <ClipboardDocumentListIcon className="h-4 w-4" />
-            Order History
-          </button>
+    <div className="suitebite-shop-container h-full flex flex-col bg-gray-50">
+      {/* Navigation Tabs - Minimal */}
+      <div className="bg-white border-b border-gray-100 px-4 sm:px-6 flex-shrink-0">
+        <div className="max-w-7xl mx-auto">
+          <nav className="flex gap-6">
+            <button
+              onClick={() => setActiveTab("products")}
+              className={`flex items-center gap-2 py-3 text-sm font-medium transition-colors relative ${
+                activeTab === "products"
+                  ? "text-[#0097b2]"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <ShoppingBagIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">Products</span>
+              {activeTab === "products" && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0097b2]" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("cart")}
+              className={`flex items-center gap-2 py-3 text-sm font-medium transition-colors relative ${
+                activeTab === "cart"
+                  ? "text-[#0097b2]"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <ShoppingCartIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">Cart</span>
+              {cart.length > 0 && (
+                <span className="bg-red-500 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                  {cart.length}
+                </span>
+              )}
+              {activeTab === "cart" && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0097b2]" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("orders")}
+              className={`flex items-center gap-2 py-3 text-sm font-medium transition-colors relative ${
+                activeTab === "orders"
+                  ? "text-[#0097b2]"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <ClipboardDocumentListIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">Orders</span>
+              {activeTab === "orders" && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0097b2]" />
+              )}
+            </button>
+          </nav>
         </div>
       </div>
 
       {/* Content */}
-      <div className="content flex-1 flex flex-col min-h-0 overflow-hidden">
-        {/* Products Tab */}
-        {activeTab === "products" && (
-          <div className="products-tab flex flex-col h-full min-h-0">
-            {/* Filters - Fixed */}
-            <div className="filters flex-shrink-0 mb-6 bg-white rounded-lg shadow-sm border p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
-                {/* Search */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Search
-                  </label>
-                  <div className="relative">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Search products..."
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                    />
-                  </div>
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 bg-white">
+          {/* Products Tab */}
+          {activeTab === "products" && (
+            <div className="products-tab space-y-6">
+              {/* Compact Search & Filter Bar */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                {/* Search - Always Visible */}
+                <div className="relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search products..."
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent outline-none text-sm"
+                  />
                 </div>
-                {/* Category Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category
-                  </label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                  >
-                    <option value="all">All Categories</option>
-                    {getCategories().map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {/* Price Range Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Price Range
-                  </label>
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="number"
-                      min="1"
-                      value={priceRange.min}
-                      onChange={(e) =>
-                        setPriceRange({
-                          ...priceRange,
-                          min: Number(e.target.value),
-                        })
-                      }
-                      className="w-1/2 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                      placeholder="Min"
-                    />
-                    <span className="text-gray-400">-</span>
-                    <input
-                      type="number"
-                      min="1"
-                      max="100000"
-                      value={priceRange.max}
-                      onChange={(e) =>
-                        setPriceRange({
-                          ...priceRange,
-                          max: Number(e.target.value),
-                        })
-                      }
-                      className="w-1/2 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                      placeholder="Max"
-                    />
-                  </div>
-                </div>
-                {/* Sort By */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Sort
-                  </label>
-                  <select
-                    value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                  >
-                    <option value="name-asc">Name: A-Z</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                    <option value="category-asc">Category: A-Z</option>
-                  </select>
-                </div>
-                {/* Reset Filters */}
-                <div>
-                  <button
-                    onClick={resetFilters}
-                    className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Reset Filters
-                  </button>
-                </div>
-                {/* Heartbits Balance */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Balance
-                  </label>
-                  <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
-                    <span className="text-[#0097b2] font-bold text-lg">
-                      {userHeartbits}
-                    </span>
-                    <span className="text-red-600 text-lg">
-                      <HeartIcon className="w-4" />
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Products Grid - Scrollable only */}
-            <div className="products-grid-container flex-1 min-h-0 overflow-y-auto">
-              <div className="pr-1">
+                {/* Expandable Filters */}
+                <div
+                  className={`transition-all duration-300 overflow-hidden ${
+                    isExpanded ? "max-h-96 mt-4" : "max-h-0"
+                  }`}
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Category */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                        Category
+                      </label>
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent outline-none text-sm"
+                      >
+                        <option value="all">All</option>
+                        {getCategories().map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Price Range */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                        Price Range
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="1"
+                          value={priceRange.min || ""}
+                          onChange={(e) =>
+                            setPriceRange({
+                              ...priceRange,
+                              min: Number(e.target.value),
+                            })
+                          }
+                          className="w-20 px-2 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent outline-none text-sm"
+                          placeholder="Min"
+                        />
+                        <span className="text-gray-400">-</span>
+                        <input
+                          type="number"
+                          min="1"
+                          max="100000"
+                          value={priceRange.max || ""}
+                          onChange={(e) =>
+                            setPriceRange({
+                              ...priceRange,
+                              max: Number(e.target.value),
+                            })
+                          }
+                          className="w-20 px-2 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent outline-none text-sm"
+                          placeholder="Max"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Sort */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                        Sort By
+                      </label>
+                      <select
+                        value={sortOption}
+                        onChange={(e) => setSortOption(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent outline-none text-sm"
+                      >
+                        <option value="name-asc">Name: A-Z</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="category-asc">Category: A-Z</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Reset Button */}
+                  {isAnyFilterActive && (
+                    <button
+                      onClick={resetFilters}
+                      className="mt-3 px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors inline-flex items-center gap-2"
+                    >
+                      <ArrowPathIcon className="w-4 h-4" />
+                      Reset Filters
+                    </button>
+                  )}
+                </div>
+
+                {/* Toggle Button */}
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="w-full mt-3 py-2 text-sm font-medium text-[#0097b2] hover:text-[#007a8f] transition-colors flex items-center justify-center gap-1"
+                >
+                  {isExpanded ? "Less Filters" : "More Filters"}
+                  <ChevronDownIcon
+                    className={`w-4 h-4 transition-transform ${
+                      isExpanded ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {/* Products Grid */}
+              <div>
                 {loading ? (
                   <div className="text-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0097b2] mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading products...</p>
+                    <Loading/>
                   </div>
                 ) : filteredAndSortedProducts.length === 0 ? (
-                  <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
+                  <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
                     <ShoppingBagIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    <h3 className="text-base font-medium text-gray-900 mb-2">
                       No products found
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-sm text-gray-600">
                       Try adjusting your search or filters.
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {filteredAndSortedProducts.map((product) => {
                       const productWithImages = {
                         ...product,
@@ -705,117 +712,102 @@ const SuitebiteShop = () => {
                         />
                       );
                     })}
-                    {/* Product Detail Modal for Add to Cart / Buy Now */}
-                    {isModalOpen && modalProduct && (
-                      <ProductDetailModal
-                        product={modalProduct}
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        onAddToCart={handleAddToCart}
-                        onBuyNow={async (
-                          productId,
-                          quantity,
-                          variationId,
-                          variations
-                        ) => {
-                          // Buy Now: Create order directly without adding to cart
-                          try {
-                            // Prepare order data
-                            const orderData = {
-                              items: [
-                                {
-                                  product_id: productId,
-                                  quantity: quantity,
-                                  ...(variationId && {
-                                    variation_id: variationId,
-                                  }),
-                                  ...(variations &&
-                                    variations.length > 0 && {
-                                      variations: variations,
-                                    }),
-                                },
-                              ],
-                            };
-
-                            // Create order directly
-                            const response = await suitebiteAPI.checkout(
-                              orderData
-                            );
-
-                            if (response.success) {
-                              showNotification(
-                                "success",
-                                "Order placed successfully!"
-                              );
-                              setIsModalOpen(false);
-                              await updateHeartbitsOnly(); // Only update heartbits after order
-                            } else {
-                              showNotification(
-                                "error",
-                                response.message || "Failed to place order"
-                              );
-                            }
-                          } catch (error) {
-                            console.error("Error with buy now:", error);
-                            showNotification(
-                              "error",
-                              "Buy now failed. Please try again."
-                            );
-                          }
-                        }}
-                        userHeartbits={userHeartbits}
-                        mode={modalMode}
-                        initialQuantity={modalInitialQuantity}
-                        initialSelectedOptions={modalInitialSelectedOptions}
-                      />
-                    )}
                   </div>
                 )}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Cart Tab */}
-        {activeTab === "cart" && (
-          <div className="cart-tab h-full overflow-y-auto">
-            <ShoppingCart
-              cart={cart}
-              userHeartbits={userHeartbits}
-              onCheckout={handleCheckout}
-              onClose={() => setActiveTab("products")}
-              onUpdateCart={loadShopData}
-              onUpdateQuantity={handleUpdateQuantity}
-              onRemoveItem={handleRemoveItem}
-              onAddToCart={handleAddToCart}
-              isVisible={true}
-              variationOptions={variationOptions}
-              variationTypes={variationTypes}
-            />
-          </div>
-        )}
+          {/* Cart Tab */}
+          {activeTab === "cart" && (
+            <div className="cart-tab">
+              <ShoppingCart
+                cart={cart}
+                userHeartbits={userHeartbits}
+                onCheckout={handleCheckout}
+                onClose={() => setActiveTab("products")}
+                onUpdateCart={loadShopData}
+                onUpdateQuantity={handleUpdateQuantity}
+                onRemoveItem={handleRemoveItem}
+                onAddToCart={handleAddToCart}
+                isVisible={true}
+                variationOptions={variationOptions}
+                variationTypes={variationTypes}
+              />
+            </div>
+          )}
 
-        {/* Order History Tab */}
-        {activeTab === "orders" && (
-          <div className="orders-tab h-full overflow-y-auto">
-            <OrderHistory
-              onCartUpdate={loadShopData}
-              onHeartbitsUpdate={loadShopData}
-            />
-          </div>
-        )}
+          {/* Order History Tab */}
+          {activeTab === "orders" && (
+            <div className="orders-tab">
+              <OrderHistory
+                onCartUpdate={loadShopData}
+                onHeartbitsUpdate={loadShopData}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Notification */}
+      {/* Product Detail Modal */}
+      {isModalOpen && modalProduct && (
+        <ProductDetailModal
+          product={modalProduct}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onAddToCart={handleAddToCart}
+          onBuyNow={async (productId, quantity, variationId, variations) => {
+            try {
+              const orderData = {
+                items: [
+                  {
+                    product_id: productId,
+                    quantity: quantity,
+                    ...(variationId && {
+                      variation_id: variationId,
+                    }),
+                    ...(variations &&
+                      variations.length > 0 && {
+                        variations: variations,
+                      }),
+                  },
+                ],
+              };
+
+              const response = await suitebiteAPI.checkout(orderData);
+
+              if (response.success) {
+                showNotification("success", "Order placed successfully!");
+                setIsModalOpen(false);
+                await updateHeartbitsOnly();
+              } else {
+                showNotification(
+                  "error",
+                  response.message || "Failed to place order"
+                );
+              }
+            } catch (error) {
+              console.error("Error with buy now:", error);
+              showNotification("error", "Buy now failed. Please try again.");
+            }
+          }}
+          userHeartbits={userHeartbits}
+          mode={modalMode}
+          initialQuantity={modalInitialQuantity}
+          initialSelectedOptions={modalInitialSelectedOptions}
+        />
+      )}
+
+      {/* Notification Toast */}
       {notification.show && (
         <div
-          className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+          className={`fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 animate-in slide-in-from-top ${
             notification.type === "success"
               ? "bg-green-500 text-white"
               : "bg-red-500 text-white"
           }`}
         >
-          {notification.message}
+          <span className="text-sm font-medium">{notification.message}</span>
         </div>
       )}
     </div>

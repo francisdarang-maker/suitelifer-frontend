@@ -54,25 +54,7 @@ export default function BlogStatsCards({blogs}) {
           {/* End Of Unassigned */}
 
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200 hover:scale-102 transition ease-linear">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-600">This Month</p>
-                <p className="text-3xl font-bold text-slate-900 mt-1">
-                  {
-                    blogs.filter(
-                      (b) =>
-                        new Date(b.createdAt).getMonth() ===
-                        new Date().getMonth()
-                    ).length
-                  }
-                </p>
-              </div>
-              <div className="p-3 bg-emerald-100 rounded-xl">
-                <Calendar className="w-6 h-6 text-emerald-600" />
-              </div>
-            </div>
-          </div>
+          
     </>
   )
 }

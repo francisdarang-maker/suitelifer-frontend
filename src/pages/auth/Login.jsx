@@ -50,13 +50,13 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
       //TODO: check first if exists in HRIS
       console.log("nakapasok hereee ");
 
-      const { token } = await loginUser({ email, password });
-      localStorage.setItem("hris-token", token);
+      // const { token } = await loginUser({ email, password });
+      // localStorage.setItem("hris-token", token);
 
-      console.log("hris-token: ", token);
+      // console.log("hris-token: ", token);
 
-      //then proceed if yes...
-      if (token) {
+      // //then proceed if yes...
+      // if (token) {
         const response = await api.post("/api/login", {
           email,
           recaptchaToken,
@@ -229,7 +229,7 @@ const Login = () => {
     <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
       <div
         id="vanta-bg"
-        className="dark max min-h-screen bg-primary overflow-y-auto"
+        className="dark max-h-screen bg-primary overflow-y-auto"
       >
         {/* <ModalResetPassword
           isOpen={isResetModal}
