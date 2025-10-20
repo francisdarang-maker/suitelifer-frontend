@@ -7,6 +7,8 @@ import ProductCard from "../../components/suitebite/ProductCard";
 import ProductDetailModal from "../../components/suitebite/ProductDetailModal";
 import ShoppingCart from "../../components/suitebite/ShoppingCart";
 import OrderHistory from "../../components/suitebite/OrderHistory";
+// import useRealTimeHeartbits from "../utils/useRealTimeHeartbits";
+import useRealTimeHeartbits from "../../utils/useRealTimeHeartbits";
 
 import {
   MagnifyingGlassIcon,
@@ -466,8 +468,17 @@ const SuitebiteShop = () => {
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  const { data: pointsData, isLoading, error } = useRealTimeHeartbits();
+  const currentBalance = pointsData?.data?.currentBalance ?? 0;
+  //
   return (
     <div className="suitebite-shop-container h-full flex flex-col bg-gray-50">
+      {activeTab === "products" && (
+        <div className="px-6 bg-white flex justify-center text-lg font-medium text-[#0097b2] hover:text-[#007a8f] transition-colors ">
+          Current Balance: {currentBalance}
+        </div>
+      )}
+
       {/* Navigation Tabs - Minimal */}
       <div className="bg-white border-b border-gray-100 px-4 sm:px-6 flex-shrink-0">
         <div className="max-w-7xl mx-auto">
@@ -549,7 +560,7 @@ const SuitebiteShop = () => {
                     isExpanded ? "max-h-96 mt-4" : "max-h-0"
                   }`}
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3 gap-4">
                     {/* Category */}
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1.5">
@@ -654,7 +665,7 @@ const SuitebiteShop = () => {
               <div>
                 {loading ? (
                   <div className="text-center py-12">
-                    <Loading/>
+                    <Loading />
                   </div>
                 ) : filteredAndSortedProducts.length === 0 ? (
                   <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -667,7 +678,7 @@ const SuitebiteShop = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5  gap-4">
                     {filteredAndSortedProducts.map((product) => {
                       const productWithImages = {
                         ...product,

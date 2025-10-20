@@ -245,17 +245,28 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, userHeartbits }) => {
           {product.description ||
             "Premium quality product curated for your needs."}
         </p>
+        <div>
+          <div className="heartbits-price flex items-center hidden  md:hidden lg:block 2xl:hidden ">
+            <span className="text-lg sm:text-xl font-bold text-[#0097b2] flex items-center gap-1">
+              {product.price_points || product.price || 0}
+              <HeartIcon className="h-4 w-4 text-red-500" />
+            </span>
+          </div>
+        </div>
 
         {/* Price and Quantity on same line */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="heartbits-price flex items-center hidden md:hidden lg:hidden xl:block ">
+        <div className="flex items-start justify-start mb-3  md:justify-start 2xl:justify-start  ">
+          {/* <div className="heartbits-price flex items-center block  md:block md:mr-6 lg:hidden xl:hidden 2xl:block 2xl:mr-6"> */}
+          {/* <div className="heartbits-price flex items-center hidden [@media(min-width:425px)]:flex md:mr-6 lg:hidden xl:hidden 2xl:flex 2xl:mr-6"> */}
+          {/* <div className="heartbits-price flex items-center hidden md:mr-6 lg:hidden xl:hidden 2xl:flex 2xl:mr-6"> */}
+          <div className="heartbits-price hidden [@media(min-width:425px)]:flex lg:!hidden xl:!hidden 2xl:flex 2xl:mr-6">
             <span className="text-lg sm:text-xl font-bold text-[#0097b2] flex items-center gap-1">
               {product.price_points || product.price || 0}
               <HeartIcon className="h-4 w-4 text-red-500" />
             </span>
           </div>
 
-          <div className="quantity-selector flex items-center gap-2">
+          <div className="quantity-selector flex items-center gap-1 justify-between ml-2 lg:ml-0 lg:gap-3">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
               className="quantity-btn w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center font-semibold hover:bg-gray-300 transition-colors duration-200 text-sm touch-manipulation"
@@ -293,7 +304,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, userHeartbits }) => {
             disabled={!canAfford}
             className="buy-now-btn w-full bg-[#0097b2] text-white py-2.5 px-3 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm min-h-[2.5rem]"
           >
-            <ShoppingBagIcon className="h-4 w-4 flex-shrink-0" />
+            <ShoppingBagIcon className="h-4 w-4 flex-shrink-0 hidden sm:block lg:hidden xl:block" />
             <span className="truncate">
               {!canAfford
                 ? `Need ${totalCost - userHeartbits} more`
@@ -307,7 +318,7 @@ const ProductCard = ({ product, onAddToCart, onBuyNow, userHeartbits }) => {
             }}
             className="add-to-cart-btn w-full bg-white text-[#0097b2] py-2.5 px-3 rounded-lg font-medium border border-[#0097b2] hover:bg-[#0097b2] hover:text-white transition-colors duration-200 flex items-center justify-center gap-2 text-sm min-h-[2.5rem]"
           >
-            <ShoppingCartIcon className="h-4 w-4 flex-shrink-0" />
+            <ShoppingCartIcon className="h-4 w-4 flex-shrink-0 hidden sm:block lg:hidden xl:block" />
             <span>Add to Cart</span>
           </button>
         </div>
