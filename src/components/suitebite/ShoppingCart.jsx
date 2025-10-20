@@ -544,273 +544,151 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
 
               {/* Cart Items */}
               {uniqueCart.map((item) => (
-                <div key={item.cart_item_id} className="cart-item bg-white border border-gray-200 rounded-lg p-3 mb-3 w-full overflow-hidden">
-                  <div className="flex items-start gap-3 w-full">
-                    {/* Item Selection */}
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.has(item.cart_item_id)}
-                      onChange={() => handleItemSelect(item.cart_item_id)}
-                      className="mt-1 rounded border-gray-300 text-[#0097b2] focus:ring-[#0097b2] flex-shrink-0"
-                    />
-                    
-                    {/* Item Image */}
-                    <div className="flex-shrink-0">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                        {(() => {
-                          // Handle both new images array and legacy image_url with priority order
-                          let imageUrl = null;
-                          
-                          // Priority 1: Check for images array from backend
-                          if (item.product_images && Array.isArray(item.product_images) && item.product_images.length > 0) {
-                            const primaryImage = item.product_images.find(img => img.is_primary) || item.product_images[0];
-                            imageUrl = primaryImage.thumbnail_url || primaryImage.image_url;
-                          }
-                          // Priority 2: Check for images array (frontend format)
-                          else if (item.images && Array.isArray(item.images) && item.images.length > 0) {
-                            const primaryImage = item.images.find(img => img.is_primary) || item.images[0];
-                            imageUrl = primaryImage.thumbnail_url || primaryImage.image_url || primaryImage.url;
-                          }
-                          // Priority 3: Fallback to legacy image_url
-                          else if (item.image_url) {
-                            imageUrl = item.image_url;
-                          }
-                          
-                          return imageUrl ? (
-                            <img
-                              src={imageUrl}
-                              alt={item.product_name}
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
-                            <ShoppingBagIcon className="h-6 w-6 text-gray-400" />
-                          );
-                        })()}
-                      </div>
-                    </div>
+                  <div
+                    key={item.cart_item_id}
+                    className="cart-item bg-white rounded-2xl border border-gray-200 p-4 mb-4 shadow-sm hover:shadow-md transition-shadow duration-300"
+                  >
+                    <div className="flex flex-col sm:flex-row items-start gap-4">
+                      
+                      {/* Selection + Image */}
+                      <div className="flex items-start gap-3 w-full sm:w-auto">
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.has(item.cart_item_id)}
+                          onChange={() => handleItemSelect(item.cart_item_id)}
+                          className="mt-1 rounded border-gray-300 text-[#0097b2] focus:ring-[#0097b2]"
+                        />
 
-                    {/* Item Details */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-gray-900 truncate mb-1">
-                        {item.product_name}
-                      </h3>
-                      
-                      {/* Price and Quantity on same line for mobile */}
-                      <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                        <span>{item.price_points || item.points_cost || item.price} pts each</span>
-                        <span className="font-medium">Qty: {item.quantity}</span>
-                      </div>
-                      
-                      {/* Enhanced Variations Display with Inline Editing */}
-                      <div className="mb-2">
-                        {(() => {
-                          const hasVariations = (item.variations && Array.isArray(item.variations) && item.variations.length > 0) || item.variation_details;
-                          const isEditingThisItem = inlineEditingItem === item.cart_item_id;
-                          
-                          if (isEditingThisItem) {
-                            // Inline editing mode
-                            return (
-                              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-3 animate-pulse-once">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-base font-medium text-blue-800 flex items-center gap-1">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Edit Options
-                                  </span>
-                                  <div className="flex items-center gap-2">
-                                    <button
-                                      onClick={() => saveInlineEdit(item)}
-                                      disabled={itemLoadingStates[item.cart_item_id] === 'updating'}
-                                      className="text-green-600 hover:text-green-800 text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 px-2 py-1 rounded hover:bg-green-50 transition-colors"
-                                    >
-                                      {itemLoadingStates[item.cart_item_id] === 'updating' ? (
-                                        <>
-                                          <svg className="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                          </svg>
-                                          Saving...
-                                        </>
-                                      ) : (
-                                        <>
-                                          <CheckIcon className="w-3 h-3" />
-                                          Save
-                                        </>
-                                      )}
-                                    </button>
-                                    <button
-                                      onClick={cancelInlineEdit}
-                                      className="text-gray-500 hover:text-gray-700 text-base px-2 py-1 rounded hover:bg-gray-100 transition-colors"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                </div>
-                                
-                                {/* Variation type selectors */}
-                                <div className="space-y-3">
-                                  {inlineEditData.variationTypes.length > 0 ? (
-                                    inlineEditData.variationTypes.map(typeName => {
-                                      const availableOptions = getAvailableOptionsForType(typeName);
-                                      const selectedOptionId = inlineEditData.selectedOptions[typeName];
-                                      
-                                      return (
-                                        <div key={typeName} className="space-y-2">
-                                          <label className="block text-sm font-medium text-gray-700 capitalize flex items-center gap-1">
-                                            <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-                                            {getTypeLabel(typeName)}
-                                          </label>
-                                          <div className="flex flex-wrap gap-2">
-                                            {availableOptions.map(option => (
-                                              <button
-                                                key={option.id}
-                                                onClick={() => handleInlineOptionChange(typeName, option.id)}
-                                                className={`text-sm px-3 py-1.5 rounded-full border transition-all duration-200 font-medium ${
-                                                  selectedOptionId === option.id
-                                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm scale-105'
-                                                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700'
-                                                }`}
-                                              >
-                                                {getOptionLabel(option.id, option.value)}
-                                              </button>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      );
-                                    })
-                                  ) : (
-                                    <div className="text-center py-4">
-                                      <div className="text-gray-500 text-base">No variations available for this product</div>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          }
-                          
-                          if (hasVariations) {
-                            let variationElements = [];
-                            
-                            if (item.variations && Array.isArray(item.variations) && item.variations.length > 0) {
-                              // Group variations by type for better display
-                              const variationsByType = item.variations.reduce((acc, variation) => {
-                                const typeName = variation.type_name || 'option';
-                                if (!acc[typeName]) acc[typeName] = [];
-                                acc[typeName].push(variation);
-                                return acc;
-                              }, {});
-                              
-                              variationElements = Object.entries(variationsByType).map(([typeName, variations]) => {
-                                const variationText = variations.map(v => getOptionLabel(v.option_id, v.option_label || v.option_value)).join(', ');
-                                return (
-                                  <span key={typeName} className="inline-block text-sm px-2 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-200 mr-1 mb-1 max-w-full truncate">
-                                    {getTypeLabel(typeName)}: {variationText}
-                                  </span>
-                                );
-                              });
-                            } else if (item.variation_details) {
-                              const details = Array.isArray(item.variation_details) ? item.variation_details : [item.variation_details];
-                              variationElements = details.map((opt, index) => (
-                                <span key={index} className="inline-block text-sm px-2 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-200 mr-1 mb-1 max-w-full truncate">
-                                  {getOptionLabel(opt.option_id, opt.option_label || opt.option_value)}
-                                </span>
-                              ));
+                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center">
+                          {(() => {
+                            let imageUrl = null;
+
+                            if (item.product_images?.length > 0) {
+                              const primaryImage =
+                                item.product_images.find((img) => img.is_primary) ||
+                                item.product_images[0];
+                              imageUrl =
+                                primaryImage.thumbnail_url || primaryImage.image_url;
+                            } else if (item.images?.length > 0) {
+                              const primaryImage =
+                                item.images.find((img) => img.is_primary) ||
+                                item.images[0];
+                              imageUrl =
+                                primaryImage.thumbnail_url ||
+                                primaryImage.image_url ||
+                                primaryImage.url;
+                            } else if (item.image_url) {
+                              imageUrl = item.image_url;
                             }
-                            
-                            return (
-                              <div className="space-y-2">
-                                <div className="flex flex-wrap gap-1">
-                                  {variationElements.length > 0 ? variationElements : (
-                                    <span className="text-sm px-2 py-1 bg-yellow-50 text-yellow-700 rounded-full border border-yellow-200">
-                                      Variations not loaded
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="flex items-center justify-end gap-2">
-                                  <button
-                                    onClick={() => startInlineEdit(item)}
-                                    disabled={itemLoadingStates[item.cart_item_id] === 'loading'}
-                                    className="text-blue-600 text-sm hover:text-blue-800 hover:underline font-medium disabled:opacity-50 whitespace-nowrap"
-                                    title="Edit options inline"
-                                  >
-                                    {itemLoadingStates[item.cart_item_id] === 'loading' ? 'Loading...' : 'Edit'}
-                                  </button>
-                                </div>
-                              </div>
+
+                            return imageUrl ? (
+                              <img
+                                src={imageUrl}
+                                alt={item.product_name}
+                                className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
+                              />
+                            ) : (
+                              <ShoppingBagIcon className="h-8 w-8 text-gray-400" />
                             );
-                          } else {
-                            return (
-                              <div className="space-y-2">
-                                <div className="flex flex-wrap gap-1">
-                                  <span className="text-sm px-2 py-1 bg-gray-50 text-gray-600 rounded-full border border-gray-200">
-                                    Standard
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          }
-                        })()}
-                      </div>
-                      
-                      {/* Price and Quantity */}
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mt-2">
-                        <div className="flex items-center gap-2">
-                          <HeartIcon className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
-                          <span className="text-sm sm:text-base font-medium text-[#0097b2]">
-                            {(item.price_points || item.points_cost || item.price) * item.quantity} heartbits
-                          </span>
-                        </div>
-                        
-                        {/* Quantity Controls */}
-                        <div className="flex items-center gap-2 self-start sm:self-auto">
-                          <button
-                            onClick={() => handleUpdateQuantity(item.cart_item_id, item.quantity - 1)}
-                            disabled={itemLoadingStates[item.cart_item_id] === 'updating'}
-                            className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-200 rounded-full flex items-center justify-center text-sm sm:text-base font-semibold hover:bg-gray-300 transition-colors disabled:opacity-50"
-                          >
-                            -
-                          </button>
-                          <span className="text-sm sm:text-base font-medium min-w-[1.5rem] sm:min-w-[2rem] text-center">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => handleUpdateQuantity(item.cart_item_id, item.quantity + 1)}
-                            disabled={itemLoadingStates[item.cart_item_id] === 'updating'}
-                            className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-200 rounded-full flex items-center justify-center text-sm sm:text-base font-semibold hover:bg-gray-300 transition-colors disabled:opacity-50"
-                          >
-                            +
-                          </button>
+                          })()}
                         </div>
                       </div>
 
-                      {/* Total for this item */}
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-sm text-gray-500">
-                          Subtotal: {(item.price_points || item.points_cost || item.price) * item.quantity} heartbits
-                        </span>
-                        
-                        {/* Remove Button */}
-                        <button
-                          onClick={() => handleRemoveItem(item.cart_item_id)}
-                          disabled={itemLoadingStates[item.cart_item_id] === 'removing'}
-                          className="text-red-500 hover:text-red-700 p-1 rounded transition-colors disabled:opacity-50"
-                          title="Remove item"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
+                      {/* Product Details */}
+                      <div className="flex-1 w-full space-y-2">
+                        {/* Product Name */}
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 leading-tight">
+                            {item.product_name}
+                          </h3>
+                          <button
+                            onClick={() => handleRemoveItem(item.cart_item_id)}
+                            disabled={itemLoadingStates[item.cart_item_id] === "removing"}
+                            className="text-red-500 hover:text-red-700 transition-colors p-1 rounded"
+                            title="Remove item"
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                        </div>
+
+                        {/* Price + Quantity */}
+                        <div className="flex flex-wrap items-center justify-between text-sm text-gray-600">
+                          <span className="font-medium text-[#0097b2]">
+                            {item.price_points || item.points_cost || item.price} pts each
+                          </span>
+
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() =>
+                                handleUpdateQuantity(item.cart_item_id, item.quantity - 1)
+                              }
+                              disabled={itemLoadingStates[item.cart_item_id] === "updating"}
+                              className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center font-bold hover:bg-gray-200 transition disabled:opacity-50"
+                            >
+                              -
+                            </button>
+                            <span className="text-sm font-semibold w-6 text-center">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() =>
+                                handleUpdateQuantity(item.cart_item_id, item.quantity + 1)
+                              }
+                              disabled={itemLoadingStates[item.cart_item_id] === "updating"}
+                              className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center font-bold hover:bg-gray-200 transition disabled:opacity-50"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Variations */}
+                        <div className="flex flex-wrap gap-2">
+                          {item.variations?.length > 0 ? (
+                            item.variations.map((v, i) => (
+                              <span
+                                key={i}
+                                className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-200"
+                              >
+                                {v.type_name ? `${v.type_name}: ` : ""}
+                                {v.option_label || v.option_value}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-xs px-2 py-1 bg-gray-50 text-gray-500 rounded-full border border-gray-200">
+                              Standard
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Subtotal */}
+                        <div className="flex items-center justify-between border-t border-gray-100 pt-3 mt-2">
+                          <span className="flex items-center gap-1 text-gray-600 text-sm">
+                            <HeartIcon className="h-4 w-4 text-red-500" />
+                            <span>
+                              Subtotal:{" "}
+                              <span className="font-semibold text-[#0097b2]">
+                                {(item.price_points || item.points_cost || item.price) *
+                                  item.quantity}{" "}
+                                heartbits
+                              </span>
+                            </span>
+                          </span>
+
+                          {itemLoadingStates[item.cart_item_id] && (
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#0097b2]"></div>
+                              {itemLoadingStates[item.cart_item_id] === "updating"
+                                ? "Updating..."
+                                : "Updated"}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
+                ))}
 
-                  {/* Loading State */}
-                  {itemLoadingStates[item.cart_item_id] && (
-                    <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#0097b2]"></div>
-                      {itemLoadingStates[item.cart_item_id] === 'updating' ? 'Updating...' : 'Updated'}
-                    </div>
-                  )}
-                </div>
-              ))}
             </div>
           )}
         </div>
