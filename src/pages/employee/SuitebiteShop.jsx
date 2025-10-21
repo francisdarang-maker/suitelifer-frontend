@@ -470,6 +470,35 @@ const SuitebiteShop = () => {
 
   const { data: pointsData, isLoading, error } = useRealTimeHeartbits();
   const currentBalance = pointsData?.data?.currentBalance ?? 0;
+
+const transformCurrentBalance = (currentBalance) => {
+  if (currentBalance == null || isNaN(currentBalance)) return "0.00";
+
+  const num = Number(currentBalance);
+
+  if (num >= 1_000_000)
+    return (num / 1_000_000)
+      .toLocaleString("en-US", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      })
+      .replace(/\.0$/, "") + "M";
+
+  if (num >= 1_000)
+    return (num / 1_000)
+      .toLocaleString("en-US", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      })
+      .replace(/\.0$/, "") + "K";
+
+  return num.toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+};
+
+
   //
   return (
     <div className="suitebite-shop-container h-full flex flex-col bg-gray-50">
@@ -528,11 +557,32 @@ const SuitebiteShop = () => {
 
             <div className="flex items-center ml-auto">
               {(activeTab === "products" || activeTab === "cart") && (
-                <div className="bg-white flex justify-center text-sm xl:text-md font-medium text-[#0097b2] hover:text-[#007a8f] transition-colors">
-                  <span className="hidden xl:block lg:hidden md:block ">
-                    Current&nbsp;
-                  </span>
-                  <span>Balance: {currentBalance}</span>
+                <div
+                  className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-0 rounded-xl 
+                            bg-gradient-to-r from-red-100 to-red-200 
+                            border border-red-300 text-red-800 font-semibold 
+                            text-sm sm:text-base shadow-sm hover:shadow-md 
+                            transition-all duration-300 ease-in-out"
+                >
+                  <h4 className="text-2xl hidden sm:inline">Heartbits</h4>
+                  
+                  <span className="tracking-wide drop-shadow-sm">{transformCurrentBalance(currentBalance)}</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-pulse"
+                  >
+                    <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 
+                            25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 
+                            8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 
+                            5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 
+                            2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 
+                            9.256a25.175 25.175 0 0 1-4.244 
+                            3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 
+                            0 0 1-.704 0l-.003-.001Z" />
+                  </svg>
+
                 </div>
               )}
             </div>
