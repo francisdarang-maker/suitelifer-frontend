@@ -13,7 +13,7 @@ export default function EventFilter({
   const activeCount = Object.values(activeFilters).filter(Boolean).length;
 
   return (
-    <div className="mt-6 p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 shadow-lg">
+    <div className="p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div className="flex items-center gap-2">

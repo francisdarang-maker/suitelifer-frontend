@@ -1,4 +1,10 @@
-function EventDayView({getEventsForDate, currentDate, isToday, onSelectSlot}) {
+function EventDayView({
+  getEventsForDate, 
+  currentDate, 
+  isToday, 
+  onSelectSlot,
+  isEmployee
+}) {
 
     const CATEGORY_COLORS = {
       party: "#ec4899",
@@ -96,7 +102,7 @@ function EventDayView({getEventsForDate, currentDate, isToday, onSelectSlot}) {
               <p className="text-gray-500 text-sm mb-4">
                 No events scheduled for this day
               </p>
-              <button
+              {!isEmployee && ( <button
                 onClick={() => {
                   const start = new Date(currentDate);
                   start.setHours(9, 0, 0, 0);
@@ -119,7 +125,8 @@ function EventDayView({getEventsForDate, currentDate, isToday, onSelectSlot}) {
                   />
                 </svg>
                 Add Event
-              </button>
+              </button>)}
+             
             </div>
           ) : (
             <div className="space-y-2">

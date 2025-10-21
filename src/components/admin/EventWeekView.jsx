@@ -7,6 +7,7 @@ function EventWeekView({
   isPast,
   onSelectEvent,
   onSelectSlot,
+  isEmployee,
 }) {
   const CATEGORY_COLORS = {
     party: "#ec4899",
@@ -178,7 +179,7 @@ function EventWeekView({
 
                 {/* Events List */}
                 <div className="p-2 space-y-1.5">
-                  {dayEvents.length === 0 ? (
+                  {dayEvents.length === 0 && !isEmployee ? (
                     <div
                       onClick={() => {
                         const start = new Date(date);

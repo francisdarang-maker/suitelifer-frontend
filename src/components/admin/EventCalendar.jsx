@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { useMediaQuery } from "@mui/material";
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,6 +24,7 @@ const EventCalendar = ({
   onSelectSlot,
   onSelectEvent,
   enableDragDrop = true,
+  isEmployee = false
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState("month");
@@ -34,6 +36,8 @@ const EventCalendar = ({
   const [draggedCategory, setDraggedCategory] = useState(null);
   const [hoveredDate, setHoveredDate] = useState(null);
   const [expandedDates, setExpandedDates] = useState(new Set());
+
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   // Helper functions
   const getDaysInMonth = useCallback((date) => {
@@ -129,144 +133,145 @@ const EventCalendar = ({
 
   return (
     <div className="w-full space-y-4 sm:space-y-6 px-2 sm:px-4">
-      {/* === Calendar Header (scoped only to the calendar section) === */}
-      <div className="p-4 sm:p-6 bg-primary rounded-xl sm:rounded-2xl shadow-xl text-white">
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-3 sm:gap-4">
-          <button
-            onClick={goToToday}
-            className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-all backdrop-blur-sm"
-          >
-            Today
-          </button>
+  { !isMobile && (isEmployee || !isMobile) &&( <div className="p-3 sm:p-4 bg-primary rounded-xl shadow-xl text-white w-full">
+  <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:justify-between lg:items-center">
+    {/* Today Button */}
+    <div className="flex justify-center lg:justify-start">
+      <button
+        onClick={goToToday}
+        className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-all backdrop-blur-sm w-full sm:w-auto text-sm sm:text-base"
+      >
+        Today
+      </button>
+    </div>
 
-          {view !== "agenda" && (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => navigate("prev")}
-                className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all hover:scale-110"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
+    {/* Month / Week / Day Navigation */}
+    {view !== "agenda" && (
+      <div className="flex items-center justify-center gap-2 sm:gap-3">
+        <button
+          onClick={() => navigate("prev")}
+          className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all hover:scale-110"
+        >
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+        </button>
 
-              <h2 className="text-xl sm:text-2xl font-bold text-center min-w-[200px]">
-                {view === "month" &&
-                  currentDate.toLocaleDateString("en-US", {
-                    month: "long",
-                    year: "numeric",
-                  })}
-                {view === "week" &&
-                  `Week of ${currentDate.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}`}
-                {view === "day" &&
-                  currentDate.toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-              </h2>
+        <h2 className="text-base sm:text-xl font-bold text-center min-w-[140px] sm:min-w-[200px]">
+          {view === "month" &&
+            currentDate.toLocaleDateString("en-US", {
+              month: "long",
+              year: "numeric",
+            })}
+          {view === "week" &&
+            `Week of ${currentDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            })}`}
+          {view === "day" &&
+            currentDate.toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+        </h2>
 
-              <button
-                onClick={() => navigate("next")}
-                className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all hover:scale-110"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
+        <button
+          onClick={() => navigate("next")}
+          className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all hover:scale-110"
+        >
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+        </button>
+      </div>
+    )}
 
-          <div className="flex gap-1 bg-white/20 p-1.5 rounded-lg backdrop-blur-sm">
-            {[
-              { id: "month", icon: Grid, label: "Month" },
-              { id: "week", icon: Calendar, label: "Week" },
-              { id: "day", icon: Clock, label: "Day" },
-              { id: "agenda", icon: List, label: "Agenda" },
-            ].map(({ id, icon: Icon, label }) => (
-              <button
-                key={id}
-                onClick={() => setView(id)}
-                className={`px-1 lg:px-3 md:px-2 py-1.5 rounded-md font-semibold flex items-center gap-1 transition-all ${
-                  view === id
-                    ? "bg-white text-cyan-700 shadow-lg scale-105"
-                    : "text-white hover:bg-white/20"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span>{label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+    <div className="flex flex-wrap justify-center gap-1 bg-white/20 p-1 rounded-lg backdrop-blur-sm">
+      {[
+        { id: "month", icon: Grid, label: "Month" },
+        { id: "week", icon: Calendar, label: "Week" },
+        { id: "day", icon: Clock, label: "Day" },
+        { id: "agenda", icon: List, label: "Agenda" },
+      ].map(({ id, icon: Icon, label }) => (
+        <button
+          key={id}
+          onClick={() => setView(id)}
+          className={`px-2 sm:px-3 py-1.5 rounded-md font-semibold flex items-center justify-center gap-1 transition-all text-xs sm:text-sm ${
+            view === id
+              ? "bg-white text-cyan-700 shadow-lg scale-105"
+              : "text-white hover:bg-white/20"
+          }`}
+        >
+          {/* Icon always visible */}
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+          {/* Text only visible on md and larger */}
+          <span className="hidden md:inline">{label}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+</div>)}
+
+
+
+    <div className="flex flex-col lg:flex-row gap-8 w-full">
+      {/* Left: Calendar Section (¾ width) */}
+      <div className="w-full lg:w-4/4 space-y-6">
+        {view === "month" && (
+          <MonthView
+            getDaysInMonth={getDaysInMonth}
+            currentDate={currentDate}
+            getEventsForDate={getEventsForDate}
+            isToday={isToday}
+            isPast={isPast}
+            hoveredDate={hoveredDate}
+            expandedDates={expandedDates}
+            eventImages={eventImages}
+            loadingImages={loadingImages}
+            onSelectEvent={onSelectEvent}
+            draggedCategory={draggedCategory}
+            handleEventHover={handleEventHover}
+            onSelectSlot={onSelectSlot}
+          />
+        )}
+        {view === "week" && (
+          <WeekView
+            currentDate={currentDate}
+            getEventsForDate={getEventsForDate}
+            isToday={isToday}
+            isPast={isPast}
+            onSelectEvent={onSelectEvent}
+            onSelectSlot={onSelectSlot}
+            isEmployee={isEmployee}
+          />
+        )}
+        {view === "day" && (
+          <DayView
+            getEventsForDate={getEventsForDate}
+            currentDate={currentDate}
+            isToday={isToday}
+            onSelectSlot={onSelectSlot}
+            isEmployee={isEmployee}
+          />
+        )}
+        {view === "agenda" && (
+          <AgendaView
+            filteredEvents={filteredEvents}
+            onSelectEvent={onSelectEvent}
+          />
+        )}
       </div>
 
-      {/* === Drag Info Banner === */}
-      {draggedCategory && (
-        <div className="p-3 bg-blue-50 border-2 border-blue-300 rounded-xl flex items-center gap-2 animate-pulse">
-          <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping" />
-          <span className="text-blue-800 text-sm font-semibold">
-            Drag <strong>{eventColors[draggedCategory]?.label}</strong> category
-            to any date to create an event
-          </span>
-        </div>
-      )}
-
-      {/* === Calendar + Filter Layout === */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6 sm:gap-8 items-start">
-        {/* Calendar Section */}
-        <div className="space-y-6">
-          {view === "month" && (
-            <MonthView
-              getDaysInMonth={getDaysInMonth}
-              currentDate={currentDate}
-              getEventsForDate={getEventsForDate}
-              isToday={isToday}
-              isPast={isPast}
-              hoveredDate={hoveredDate}
-              expandedDates={expandedDates}
-              eventImages={eventImages}
-              loadingImages={loadingImages}
-              onSelectEvent={onSelectEvent}
-              draggedCategory={draggedCategory}
-              handleEventHover={handleEventHover}
-              onSelectSlot={onSelectSlot}
-            />
-          )}
-          {view === "week" && (
-            <WeekView
-              currentDate={currentDate}
-              getEventsForDate={getEventsForDate}
-              isToday={isToday}
-              isPast={isPast}
-              onSelectEvent={onSelectEvent}
-              onSelectSlot={onSelectSlot}
-            />
-          )}
-          {view === "day" && (
-            <DayView
-              getEventsForDate={getEventsForDate}
-              currentDate={currentDate}
-              isToday={isToday}
-              onSelectSlot={onSelectSlot}
-            />
-          )}
-          {view === "agenda" && <AgendaView filteredEvents={filteredEvents} onSelectEvent={onSelectEvent} />}
-        </div>
-
-        {/* Sticky Filter Sidebar */}
-       <div className="h-full lg:sticky lg:top-20 self-start">
-          <EventFilter
-            activeFilters={activeFilters}
-            toggleFilter={toggleFilter}
-            toggleAllFilters={toggleAllFilters}
-            onDragStart={enableDragDrop ? handleDragStart : undefined}
-            onDragEnd={enableDragDrop ? handleDragEnd : undefined}
-            draggedCategory={draggedCategory}
-            enableDragDrop={enableDragDrop}
-          />
-        </div>
-      </div> 
-     
+      {/* Right: Filter Sidebar (¼ width) */}
+      <div className="hidden lg:block w-1/4 lg:sticky lg:top-24 self-start">
+        <EventFilter
+          activeFilters={activeFilters}
+          toggleFilter={toggleFilter}
+          toggleAllFilters={toggleAllFilters}
+          onDragStart={enableDragDrop ? handleDragStart : undefined}
+          onDragEnd={enableDragDrop ? handleDragEnd : undefined}
+          draggedCategory={draggedCategory}
+          enableDragDrop={enableDragDrop}
+        />
+      </div>
+    </div>
     </div>
   );
 };
