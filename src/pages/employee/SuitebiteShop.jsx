@@ -473,16 +473,11 @@ const SuitebiteShop = () => {
   //
   return (
     <div className="suitebite-shop-container h-full flex flex-col bg-gray-50">
-      {activeTab === "products" && (
-        <div className="px-6 bg-white flex justify-center text-lg font-medium text-[#0097b2] hover:text-[#007a8f] transition-colors ">
-          Current Balance: {currentBalance}
-        </div>
-      )}
-
       {/* Navigation Tabs - Minimal */}
+
       <div className="bg-white border-b border-gray-100 px-4 sm:px-6 flex-shrink-0">
         <div className="max-w-7xl mx-auto">
-          <nav className="flex gap-6">
+          <nav className="flex gap-6 items-center">
             <button
               onClick={() => setActiveTab("products")}
               className={`flex items-center gap-2 py-3 text-sm font-medium transition-colors relative ${
@@ -530,6 +525,17 @@ const SuitebiteShop = () => {
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0097b2]" />
               )}
             </button>
+
+            <div className="flex items-center ml-auto">
+              {(activeTab === "products" || activeTab === "cart") && (
+                <div className="bg-white flex justify-center text-sm xl:text-md font-medium text-[#0097b2] hover:text-[#007a8f] transition-colors">
+                  <span className="hidden xl:block lg:hidden md:block ">
+                    Current&nbsp;
+                  </span>
+                  <span>Balance: {currentBalance}</span>
+                </div>
+              )}
+            </div>
           </nav>
         </div>
       </div>

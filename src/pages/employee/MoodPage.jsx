@@ -24,7 +24,6 @@ import { useStore } from "../../store/authStore";
 import moodApi from "../../utils/moodApi";
 import Loading from "../../components/loader/Loading";
 
-
 const MoodPage = () => {
   const user = useStore((state) => state.user);
   const [currentMoodLevel, setCurrentMoodLevel] = useState(3);
@@ -193,13 +192,9 @@ const MoodPage = () => {
         ).toFixed(1)
       : "0";
 
-
- if (loading) {
-   return (
-     <Loading/>
-   );
- }
-
+  if (loading) {
+    return <Loading />;
+  }
 
   // Prepare chart data
   const last30Days = moodHistory.slice(0, 30).reverse();
@@ -288,7 +283,7 @@ const MoodPage = () => {
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1  xl:grid-cols-3 gap-6">
             {/* LEFT COLUMN - Mood Input & Quick Stats */}
             <div className="space-y-6">
               {/* Mood Input Card */}

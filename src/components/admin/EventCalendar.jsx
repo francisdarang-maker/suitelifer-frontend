@@ -87,13 +87,13 @@ const EventFilter = ({
             >
               {value.label}
             </button>
-            {enableDragDrop && (
-              <div className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                  Drag me
-                </div>
-              </div>
-            )}
+            {/* {enableDragDrop && ( */}
+            {/* // <div className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              //   <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+              //     Drag me
+              //   </div>
+              // </div> */}
+            {/* )} */}
           </div>
         ))}
       </div>
@@ -279,57 +279,57 @@ const EventCalendar = ({
     [eventImages, loadingImages, fetchImagesForEvent]
   );
 
- // Replace your existing EventBadge component with this updated version:
+  // Replace your existing EventBadge component with this updated version:
 
-const EventBadge = ({ event, compact = false }) => {
-  // Use solid colors matching WeekView instead of gradients
-  const CATEGORY_COLORS = {
-    party: "#ec4899",
-    launchpod: "#3b82f6",
-    holiday: "#22c55e",
-    payroll: "#f97316",
-    others: "#0097b2",
-  };
+  const EventBadge = ({ event, compact = false }) => {
+    // Use solid colors matching WeekView instead of gradients
+    const CATEGORY_COLORS = {
+      party: "#ec4899",
+      launchpod: "#3b82f6",
+      holiday: "#22c55e",
+      payroll: "#f97316",
+      others: "#0097b2",
+    };
 
-  const category = event.category?.toLowerCase() || "others";
-  const solidColor = CATEGORY_COLORS[category] || CATEGORY_COLORS.others;
-  const eventKey = event.eventId || event.id;
-  const images = eventImages[eventKey] || [];
-  const isLoading = loadingImages[eventKey];
+    const category = event.category?.toLowerCase() || "others";
+    const solidColor = CATEGORY_COLORS[category] || CATEGORY_COLORS.others;
+    const eventKey = event.eventId || event.id;
+    const images = eventImages[eventKey] || [];
+    const isLoading = loadingImages[eventKey];
 
-  return (
-    <Tooltip
-      title={
-        <EventImageCarousel
-          isLoading={isLoading}
-          hasLink={!!(event.gdriveLink || event.gdrive_link)}
-          images={images}
-        />
-      }
-      arrow
-      placement="top"
-      TransitionComponent={Fade}
-      TransitionProps={{ timeout: 300 }}
-      enterDelay={500}
-      leaveDelay={100}
-      slotProps={{
-        tooltip: {
-          sx: {
-            backgroundColor: "transparent",
-            padding: 0,
-            maxWidth: "none",
-            boxShadow: "none",
+    return (
+      <Tooltip
+        title={
+          <EventImageCarousel
+            isLoading={isLoading}
+            hasLink={!!(event.gdriveLink || event.gdrive_link)}
+            images={images}
+          />
+        }
+        arrow
+        placement="top"
+        TransitionComponent={Fade}
+        TransitionProps={{ timeout: 300 }}
+        enterDelay={500}
+        leaveDelay={100}
+        slotProps={{
+          tooltip: {
+            sx: {
+              backgroundColor: "transparent",
+              padding: 0,
+              maxWidth: "none",
+              boxShadow: "none",
+            },
           },
-        },
-        arrow: {
-          sx: { color: "rgba(17, 24, 39, 0.95)" },
-        },
-      }}
-    >
-      <div
-        onMouseEnter={() => handleEventHover(event)}
-        onClick={() => onSelectEvent(event)}
-        className={`
+          arrow: {
+            sx: { color: "rgba(17, 24, 39, 0.95)" },
+          },
+        }}
+      >
+        <div
+          onMouseEnter={() => handleEventHover(event)}
+          onClick={() => onSelectEvent(event)}
+          className={`
           relative group cursor-pointer
           ${
             compact
@@ -340,66 +340,66 @@ const EventBadge = ({ event, compact = false }) => {
           hover:shadow-lg
           overflow-hidden
         `}
-        style={{
-          backgroundColor: `${solidColor}20`,
-          borderLeft: `3px solid ${solidColor}`,
-        }}
-      >
-        <div 
-          className="relative z-10 font-semibold truncate"
-          style={{ color: solidColor }}
+          style={{
+            backgroundColor: `${solidColor}20`,
+            borderLeft: `3px solid ${solidColor}`,
+          }}
         >
-          {event.title}
+          <div
+            className="relative z-10 font-semibold truncate"
+            style={{ color: solidColor }}
+          >
+            {event.title}
+          </div>
         </div>
-      </div>
-    </Tooltip>
-  );
-};
-
-// Month view - Complete with solid colors matching WeekView
-const MonthView = () => {
-  const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentDate);
-  const days = [];
-
-  const toggleDateExpansion = (dateStr) => {
-    setExpandedDates((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(dateStr)) {
-        newSet.delete(dateStr);
-      } else {
-        newSet.add(dateStr);
-      }
-      return newSet;
-    });
+      </Tooltip>
+    );
   };
 
-  for (let i = 0; i < startingDayOfWeek; i++) {
-    days.push(
-      <div
-        key={`empty-${i}`}
-        className="bg-gray-50 min-h-[100px] sm:min-h-[120px] border border-gray-200"
-      />
-    );
-  }
+  // Month view - Complete with solid colors matching WeekView
+  const MonthView = () => {
+    const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentDate);
+    const days = [];
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const date = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      day
-    );
-    const dateStr = date.toISOString().split("T")[0];
-    const dayEvents = getEventsForDate(date);
-    const isCurrentDay = isToday(date);
-    const isPastDay = isPast(date);
-    const isHovered = hoveredDate && isSameDay(hoveredDate, date);
-    const isExpanded = expandedDates.has(dateStr);
-    const visibleEvents = isExpanded ? dayEvents : dayEvents.slice(0, 3);
+    const toggleDateExpansion = (dateStr) => {
+      setExpandedDates((prev) => {
+        const newSet = new Set(prev);
+        if (newSet.has(dateStr)) {
+          newSet.delete(dateStr);
+        } else {
+          newSet.add(dateStr);
+        }
+        return newSet;
+      });
+    };
 
-    days.push(
-      <div
-        key={day}
-        className={`
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(
+        <div
+          key={`empty-${i}`}
+          className="bg-gray-50 min-h-[100px] sm:min-h-[120px] border border-gray-200"
+        />
+      );
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        day
+      );
+      const dateStr = date.toISOString().split("T")[0];
+      const dayEvents = getEventsForDate(date);
+      const isCurrentDay = isToday(date);
+      const isPastDay = isPast(date);
+      const isHovered = hoveredDate && isSameDay(hoveredDate, date);
+      const isExpanded = expandedDates.has(dateStr);
+      const visibleEvents = isExpanded ? dayEvents : dayEvents.slice(0, 3);
+
+      days.push(
+        <div
+          key={day}
+          className={`
           min-h-[100px] sm:min-h-[120px] border border-gray-200 p-1.5 sm:p-2 transition-all cursor-pointer
           ${
             isCurrentDay
@@ -413,33 +413,33 @@ const MonthView = () => {
               : ""
           }
         `}
-        onClick={(e) => {
-          // Only trigger slot selection if clicking on empty space (not on events or +more button)
-          if (!draggedCategory && e.target === e.currentTarget) {
-            const start = new Date(date);
-            start.setHours(9, 0, 0, 0);
-            const end = new Date(start.getTime() + 60 * 60 * 1000);
-            onSelectSlot({ start, end });
-          }
-        }}
-        onDragOver={(e) => {
-          if (enableDragDrop && draggedCategory) {
-            e.preventDefault();
-            setHoveredDate(date);
-          }
-        }}
-        onDragLeave={() => {
-          if (enableDragDrop) setHoveredDate(null);
-        }}
-        onDrop={(e) => {
-          if (enableDragDrop) {
-            e.preventDefault();
-            handleDateDrop(date);
-          }
-        }}
-      >
-        <div
-          className={`
+          onClick={(e) => {
+            // Only trigger slot selection if clicking on empty space (not on events or +more button)
+            if (!draggedCategory && e.target === e.currentTarget) {
+              const start = new Date(date);
+              start.setHours(9, 0, 0, 0);
+              const end = new Date(start.getTime() + 60 * 60 * 1000);
+              onSelectSlot({ start, end });
+            }
+          }}
+          onDragOver={(e) => {
+            if (enableDragDrop && draggedCategory) {
+              e.preventDefault();
+              setHoveredDate(date);
+            }
+          }}
+          onDragLeave={() => {
+            if (enableDragDrop) setHoveredDate(null);
+          }}
+          onDrop={(e) => {
+            if (enableDragDrop) {
+              e.preventDefault();
+              handleDateDrop(date);
+            }
+          }}
+        >
+          <div
+            className={`
           text-xs sm:text-sm font-bold mb-1 sm:mb-2
           ${
             isCurrentDay
@@ -449,45 +449,45 @@ const MonthView = () => {
               : "text-gray-700"
           }
         `}
-        >
-          {day}
-        </div>
-        <div className={`space-y-1 ${isExpanded ? "" : ""}`}>
-          {visibleEvents.map((event, idx) => (
-            <EventBadge key={idx} event={event} compact />
-          ))}
-          {dayEvents.length > 3 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleDateExpansion(dateStr);
-              }}
-              className="text-xs text-cyan-600 hover:text-cyan-800 font-semibold hover:underline transition-colors w-full text-left px-1"
-            >
-              {isExpanded ? `Show less` : `+${dayEvents.length - 3} more`}
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div className="grid grid-cols-7 bg-gradient-to-r from-gray-100 to-gray-200">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div
-            key={day}
-            className="text-center py-2 sm:py-3 font-bold text-gray-700 text-xs sm:text-sm border-b border-gray-300"
           >
             {day}
           </div>
-        ))}
+          <div className={`space-y-1 ${isExpanded ? "" : ""}`}>
+            {visibleEvents.map((event, idx) => (
+              <EventBadge key={idx} event={event} compact />
+            ))}
+            {dayEvents.length > 3 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDateExpansion(dateStr);
+                }}
+                className="text-xs text-cyan-600 hover:text-cyan-800 font-semibold hover:underline transition-colors w-full text-left px-1"
+              >
+                {isExpanded ? `Show less` : `+${dayEvents.length - 3} more`}
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="grid grid-cols-7 bg-gradient-to-r from-gray-100 to-gray-200">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            <div
+              key={day}
+              className="text-center py-2 sm:py-3 font-bold text-gray-700 text-xs sm:text-sm border-b border-gray-300"
+            >
+              {day}
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7">{days}</div>
       </div>
-      <div className="grid grid-cols-7">{days}</div>
-    </div>
-  );
-};
+    );
+  };
 
   // Week view - Modern and Compact Design
   const WeekView = () => {
@@ -662,13 +662,13 @@ const MonthView = () => {
                         onSelectSlot({ start, end });
                       }}
                       className={`
-                      mt-4 p-2 border-2 border-dashed rounded-lg text-center cursor-pointer transition-all
-                      ${
-                        isPastDay
-                          ? "border-gray-200 hover:border-gray-300"
-                          : "border-gray-300 hover:border-cyan-400 hover:bg-cyan-50"
-                      }
-                    `}
+                        mt-4 p-2 border-2 border-dashed rounded-lg text-center cursor-pointer transition-all
+                        ${
+                          isPastDay
+                            ? "border-gray-200 hover:border-gray-300"
+                            : "border-gray-300 hover:border-cyan-400 hover:bg-cyan-50"
+                        }
+                      `}
                     >
                       <svg
                         className="w-5 h-5 text-gray-300 mx-auto mb-1"
@@ -1636,52 +1636,52 @@ const MonthView = () => {
           Today
         </button>
 
-{/* Conditional navigation - hide when in agenda view */}
-{view !== "agenda" && (
-  <div className="flex items-center gap-2 sm:gap-4 w-full lg:w-auto justify-center">
-    <button
-      onClick={() => navigate("prev")}
-      className="p-2 sm:p-3 bg-white/20 hover:bg-white/30 rounded-lg sm:rounded-xl transition-all backdrop-blur-sm hover:scale-110"
-    >
-      <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-    </button>
+        {/* Conditional navigation - hide when in agenda view */}
+        {view !== "agenda" && (
+          <div className="flex items-center gap-2 sm:gap-4 w-full lg:w-auto justify-center">
+            <button
+              onClick={() => navigate("prev")}
+              className="p-2 sm:p-3 bg-white/20 hover:bg-white/30 rounded-lg sm:rounded-xl transition-all backdrop-blur-sm hover:scale-110"
+            >
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
 
-    <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold min-w-[200px] sm:min-w-[280px] text-center">
-      {view === "month" &&
-        currentDate.toLocaleDateString("en-US", {
-          month: "long",
-          year: "numeric",
-        })}
-      {view === "week" &&
-        `Week of ${currentDate.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        })}`}
-      {view === "day" &&
-        currentDate.toLocaleDateString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        })}
-    </h2>
+            <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold min-w-[200px] sm:min-w-[280px] text-center">
+              {view === "month" &&
+                currentDate.toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
+              {view === "week" &&
+                `Week of ${currentDate.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}`}
+              {view === "day" &&
+                currentDate.toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+            </h2>
 
-    <button
-      onClick={() => navigate("next")}
-      className="p-2 sm:p-3 bg-white/20 hover:bg-white/30 rounded-lg sm:rounded-xl transition-all backdrop-blur-sm hover:scale-110"
-    >
-      <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-    </button>
-  </div>
-)}
+            <button
+              onClick={() => navigate("next")}
+              className="p-2 sm:p-3 bg-white/20 hover:bg-white/30 rounded-lg sm:rounded-xl transition-all backdrop-blur-sm hover:scale-110"
+            >
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </div>
+        )}
 
-{/* Show title only for agenda view */}
-{view === "agenda" && (
-  <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-center">
-    Event Agenda
-  </h2>
-)}
+        {/* Show title only for agenda view */}
+        {view === "agenda" && (
+          <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-center">
+            Event Agenda
+          </h2>
+        )}
 
-        <div className="flex gap-1 sm:gap-2 bg-white/20 p-1.5 sm:p-2 rounded-lg sm:rounded-xl backdrop-blur-sm w-full lg:w-auto overflow-x-auto">
+        <div className="flex gap-1 justify-evenly sm:gap-2 bg-white/20 p-1.5 sm:p-2 rounded-lg sm:rounded-xl backdrop-blur-sm w-full lg:w-auto overflow-x-auto">
           {[
             { id: "month", icon: Grid, label: "Month" },
             { id: "week", icon: Calendar, label: "Week" },
