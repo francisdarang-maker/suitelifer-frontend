@@ -491,9 +491,7 @@ const CheerPage = () => {
     statsLoading || pointsLoading || feedLoading || leaderboardLoading;
 
   if (anyLoading) {
-    return (
-      <Loading/>
-    );
+    return <Loading />;
   }
 
   const availableHeartbits =
@@ -520,7 +518,7 @@ const CheerPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* LEFT: Send Cheer + Stats */}
           <div className="space-y-4 ">
             {/* Send Cheer Card */}

@@ -1,12 +1,20 @@
-import { useState, useEffect } from 'react';
-import { suitebiteAPI } from '../../utils/suitebiteAPI';
-import { XMarkIcon, TrashIcon, CheckIcon, HeartIcon, ShoppingBagIcon, CurrencyDollarIcon, EyeIcon } from '@heroicons/react/24/outline';
-import useIsMobile from '../../utils/useIsMobile';
-import ProductDetailModal from './ProductDetailModal';
+import { useState, useEffect } from "react";
+import { suitebiteAPI } from "../../utils/suitebiteAPI";
+import {
+  XMarkIcon,
+  TrashIcon,
+  CheckIcon,
+  HeartIcon,
+  ShoppingBagIcon,
+  CurrencyDollarIcon,
+  EyeIcon,
+} from "@heroicons/react/24/outline";
+import useIsMobile from "../../utils/useIsMobile";
+import ProductDetailModal from "./ProductDetailModal";
 
 /**
  * ShoppingCart Component - Enhanced with Real-Time Updates
- * 
+ *
  * Advanced shopping cart with real-time heartbit updates and improved UX.
  * Features include:
  * - Real-time heartbits balance updates
@@ -17,7 +25,19 @@ import ProductDetailModal from './ProductDetailModal';
  * - Improved quantity management
  * - Integrated design for better UX
  */
-const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, onUpdateQuantity, onRemoveItem, onAddToCart, isVisible = false, variationOptions = [], variationTypes = [] }) => {
+const ShoppingCart = ({
+  cart,
+  userHeartbits,
+  onCheckout,
+  onClose,
+  onUpdateCart,
+  onUpdateQuantity,
+  onRemoveItem,
+  onAddToCart,
+  isVisible = false,
+  variationOptions = [],
+  variationTypes = [],
+}) => {
   // Mobile detection
   const isMobile = useIsMobile();
 
@@ -25,19 +45,23 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
   const [isUpdating, setIsUpdating] = useState(false);
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [itemLoadingStates, setItemLoadingStates] = useState({});
-  const [notification, setNotification] = useState({ show: false, type: '', message: '' });
+  const [notification, setNotification] = useState({
+    show: false,
+    type: "",
+    message: "",
+  });
   const [realTimeHeartbits, setRealTimeHeartbits] = useState(userHeartbits);
   const [cartItemToEdit, setCartItemToEdit] = useState(null);
   const [productModalData, setProductModalData] = useState(null);
   const [modalInitialOptions, setModalInitialOptions] = useState({});
   const [modalInitialQuantity, setModalInitialQuantity] = useState(1);
-  
+
   // Inline editing state
   const [inlineEditingItem, setInlineEditingItem] = useState(null);
   const [inlineEditData, setInlineEditData] = useState({
     selectedOptions: {},
     availableVariations: [],
-    variationTypes: []
+    variationTypes: [],
   });
 
   // Clear cart confirmation modal state
@@ -52,9 +76,13 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
       seenIds.add(item.cart_item_id);
     } else {
       // Log duplicate for debugging
-      if (process.env.NODE_ENV !== 'production') {
+      if (process.env.NODE_ENV !== "production") {
         // eslint-disable-next-line no-console
-        console.warn('Duplicate cart_item_id in cart:', item.cart_item_id, item);
+        console.warn(
+          "Duplicate cart_item_id in cart:",
+          item.cart_item_id,
+          item
+        );
       }
     }
   }
@@ -73,7 +101,10 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
 
   // Cancel inline editing if the item being edited is no longer in the cart
   useEffect(() => {
-    if (inlineEditingItem && !uniqueCart.find(item => item.cart_item_id === inlineEditingItem)) {
+    if (
+      inlineEditingItem &&
+      !uniqueCart.find((item) => item.cart_item_id === inlineEditingItem)
+    ) {
       cancelInlineEdit();
     }
   }, [uniqueCart, inlineEditingItem]);
@@ -81,7 +112,7 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
   // Only auto-select all items if cart is non-empty and nothing is selected yet (and not on every cart change)
   useEffect(() => {
     if (cart.length > 0 && selectedItems.size === 0) {
-      setSelectedItems(new Set(cart.map(item => item.cart_item_id)));
+      setSelectedItems(new Set(cart.map((item) => item.cart_item_id)));
     }
     if (cart.length === 0 && selectedItems.size > 0) {
       setSelectedItems(new Set());
@@ -89,17 +120,25 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart.length]);
 
-  const total = uniqueCart.reduce((sum, item) => sum + ((item.price_points || item.points_cost || item.price) * item.quantity), 0);
+  const total = uniqueCart.reduce(
+    (sum, item) =>
+      sum +
+      (item.price_points || item.points_cost || item.price) * item.quantity,
+    0
+  );
   const itemCount = uniqueCart.reduce((sum, item) => sum + item.quantity, 0);
-  
+
   // Calculate selected items totals
   const selectedItemsTotal = uniqueCart.reduce((sum, item) => {
     if (selectedItems.has(item.cart_item_id)) {
-      return sum + ((item.price_points || item.points_cost || item.price) * item.quantity);
+      return (
+        sum +
+        (item.price_points || item.points_cost || item.price) * item.quantity
+      );
     }
     return sum;
   }, 0);
-  
+
   const selectedItemsCount = uniqueCart.reduce((sum, item) => {
     if (selectedItems.has(item.cart_item_id)) {
       return sum + item.quantity;
@@ -113,18 +152,21 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
 
   const showNotification = (type, message) => {
     setNotification({ show: true, type, message });
-    setTimeout(() => setNotification({ show: false, type: '', message: '' }), 3000);
+    setTimeout(
+      () => setNotification({ show: false, type: "", message: "" }),
+      3000
+    );
   };
 
   const setItemLoadingState = (itemId, state) => {
-    setItemLoadingStates(prev => ({ ...prev, [itemId]: state }));
+    setItemLoadingStates((prev) => ({ ...prev, [itemId]: state }));
   };
 
   const handleSelectAll = () => {
     if (selectedItems.size === uniqueCart.length) {
       setSelectedItems(new Set());
     } else {
-      setSelectedItems(new Set(uniqueCart.map(item => item.cart_item_id)));
+      setSelectedItems(new Set(uniqueCart.map((item) => item.cart_item_id)));
     }
   };
 
@@ -147,22 +189,26 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
 
     try {
       setIsCheckingOut(true);
-      
+
       // Update real-time heartbits optimistically
-      setRealTimeHeartbits(prev => Math.max(0, prev - selectedItemsTotal));
-      
+      setRealTimeHeartbits((prev) => Math.max(0, prev - selectedItemsTotal));
+
       // Filter cart to only selected items
-      const selectedCartItems = uniqueCart.filter(item => selectedItems.has(item.cart_item_id));
+      const selectedCartItems = uniqueCart.filter((item) =>
+        selectedItems.has(item.cart_item_id)
+      );
       await onCheckout(selectedCartItems);
-      
+
       // Clear selected items after successful checkout
       setSelectedItems(new Set());
-      showNotification('success', 'Order placed successfully! Awaiting admin approval. 🎉');
-      
+      showNotification(
+        "success",
+        "Order placed successfully! Awaiting admin approval. 🎉"
+      );
     } catch (error) {
       // Revert optimistic update on error
       setRealTimeHeartbits(userHeartbits);
-      showNotification('error', 'Checkout failed. Please try again.');
+      showNotification("error", "Checkout failed. Please try again.");
     } finally {
       setIsCheckingOut(false);
     }
@@ -170,25 +216,26 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
 
   const handleUpdateQuantity = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
-    
-    const currentItem = uniqueCart.find(item => item.cart_item_id === itemId);
+
+    const currentItem = uniqueCart.find((item) => item.cart_item_id === itemId);
     if (!currentItem) return;
 
     try {
-      setItemLoadingState(itemId, 'updating');
-      
-      const response = await suitebiteAPI.updateCartItem(itemId, { quantity: newQuantity });
-      
+      setItemLoadingState(itemId, "updating");
+
+      const response = await suitebiteAPI.updateCartItem(itemId, {
+        quantity: newQuantity,
+      });
+
       if (response.success) {
         onUpdateCart();
-        showNotification('success', 'Quantity updated');
+        showNotification("success", "Quantity updated");
       } else {
-        showNotification('error', 'Failed to update quantity');
+        showNotification("error", "Failed to update quantity");
       }
-      
     } catch (error) {
-      console.error('Error updating quantity:', error);
-      showNotification('error', 'Failed to update quantity');
+      console.error("Error updating quantity:", error);
+      showNotification("error", "Failed to update quantity");
     } finally {
       setItemLoadingState(itemId, null);
     }
@@ -196,30 +243,29 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
 
   const handleRemoveItem = async (itemId) => {
     try {
-      setItemLoadingState(itemId, 'removing');
-      
+      setItemLoadingState(itemId, "removing");
+
       // Cancel inline editing if this item is being edited
       if (inlineEditingItem === itemId) {
         cancelInlineEdit();
       }
-      
+
       // Remove from selected items optimistically
       const newSelected = new Set(selectedItems);
       newSelected.delete(itemId);
       setSelectedItems(newSelected);
-      
+
       const response = await suitebiteAPI.removeFromCart(itemId);
-      
+
       if (response.success) {
         onUpdateCart();
-        showNotification('success', 'Item removed from cart');
+        showNotification("success", "Item removed from cart");
       } else {
-        showNotification('error', 'Failed to remove item');
+        showNotification("error", "Failed to remove item");
       }
-      
     } catch (error) {
-      console.error('Error removing item:', error);
-      showNotification('error', 'Failed to remove item');
+      console.error("Error removing item:", error);
+      showNotification("error", "Failed to remove item");
     } finally {
       setItemLoadingState(itemId, null);
     }
@@ -236,13 +282,13 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
       if (response.success) {
         onUpdateCart();
         setSelectedItems(new Set());
-        showNotification('success', 'Cart cleared');
+        showNotification("success", "Cart cleared");
       } else {
-        showNotification('error', 'Failed to clear cart');
+        showNotification("error", "Failed to clear cart");
       }
     } catch (error) {
-      console.error('Error clearing cart:', error);
-      showNotification('error', 'Failed to clear cart');
+      console.error("Error clearing cart:", error);
+      showNotification("error", "Failed to clear cart");
     } finally {
       setIsUpdating(false);
       setShowClearCartConfirm(false);
@@ -253,43 +299,43 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
   // Inline editing functions
   const startInlineEdit = async (item) => {
     try {
-      setItemLoadingState(item.cart_item_id, 'loading');
-      
+      setItemLoadingState(item.cart_item_id, "loading");
+
       const [prodRes, varRes] = await Promise.all([
         suitebiteAPI.getProductById(item.product_id),
-        suitebiteAPI.getProductVariations(item.product_id)
+        suitebiteAPI.getProductVariations(item.product_id),
       ]);
-      
+
       if (prodRes.success && varRes.success) {
         // Build current selected options from cart item variations
         let currentOptions = {};
         if (item.variations && Array.isArray(item.variations)) {
-          item.variations.forEach(variation => {
+          item.variations.forEach((variation) => {
             if (variation.type_name && variation.option_id) {
               currentOptions[variation.type_name] = variation.option_id;
             }
           });
         }
-        
+
         // Extract variation types
         const types = new Set();
-        varRes.variations.forEach(variation => {
-          variation.options?.forEach(option => {
+        varRes.variations.forEach((variation) => {
+          variation.options?.forEach((option) => {
             types.add(option.type_name);
           });
         });
-        
+
         setInlineEditData({
           selectedOptions: currentOptions,
           availableVariations: varRes.variations,
-          variationTypes: Array.from(types)
+          variationTypes: Array.from(types),
         });
-        
+
         setInlineEditingItem(item.cart_item_id);
       }
     } catch (error) {
-      console.error('Error starting inline edit:', error);
-      showNotification('error', 'Failed to load product variations');
+      console.error("Error starting inline edit:", error);
+      showNotification("error", "Failed to load product variations");
     } finally {
       setItemLoadingState(item.cart_item_id, null);
     }
@@ -300,108 +346,120 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
     setInlineEditData({
       selectedOptions: {},
       availableVariations: [],
-      variationTypes: []
+      variationTypes: [],
     });
   };
 
   const saveInlineEdit = async (item) => {
     try {
-      setItemLoadingState(item.cart_item_id, 'updating');
-      
+      setItemLoadingState(item.cart_item_id, "updating");
+
       // Convert selected options to variations array format
       const variationsArray = [];
-      Object.entries(inlineEditData.selectedOptions).forEach(([typeName, optionId]) => {
-        // Find the variation type id from available variations
-        let variationTypeId = null;
-        for (const variation of inlineEditData.availableVariations) {
-          const option = variation.options?.find(opt => 
-            opt.type_name === typeName && opt.option_id === optionId
-          );
-          if (option) {
-            variationTypeId = option.variation_type_id;
-            break;
+      Object.entries(inlineEditData.selectedOptions).forEach(
+        ([typeName, optionId]) => {
+          // Find the variation type id from available variations
+          let variationTypeId = null;
+          for (const variation of inlineEditData.availableVariations) {
+            const option = variation.options?.find(
+              (opt) => opt.type_name === typeName && opt.option_id === optionId
+            );
+            if (option) {
+              variationTypeId = option.variation_type_id;
+              break;
+            }
+          }
+
+          if (variationTypeId) {
+            variationsArray.push({
+              variation_type_id: variationTypeId,
+              option_id: optionId,
+            });
           }
         }
-        
-        if (variationTypeId) {
-          variationsArray.push({
-            variation_type_id: variationTypeId,
-            option_id: optionId
-          });
-        }
-      });
-      
+      );
+
       const updateData = {
         quantity: item.quantity,
-        variations: variationsArray
+        variations: variationsArray,
       };
-      
-      const res = await suitebiteAPI.updateCartItem(item.cart_item_id, updateData);
+
+      const res = await suitebiteAPI.updateCartItem(
+        item.cart_item_id,
+        updateData
+      );
       if (res.success) {
         onUpdateCart();
-        showNotification('success', 'Variations updated successfully');
+        showNotification("success", "Variations updated successfully");
         cancelInlineEdit();
       } else {
-        showNotification('error', 'Failed to update variations');
+        showNotification("error", "Failed to update variations");
       }
     } catch (error) {
-      console.error('Error saving inline edit:', error);
-      showNotification('error', 'Failed to update variations');
+      console.error("Error saving inline edit:", error);
+      showNotification("error", "Failed to update variations");
     } finally {
       setItemLoadingState(item.cart_item_id, null);
     }
   };
 
   const handleInlineOptionChange = (typeName, optionId) => {
-    setInlineEditData(prev => ({
+    setInlineEditData((prev) => ({
       ...prev,
       selectedOptions: {
         ...prev.selectedOptions,
-        [typeName]: optionId
-      }
+        [typeName]: optionId,
+      },
     }));
   };
 
   const getAvailableOptionsForType = (typeName) => {
     const options = new Set();
-    inlineEditData.availableVariations.forEach(variation => {
-      variation.options?.forEach(option => {
+    inlineEditData.availableVariations.forEach((variation) => {
+      variation.options?.forEach((option) => {
         if (option.type_name === typeName) {
-          options.add(JSON.stringify({
-            id: option.option_id,
-            value: option.option_value,
-            label: option.option_label
-          }));
+          options.add(
+            JSON.stringify({
+              id: option.option_id,
+              value: option.option_value,
+              label: option.option_label,
+            })
+          );
         }
       });
     });
-    
-    return Array.from(options).map(optStr => JSON.parse(optStr));
+
+    return Array.from(options).map((optStr) => JSON.parse(optStr));
   };
 
   // Enhanced function to handle both adding new items and updating existing ones
-  const handleSaveCartEdit = async (productId, quantity, variationId, variations = []) => {
+  const handleSaveCartEdit = async (
+    productId,
+    quantity,
+    variationId,
+    variations = []
+  ) => {
     try {
-      console.log('🛒 ShoppingCart - handleSaveCartEdit called with:', {
+      console.log("🛒 ShoppingCart - handleSaveCartEdit called with:", {
         productId,
         quantity,
         variationId,
         variations,
         cartItemToEdit: cartItemToEdit?.cart_item_id,
         isAddingNew: !cartItemToEdit,
-        hasExternalOnAddToCart: !!onAddToCart
+        hasExternalOnAddToCart: !!onAddToCart,
       });
 
       // Case 1: Adding a new item to cart (no cartItemToEdit)
       if (!cartItemToEdit) {
         // If we have an external onAddToCart function, use it instead of internal logic
         if (onAddToCart) {
-          console.log('🔄 Using external onAddToCart function');
+          console.log("🔄 Using external onAddToCart function");
           await onAddToCart({
             product_id: productId,
             quantity,
             variation_id: variationId,
-            variations
+            variations,
           });
           // Clear modal states after external function handles the addition
           setCartItemToEdit(null);
@@ -415,53 +473,58 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
           product_id: productId,
           quantity,
           variations,
-          variation_id: variationId // Legacy support
+          variation_id: variationId, // Legacy support
         };
-        console.log('🆕 Adding new item to cart (internal):', cartData);
+        console.log("🆕 Adding new item to cart (internal):", cartData);
         const response = await suitebiteAPI.addToCart(cartData);
         if (response.success) {
           onUpdateCart();
-          showNotification('success', 'Item added to cart! 🛒');
+          showNotification("success", "Item added to cart! 🛒");
         } else {
-          showNotification('error', 'Failed to add item to cart');
+          showNotification("error", "Failed to add item to cart");
         }
         return;
       }
 
       // Case 2: Updating existing cart item
       const updateData = { quantity };
-      
+
       // If variations are provided (new format), use them
       if (variations && variations.length > 0) {
         updateData.variations = variations;
       }
       // Legacy support: convert variationId to new format if provided
       else if (variationId && productModalData.variations) {
-        const variation = productModalData.variations.find(v => v.variation_id === variationId);
+        const variation = productModalData.variations.find(
+          (v) => v.variation_id === variationId
+        );
         if (variation && variation.options) {
-          updateData.variations = variation.options.map(option => ({
+          updateData.variations = variation.options.map((option) => ({
             variation_type_id: option.variation_type_id,
-            option_id: option.option_id
+            option_id: option.option_id,
           }));
         }
       }
-      
-      console.log('✏️ Updating existing cart item:', {
+
+      console.log("✏️ Updating existing cart item:", {
         cartItemId: cartItemToEdit.cart_item_id,
-        updateData
+        updateData,
       });
-      
-      const res = await suitebiteAPI.updateCartItem(cartItemToEdit.cart_item_id, updateData);
+
+      const res = await suitebiteAPI.updateCartItem(
+        cartItemToEdit.cart_item_id,
+        updateData
+      );
       if (res.success) {
         onUpdateCart();
-        showNotification('success', 'Cart item updated successfully');
+        showNotification("success", "Cart item updated successfully");
       } else {
-        showNotification('error', 'Failed to update cart item');
+        showNotification("error", "Failed to update cart item");
       }
     } catch (err) {
-      console.error('Error in handleSaveCartEdit:', err);
-      const action = cartItemToEdit ? 'update' : 'add';
-      showNotification('error', `Failed to ${action} cart item`);
+      console.error("Error in handleSaveCartEdit:", err);
+      const action = cartItemToEdit ? "update" : "add";
+      showNotification("error", `Failed to ${action} cart item`);
     } finally {
       // Always clear modal states when the function completes
       setCartItemToEdit(null);
@@ -473,21 +536,24 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
 
   // Helper to format labels
   const formatLabel = (label) => {
-    if (typeof label !== 'string') return String(label ?? '');
+    if (typeof label !== "string") return String(label ?? "");
     return label
-      .replace(/_/g, ' ')
-      .replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+      .replace(/_/g, " ")
+      .replace(
+        /\w\S*/g,
+        (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+      );
   };
 
   // Helper to get label by id, with fallback
   const getOptionLabel = (optionId, fallbackLabel) => {
-    const found = variationOptions.find(opt => opt.option_id === optionId);
+    const found = variationOptions.find((opt) => opt.option_id === optionId);
     if (found && found.option_label) return formatLabel(found.option_label);
     if (fallbackLabel) return formatLabel(fallbackLabel);
     return formatLabel(optionId);
   };
   const getTypeLabel = (typeId) => {
-    const found = variationTypes.find(type => type.type_id === typeId);
+    const found = variationTypes.find((type) => type.type_id === typeId);
     return found ? formatLabel(found.type_label) : formatLabel(typeId);
   };
 
@@ -500,8 +566,12 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
         <div className="cart-header flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-2 sm:gap-3">
             <ShoppingBagIcon className="h-5 w-5 sm:h-6 sm:w-6 text-[#0097b2]" />
-            <span className="font-bold text-lg sm:text-xl text-gray-900">Shopping Cart</span>
-            <span className="ml-1 sm:ml-2 text-sm sm:text-base font-medium text-gray-500">({itemCount} items)</span>
+            <span className="font-bold text-lg sm:text-xl text-gray-900">
+              Shopping Cart
+            </span>
+            <span className="ml-1 sm:ml-2 text-sm sm:text-base font-medium text-gray-500">
+              ({itemCount} items)
+            </span>
           </div>
           <button
             onClick={onClose}
@@ -516,8 +586,12 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
           {uniqueCart.length === 0 ? (
             <div className="text-center py-6 sm:py-8">
               <ShoppingBagIcon className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-3 sm:mb-4" />
-              <h3 className="text-lg sm:text-xl font-medium text-gray-900 mb-2">Your cart is empty</h3>
-              <p className="text-sm sm:text-base text-gray-600">Add some items to get started!</p>
+              <h3 className="text-lg sm:text-xl font-medium text-gray-900 mb-2">
+                Your cart is empty
+              </h3>
+              <p className="text-sm sm:text-base text-gray-600">
+                Add some items to get started!
+              </p>
             </div>
           ) : (
             <div className="space-y-3 sm:space-y-4">
@@ -701,7 +775,8 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
               <div className="flex items-center gap-2">
                 <CheckIcon className="h-4 w-4 text-green-500" />
                 <span className="text-sm sm:text-base font-medium text-gray-700">
-                  {selectedItemsCount} item{selectedItemsCount !== 1 ? 's' : ''} selected
+                  {selectedItemsCount} item{selectedItemsCount !== 1 ? "s" : ""}{" "}
+                  selected
                 </span>
               </div>
               <span className="text-sm sm:text-base text-gray-500">
@@ -710,24 +785,35 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
             </div>
 
             {/* Heartbits Balance */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4 p-3 bg-gray-50 rounded-lg">
+            {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4 p-3 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2">
                 <HeartIcon className="h-4 w-4 text-red-500" />
-                <span className="text-sm sm:text-base font-medium text-gray-700">Your Balance:</span>
+                <span className="text-sm sm:text-base font-medium text-gray-700">
+                  Your Balance:
+                </span>
               </div>
-              <span className={`text-sm sm:text-base font-semibold ${realTimeHeartbits >= selectedItemsTotal ? 'text-green-600' : 'text-red-600'}`}>
+              <span
+                className={`text-sm sm:text-base font-semibold ${
+                  realTimeHeartbits >= selectedItemsTotal
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
                 {realTimeHeartbits} heartbits
               </span>
-            </div>
+            </div> */}
 
             {/* Affordability Indicator */}
             {realTimeHeartbits < selectedItemsTotal && (
               <div className="mb-3 sm:mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                 <div className="flex items-center gap-2 text-red-700">
-                  <span className="text-sm sm:text-base font-medium">Insufficient Balance</span>
+                  <span className="text-sm sm:text-base font-medium">
+                    Insufficient Balance
+                  </span>
                 </div>
                 <p className="text-xs sm:text-sm text-red-600 mt-1">
-                  You need {selectedItemsTotal - realTimeHeartbits} more heartbits to complete this purchase.
+                  You need {selectedItemsTotal - realTimeHeartbits} more
+                  heartbits to complete this purchase.
                 </p>
               </div>
             )}
@@ -739,9 +825,9 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
                 disabled={isUpdating}
                 className="w-full sm:flex-1 px-3 sm:px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm"
               >
-                {isUpdating ? 'Clearing...' : 'Clear Cart'}
+                {isUpdating ? "Clearing..." : "Clear Cart"}
               </button>
-              
+
               <button
                 onClick={handleCheckout}
                 disabled={!canCheckout() || isCheckingOut}
@@ -765,31 +851,35 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
 
         {/* Notification */}
         {notification.show && (
-          <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-            notification.type === 'success' 
-              ? 'bg-green-500 text-white' 
-              : 'bg-red-500 text-white'
-          }`}>
+          <div
+            className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+              notification.type === "success"
+                ? "bg-green-500 text-white"
+                : "bg-red-500 text-white"
+            }`}
+          >
             {notification.message}
           </div>
         )}
       </div>
       {/* Modal should only render when we don't have an external onAddToCart handler */}
-      {!onAddToCart && (cartItemToEdit || productModalData) && productModalData && (
-        <ProductDetailModal
-          product={productModalData}
-          isOpen={true}
-          onClose={() => {
-            setCartItemToEdit(null);
-            setProductModalData(null);
-          }}
-          onAddToCart={handleSaveCartEdit}
-          userHeartbits={realTimeHeartbits}
-          initialQuantity={modalInitialQuantity}
-          initialSelectedOptions={modalInitialOptions}
-          mode={cartItemToEdit ? 'edit' : 'add-to-cart'}
-        />
-      )}
+      {!onAddToCart &&
+        (cartItemToEdit || productModalData) &&
+        productModalData && (
+          <ProductDetailModal
+            product={productModalData}
+            isOpen={true}
+            onClose={() => {
+              setCartItemToEdit(null);
+              setProductModalData(null);
+            }}
+            onAddToCart={handleSaveCartEdit}
+            userHeartbits={realTimeHeartbits}
+            initialQuantity={modalInitialQuantity}
+            initialSelectedOptions={modalInitialOptions}
+            mode={cartItemToEdit ? "edit" : "add-to-cart"}
+          />
+        )}
 
       {/* Clear Cart Confirmation Modal */}
       <ConfirmationModal
@@ -807,16 +897,29 @@ const ShoppingCart = ({ cart, userHeartbits, onCheckout, onClose, onUpdateCart, 
 };
 
 // ConfirmationModal Component
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmText, cancelText, confirmColor = "red" }) => {
+const ConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText,
+  cancelText,
+  confirmColor = "red",
+}) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+    <div
+      className="fixed inset-0 bg-black/40 backdrop-blur z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+    >
       <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
         <div className="text-center">
           <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
           <p className="text-gray-600 mb-6">{message}</p>
-          
+
           <div className="flex gap-3 justify-center">
             <button
               onClick={onClose}
@@ -827,8 +930,8 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
             <button
               onClick={onConfirm}
               className={`px-4 py-2 text-white rounded-lg transition-colors ${
-                confirmColor === "red" 
-                  ? "bg-red-600 hover:bg-red-700" 
+                confirmColor === "red"
+                  ? "bg-red-600 hover:bg-red-700"
                   : "bg-blue-600 hover:bg-blue-700"
               }`}
             >

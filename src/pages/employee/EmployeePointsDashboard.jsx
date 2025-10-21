@@ -105,6 +105,7 @@ const PointsDashboard = () => {
   }, []);
 
   // Queries
+  //
   const { data: pointsData, isLoading: pointsLoading, error: pointsError } = useQuery({
     queryKey: ["points"],
     queryFn: pointsSystemApi.getPoints,
