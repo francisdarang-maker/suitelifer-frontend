@@ -196,10 +196,10 @@ const AdminEvents = () => {
 
   return (
     <div className="bg-white p-2">
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 me-8">
         <ContentButtons
           icon={<PlusCircleIcon className="size-5" />}
-          text="Add Event"
+          text={"Add Event"}
           handleClick={openAddModal}
         />
       </div>

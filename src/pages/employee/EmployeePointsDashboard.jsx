@@ -199,15 +199,9 @@ const PointsDashboard = () => {
   };
 
   // Early Returns
-  if (!user?.id) {
+  if (!user?.id || pointsLoading) {
     return (
       <Loading/>
-    );
-  }
-
-  if (pointsLoading) {
-    return (
-     <Loading/>
     );
   }
 
