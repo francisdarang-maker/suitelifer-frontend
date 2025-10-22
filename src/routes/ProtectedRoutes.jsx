@@ -45,7 +45,9 @@ const ProtectedRoutes = () => {
     );
   }
 
-  return user ? <Outlet /> : <Navigate to="/login" />;
+  // return user ? <Outlet /> : <Navigate to="/login" />;
+  return user ? <Outlet /> : null;
+
 };
 
 export default ProtectedRoutes;
