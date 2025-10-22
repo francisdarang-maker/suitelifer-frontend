@@ -140,7 +140,7 @@ const lastBlogRef = useCallback(
     setIsPosting(true);
     try {
       // Build title with feeling
-      let finalTitle = title.trim() || "Untitled Post";
+      let finalTitle = title.trim() || "";
 
       if (selectedFeeling) {
         finalTitle = `${finalTitle} - (feeling ${selectedFeeling.label.toLowerCase()} ${

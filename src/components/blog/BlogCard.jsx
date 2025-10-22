@@ -24,7 +24,7 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
 
   // Parse title to extract feeling
   const parseTitleAndFeeling = (title) => {
-    if (!title) return { cleanTitle: "Untitled Post", feeling: null };
+    if (!title) return { cleanTitle: "", feeling: null };
     
     // Check if title contains feeling pattern: "Title - (feeling happy 😊)"
     const feelingMatch = title.match(/^(.+?)\s*-\s*\(feeling\s+(.+?)\)$/i);
