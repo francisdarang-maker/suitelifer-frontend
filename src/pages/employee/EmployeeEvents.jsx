@@ -47,12 +47,13 @@ const EmployeeEvents = () => {
     <div className="bg-white p-4">
      
 
-      <div className="rounded-md p-4">
+      <div className="rounded-md lg:p-4">
         <EventCalendar
           events={events}
           onSelectEvent={handleEventClick}
           onSelectSlot={() => {}}
           enableDragDrop={false}
+          isEmployee={true}
         />
       </div>
 

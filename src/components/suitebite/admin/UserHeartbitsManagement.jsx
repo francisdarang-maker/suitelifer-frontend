@@ -40,6 +40,9 @@ const UserHeartbitsManagement = () => {
     type: "",
     message: "",
   });
+  const [bulkAmount, setBulkAmount] = useState("");
+  const [bulkReason, setBulkReason] = useState("");
+
 
   useEffect(() => {
     loadUsersWithHeartbits();
@@ -873,66 +876,80 @@ const UserHeartbitsManagement = () => {
 
       {/* Bulk Update Modal */}
       {showBulkUpdateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur  ">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Give Heartbits to Selected Users
-            </h3>
-            <div className="mb-4">
-              <label
-                htmlFor="bulk-amount"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Amount to Give
-              </label>
-              <input
-                id="bulk-amount"
-                type="number"
-                min="1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                placeholder="Enter amount"
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="bulk-reason"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Reason
-              </label>
-              <textarea
-                id="bulk-reason"
-                rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-                placeholder="Explain why you're giving heartbits..."
-              />
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowBulkUpdateModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  const amount = parseInt(
-                    document.getElementById("bulk-amount").value
-                  );
-                  const reason = document.getElementById("bulk-reason").value;
-                  if (amount && reason) {
-                    handleBulkGiveHeartbits(amount, reason);
-                    setShowBulkUpdateModal(false);
-                  }
-                }}
-                className="flex-1 px-4 py-2 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e]"
-              >
-                Give Heartbits
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur">
+    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        Give Heartbits to Selected Users
+      </h3>
+
+      {/* Track input states */}
+      <div className="mb-4">
+        <label
+          htmlFor="bulk-amount"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Amount to Give
+        </label>
+        <input
+          id="bulk-amount"
+          type="number"
+          min="1"
+          value={bulkAmount}
+          onChange={(e) => setBulkAmount(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+          placeholder="Enter amount"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label
+          htmlFor="bulk-reason"
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Reason
+        </label>
+        <textarea
+          id="bulk-reason"
+          rows="3"
+          value={bulkReason}
+          onChange={(e) => setBulkReason(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+          placeholder="Explain why you're giving heartbits..."
+        />
+      </div>
+
+      <div className="flex gap-3">
+        <button
+          onClick={() => setShowBulkUpdateModal(false)}
+          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+
+        <button
+          disabled={!bulkAmount || !bulkReason}
+          onClick={() => {
+            const amount = parseInt(bulkAmount);
+            if (amount && bulkReason) {
+              handleBulkGiveHeartbits(amount, bulkReason);
+              setShowBulkUpdateModal(false);
+              setBulkAmount("");
+              setBulkReason("");
+            }
+          }}
+          className={`flex-1 px-4 py-2 rounded-lg text-white transition ${
+            !bulkAmount || !bulkReason
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-[#0097b2] hover:bg-[#007a8e]"
+          }`}
+        >
+          Give Heartbits
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
