@@ -226,7 +226,7 @@ const Login = () => {
   }, []);
 
   return (
-    <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
+    // <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
       <div
         id="vanta-bg"
         className="dark max-h-screen bg-primary overflow-y-auto"
@@ -264,7 +264,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </GoogleReCaptchaProvider>
+    // </GoogleReCaptchaProvider>
   );
 };
 

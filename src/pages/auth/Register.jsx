@@ -235,7 +235,7 @@ const Form = () => {
 
 const Register = () => {
   return (
-    <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
+    // <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
       <section className="flex flex-col h-dvh px-7 py-4">
         <section>
           <img src={logo} className="w-32 h-auto" alt="Logo" />
@@ -263,7 +263,7 @@ const Register = () => {
           </p>
         </main>
       </section>
-    </GoogleReCaptchaProvider>
+    // </GoogleReCaptchaProvider>
   );
 };
 

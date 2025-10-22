@@ -539,7 +539,7 @@ const ApplicationForm = () => {
   const { id, jobPosition } = useParams();
 
   return (
-    <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
+    // <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
       <section
         className="gap-4 h-dvh"
         style={{ maxWidth: "1800px", margin: "0 auto" }}
@@ -574,7 +574,7 @@ const ApplicationForm = () => {
         <div className="h-30"></div>
         <BackToTop />
       </section>
-    </GoogleReCaptchaProvider>
+    // </GoogleReCaptchaProvider>
   );
 };
 

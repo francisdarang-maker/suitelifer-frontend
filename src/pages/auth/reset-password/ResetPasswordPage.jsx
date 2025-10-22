@@ -119,7 +119,7 @@ const ResetPasswordPage = () => {
   }, []);
 
   return (
-    <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
+    // <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
       <div
         id="vanta-bg"
         className="flex max items-center justify-center h-screen bg-primary p-6"
@@ -155,7 +155,7 @@ const ResetPasswordPage = () => {
           {step === 4 && <Step4 />}
         </div>
       </div>
-    </GoogleReCaptchaProvider>
+    // </GoogleReCaptchaProvider>
   );
 };
 
