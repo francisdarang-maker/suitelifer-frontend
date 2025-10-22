@@ -8,6 +8,7 @@ import { Link, useLocation } from "react-router-dom";
 import { toSlug } from "../../utils/slugUrl";
 import { Heart, Trash2 } from "lucide-react";
 import Loader from '../../components/loader/Loading'
+import defaultAvatar from "../../assets/images/defaultAvatar.svg";
 
 
 import api from "../../utils/axios";
@@ -425,12 +426,10 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
           <div className="flex gap-4 items-center">
             <div className="w-12 h-12 ring-2 ring-gray-100 ring-offset-2 rounded-full overflow-hidden">
               <img
-                src={blog.userPic || "/default-avatar.png"}
+                src={blog.userPic || defaultAvatar}
                 alt={blog.firstName || "User"}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = "/default-avatar.png";
-                }}
+             
               />
             </div>
             <div>
