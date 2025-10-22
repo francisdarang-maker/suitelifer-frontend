@@ -541,7 +541,7 @@ const SuitebiteShop = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide">
+      <div className="flex-1 overflow-y-auto scrollbar-hide mb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 bg-white">
           {/* Products Tab */}
           {activeTab === "products" && (

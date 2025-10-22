@@ -23,7 +23,7 @@ import Loading from "../../components/loader/Loading";
 const PointsDashboard = () => {
   const user = useStore((state) => state.user);
   const queryClient = useQueryClient();
-  
+
   const [cheerModalOpen, setCheerModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState("");
   const [cheerAmount, setCheerAmount] = useState(10);
@@ -39,12 +39,12 @@ const PointsDashboard = () => {
       const now = new Date();
       const dateObj = new Date(date);
       if (isNaN(dateObj.getTime())) return "Invalid date";
-      
+
       const diffMs = now - dateObj;
       const diffMins = Math.floor(diffMs / 60000);
       const diffHours = Math.floor(diffMs / 3600000);
       const diffDays = Math.floor(diffMs / 86400000);
-      
+
       if (diffMins < 1) return "Just now";
       if (diffMins < 60) return `${diffMins}m ago`;
       if (diffHours < 24) return `${diffHours}h ago`;
@@ -63,14 +63,16 @@ const PointsDashboard = () => {
 
     const moderationTransactions = transactions.filter((t) => {
       const isModeration = t.type === "moderation";
-      const hasModerationMessage = t.type === "notification" && t.message?.includes("moderated");
+      const hasModerationMessage =
+        t.type === "notification" && t.message?.includes("moderated");
       return isModeration || hasModerationMessage;
     });
 
     if (moderationTransactions.length === 0) return;
 
     const latestModeration = moderationTransactions[0];
-    const transactionId = latestModeration.transactionId || latestModeration.transaction_id;
+    const transactionId =
+      latestModeration.transactionId || latestModeration.transaction_id;
 
     let metadata = latestModeration.metadata;
     if (typeof metadata === "string") {
@@ -83,20 +85,29 @@ const PointsDashboard = () => {
 
     if (metadata?.dismissed === true) return;
 
-    const notificationDate = new Date(latestModeration.created_at || latestModeration.createdAt);
-    const isRecent = Date.now() - notificationDate.getTime() < 24 * 60 * 60 * 1000;
+    const notificationDate = new Date(
+      latestModeration.created_at || latestModeration.createdAt
+    );
+    const isRecent =
+      Date.now() - notificationDate.getTime() < 24 * 60 * 60 * 1000;
 
     if (!metadata?.reason && !isRecent) return;
 
     const action = metadata?.action || "moderated";
-    const actionText = 
-      action === "hidden" ? "hidden" :
-      action === "deleted" ? "deleted" :
-      action === "unhidden" ? "restored" : "moderated";
+    const actionText =
+      action === "hidden"
+        ? "hidden"
+        : action === "deleted"
+        ? "deleted"
+        : action === "unhidden"
+        ? "restored"
+        : "moderated";
 
     setModerationNotification({
       type: "moderation",
-      message: latestModeration.message || `Your cheer post has been ${actionText} by our moderation team.`,
+      message:
+        latestModeration.message ||
+        `Your cheer post has been ${actionText} by our moderation team.`,
       reason: metadata?.reason || "No reason provided",
       date: latestModeration.created_at,
       action: action,
@@ -106,7 +117,11 @@ const PointsDashboard = () => {
 
   // Queries
   //
-  const { data: pointsData, isLoading: pointsLoading, error: pointsError } = useQuery({
+  const {
+    data: pointsData,
+    isLoading: pointsLoading,
+    error: pointsError,
+  } = useQuery({
     queryKey: ["points"],
     queryFn: pointsSystemApi.getPoints,
     staleTime: 10 * 1000,
@@ -175,7 +190,11 @@ const PointsDashboard = () => {
       toast.error("Please select a user and enter a valid amount");
       return;
     }
-    cheerMutation.mutate({ recipientId: selectedUser, amount: cheerAmount, message: cheerMessage });
+    cheerMutation.mutate({
+      recipientId: selectedUser,
+      amount: cheerAmount,
+      message: cheerMessage,
+    });
   };
 
   const handlePageChange = (page) => {
@@ -189,7 +208,9 @@ const PointsDashboard = () => {
   const handleDismissNotification = async () => {
     if (moderationNotification?.transactionId) {
       try {
-        await pointsSystemApi.dismissModerationNotification(moderationNotification.transactionId);
+        await pointsSystemApi.dismissModerationNotification(
+          moderationNotification.transactionId
+        );
         queryClient.invalidateQueries(["points-history"]);
       } catch (error) {
         console.error("Failed to dismiss notification:", error);
@@ -200,15 +221,11 @@ const PointsDashboard = () => {
 
   // Early Returns
   if (!user?.id) {
-    return (
-      <Loading/>
-    );
+    return <Loading />;
   }
 
   if (pointsLoading) {
-    return (
-     <Loading/>
-    );
+    return <Loading />;
   }
 
   if (pointsError) {
@@ -216,7 +233,9 @@ const PointsDashboard = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center">
           <ExclamationTriangleIcon className="w-12 h-12 text-red-500 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-gray-900 mb-2">Error Loading Points</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-2">
+            Error Loading Points
+          </h2>
           <p className="text-sm text-gray-600 mb-4">{pointsError.message}</p>
           <button
             onClick={() => window.location.reload()}
@@ -230,14 +249,19 @@ const PointsDashboard = () => {
   }
 
   // Data Processing
-  const filteredTransactions = historyData?.data?.filter((transaction) => {
-    if (transaction.type === "moderation") return false;
-    if (transaction.type === "given") return transaction.fromUserId === user.id;
-    if (transaction.type === "received") return transaction.toUserId === user.id;
-    if (transaction.type === "admin_grant") return transaction.toUserId === user.id;
-    if (transaction.type === "admin_deduct") return transaction.toUserId === user.id;
-    return true;
-  }) || [];
+  const filteredTransactions =
+    historyData?.data?.filter((transaction) => {
+      if (transaction.type === "moderation") return false;
+      if (transaction.type === "given")
+        return transaction.fromUserId === user.id;
+      if (transaction.type === "received")
+        return transaction.toUserId === user.id;
+      if (transaction.type === "admin_grant")
+        return transaction.toUserId === user.id;
+      if (transaction.type === "admin_deduct")
+        return transaction.toUserId === user.id;
+      return true;
+    }) || [];
 
   const totalItems = historyData?.pagination?.total || 0;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -245,50 +269,71 @@ const PointsDashboard = () => {
   const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
 
   const getTransactionDisplay = (transaction) => {
-    const isAdminTransaction = ["admin_grant", "admin_added", "admin_deduct"].includes(transaction.type);
-    
+    const isAdminTransaction = [
+      "admin_grant",
+      "admin_added",
+      "admin_deduct",
+    ].includes(transaction.type);
+
     let displayDescription = transaction.description;
-    
-    if (transaction.type === "received" && displayDescription?.includes("points")) {
+
+    if (
+      transaction.type === "received" &&
+      displayDescription?.includes("points")
+    ) {
       displayDescription = displayDescription.replace("points", "Heartbits");
     }
-    
-    if (transaction.type === "received" && displayDescription?.includes("from Admin")) {
-      displayDescription = displayDescription.replace("from Admin", `from ${transaction.related_user || "Unknown"}`);
+
+    if (
+      transaction.type === "received" &&
+      displayDescription?.includes("from Admin")
+    ) {
+      displayDescription = displayDescription.replace(
+        "from Admin",
+        `from ${transaction.related_user || "Unknown"}`
+      );
     }
-    
+
     if (transaction.type === "given" && !displayDescription) {
       displayDescription = `Cheered ${transaction.amount} heartbits`;
     }
-    
+
     if (transaction.type === "received" && !displayDescription) {
       displayDescription = `Received ${transaction.amount} heartbits`;
     }
-    
+
     if (isAdminTransaction && !displayDescription) {
       if (transaction.type === "admin_deduct") {
-        displayDescription = `Deducted ${Math.abs(transaction.amount)} heartbits by Admin`;
+        displayDescription = `Deducted ${Math.abs(
+          transaction.amount
+        )} heartbits by Admin`;
       } else {
         displayDescription = `Received ${transaction.amount} heartbits from Admin`;
       }
     }
-    
-    const isNegative = ["purchase", "given", "admin_deduct"].includes(transaction.type);
-    const senderLabel = isAdminTransaction ? "Admin" : transaction.related_user || "Unknown";
-    
+
+    const isNegative = ["purchase", "given", "admin_deduct"].includes(
+      transaction.type
+    );
+    const senderLabel = isAdminTransaction
+      ? "Admin"
+      : transaction.related_user || "Unknown";
+
     return { displayDescription, isNegative, isAdminTransaction, senderLabel };
   };
 
   const renderMessageWithMedia = (message) => {
     if (!message) return null;
-    
-    const urlRegex = /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
+
+    const urlRegex =
+      /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
     const parts = message.split(urlRegex);
-    
+
     return (
       <div className="w-full p-2 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary">
         {parts.map((part, index) => {
-          const resetRegex = /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
+          const resetRegex =
+            /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
           if (resetRegex.test(part)) {
             return (
               <div key={index} className="my-1">
@@ -314,7 +359,10 @@ const PointsDashboard = () => {
             );
           }
           return part ? (
-            <p key={index} className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
+            <p
+              key={index}
+              className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
+            >
               {part}
             </p>
           ) : null;
@@ -328,9 +376,9 @@ const PointsDashboard = () => {
       <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
         {/* Moderation Notification */}
         {moderationNotification && (
-          <ModerationBanner 
-            notification={moderationNotification} 
-            onDismiss={handleDismissNotification} 
+          <ModerationBanner
+            notification={moderationNotification}
+            onDismiss={handleDismissNotification}
           />
         )}
 
@@ -340,6 +388,7 @@ const PointsDashboard = () => {
             title="Balance"
             value={pointsData?.data?.currentBalance || 0}
             label="Points"
+            // icon={<StarIconSolid />}
             icon={<StarIconSolid />}
             gradient="from-blue-50 to-blue-100"
             iconBg="bg-blue-500"
@@ -348,7 +397,10 @@ const PointsDashboard = () => {
           />
           <StatCard
             title="Heartbits"
-            value={(pointsData?.data?.monthlyCheerLimit || 100) - (pointsData?.data?.monthlyCheerUsed || 0)}
+            value={
+              (pointsData?.data?.monthlyCheerLimit || 100) -
+              (pointsData?.data?.monthlyCheerUsed || 0)
+            }
             label="Left"
             icon={<HeartIconSolid />}
             gradient="from-rose-50 to-rose-100"
@@ -383,8 +435,12 @@ const PointsDashboard = () => {
           <div className="px-5 py-3.5 border-b border-gray-200">
             <div className="flex items-center gap-2">
               <ChartBarIcon className="w-5 h-5 text-blue-600" />
-              <h2 className="text-base font-semibold text-gray-900">Recent Activity</h2>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{filteredTransactions.length}</span>
+              <h2 className="text-base font-semibold text-gray-900">
+                Recent Activity
+              </h2>
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                {filteredTransactions.length}
+              </span>
             </div>
           </div>
 
@@ -444,11 +500,24 @@ const PointsDashboard = () => {
 };
 
 // Sub-components
-const StatCard = ({ title, value, label, icon, gradient, iconBg, textColor, valueColor }) => (
-  <div className={`bg-gradient-to-br ${gradient} rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all hover:scale-105`}>
+const StatCard = ({
+  title,
+  value,
+  label,
+  icon,
+  gradient,
+  iconBg,
+  textColor,
+  valueColor,
+}) => (
+  <div
+    className={`bg-gradient-to-br ${gradient} rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all hover:scale-105`}
+  >
     <div className="flex items-center gap-2 mb-2">
-      <div className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center shadow-sm`}>
-        {React.cloneElement(icon, { className: 'w-5 h-5 text-white' })}
+      <div
+        className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center shadow-sm lg:hidden xl:inline-flex`}
+      >
+        {React.cloneElement(icon, { className: "w-5 h-5 text-white" })}
       </div>
       <p className={`text-sm font-semibold ${textColor}`}>{title}</p>
     </div>
@@ -459,52 +528,64 @@ const StatCard = ({ title, value, label, icon, gradient, iconBg, textColor, valu
 
 const ModerationBanner = ({ notification, onDismiss }) => {
   const colorClasses = {
-    hidden: { 
-      bg: "bg-amber-50", 
-      border: "border-amber-500", 
-      icon: "bg-amber-100 text-amber-600", 
-      text: "text-amber-800", 
-      subtext: "text-amber-700", 
-      reason: "text-amber-600", 
-      button: "bg-amber-500 hover:bg-amber-600" 
+    hidden: {
+      bg: "bg-amber-50",
+      border: "border-amber-500",
+      icon: "bg-amber-100 text-amber-600",
+      text: "text-amber-800",
+      subtext: "text-amber-700",
+      reason: "text-amber-600",
+      button: "bg-amber-500 hover:bg-amber-600",
     },
-    deleted: { 
-      bg: "bg-red-50", 
-      border: "border-red-500", 
-      icon: "bg-red-100 text-red-600", 
-      text: "text-red-800", 
-      subtext: "text-red-700", 
-      reason: "text-red-600", 
-      button: "bg-red-500 hover:bg-red-600" 
+    deleted: {
+      bg: "bg-red-50",
+      border: "border-red-500",
+      icon: "bg-red-100 text-red-600",
+      text: "text-red-800",
+      subtext: "text-red-700",
+      reason: "text-red-600",
+      button: "bg-red-500 hover:bg-red-600",
     },
-    default: { 
-      bg: "bg-green-50", 
-      border: "border-green-500", 
-      icon: "bg-green-100 text-green-600", 
-      text: "text-green-800", 
-      subtext: "text-green-700", 
-      reason: "text-green-600", 
-      button: "bg-green-500 hover:bg-green-600" 
-    }
+    default: {
+      bg: "bg-green-50",
+      border: "border-green-500",
+      icon: "bg-green-100 text-green-600",
+      text: "text-green-800",
+      subtext: "text-green-700",
+      reason: "text-green-600",
+      button: "bg-green-500 hover:bg-green-600",
+    },
   };
-  
+
   const colors = colorClasses[notification.action] || colorClasses.default;
-  
+
   return (
     <div className="mb-4">
-      <div className={`relative overflow-hidden rounded-lg shadow-md border-l-4 ${colors.bg} ${colors.border}`}>
+      <div
+        className={`relative overflow-hidden rounded-lg shadow-md border-l-4 ${colors.bg} ${colors.border}`}
+      >
         <div className="p-3">
           <div className="flex items-start gap-2">
-            <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${colors.icon}`}>
+            <div
+              className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${colors.icon}`}
+            >
               <ExclamationTriangleIcon className="w-4 h-4" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className={`text-xs font-bold mb-0.5 ${colors.text}`}>
-                {notification.action === "hidden" ? "Hidden Post" : notification.action === "deleted" ? "Deleted Post" : "Restored Post"}
+                {notification.action === "hidden"
+                  ? "Hidden Post"
+                  : notification.action === "deleted"
+                  ? "Deleted Post"
+                  : "Restored Post"}
               </h3>
-              <p className={`text-xs ${colors.subtext}`}>{notification.message}</p>
+              <p className={`text-xs ${colors.subtext}`}>
+                {notification.message}
+              </p>
               {notification.reason && (
-                <p className={`text-xs mt-0.5 ${colors.reason}`}>Reason: {notification.reason}</p>
+                <p className={`text-xs mt-0.5 ${colors.reason}`}>
+                  Reason: {notification.reason}
+                </p>
               )}
             </div>
             <button
@@ -520,22 +601,38 @@ const ModerationBanner = ({ notification, onDismiss }) => {
   );
 };
 
-const TransactionCard = ({ transaction, display, getUserAvatar, formatTimeAgo, renderMessageWithMedia, logoFs }) => {
-  const { displayDescription, isNegative, isAdminTransaction, senderLabel } = display;
-  
+const TransactionCard = ({
+  transaction,
+  display,
+  getUserAvatar,
+  formatTimeAgo,
+  renderMessageWithMedia,
+  logoFs,
+}) => {
+  const { displayDescription, isNegative, isAdminTransaction, senderLabel } =
+    display;
+
   return (
     <div className="border border-gray-200 rounded-lg p-3.5 hover:shadow-md transition-shadow">
       <div className="flex gap-3">
         <div className="flex-shrink-0">
           {isAdminTransaction ? (
             <div className="relative">
-              <img src={logoFs} alt="Admin" className="w-10 h-10 rounded-full object-cover border-2 border-blue-500" />
+              <img
+                src={logoFs}
+                alt="Admin"
+                className="w-10 h-10 rounded-full object-cover border-2 border-blue-500"
+              />
               <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
                 <span className="text-white text-[9px] font-bold">A</span>
               </div>
             </div>
           ) : transaction.related_user ? (
-            <img src={getUserAvatar(transaction)} alt={transaction.related_user} className="w-10 h-10 rounded-full object-cover" />
+            <img
+              src={getUserAvatar(transaction)}
+              alt={transaction.related_user}
+              className="w-10 h-10 rounded-full object-cover"
+            />
           ) : (
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
               <StarIconSolid className="w-5 h-5 text-white" />
@@ -547,32 +644,56 @@ const TransactionCard = ({ transaction, display, getUserAvatar, formatTimeAgo, r
           <div className="flex items-start justify-between gap-2 mb-1.5">
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm text-gray-900 truncate">
-                {displayDescription || transaction.type.replace("_", " ").toUpperCase()}
+                {displayDescription ||
+                  transaction.type.replace("_", " ").toUpperCase()}
               </p>
               <div className="flex items-center gap-1.5 mt-1">
                 <ClockIcon className="w-3 h-3 text-gray-400" />
-                <span className="text-xs text-gray-500">{formatTimeAgo(transaction.createdAt || transaction.created_at)}</span>
+                <span className="text-xs text-gray-500">
+                  {formatTimeAgo(
+                    transaction.createdAt || transaction.created_at
+                  )}
+                </span>
                 {transaction.related_user && !isAdminTransaction && (
                   <>
                     <span className="text-xs text-gray-400">•</span>
-                    <span className="text-xs text-gray-600">{transaction.type === "given" ? "to" : "from"} {senderLabel}</span>
+                    <span className="text-xs text-gray-600">
+                      {transaction.type === "given" ? "to" : "from"}{" "}
+                      {senderLabel}
+                    </span>
                   </>
                 )}
                 {isAdminTransaction && (
                   <>
                     <span className="text-xs text-gray-400">•</span>
-                    <span className="text-xs font-medium text-blue-600">from Admin</span>
+                    <span className="text-xs font-medium text-blue-600">
+                      from Admin
+                    </span>
                   </>
                 )}
               </div>
             </div>
-            <span className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-bold ${isNegative ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
-              {isNegative ? "-" : "+"}{transaction.amount}{["received", "given"].includes(transaction.type) ? " bits" : " pts"}
+            <span
+              className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-bold ${
+                isNegative
+                  ? "bg-red-100 text-red-700"
+                  : "bg-green-100 text-green-700"
+              }`}
+            >
+              {isNegative ? "-" : "+"}
+              {transaction.amount}
+              {["received", "given"].includes(transaction.type)
+                ? " bits"
+                : " pts"}
             </span>
           </div>
 
-          {(isAdminTransaction || (["received", "given"].includes(transaction.type) && transaction.message)) && (
-            <div className="mt-2">{renderMessageWithMedia(transaction.message)}</div>
+          {(isAdminTransaction ||
+            (["received", "given"].includes(transaction.type) &&
+              transaction.message)) && (
+            <div className="mt-2">
+              {renderMessageWithMedia(transaction.message)}
+            </div>
           )}
         </div>
       </div>
@@ -590,15 +711,26 @@ const LoadingState = () => (
 const EmptyState = () => (
   <div className="text-center py-12">
     <ChartBarIcon className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-    <h3 className="text-base font-medium text-gray-900 mb-1">No recent activity</h3>
+    <h3 className="text-base font-medium text-gray-900 mb-1">
+      No recent activity
+    </h3>
     <p className="text-xs text-gray-500">Your transactions will appear here</p>
   </div>
 );
 
-const Pagination = ({ currentPage, totalPages, startIndex, endIndex, totalItems, onPageChange }) => (
+const Pagination = ({
+  currentPage,
+  totalPages,
+  startIndex,
+  endIndex,
+  totalItems,
+  onPageChange,
+}) => (
   <div className="px-4 py-2.5 border-t border-gray-200">
     <div className="flex items-center justify-between">
-      <p className="text-xs text-gray-700">Showing {startIndex}-{endIndex} of {totalItems}</p>
+      <p className="text-xs text-gray-700">
+        Showing {startIndex}-{endIndex} of {totalItems}
+      </p>
       <div className="flex items-center gap-1">
         <button
           onClick={() => onPageChange(currentPage - 1)}
@@ -612,7 +744,8 @@ const Pagination = ({ currentPage, totalPages, startIndex, endIndex, totalItems,
             let pageNum;
             if (totalPages <= 5) pageNum = i + 1;
             else if (currentPage <= 3) pageNum = i + 1;
-            else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+            else if (currentPage >= totalPages - 2)
+              pageNum = totalPages - 4 + i;
             else pageNum = currentPage - 2 + i;
 
             return (
@@ -620,7 +753,9 @@ const Pagination = ({ currentPage, totalPages, startIndex, endIndex, totalItems,
                 key={pageNum}
                 onClick={() => onPageChange(pageNum)}
                 className={`w-7 h-7 text-xs font-medium rounded-md transition-colors ${
-                  currentPage === pageNum ? "bg-blue-500 text-white" : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                  currentPage === pageNum
+                    ? "bg-blue-500 text-white"
+                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                 }`}
               >
                 {pageNum}
@@ -640,7 +775,19 @@ const Pagination = ({ currentPage, totalPages, startIndex, endIndex, totalItems,
   </div>
 );
 
-const CheerModal = ({ selectedUser, setSelectedUser, cheerAmount, setCheerAmount, cheerMessage, setCheerMessage, usersData, pointsData, onSubmit, onClose, isSubmitting }) => (
+const CheerModal = ({
+  selectedUser,
+  setSelectedUser,
+  cheerAmount,
+  setCheerAmount,
+  cheerMessage,
+  setCheerMessage,
+  usersData,
+  pointsData,
+  onSubmit,
+  onClose,
+  isSubmitting,
+}) => (
   <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
       <div className="px-5 py-3 border-b border-gray-200">
@@ -651,7 +798,10 @@ const CheerModal = ({ selectedUser, setSelectedUser, cheerAmount, setCheerAmount
             </div>
             <h3 className="text-lg font-bold text-gray-900">Send Heartbits</h3>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+          <button
+            onClick={onClose}
+            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+          >
             <XMarkIcon className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -659,7 +809,9 @@ const CheerModal = ({ selectedUser, setSelectedUser, cheerAmount, setCheerAmount
 
       <form onSubmit={onSubmit} className="p-5 space-y-3">
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1.5">Select User</label>
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+            Select User
+          </label>
           <select
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
@@ -667,16 +819,23 @@ const CheerModal = ({ selectedUser, setSelectedUser, cheerAmount, setCheerAmount
             required
           >
             <option value="">Choose a user...</option>
-            {Array.isArray(usersData) && usersData.map((user) => (
-              <option key={user.id} value={user.id}>{user.first_name} {user.last_name}</option>
-            ))}
+            {Array.isArray(usersData) &&
+              usersData.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.first_name} {user.last_name}
+                </option>
+              ))}
           </select>
         </div>
 
         <div>
           <div className="flex justify-between items-center mb-1.5">
-            <label className="text-xs font-semibold text-gray-700">Amount (Points)</label>
-            <span className="text-xl font-bold text-blue-600">{cheerAmount}</span>
+            <label className="text-xs font-semibold text-gray-700">
+              Amount (Points)
+            </label>
+            <span className="text-xl font-bold text-blue-600">
+              {cheerAmount}
+            </span>
           </div>
           <input
             type="range"
@@ -693,7 +852,9 @@ const CheerModal = ({ selectedUser, setSelectedUser, cheerAmount, setCheerAmount
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1.5">Message (Optional)</label>
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+            Message (Optional)
+          </label>
           <textarea
             value={cheerMessage}
             onChange={(e) => setCheerMessage(e.target.value)}
