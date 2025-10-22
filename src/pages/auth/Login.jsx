@@ -34,10 +34,10 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!executeRecaptcha) {
-      toast.error("reCAPTCHA is not ready.");
-      return;
-    }
+    // if (!executeRecaptcha) {
+    //   toast.error("reCAPTCHA is not ready.");
+    //   return;
+    // }
 
     if (!email || !password) {
       toast.error("Please enter both email and password.");
@@ -46,7 +46,7 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
 
     try {
       setLoading(true);
-      const recaptchaToken = await executeRecaptcha("login");
+      // const recaptchaToken = await executeRecaptcha("login");
       //TODO: check first if exists in HRIS
       console.log("nakapasok hereee ");
 
@@ -59,7 +59,7 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
       if (token) {
         const response = await api.post("/api/login", {
           email,
-          recaptchaToken,
+          // recaptchaToken,
         });
 
         const user = await getUserFromCookie();
