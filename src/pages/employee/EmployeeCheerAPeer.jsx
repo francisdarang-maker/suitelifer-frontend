@@ -542,7 +542,7 @@ const CheerPage = () => {
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200"
                         >
                           <img
-                            src={user.avatar || "/images/default-avatar.png"}
+                            src={user.avatar ||defaultAvatar}
                             alt={user.name}
                             className="w-5 h-5 rounded-full"
                           />
@@ -597,7 +597,7 @@ const CheerPage = () => {
                             >
                               <img
                                 src={
-                                  result.avatar || "/images/default-avatar.png"
+                                  result.avatar || defaultAvatar
                                 }
                                 alt={result.name}
                                 className="w-10 h-10 rounded-full"
@@ -775,7 +775,7 @@ const CheerPage = () => {
                     <img
                       src={
                         currentUserLeaderboard.info?.avatar ||
-                        "/images/default-avatar.png"
+                        defaultAvatar
                       }
                       alt={currentUserLeaderboard.info?.name}
                       className="w-8 h-8 rounded-full"
@@ -823,7 +823,7 @@ const CheerPage = () => {
                           {entry.rank}
                         </div>
                         <img
-                          src={entry.avatar || "/images/default-avatar.png"}
+                          src={entry.avatar || defaultAvatar}
                           alt={entry.name || entry.userName}
                           className="w-8 h-8 rounded-full"
                         />
@@ -914,7 +914,7 @@ const CheerPage = () => {
                           <img
                             src={
                               cheer.fromUser?.avatar ||
-                              "/images/default-avatar.png"
+                             defaultAvatar
                             }
                             alt={cheer.fromUser?.name}
                             className="w-10 h-10 rounded-full flex-shrink-0"
@@ -1130,7 +1130,7 @@ const CheerPage = () => {
                                                       src={
                                                         comment.fromUser
                                                           ?.avatar ||
-                                                        "/images/default-avatar.png"
+                                                      defaultAvatar
                                                       }
                                                       alt={
                                                         comment.fromUser

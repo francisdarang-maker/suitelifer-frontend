@@ -744,7 +744,7 @@ const UserHeartbitsManagement = () => {
                     {/* Avatar */}
                     <div className="relative">
                       <img
-                        src={user.avatar || "/default-avatar.png"}
+                        src={user.avatar || defaultAvatar}
                         alt={`${user.first_name || ""} ${user.last_name || ""}`.trim()}
                         className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-100"
                       />
