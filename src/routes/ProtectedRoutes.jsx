@@ -13,12 +13,12 @@ const ProtectedRoutes = () => {
     try {
       let user = await getUserFromCookie();
 
-      if (!user) {
-        const newToken = await refreshToken();
-        if (newToken) {
-          user = await getUserFromCookie();
-        }
-      }
+      // if (!user) {
+      //   const newToken = await refreshToken();
+      //   if (newToken) {
+      //     user = await getUserFromCookie();
+      //   }
+      // }
 
       if (user) {
         setUser(user);
