@@ -13,12 +13,12 @@ const ProtectedRoutes = () => {
     try {
       let user = await getUserFromCookie();
 
-      // if (!user) {
-      //   const newToken = await refreshToken();
-      //   if (newToken) {
-      //     user = await getUserFromCookie();
-      //   }
-      // }
+      if (!user) {
+        const newToken = await refreshToken();
+        if (newToken) {
+          user = await getUserFromCookie();
+        }
+      }
 
       if (user) {
         setUser(user);
@@ -45,9 +45,7 @@ const ProtectedRoutes = () => {
     );
   }
 
-  // return user ? <Outlet /> : <Navigate to="/login" />;
-  return user ? <Outlet /> : null;
-
+  return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default ProtectedRoutes;
