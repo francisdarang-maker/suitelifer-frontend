@@ -48,15 +48,15 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
       setLoading(true);
       // const recaptchaToken = await executeRecaptcha("login");
       //TODO: check first if exists in HRIS
-      console.log("nakapasok hereee ");
+      // console.log("nakapasok hereee ");
 
-      const { token } = await loginUser({ email, password });
-      localStorage.setItem("hris-token", token);
+      // const { token } = await loginUser({ email, password });
+      // localStorage.setItem("hris-token", token);
 
-      console.log("hris-token: ", token);
+      // console.log("hris-token: ", token);
 
       //then proceed if yes...
-      if (token) {
+      // if (token) {
         const response = await api.post("/api/login", {
           email,
           // recaptchaToken,
@@ -77,7 +77,7 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
         } else {
           toast.error("Login failed. Please check your credentials.");
         }
-      }
+      // }
     } catch (error) {
       setLoading(false);
       if (error.response?.status === 400) {
