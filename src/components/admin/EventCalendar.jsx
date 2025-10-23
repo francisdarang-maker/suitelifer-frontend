@@ -23,7 +23,6 @@ const EventCalendar = ({
   events = [],
   onSelectSlot,
   onSelectEvent,
-  enableDragDrop = true,
   isEmployee = false
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -81,18 +80,6 @@ const EventCalendar = ({
   const toggleAllFilters = () => {
     const allActive = Object.values(activeFilters).every(Boolean);
     setActiveFilters(Object.fromEntries(Object.keys(activeFilters).map((k) => [k, !allActive])));
-  };
-
-  // Drag and drop
-  const handleDragStart = (c) => setDraggedCategory(c);
-  const handleDragEnd = () => setDraggedCategory(null);
-  const handleDateDrop = (date) => {
-    if (!draggedCategory) return;
-    const start = new Date(date);
-    start.setHours(9, 0, 0, 0);
-    const end = new Date(start.getTime() + 60 * 60 * 1000);
-    onSelectSlot({ start, end, category: draggedCategory });
-    setDraggedCategory(null);
   };
 
   // Google Drive fetch
@@ -265,10 +252,6 @@ const EventCalendar = ({
           activeFilters={activeFilters}
           toggleFilter={toggleFilter}
           toggleAllFilters={toggleAllFilters}
-          onDragStart={enableDragDrop ? handleDragStart : undefined}
-          onDragEnd={enableDragDrop ? handleDragEnd : undefined}
-          draggedCategory={draggedCategory}
-          enableDragDrop={enableDragDrop}
         />
       </div>
     </div>

@@ -312,6 +312,7 @@ import { EmployeeDetailsProvider } from "./pages/employee/context/EmployeeDetail
 import Logout from "./pages/auth/Logout";
 import BlogDetails from "./components/blog/guest/BlogDetails";
 import BlogsPage from "./pages/guest/Blogs";
+import EventSummary from "./components/admin/EventSummary";
 
 const queryClient = new QueryClient();
 function App() {
@@ -369,7 +370,9 @@ function App() {
                   </EmployeeDetailsProvider>
                 }
               />
-              <Route path="blogs-feed" element={<EmployeeBlogsFeed />} />
+              <Route path="blogs-feed" element={<EmployeeDetailsProvider>
+                                                  <EmployeeBlogsFeed />
+                                                </EmployeeDetailsProvider>} />
               <Route path="blogs-feed/blog/:id/:slug" element={<BlogView />} />
               <Route path="my-blogs" element={<EmployeeMyBlogs />} />
               <Route path="my-blogs/blog/:id/:slug" element={<BlogView />} />
@@ -378,6 +381,7 @@ function App() {
               <Route path="points" element={<EmployeePointsDashboard />} />
               <Route path="threads" element={<EmployeeThreads />} />
               <Route path="company-events" element={<EmployeeEvents />} />
+              <Route path="weekly-event" element={<EventSummary/>}/>
               <Route path="courses" element={<EmployeeWorkshops />} />
               <Route
                 path="personality-test"

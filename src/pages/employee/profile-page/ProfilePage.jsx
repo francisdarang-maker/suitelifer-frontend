@@ -34,7 +34,6 @@ import sessionTimeout from "../../../assets/images/session-timeout.webp";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("personal");
-  // const [loading, setLoading] = useState(true);
   const [activeModal, setActiveModal] = useState(null);
   const userLoggedIn = useStore((state) => state.user);
   const setUser = useStore((state) => state.setUser);

@@ -1,6 +1,6 @@
 import React from "react";
 import moment from "moment-timezone";
-
+import DefaultAvatar from "../../assets/images/defaultAvatar.svg"
 const BlogComment = ({
   commentId,
   userPic,
@@ -31,7 +31,7 @@ const BlogComment = ({
       <section className="flex flex-row gap-4">
         <div className="w-12 h-12">
           <img
-            src={userPic}
+            src={userPic || DefaultAvatar}
             alt={firstName}
             className="w-full h-full object-cover rounded-full"
           />

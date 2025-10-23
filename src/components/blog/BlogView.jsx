@@ -19,6 +19,7 @@ import Carousel from "../cms/Carousel";
 import api from "../../utils/axios";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import defaultAvatar from "../../assets/images/defaultAvatar.svg";
 
 const BlogView = () => {
   const { id } = useParams();
@@ -32,9 +33,10 @@ const BlogView = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [onComment, onCommentChange] = useState("");
   const [isSubmitComment, setIsSubmitComment] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
-  const [sortOrder, setSortOrder] = useState("newest"); // 'newest' or 'oldest'
-  const [currentUserId, setCurrentUserId] = useState(null); // Set this from your auth context
+  const [sortOrder, setSortOrder] = useState("newest"); 
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [isMobile, setIsMobile] = useState(false); 
+
 
   const fetchBlog = async () => {
     setIsLoading(true);
@@ -48,6 +50,8 @@ const BlogView = () => {
       setIsLoading(false);
     }
   };
+
+  
 
   const handleHeartClick = async () => {
     const newState = !isHeart;
@@ -70,25 +74,6 @@ const BlogView = () => {
     }
   };
 
-  const handleSaveClick = async () => {
-    const newState = !isSaved;
-    setIsSaved(newState);
-
-    try {
-      if (newState) {
-        await api.post(`/api/${blog.eblogId}/save`);
-        toast.success("Post saved!");
-      } else {
-        await api.delete(`/api/${blog.eblogId}/save`);
-        toast.success("Post unsaved");
-      }
-    } catch (err) {
-      console.error("Error toggling save:", err);
-      toast.error("Failed to save post");
-      setIsSaved(!newState);
-    }
-  };
-
   const handleShareClick = async () => {
     try {
       if (navigator.share) {
@@ -103,36 +88,6 @@ const BlogView = () => {
       }
     } catch (err) {
       console.error("Error sharing:", err);
-    }
-  };
-
-  const handleEditBlog = () => {
-    navigate(`/blog/edit/${blog.eblogId}`);
-  };
-
-  const handleDeleteBlog = async () => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      try {
-        await api.delete(`/api/employee-blog/${blog.eblogId}`);
-        toast.success("Post deleted successfully");
-        navigate(-1);
-      } catch (err) {
-        console.error("Error deleting blog:", err);
-        toast.error("Failed to delete post");
-      }
-    }
-  };
-
-  const handleReportBlog = async () => {
-    if (window.confirm("Do you want to report this post?")) {
-      try {
-        await api.post(`/api/employee-blog/${blog.eblogId}/report`);
-        toast.success("Post reported successfully");
-        setShowMenu(false);
-      } catch (err) {
-        console.error("Error reporting blog:", err);
-        toast.error("Failed to report post");
-      }
     }
   };
 
@@ -279,6 +234,13 @@ const BlogView = () => {
     }
   }, [blog?.eblogId]);
 
+  useEffect(() => {
+    const checkScreenSize = () => setIsMobile(window.innerWidth < 640); 
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   if (isLoading || !blog) return <Loader />;
 
   const isOwner = currentUserId === blog.userId;
@@ -294,53 +256,6 @@ const BlogView = () => {
           <ArrowLeftIcon className="w-5 h-5 text-primary" />
           <span className="font-semibold text-primary">Back</span>
         </button>
-
-        {/* More Options Menu */}
-        <div className="relative">
-          <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="p-2 rounded-full hover:bg-gray-100 transition-all"
-          >
-            <MoreHorizontal className="w-6 h-6 text-gray-600" />
-          </button>
-
-          {showMenu && (
-            <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowMenu(false)}
-              />
-              <div className="absolute right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 py-1 min-w-[180px] z-50">
-                {isOwner ? (
-                  <>
-                    <button
-                      onClick={handleEditBlog}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-all"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                      Edit Post
-                    </button>
-                    <button
-                      onClick={handleDeleteBlog}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-all"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete Post
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={handleReportBlog}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition-all"
-                  >
-                    <Flag className="w-4 h-4" />
-                    Report Post
-                  </button>
-                )}
-              </div>
-            </>
-          )}
-        </div>
       </div>
 
       {/* Blog Post Card */}
@@ -350,7 +265,7 @@ const BlogView = () => {
           <img
             src={
               blog.userPic ||
-              "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+              defaultAvatar
             }
             alt={blog.firstName}
             className="w-12 h-12 object-cover rounded-full ring-2 ring-gray-100"
@@ -408,7 +323,7 @@ const BlogView = () => {
             ) : (
               <Heart className="w-6 h-6" />
             )}
-            <span className="text-sm font-semibold">Like</span>
+            <span className="hidden sm:inline text-sm font-semibold">Like</span>
           </button>
 
           <button
@@ -416,7 +331,7 @@ const BlogView = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all text-gray-600"
           >
             <MessageCircle className="w-6 h-6" />
-            <span className="text-sm font-semibold">Comment</span>
+            <span className=" hidden sm:inline text-sm font-semibold">Comment</span>
           </button>
 
           <button
@@ -424,64 +339,98 @@ const BlogView = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all text-gray-600"
           >
             <Share2 className="w-6 h-6" />
-            <span className="text-sm font-semibold">Share</span>
+            <span className="hidden sm:inline text-sm font-semibold">Share</span>
           </button>
-
-          {/* <button
-            onClick={handleSaveClick}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all ${
-              isSaved ? "text-blue-600" : "text-gray-600"
-            }`}
-          >
-            {isSaved ? (
-              <BookmarkCheck className="w-6 h-6" />
-            ) : (
-              <Bookmark className="w-6 h-6" />
-            )}
-            <span className="text-sm font-semibold">Save</span>
-          </button> */}
         </div>
 
-        {/* Comment Input */}
-        <div className="p-4 flex items-start gap-3 bg-gray-50">
-          <img
-            src={
-              blog.userPic ||
-              "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-            }
-            alt="Your avatar"
-            className="w-10 h-10 object-cover rounded-full ring-2 ring-gray-100"
+
+
+    <div className="p-3 sm:p-4 flex items-start gap-3 bg-gray-50 rounded-b-lg">
+      {/* Avatar */}
+      <img
+        src={blog.userPic || defaultAvatar}
+        alt="Your avatar"
+        className="w-9 h-9 sm:w-10 sm:h-10 object-cover rounded-full ring-2 ring-gray-100 flex-shrink-0"
+      />
+
+      {/* Comment Section */}
+      <div className="flex-1 relative flex flex-col sm:flex-row sm:items-center gap-2">
+        {/* Textarea */}
+        <div
+          className="
+            flex items-end w-full 
+            bg-white border border-gray-300 
+            rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent
+          "
+        >
+          <textarea
+            id="comment-input"
+            value={onComment}
+            disabled={isSubmitComment}
+            className="
+              flex-1 px-3 py-2.5 
+              rounded-lg focus:outline-none
+              resize-none text-sm sm:text-base
+              bg-transparent
+            "
+            placeholder="Write a comment..."
+            onChange={(e) => onCommentChange(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleCommentSubmit();
+              }
+            }}
+            rows={1}
+            style={{ minHeight: "44px", maxHeight: "120px" }}
           />
-          <div className="flex-1 flex gap-2">
-            <textarea
-              id="comment-input"
-              value={onComment}
-              disabled={isSubmitComment}
-              className="flex-1 px-4 py-3 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-              placeholder="Write a comment..."
-              onChange={(e) => onCommentChange(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleCommentSubmit();
-                }
-              }}
-              rows={1}
-              style={{ minHeight: "44px", maxHeight: "120px" }}
-            />
+
+          {/* Send icon (inside input for mobile) */}
+          {isMobile && (
             <button
               onClick={handleCommentSubmit}
               disabled={isSubmitComment || !onComment.trim()}
-              className="px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
+              className="
+                p-2 m-1
+                bg-primary text-white 
+                 transition-all 
+                disabled:cursor-not-allowed
+                bg-white
+                flex items-center justify-center
+              "
             >
               {isSubmitComment ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <Send className="w-5 h-5" />
+                <Send className="w-4 h-4 text-primary" />
               )}
             </button>
-          </div>
+          )}
         </div>
+
+        {/* Desktop Send Button */}
+        {!isMobile && (
+          <button
+            onClick={handleCommentSubmit}
+            disabled={isSubmitComment || !onComment.trim()}
+            className="
+              px-4 py-3 
+              bg-primary text-white 
+              rounded-lg hover:bg-primary/90 transition-all 
+              disabled:bg-gray-300 disabled:cursor-not-allowed 
+              flex items-center justify-center
+            "
+          >
+            {isSubmitComment ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+          </button>
+        )}
+      </div>
+    </div>
+
       </div>
 
       {/* Comments Section */}
@@ -501,8 +450,8 @@ const BlogView = () => {
 
         <div className="divide-y divide-gray-200">
           {comments.length > 0 ? (
-            comments.map((comment) => (
-              <div key={comment.id} className="p-4">
+            comments.map((comment, key) => (
+              <div key={key} className="p-4">
                 <BlogComment
                   {...comment}
                   currentUserId={currentUserId}

@@ -1,11 +1,15 @@
 import BlogCard from "../../components/blog/BlogCard";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams, useNavigate } from "react-router-dom";
 import { TicketIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import api from "../../utils/axios";
-import { useEffect, useState, useRef, useCallback } from "react";
-import { RefreshCcw, ImagePlus, X, Smile, MapPin, Users } from "lucide-react";
+import { useEffect, useState, useRef, useCallback, useContext } from "react";
+import { RefreshCcw, ImagePlus, X, Smile, Users } from "lucide-react";
 import Loader from "../../components/loader/Loading";
 import toast from "react-hot-toast";
+import { useStore } from "../../store/authStore";
+
+import DefaultAvatar from '../../assets/images/defaultAvatar.svg'
+import moment from "moment";
 
 const EmployeeBlogsFeed = () => {
   const { id } = useParams();
@@ -22,10 +26,13 @@ const EmployeeBlogsFeed = () => {
   const fileInputRef = useRef(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [events, setEvents] = useState([]);
+  const navigate = useNavigate();
 
   const observer = useRef()
 
-
+  const userLoggedIn = useStore((state) => state.user);
+  
   // Feelings data
   const feelings = [
     { id: 1, name: "happy", emoji: "😊", label: "Happy" },
@@ -205,6 +212,43 @@ const lastBlogRef = useCallback(
     }
   };
 
+  // Fetch & adjust events
+  const fetchEvents = async () => {
+    try {
+      const localTimeZone = moment.tz.guess();
+      const response = await api.get("/api/events");
+      const adjustedEvents = response.data.events.map((event) => ({
+        ...event,
+        start: moment(event.start).utc(true).tz(localTimeZone).toDate(),
+        end: moment(event.end).utc(true).tz(localTimeZone).toDate(),
+      }));
+      setEvents(adjustedEvents);
+    } catch (err) {
+      console.error("Failed to fetch events:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  // Filter current week events
+  const getWeeklyEvents = () => {
+    const startOfWeek = moment().startOf("week");
+    const endOfWeek = moment().endOf("week");
+
+    return events.filter((e) => {
+      const eventStart = moment(e.start);
+      return eventStart.isBetween(startOfWeek, endOfWeek, "day", "[]");
+    });
+  };
+
+  const weeklyEvents = getWeeklyEvents();
+
+  const handleEventClick = () => {
+    navigate("/app/weekly-event", { state: { events: weeklyEvents } });
+  };
+
   return (
     <section className="min-h-screen bg-white mb-2 mt-10 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
       {id ? (
@@ -212,16 +256,21 @@ const lastBlogRef = useCallback(
       ) : (
         <>
           {/* Info banner */}
-          <div className="bg-primary rounded-md p-3 flex justify-between mb-5 lg:hidden ">
-            <div className="flex gap-2">
-              <TicketIcon className="w-5 h-5 text-white" />
-              <span className="text-white text-sm">3 events today</span>
+           <div
+              className="bg-primary rounded-md p-3 flex justify-between mb-5 lg:hidden"
+              onClick={handleEventClick}
+            >
+              <div className="flex gap-2">
+                <TicketIcon className="w-5 h-5 text-white" />
+                <span className="text-white text-sm">
+                  {weeklyEvents.length} {weeklyEvents.length === 1 ? "event" : "events"} this week
+                </span>
+              </div>
+              <div className="flex gap-1 items-center">
+                <span className="text-white text-xss">See all</span>
+                <ChevronRightIcon className="w-3 h-3 text-white" />
+              </div>
             </div>
-            <div className="flex gap-1 items-center">
-              <span className="text-white text-xss">See all</span>
-              <ChevronRightIcon className="w-3 h-3 text-white" />
-            </div>
-          </div>
 
           {/* Create Post Section - Facebook Style */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-4 overflow-hidden">
@@ -230,7 +279,7 @@ const lastBlogRef = useCallback(
               <div className="p-4 ">
                 <div className="flex gap-3 items-center">
                   <img
-                    src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                    src={userLoggedIn?.profile_pic ?? DefaultAvatar }
                     alt="User Avatar"
                     className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-100"
                   />
@@ -295,24 +344,15 @@ const lastBlogRef = useCallback(
                   {/* User Info */}
                   <div className="flex items-center gap-3 px-4 pt-4">
                     <img
-                      src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                      src={userLoggedIn?.profile_pic ?? DefaultAvatar }
                       alt="User Avatar"
                       className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-100"
                     />
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-sm font-semibold text-gray-800">
-                          Your Name
+                          { `${ userLoggedIn.first_name} ${userLoggedIn.last_name}`}
                         </p>
-                        {selectedFeeling && (
-                          <span className="text-sm text-gray-600">
-                            is feeling{" "}
-                            <span className="font-semibold">
-                              {selectedFeeling.label.toLowerCase()}
-                            </span>{" "}
-                            {selectedFeeling.emoji}
-                          </span>
-                        )}
                       </div>
                       <div className="flex items-center gap-1 bg-gray-200 rounded px-2 py-0.5 w-fit mt-1">
                         <Users className="w-3 h-3 text-gray-600" />
@@ -345,8 +385,9 @@ const lastBlogRef = useCallback(
                     {/* Title Input */}
                     <input
                       type="text"
-                      placeholder="Add a title (optional)"
+                      placeholder="Add a title"
                       value={title}
+                      required
                       onChange={(e) => setTitle(e.target.value)}
                       className="w-full text-base font-medium text-gray-800 placeholder-gray-400 border-none outline-none mb-2"
                     />
@@ -399,7 +440,12 @@ const lastBlogRef = useCallback(
                               <button
                                 type="button"
                                 onClick={() => removeFile(idx)}
-                                className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-all opacity-0 group-hover:opacity-100"
+                                  className="
+                                    absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-lg 
+                                    transition-all 
+                                    opacity-100 sm:opacity-0 sm:group-hover:opacity-100 
+                                    hover:bg-gray-100
+                                  "
                               >
                                 <X className="w-4 h-4 text-gray-700" />
                               </button>
@@ -452,13 +498,6 @@ const lastBlogRef = useCallback(
                         >
                           <Smile className="w-5 h-5 text-yellow-500 group-hover:scale-110 transition-transform" />
                         </button>
-                        <button
-                          type="button"
-                          className="p-2 rounded-full hover:bg-gray-100 transition-all group"
-                          title="Check in"
-                        >
-                          <MapPin className="w-5 h-5 text-red-500 group-hover:scale-110 transition-transform" />
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -478,10 +517,10 @@ const lastBlogRef = useCallback(
                     <button
                       type="submit"
                       disabled={
-                        isPosting || (!description.trim() && files.length === 0)
+                        isPosting || !description.trim() || !title.trim() && files.length === 0
                       }
                       className={`w-full py-2.5 rounded-lg font-semibold text-sm transition-all ${
-                        isPosting || (!description.trim() && files.length === 0)
+                        isPosting || !description.trim() || !title.trim() && files.length === 0
                           ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                           : "bg-primary text-white hover:bg-primary/90"
                       }`}
@@ -492,50 +531,60 @@ const lastBlogRef = useCallback(
                 </form>
 
                 {/* Feeling Picker Modal - Outside form */}
-                {showFeelingPicker && (
-                  <>
-                    {/* Backdrop */}
-                    <div
-                      className="fixed inset-0 bg-black/30 z-40"
-                      onClick={() => setShowFeelingPicker(false)}
-                    />
+{showFeelingPicker && (
+  <>
+    {/* Backdrop */}
+    <div
+      className="fixed inset-0 bg-black/30 z-40"
+      onClick={() => setShowFeelingPicker(false)}
+    />
 
-                    {/* Modal - Fixed Position */}
-                    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[500px] overflow-hidden mx-4">
-                      <div className="p-4 border-b border-gray-200 bg-white">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-lg font-semibold text-gray-800">
-                            How are you feeling?
-                          </h4>
-                          <button
-                            type="button"
-                            onClick={() => setShowFeelingPicker(false)}
-                            className="p-1 hover:bg-gray-100 rounded-full transition-all"
-                          >
-                            <X className="w-5 h-5 text-gray-500" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="p-3 max-h-[400px] overflow-y-auto">
-                        <div className="grid grid-cols-2 gap-2">
-                          {feelings.map((feeling) => (
-                            <button
-                              key={feeling.id}
-                              type="button"
-                              onClick={() => handleFeelingSelect(feeling)}
-                              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-all text-left border border-transparent hover:border-gray-300"
-                            >
-                              <span className="text-2xl">{feeling.emoji}</span>
-                              <span className="text-sm font-medium text-gray-700">
-                                {feeling.label}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
+    {/* Modal */}
+    <div
+      className="
+        fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+        w-[90%] sm:w-[85%] md:w-[60%] lg:w-[40%] xl:w-[30%]
+        bg-white rounded-2xl shadow-2xl border border-gray-200
+        z-50 overflow-hidden
+        p-4
+      "
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-3">
+        <h4 className="text-lg font-semibold text-gray-800">
+          How are you feeling?
+        </h4>
+        <button
+          type="button"
+          onClick={() => setShowFeelingPicker(false)}
+          className="p-1 hover:bg-gray-100 rounded-full transition-all"
+        >
+          <X className="w-5 h-5 text-gray-500" />
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="overflow-y-auto max-h-[65vh] pr-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {feelings.map((feeling) => (
+            <button
+              key={feeling.id}
+              type="button"
+              onClick={() => handleFeelingSelect(feeling)}
+              className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition-all text-left border border-transparent hover:border-gray-300"
+            >
+              <span className="text-2xl">{feeling.emoji}</span>
+              <span className="text-sm font-medium text-gray-700">
+                {feeling.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  </>
+)}
+
               </div>
             )}
           </div>

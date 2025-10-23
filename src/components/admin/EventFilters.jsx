@@ -5,10 +5,6 @@ export default function EventFilter({
   activeFilters,
   toggleFilter,
   toggleAllFilters,
-  onDragStart,
-  onDragEnd,
-  draggedCategory,
-  enableDragDrop,
 }) {
   const activeCount = Object.values(activeFilters).filter(Boolean).length;
 
@@ -78,15 +74,6 @@ export default function EventFilter({
                 />
               )}
             </button>
-
-            {/* "Drag me" indicator */}
-            {enableDragDrop && (
-              <div className="absolute -top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm">
-                  Drag me
-                </div>
-              </div>
-            )}
           </div>
         ))}
       </div>

@@ -13,20 +13,6 @@ const EventFilter = ({
   const activeCount = Object.values(activeFilters).filter(Boolean).length;
   const allActive = activeCount === Object.keys(eventColors).length;
 
-  const handleDragStart = (e, category) => {
-    if (!enableDragDrop) {
-      e.preventDefault();
-      return;
-    }
-    e.dataTransfer.effectAllowed = "copy";
-    e.dataTransfer.setData("text/plain", category);
-    onDragStart(category);
-  };
-
-  const handleDragEnd = () => {
-    if (!enableDragDrop) return;
-    onDragEnd();
-  };
   return (
     <div className="mt-6 pt-4 border-t border-gray-200">
       <div className="flex items-center justify-between mb-3">
@@ -71,9 +57,6 @@ const EventFilter = ({
           return (
             <div
               key={key}
-              draggable={isActive}
-              onDragStart={(e) => handleDragStart(e, key)}
-              onDragEnd={handleDragEnd}
               onClick={() => toggleFilter(key)}
               className={`
                 relative group
@@ -140,18 +123,6 @@ const EventFilter = ({
                 )}
                 {label}
               </span>
-
-              {/* Draggable indicator tooltip */}
-              {isActive && !isDragging && enableDragDrop && (
-                <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <div className="bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                    Drag to calendar
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-px">
-                      <div className="border-4 border-transparent border-t-gray-900"></div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}

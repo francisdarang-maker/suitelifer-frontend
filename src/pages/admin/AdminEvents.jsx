@@ -753,36 +753,6 @@ const DeleteConfirmationModal = ({ open, onClose, eventTitle, onConfirm }) => (
   </Modal>
 );
 
-// Detail Section Component
-const DetailSection = ({ icon, title, children }) => (
-  <Box sx={{ mb: 3 }}>
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-      <svg
-        className="w-5 h-5 text-gray-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d={icon}
-        />
-      </svg>
-      <Typography
-        sx={{ fontWeight: 600, fontSize: "0.875rem", color: "#374151" }}
-      >
-        {title}
-      </Typography>
-    </Box>
-    <Box sx={{ pl: 4, display: "flex", flexDirection: "column", gap: 0.5 }}>
-      {children}
-    </Box>
-  </Box>
-);
-
-// Styles
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -795,52 +765,10 @@ const modalStyle = {
   width: { xs: "95%", sm: "90%", md: "500px" },
   maxWidth: "500px",
   maxHeight: { xs: "90vh", sm: "85vh" },
-  overflow: "hidden",
+  overflowY: "auto",     
+  overflowX: "hidden", 
   display: "flex",
   flexDirection: "column",
-};
-
-const detailsModalStyle = (color) => ({
-  ...modalStyle,
-  width: { xs: "95%", sm: "90%", md: "480px" },
-  maxWidth: "480px",
-});
-
-const headerStyle = {
-  background: "linear-gradient(135deg, #2e97b2 0%, #25798e 100%)",
-  px: { xs: 3, sm: 4 },
-  py: 3,
-  color: "white",
-};
-
-const titleStyle = {
-  fontWeight: 700,
-  fontSize: { xs: "1.25rem", sm: "1.5rem" },
-  textAlign: "center",
-};
-
-const subtitleStyle = {
-  textAlign: "center",
-  opacity: 0.9,
-  mt: 0.5,
-  fontSize: { xs: "0.75rem", sm: "0.875rem" },
-};
-
-const contentStyle = {
-  px: { xs: 3, sm: 4 },
-  py: 3,
-  overflowY: "auto",
-  flexGrow: 1,
-};
-
-const footerStyle = {
-  px: { xs: 3, sm: 4 },
-  py: 2.5,
-  borderTop: "1px solid #e5e7eb",
-  display: "flex",
-  gap: 2,
-  justifyContent: "flex-end",
-  flexWrap: { xs: "wrap", sm: "nowrap" },
 };
 
 const deleteDialogStyle = {

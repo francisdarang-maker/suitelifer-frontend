@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowUpRightIcon,
   HeartIcon,
   ChatBubbleLeftEllipsisIcon,
 } from "@heroicons/react/20/solid";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toSlug } from "../../utils/slugUrl";
 import { Heart, Trash2 } from "lucide-react";
-import Loader from '../../components/loader/Loading'
 import defaultAvatar from "../../assets/images/defaultAvatar.svg";
-
-
 import api from "../../utils/axios";
 import ModalFullImages from "../../components/blog/ModalFullImages";
 
@@ -22,6 +19,7 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Parse title to extract feeling
   const parseTitleAndFeeling = (title) => {
@@ -53,8 +51,12 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
 
     const diffInSeconds = Math.floor((now - utcDate) / 1000);
     
-    if (diffInSeconds < 60) {
+    if (diffInSeconds  ==  0) {
       return 'Just now';
+    }
+
+    if(diffInSeconds < 60 && diffInSeconds != 0){
+      return `${diffInSeconds} seconds ago`
     }
     
     if (diffInSeconds < 3600) {
@@ -110,6 +112,13 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
     if (!blog?.eblogId || isDeleting) return;
     setShowDeleteModal(true);
   };
+
+  const handleCardClick = (e) => {
+    e.stopPropagation();
+    navigate(`blog/${blog.eblogId}/${toSlug(blog.title)}`, {
+      state: { previousPage: location.pathname },
+    });
+  }
 
  const confirmDelete = async () => {
   if (!blog?.eblogId) return;
@@ -410,116 +419,122 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
         </>
       )}
 
-      <section className="rounded-2xl p-6 xl:p-8 flex flex-col gap-6 bg-white border border-gray-200/60 shadow-sm hover:shadow-xl hover:border-gray-300/60 transition-all duration-300">
-        {/* Modal for full images */}
-        {validImages.length > 0 && (
-          <ModalFullImages
-            viewFull={isFullImages}
-            handleViewFull={handleViewImages}
-            images={validImages}
-            initialIndex={clickedImageIndex}
-          />
-        )}
+      {/* When clicked the image */}
+      {validImages.length > 0 && (
+                <ModalFullImages
+                  viewFull={isFullImages}
+                  handleViewFull={handleViewImages}
+                  images={validImages}
+                  initialIndex={clickedImageIndex}
+                />
+      )}
 
-        {/* Header */}
-        <section className="flex items-center justify-between">
-          <div className="flex gap-4 items-center">
-            <div className="w-12 h-12 ring-2 ring-gray-100 ring-offset-2 rounded-full overflow-hidden">
-              <img
-                src={blog.userPic || defaultAvatar}
-                alt={blog.firstName || "User"}
-                className="w-full h-full object-cover"
-             
-              />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="font-avenir-black text-gray-900">
-                  {blog.firstName} {blog.lastName}
-                </p>
-                {feeling && (
-                  <span className="text-sm text-gray-600">
-                    — is feeling <span className="font-semibold">{feeling}</span>
+      {/* Whole Card Body HERE */}
+      <div
+            onClick={handleCardClick}
+            className="rounded-2xl p-6 xl:p-8 flex flex-col gap-6 bg-white border border-gray-200/60 shadow-sm hover:shadow-xl hover:border-gray-300/60 transition-all duration-300 cursor-pointer relative"
+          >
+            {/* Header */}
+            <section className="flex items-center justify-between" onClick={handleCardClick}>
+              <div className="flex gap-4 items-center">
+                <div className="w-12 h-12 ring-2 ring-gray-100 ring-offset-2 rounded-full overflow-hidden">
+                  <img
+                    src={blog.userPic || defaultAvatar}
+                    alt={blog.firstName || "User"}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-avenir-black text-gray-900">
+                      {blog.firstName} {blog.lastName}
+                    </p>
+                    {blog.feeling && (
+                      <span className="text-sm text-gray-600">
+                        — is feeling <span className="font-semibold">{blog.feeling}</span>
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-500 font-medium">
+                    {formatDate(blog.date || blog.createdAt)}
                   </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {isMine && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteAction();
+                    }}
+                    disabled={isDeleting}
+                    className="p-2 rounded-lg hover:bg-red-50 transition-colors duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="Delete post"
+                  >
+                    <Trash2 className="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors" />
+                  </button>
                 )}
               </div>
-              <span className="text-xs text-gray-500 font-medium">
-                {formatDate(blog.date || blog.createdAt)}
-              </span>
-            </div>
-          </div>
+            </section>
 
-          <div className="flex items-center gap-2">
-            {isMine && (
-              <button
-                onClick={handleDeleteAction}
-                disabled={isDeleting}
-                className="p-2 rounded-lg hover:bg-red-50 transition-colors duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Delete post"
-              >
-                <Trash2 className="w-5 h-5 text-red-500 group-hover:text-red-600 transition-colors" />
-              </button>
+            {/* Content */}
+            <section className="space-y-3" onClick={handleCardClick}>
+              <h3 className="font-avenir-black text-xl text-gray-900 leading-tight">
+                {blog.title}
+              </h3>
+              <div
+                className="text-gray-600 leading-relaxed line-clamp-3"
+                dangerouslySetInnerHTML={{ __html: blog.description || "" }}
+              />
+            </section>
+
+            {/* Image Grid */}
+            {validImages.length > 0 && (
+              <div onClick={(e) => e.stopPropagation()}>
+                {renderImageGrid()}
+              </div>
             )}
-            <Link
-              to={`blog/${blog.eblogId}/${toSlug(blog.title)}`}
-              state={{ previousPage: location.pathname }}
-              className="p-2 rounded-lg hover:bg-primary/10 transition-colors duration-200 group"
-              aria-label="View full blog post"
+
+            {/* Actions */}
+            <section
+              className="flex items-center gap-6 pt-2 border-t border-gray-100"
+              onClick={handleCardClick}
             >
-              <ArrowUpRightIcon className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
-            </Link>
-          </div>
-        </section>
+              <button
+                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200 group"
+                onClick={handleHeartClick}
+                aria-label={isHeart ? "Unlike post" : "Like post"}
+              >
+                {isHeart ? (
+                  <HeartIcon className="w-5 h-5 text-red-500 animate-pulse" />
+                ) : (
+                  <Heart className="w-5 h-5 text-gray-400 group-hover:text-red-400 transition-colors" />
+                )}
+                <span className="text-sm font-medium text-gray-700">{likeCount}</span>
+              </button>
 
-        {/* Content */}
-        <section className="space-y-3">
-          <h3 className="font-avenir-black text-xl text-gray-900 leading-tight">
-            {cleanTitle}
-          </h3>
-          <div
-            className="text-gray-600 leading-relaxed line-clamp-3"
-            dangerouslySetInnerHTML={{ __html: blog.description || "" }}
-          />
-        </section>
+              <Link
+                to={`blog/${blog.eblogId}/${toSlug(blog.title)}`}
+                state={{ previousPage: location.pathname }}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200 no-underline group"
+                aria-label="View comments"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ChatBubbleLeftEllipsisIcon className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
+                <span className="text-sm font-medium text-gray-700">
+                  {blog.commentCount || 0}
+                </span>
+              </Link>
+            </section>
 
-        {/* Image Grid - Only render if images exist */}
-        {validImages.length > 0 && renderImageGrid()}
-
-        {/* Actions */}
-        <section className="flex items-center gap-6 pt-2 border-t border-gray-100">
-          <button
-            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200 group"
-            onClick={handleHeartClick}
-            aria-label={isHeart ? "Unlike post" : "Like post"}
-          >
-            {isHeart ? (
-              <HeartIcon className="w-5 h-5 text-red-500 animate-pulse" />
-            ) : (
-              <Heart className="w-5 h-5 text-gray-400 group-hover:text-red-400 transition-colors" />
+            {isDeleting && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm rounded-2xl z-50">
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+                <p className="text-sm text-gray-700 font-medium">Deleting...</p>
+              </div>
             )}
-            <span className="text-sm font-medium text-gray-700">{likeCount}</span>
-          </button>
-
-          <Link
-            to={`blog/${blog.eblogId}/${toSlug(blog.title)}`}
-            state={{ previousPage: location.pathname }}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200 no-underline group"
-            aria-label="View comments"
-          >
-            <ChatBubbleLeftEllipsisIcon className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" />
-            <span className="text-sm font-medium text-gray-700">
-              {blog.commentCount || 0}
-            </span>
-          </Link>
-        </section>
-        {isDeleting && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm rounded-2xl z-50">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
-            <p className="text-sm text-gray-700 font-medium">Deleting...</p>
           </div>
-        )}
-
-      </section>
     </>
   );
 };
