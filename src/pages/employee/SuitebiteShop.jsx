@@ -471,37 +471,40 @@ const SuitebiteShop = () => {
   const { data: pointsData, isLoading, error } = useRealTimeHeartbits();
   const currentBalance = pointsData?.data?.currentBalance ?? 0;
 
-const transformCurrentBalance = (currentBalance) => {
-  if (currentBalance == null || isNaN(currentBalance)) return "0.00";
+  const transformCurrentBalance = (currentBalance) => {
+    if (currentBalance == null || isNaN(currentBalance)) return "0.00";
 
-  const num = Number(currentBalance);
+    const num = Number(currentBalance);
 
-  if (num >= 1_000_000)
-    return (num / 1_000_000)
-      .toLocaleString("en-US", {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1,
-      })
-      .replace(/\.0$/, "") + "M";
+    if (num >= 1_000_000)
+      return (
+        (num / 1_000_000)
+          .toLocaleString("en-US", {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          })
+          .replace(/\.0$/, "") + "M"
+      );
 
-  if (num >= 1_000)
-    return (num / 1_000)
-      .toLocaleString("en-US", {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1,
-      })
-      .replace(/\.0$/, "") + "K";
+    if (num >= 1_000)
+      return (
+        (num / 1_000)
+          .toLocaleString("en-US", {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          })
+          .replace(/\.0$/, "") + "K"
+      );
 
-  return num.toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-};
-
+    return num.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+  };
 
   //
   return (
-    <div className="suitebite-shop-container h-full flex flex-col bg-gray-50">
+    <div className="suitebite-shop-container h-full flex flex-col ">
       {/* Navigation Tabs - Minimal */}
 
       <div className="bg-white border-b border-gray-100 px-4 sm:px-6 flex-shrink-0">
@@ -565,24 +568,27 @@ const transformCurrentBalance = (currentBalance) => {
                             transition-all duration-300 ease-in-out"
                 >
                   <h4 className="text-2xl hidden sm:inline">Heartbits</h4>
-                  
-                  <span className="tracking-wide drop-shadow-sm">{transformCurrentBalance(currentBalance)}</span>
+
+                  <span className="tracking-wide drop-shadow-sm">
+                    {transformCurrentBalance(currentBalance)}
+                  </span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                     className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 animate-pulse"
                   >
-                    <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 
+                    <path
+                      d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 
                             25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 
                             8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 
                             5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 
                             2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 
                             9.256a25.175 25.175 0 0 1-4.244 
                             3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 
-                            0 0 1-.704 0l-.003-.001Z" />
+                            0 0 1-.704 0l-.003-.001Z"
+                    />
                   </svg>
-
                 </div>
               )}
             </div>
@@ -591,7 +597,7 @@ const transformCurrentBalance = (currentBalance) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto scrollbar-hide mb-10">
+      <div className="flex-1 overflow-y-auto scrollbar-hide mb-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 bg-white">
           {/* Products Tab */}
           {activeTab === "products" && (
@@ -734,7 +740,7 @@ const transformCurrentBalance = (currentBalance) => {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5  gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-4">
                     {filteredAndSortedProducts.map((product) => {
                       const productWithImages = {
                         ...product,

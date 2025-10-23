@@ -1,11 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
-import { XMarkIcon, HeartIcon, ShoppingBagIcon, ShoppingCartIcon, EyeIcon } from '@heroicons/react/24/outline';
-import useCategoryStore from '../../store/stores/categoryStore';
-import ProductImageCarousel from './ProductImageCarousel';
+import { useState, useEffect, useRef } from "react";
+import {
+  XMarkIcon,
+  HeartIcon,
+  ShoppingBagIcon,
+  ShoppingCartIcon,
+  EyeIcon,
+} from "@heroicons/react/24/outline";
+import useCategoryStore from "../../store/stores/categoryStore";
+import ProductImageCarousel from "./ProductImageCarousel";
 
 /**
  * ProductDetailModal Component - Enhanced Product Detail View
- * 
+ *
  * Shows detailed product information with variation selection, quantity, and purchase options.
  * Features include:
  * - Large product image display
@@ -14,7 +20,7 @@ import ProductImageCarousel from './ProductImageCarousel';
  * - Quantity selection with price calculation
  * - Add to cart and buy now functionality
  * - Responsive design
- * 
+ *
  * @param {Object} product - Product data object with variations
  * @param {boolean} isOpen - Modal open state
  * @param {Function} onClose - Callback to close modal
@@ -25,30 +31,32 @@ import ProductImageCarousel from './ProductImageCarousel';
  * @param {number} initialQuantity - Initial quantity (default: 1)
  * @param {Object} initialSelectedOptions - Initial selected options
  */
-const ProductDetailModal = ({ 
-  product, 
-  isOpen, 
-  onClose, 
-  onAddToCart, 
-  onBuyNow, 
-  userHeartbits, 
-  mode = 'buy-now',
-  initialQuantity = 1, 
-  initialSelectedOptions 
+const ProductDetailModal = ({
+  product,
+  isOpen,
+  onClose,
+  onAddToCart,
+  onBuyNow,
+  userHeartbits,
+  mode = "buy-now",
+  initialQuantity = 1,
+  initialSelectedOptions,
 }) => {
   // Local state for cart interaction
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
   const [quantity, setQuantity] = useState(initialQuantity);
-  
+
   // Variation selection state
   const [selectedVariation, setSelectedVariation] = useState(null);
-  const [selectedOptions, setSelectedOptions] = useState(initialSelectedOptions || {});
+  const [selectedOptions, setSelectedOptions] = useState(
+    initialSelectedOptions || {}
+  );
   const [availableVariations, setAvailableVariations] = useState([]);
   const [variationTypes, setVariationTypes] = useState([]);
 
   // Add state for in-modal error message
-  const [modalError, setModalError] = useState('');
+  const [modalError, setModalError] = useState("");
   // Ref for focus trap
   const modalRef = useRef(null);
   const firstButtonRef = useRef(null);
@@ -60,11 +68,11 @@ const ProductDetailModal = ({
   useEffect(() => {
     if (product.variations && product.variations.length > 0) {
       setAvailableVariations(product.variations);
-      
+
       // Extract unique variation types from the product's variations
       const types = new Set();
-      product.variations.forEach(variation => {
-        variation.options?.forEach(option => {
+      product.variations.forEach((variation) => {
+        variation.options?.forEach((option) => {
           types.add(option.type_name);
         });
       });
@@ -91,16 +99,19 @@ const ProductDetailModal = ({
       setSelectedOptions(initialSelectedOptions || {});
       setIsAddingToCart(false);
       setIsBuying(false);
-      setModalError(''); // Clear error on modal open
+      setModalError(""); // Clear error on modal open
     }
   }, [isOpen, initialQuantity, initialSelectedOptions, mode]);
 
   // Update selected variation when options change
   useEffect(() => {
-    if (availableVariations.length > 0 && Object.keys(selectedOptions).length > 0) {
-      const matchingVariation = availableVariations.find(variation => {
-        return variation.options?.every(option => 
-          selectedOptions[option.type_name] === option.option_id
+    if (
+      availableVariations.length > 0 &&
+      Object.keys(selectedOptions).length > 0
+    ) {
+      const matchingVariation = availableVariations.find((variation) => {
+        return variation.options?.every(
+          (option) => selectedOptions[option.type_name] === option.option_id
         );
       });
       setSelectedVariation(matchingVariation || null);
@@ -120,12 +131,14 @@ const ProductDetailModal = ({
       }, 0);
       // Add keydown listener for ESC and tab trap
       const handleKeyDown = (e) => {
-        if (e.key === 'Escape') {
+        if (e.key === "Escape") {
           onClose();
         }
         // Focus trap
-        if (e.key === 'Tab' && modalRef.current) {
-          const focusableEls = modalRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (e.key === "Tab" && modalRef.current) {
+          const focusableEls = modalRef.current.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
           const firstEl = focusableEls[0];
           const lastEl = focusableEls[focusableEls.length - 1];
           if (e.shiftKey) {
@@ -141,8 +154,8 @@ const ProductDetailModal = ({
           }
         }
       };
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
     }
   }, [isOpen, onClose]);
 
@@ -150,13 +163,13 @@ const ProductDetailModal = ({
    * Handles variation option selection
    */
   const handleOptionSelect = (typeName, optionId) => {
-    setSelectedOptions(prev => ({
+    setSelectedOptions((prev) => ({
       ...prev,
-      [typeName]: optionId
+      [typeName]: optionId,
     }));
 
-    console.log("Option Id",optionId)
-    console.log("Type Name",typeName)
+    console.log("Option Id", optionId);
+    console.log("Type Name", typeName);
   };
 
   /**
@@ -164,19 +177,21 @@ const ProductDetailModal = ({
    */
   const getAvailableOptions = (typeName) => {
     const options = new Set();
-    availableVariations.forEach(variation => {
-      variation.options?.forEach(option => {
+    availableVariations.forEach((variation) => {
+      variation.options?.forEach((option) => {
         if (option.type_name === typeName) {
-          options.add(JSON.stringify({
-            id: option.option_id,
-            value: option.option_value,
-            label: option.option_label,
-            hexColor: option.hex_color
-          }));
+          options.add(
+            JSON.stringify({
+              id: option.option_id,
+              value: option.option_value,
+              label: option.option_label,
+              hexColor: option.hex_color,
+            })
+          );
         }
       });
     });
-    return Array.from(options).map(opt => JSON.parse(opt));
+    return Array.from(options).map((opt) => JSON.parse(opt));
   };
 
   /**
@@ -193,37 +208,45 @@ const ProductDetailModal = ({
    */
   const handleAddToCartFromModal = async () => {
     if (isAddingToCart) return;
-    setModalError('');
+    setModalError("");
     // Ensure variation selection if required
     if (availableVariations.length > 0 && variationTypes.length > 0) {
-      const allTypesSelected = variationTypes.every(type => selectedOptions[type]);
+      const allTypesSelected = variationTypes.every(
+        (type) => selectedOptions[type]
+      );
       if (!allTypesSelected) {
-        setModalError('Please select all product options before adding to cart.');
+        setModalError(
+          "Please select all product options before adding to cart."
+        );
         return;
       }
     }
 
     try {
       setIsAddingToCart(true);
-      
+
       // Prepare variation data in the new format
-      const variations = Object.entries(selectedOptions).map(([typeName, optionId]) => {
-        const option = availableVariations
-          .flatMap(v => v.options || [])
-          .find(opt => opt.option_id === optionId && opt.type_name === typeName);
-        
-        const variation = {
-          variation_type_id: option?.variation_type_id,
-          option_id: optionId
-        };
-        
-        return variation;
-      }).filter(v => v.variation_type_id && v.option_id);
+      const variations = Object.entries(selectedOptions)
+        .map(([typeName, optionId]) => {
+          const option = availableVariations
+            .flatMap((v) => v.options || [])
+            .find(
+              (opt) => opt.option_id === optionId && opt.type_name === typeName
+            );
+
+          const variation = {
+            variation_type_id: option?.variation_type_id,
+            option_id: optionId,
+          };
+
+          return variation;
+        })
+        .filter((v) => v.variation_type_id && v.option_id);
 
       await onAddToCart(product.product_id, quantity, null, variations);
       onClose(); // Close modal after adding to cart
     } catch (error) {
-      setModalError('Failed to add to cart.');
+      setModalError("Failed to add to cart.");
     } finally {
       setIsAddingToCart(false);
     }
@@ -234,35 +257,43 @@ const ProductDetailModal = ({
    */
   const handleBuyNowFromModal = async () => {
     if (isBuying) return;
-    setModalError('');
+    setModalError("");
     // Ensure variation selection if required
     if (availableVariations.length > 0 && variationTypes.length > 0) {
-      const allTypesSelected = variationTypes.every(type => selectedOptions[type]);
+      const allTypesSelected = variationTypes.every(
+        (type) => selectedOptions[type]
+      );
       if (!allTypesSelected) {
-        setModalError('Please select all product options before confirming order.');
+        setModalError(
+          "Please select all product options before confirming order."
+        );
         return;
       }
     }
 
     try {
       setIsBuying(true);
-      
+
       // Prepare variation data in the new format
-      const variations = Object.entries(selectedOptions).map(([typeName, optionId]) => {
-        const option = availableVariations
-          .flatMap(v => v.options || [])
-          .find(opt => opt.option_id === optionId && opt.type_name === typeName);
-        
-        return {
-          variation_type_id: option?.variation_type_id,
-          option_id: optionId
-        };
-      }).filter(v => v.variation_type_id && v.option_id);
+      const variations = Object.entries(selectedOptions)
+        .map(([typeName, optionId]) => {
+          const option = availableVariations
+            .flatMap((v) => v.options || [])
+            .find(
+              (opt) => opt.option_id === optionId && opt.type_name === typeName
+            );
+
+          return {
+            variation_type_id: option?.variation_type_id,
+            option_id: optionId,
+          };
+        })
+        .filter((v) => v.variation_type_id && v.option_id);
 
       await onBuyNow(product.product_id, quantity, null, variations);
       onClose(); // Close modal after purchase
     } catch (error) {
-      setModalError('Failed to process buy now.');
+      setModalError("Failed to process buy now.");
     } finally {
       setIsBuying(false);
     }
@@ -285,19 +316,32 @@ const ProductDetailModal = ({
   // Helper to format labels
   const formatLabel = (label) =>
     label
-      ? label.replace(/_/g, ' ').replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-      : '';
+      ? label
+          .replace(/_/g, " ")
+          .replace(
+            /\w\S*/g,
+            (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+          )
+      : "";
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur  z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto outline-none" ref={modalRef} tabIndex={-1}>
+    <div
+      className="fixed inset-0 bg-black/40 backdrop-blur  z-50 flex items-center justify-center p-4 "
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="bg-white rounded-xl max-w-4xl w-full  max-h-[70vh]  overflow-y-auto outline-none"
+        ref={modalRef}
+        tabIndex={-1}
+      >
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between pt-2 px-5  border-gray-200">
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-gray-900">Product Details</h2>
-            {mode === 'edit' && (
+            <h2 className="text-xs font-bold text-gray-900">Product Details</h2>
+            {mode === "edit" && (
               <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
                 Editing Cart Item
               </span>
@@ -314,44 +358,53 @@ const ProductDetailModal = ({
         </div>
 
         {/* Modal Content */}
-        <div className="p-6">
+        <div className="p-5 pt-0">
           {modalError && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-300" role="alert">
+            <div
+              className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-300"
+              role="alert"
+            >
               {modalError}
             </div>
           )}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* Product Image Section */}
             <div className="product-image-section">
-              <div className="relative h-96 rounded-lg overflow-hidden">
+              <div className="relative  object-cover h-[200px] rounded-lg overflow-hidden">
                 {(() => {
                   // Always prefer the full images array from backend
                   const imagesToPass =
                     Array.isArray(product.images) && product.images.length > 0
                       ? product.images
-                      : Array.isArray(product.product_images) && product.product_images.length > 0
-                        ? product.product_images
-                        : product.image_url
-                          ? [{ image_url: product.image_url, alt_text: product.name }]
-                          : [];
+                      : Array.isArray(product.product_images) &&
+                        product.product_images.length > 0
+                      ? product.product_images
+                      : product.image_url
+                      ? [
+                          {
+                            image_url: product.image_url,
+                            alt_text: product.name,
+                          },
+                        ]
+                      : [];
                   return (
-                    <ProductImageCarousel 
+                    <ProductImageCarousel
                       images={imagesToPass}
                       productName={product.name}
-                      className="w-full h-full"
                     />
                   );
                 })()}
-                
+
                 {/* Category Badge */}
                 {product.category && (
-                  <div className="absolute top-4 left-4 z-10">{/* Increased z-index to show above carousel */}
-                    <span 
+                  <div className="absolute top-4 left-4 z-10">
+                    {/* Increased z-index to show above carousel */}
+                    <span
                       className="category-badge px-3 py-1 rounded-full text-sm font-semibold shadow-sm border border-white border-opacity-20"
-                      style={{ 
+                      style={{
                         backgroundColor: categoryColor,
-                        color: 'white',
-                        textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                        color: "white",
+                        textShadow: "0 1px 2px rgba(0,0,0,0.1)",
                       }}
                     >
                       {product.category}
@@ -364,21 +417,22 @@ const ProductDetailModal = ({
             {/* Product Information Section */}
             <div className="product-info-section">
               {/* Product Name */}
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              <div className="text-2xl font-bold text-gray-900 mb-2">
                 {product.name}
-              </h1>
-              
+              </div>
+
               {/* Product Description */}
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                {product.description || 'Premium quality product curated for your needs.'}
+              <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                {product.description ||
+                  "Premium quality product curated for your needs."}
               </p>
 
               {/* Price Display */}
-              <div className="price-section mb-6">
+              <div className="price-section mb-5">
                 <div className="flex items-center gap-3">
-                  <span className="text-4xl font-bold text-[#0097b2] flex items-center gap-2">
+                  <span className="text-xl font-bold text-[#0097b2] flex items-center gap-2">
                     {finalPrice}
-                    <HeartIcon className="h-8 w-8 text-red-500" />
+                    <HeartIcon className="h-5 w-5 text-red-500" />
                   </span>
                 </div>
               </div>
@@ -386,32 +440,54 @@ const ProductDetailModal = ({
               {/* Product Variations Selection */}
               {availableVariations.length > 0 && (
                 <div className="variations-section mb-6 p-4 bg-gray-50 rounded-lg border">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Options:</h3>
-                  
-                  {variationTypes.map(typeName => (
-                    <div key={typeName} className="variation-type mb-4 last:mb-0">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Choose Options:
+                  </h3>
+
+                  {variationTypes.map((typeName) => (
+                    <div
+                      key={typeName}
+                      className="variation-type mb-4 last:mb-0"
+                    >
                       <label className="block text-sm font-medium text-gray-700 mb-3 capitalize">
                         {formatLabel(typeName)}:
                       </label>
                       <div className="flex flex-wrap gap-3">
-                        {getAvailableOptions(typeName).map(option => (
+                        {getAvailableOptions(typeName).map((option) => (
                           <button
                             key={option.id}
-                            onClick={() => handleOptionSelect(typeName, option.id)}
+                            onClick={() =>
+                              handleOptionSelect(typeName, option.id)
+                            }
                             className={`option-button px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-200 ${
                               selectedOptions[typeName] === option.id
-                                ? 'bg-blue-500 text-white border-blue-500 shadow-sm'
-                                : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50'
+                                ? "bg-blue-500 text-white border-blue-500 shadow-sm"
+                                : "bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50"
                             }`}
-                            style={typeName === 'color' && option.hexColor ? {
-                              backgroundColor: selectedOptions[typeName] === option.id ? undefined : option.hexColor,
-                              color: selectedOptions[typeName] === option.id ? undefined : (option.hexColor === '#FFFFFF' ? '#000' : '#fff'),
-                              borderColor: selectedOptions[typeName] === option.id ? undefined : option.hexColor
-                            } : {}}
+                            style={
+                              typeName === "color" && option.hexColor
+                                ? {
+                                    backgroundColor:
+                                      selectedOptions[typeName] === option.id
+                                        ? undefined
+                                        : option.hexColor,
+                                    color:
+                                      selectedOptions[typeName] === option.id
+                                        ? undefined
+                                        : option.hexColor === "#FFFFFF"
+                                        ? "#000"
+                                        : "#fff",
+                                    borderColor:
+                                      selectedOptions[typeName] === option.id
+                                        ? undefined
+                                        : option.hexColor,
+                                  }
+                                : {}
+                            }
                           >
-                            {typeName === 'color' ? (
+                            {typeName === "color" ? (
                               <div className="flex items-center gap-2">
-                                <div 
+                                <div
                                   className="w-4 h-4 rounded-full border border-gray-300"
                                   style={{ backgroundColor: option.hexColor }}
                                 />
@@ -430,9 +506,13 @@ const ProductDetailModal = ({
                   {selectedVariation && (
                     <div className="selected-variation-info mt-4 p-3 bg-blue-50 rounded border border-blue-200">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-blue-800">Selected Options:</span>
+                        <span className="font-medium text-blue-800">
+                          Selected Options:
+                        </span>
                         <span className="text-blue-600">
-                          {selectedVariation.options?.map(opt => opt.option_label).join(' + ')}
+                          {selectedVariation.options
+                            ?.map((opt) => opt.option_label)
+                            .join(" + ")}
                         </span>
                       </div>
                     </div>
@@ -445,27 +525,37 @@ const ProductDetailModal = ({
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Quantity:
                 </label>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => {
                       const newQuantity = Math.max(1, quantity - 1);
-                      console.log('🔢 Decreasing quantity from', quantity, 'to', newQuantity);
+                      console.log(
+                        "🔢 Decreasing quantity from",
+                        quantity,
+                        "to",
+                        newQuantity
+                      );
                       setQuantity(newQuantity);
                     }}
-                    className="quantity-btn w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-semibold hover:bg-gray-300 transition-colors duration-200"
+                    className="quantity-btn w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center font-semibold hover:bg-gray-300 transition-colors duration-200"
                   >
                     -
                   </button>
-                  <span className="quantity-display text-2xl font-semibold text-gray-900 min-w-[3rem] text-center">
+                  <span className="quantity-display text-xl font-semibold text-gray-900 min-w-[3rem] text-center">
                     {quantity}
                   </span>
                   <button
                     onClick={() => {
                       const newQuantity = quantity + 1;
-                      console.log('🔢 Increasing quantity from', quantity, 'to', newQuantity);
+                      console.log(
+                        "🔢 Increasing quantity from",
+                        quantity,
+                        "to",
+                        newQuantity
+                      );
                       setQuantity(newQuantity);
                     }}
-                    className="quantity-btn w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-semibold hover:bg-gray-300 transition-colors duration-200"
+                    className="quantity-btn w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center font-semibold hover:bg-gray-300 transition-colors duration-200"
                   >
                     +
                   </button>
@@ -473,12 +563,14 @@ const ProductDetailModal = ({
               </div>
 
               {/* Total Cost Display */}
-              <div className="total-cost-display bg-gray-50 p-4 rounded-lg mb-6">
+              <div className="total-cost-display bg-gray-50 p-4 rounded-lg mb-5">
                 <div className="flex items-center justify-between">
-                  <span className="text-lg text-gray-600">Total for {quantity}:</span>
-                  <span className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <span className="text-sm text-gray-600">
+                    Total for {quantity}:
+                  </span>
+                  <span className="text-xl font-bold text-gray-900 flex items-center gap-2">
                     {totalCost}
-                    <HeartIcon className="h-6 w-6 text-red-500" />
+                    <HeartIcon className="h-5 w-5 text-red-500" />
                   </span>
                 </div>
                 <div className="mt-2 text-sm text-gray-500">
@@ -488,7 +580,7 @@ const ProductDetailModal = ({
 
               {/* Action Buttons */}
               <div className="action-buttons">
-                {(mode === 'buy-now' || mode === 'details') ? (
+                {mode === "buy-now" || mode === "details" ? (
                   /* Confirm Order Button for Buy Now mode */
                   <button
                     onClick={handleBuyNowFromModal}
@@ -503,7 +595,9 @@ const ProductDetailModal = ({
                     ) : !canAfford ? (
                       <>
                         <HeartIcon className="h-5 w-5" />
-                        <span>Need {totalCost - userHeartbits} more heartbits</span>
+                        <span>
+                          Need {totalCost - userHeartbits} more heartbits
+                        </span>
                       </>
                     ) : (
                       <>
@@ -517,17 +611,21 @@ const ProductDetailModal = ({
                   <button
                     onClick={handleAddToCartFromModal}
                     disabled={isBuying || isAddingToCart}
-                    className="add-to-cart-btn w-full bg-[#0097b2] text-white py-4 px-6 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                    className="add-to-cart-btn w-full bg-[#0097b2] text-white py-3 px-5 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
                   >
                     {isAddingToCart ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>{mode === 'edit' ? 'Updating...' : 'Adding...'}</span>
+                        <span>
+                          {mode === "edit" ? "Updating..." : "Adding..."}
+                        </span>
                       </>
                     ) : (
                       <>
                         <ShoppingCartIcon className="h-5 w-5" />
-                        <span>{mode === 'edit' ? 'Update Cart Item' : 'Add to Cart'}</span>
+                        <span>
+                          {mode === "edit" ? "Update Cart Item" : "Add to Cart"}
+                        </span>
                       </>
                     )}
                   </button>
@@ -541,4 +639,4 @@ const ProductDetailModal = ({
   );
 };
 
-export default ProductDetailModal; 
+export default ProductDetailModal;

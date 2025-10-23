@@ -55,7 +55,11 @@ function EventMonthView({
 
   // --- Generate Day Boxes
   for (let day = 1; day <= daysInMonth; day++) {
-    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    const date = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      day
+    );
     const dateStr = date.toISOString().split("T")[0];
     const dayEvents = getEventsForDate(date);
     const isCurrentDay = isToday(date);
@@ -69,7 +73,11 @@ function EventMonthView({
         className={`
           border border-gray-200 p-1 sm:p-2 transition-all cursor-pointer flex flex-col
           justify-start aspect-square relative
-          ${isCurrentDay ? "bg-blue-50 ring-2 ring-blue-400" : "bg-white hover:bg-gray-50"}
+          ${
+            isCurrentDay
+              ? "bg-blue-50 ring-2 ring-blue-400"
+              : "bg-white hover:bg-gray-50"
+          }
           ${isPastDay ? "opacity-60" : ""}
         `}
         onClick={(e) => {
@@ -83,13 +91,17 @@ function EventMonthView({
       >
         <div
           className={`text-[10px] sm:text-xs font-bold mb-0.5 sm:mb-1 ${
-            isCurrentDay ? "text-blue-600" : isPastDay ? "text-gray-400" : "text-gray-700"
+            isCurrentDay
+              ? "text-blue-600"
+              : isPastDay
+              ? "text-gray-400"
+              : "text-gray-700"
           }`}
         >
           {day}
         </div>
 
-        <div className="flex flex-col gap-0.5 sm:gap-1 overflow-hidden">
+        <div className="flex flex-col gap-0.5 sm:gap-1 overflow-hidden ">
           {visibleEvents.map((event, idx) => (
             <EventBadge
               key={idx}
@@ -119,244 +131,323 @@ function EventMonthView({
   }
 
   // --- MOBILE VIEW ---
- if (isMobile) {
-  const selectedEvents = getEventsForDate(selectedDate);
+  if (isMobile) {
+    const selectedEvents = getEventsForDate(selectedDate);
 
-  return (
-    <>
-    <Typography
-   
-    sx={{
-      fontWeight: "bold",
-      marginBottom: '10px'
-    }}
-    >
-      Events
-    </Typography>
-      {/* Calendar Section */}
-      <Box
-        sx={{
-          width: "100%",
-          bgcolor: "white",
-          borderRadius: 3,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          p: { xs: 1.5, sm: 2 },
-          mb: 2,
-        }}
-      >
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateCalendar
-            value={selectedDate}
-            onChange={(newDate) => setSelectedDate(newDate)}
-            views={["day"]}
-            displayWeekNumber={false}
-            showDaysOutsideCurrentMonth
-            slots={{
-              day: (props) => {
-                const dayEvents = getEventsForDate(props.day);
-                const hasEvents = dayEvents.length > 0;
-                return (
-                  <PickersDay
-                    {...props}
-                    sx={{
-                      position: "relative",
-                      fontSize: { xs: "0.85rem", sm: "1rem" },
-                      "&::after": hasEvents
-                        ? {
-                            content: '""',
-                            position: "absolute",
-                            bottom: 4,
-                            left: "50%",
-                            transform: "translateX(-50%)",
-                            width: 5,
-                            height: 5,
-                            borderRadius: "50%",
-                            backgroundColor: "#0097b2",
-                          }
-                        : {},
-                    }}
-                  />
-                );
-              },
-              toolbar: () => null,
-            }}
-          />
-        </LocalizationProvider>
-      </Box>
-
-      {/* Event Cards Section */}
-      {selectedEvents.length > 0 ? (
-        <Box
+    return (
+      <>
+        <Typography
           sx={{
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-            gap: 2,
-            mt: 2,
+            fontWeight: "bold",
+            marginBottom: "10px",
           }}
         >
-          {selectedEvents.map((event, idx) => {
-            const CATEGORY_COLORS = {
-              party: "#ec4899",
-              launchpod: "#3b82f6",
-              holiday: "#22c55e",
-              payroll: "#f97316",
-              others: "#0097b2",
-            };
+          Events
+        </Typography>
+        {/* Calendar Section */}
 
-            const color = CATEGORY_COLORS[event.category] || "#94a3b8";
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 320,
+            overflow: "auto",
+            bgcolor: "white",
+            borderRadius: 3,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            pl: { xs: 0, sm: 0 },
+            mb: 2,
+          }}
+        >
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DateCalendar
+              value={selectedDate}
+              onChange={(newDate) => setSelectedDate(newDate)}
+              views={["day"]}
+              displayWeekNumber={false}
+              showDaysOutsideCurrentMonth
+              sx={{
+                width: "100%",
+                maxWidth: "425px",
 
-            return (
-              <Box
-                key={idx}
-                sx={{
+                // Base styles (320px)
+                "& .MuiPickersDay-root": {
+                  width: 35,
+                  height: 35,
+                  fontSize: "0.75rem",
+                  margin: "0px",
+                },
+                "& .MuiDayCalendar-weekDayLabel": {
+                  width: 35,
+                  textAlign: "center",
+                  fontSize: "0.65rem",
+                  padding: "2px 0",
+                  margin: "0px",
+                },
+                "& .MuiDayCalendar-header": {
+                  paddingLeft: 1,
                   display: "flex",
-                  flexDirection: "column",
-                  gap: 1,
-                  p: { xs: 1.5, sm: 2 },
-                  borderRadius: 3,
-                  bgcolor: "#fff",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                  cursor: "pointer",
-                  transition: "0.3s ease",
-                  "&:hover": {
-                    transform: { sm: "translateY(-3px)" },
-                    boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                  justifyContent: "center",
+                  gap: "0px",
+                },
+                "& .MuiDayCalendar-weekContainer": {
+                  paddingLeft: 1,
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "0px",
+                },
+                "& .MuiPickersCalendarHeader-root": {
+                  marginTop: 3,
+                  paddingLeft: 1.5,
+                },
+                "& .MuiPickersArrowSwitcher-root": {
+                  gap: "0px",
+                  paddingLeft: 0,
+                  paddingRight: 0,
+                  marginLeft: 0,
+                  marginRight: 0,
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+                "& .MuiPickersArrowSwitcher-button": {
+                  fontSize: "0.8rem",
+                  marginRight: "20px",
+                  minWidth: "auto",
+                },
+                "& .MuiPickersArrowSwitcher-spacer": {
+                  display: "none",
+                  width: 0,
+                  padding: 0,
+                  margin: 0,
+                },
+
+                // 🔁 Slight bump for 375px and up
+                "@media (min-width: 375px)": {
+                  "& .MuiPickersDay-root": {
+                    width: 42,
+                    height: 42,
+                    fontSize: "0.8rem",
                   },
-                }}
-                onClick={() => onSelectEvent(event)}
-              >
-                {/* Colored Strip */}
+                  "& .MuiDayCalendar-weekDayLabel": {
+                    width: 42,
+                    fontSize: "0.7rem",
+                  },
+                  "& .MuiPickersArrowSwitcher-button": {
+                    fontSize: "0.85rem",
+                    marginRight: "16px",
+                  },
+                  "& .MuiPickersCalendarHeader-root": {
+                    marginTop: 3,
+                    paddingLeft: 3,
+                  },
+                },
+              }}
+              slots={{
+                day: (props) => {
+                  const dayEvents = getEventsForDate(props.day);
+                  const hasEvents = dayEvents.length > 0;
+
+                  return (
+                    <PickersDay
+                      {...props}
+                      sx={{
+                        position: "relative",
+                        fontSize: { xs: "0.85rem", sm: "1rem" },
+                        "&::after": hasEvents
+                          ? {
+                              content: '""',
+                              position: "absolute",
+                              bottom: 4,
+                              left: "50%",
+                              transform: "translateX(-50%)",
+                              width: 5,
+                              height: 5,
+                              borderRadius: "50%",
+                              backgroundColor: "#0097b2",
+                            }
+                          : {},
+                      }}
+                    />
+                  );
+                },
+                toolbar: () => null,
+              }}
+            />
+          </LocalizationProvider>
+        </Box>
+        {/* Event Cards Section */}
+        {selectedEvents.length > 0 ? (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+              gap: 2,
+              mt: 2,
+            }}
+          >
+            {selectedEvents.map((event, idx) => {
+              const CATEGORY_COLORS = {
+                party: "#ec4899",
+                launchpod: "#3b82f6",
+                holiday: "#22c55e",
+                payroll: "#f97316",
+                others: "#0097b2",
+              };
+
+              const color = CATEGORY_COLORS[event.category] || "#94a3b8";
+
+              return (
                 <Box
+                  key={idx}
                   sx={{
-                    height: 6,
-                    width: "100%",
-                    borderRadius: "8px 8px 0 0",
-                    backgroundColor: color,
-                    mb: 1,
+                    backdropFilter: "blur(600px)",
+                    WebkitBackdropFilter: "blur(6px)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1,
+                    p: { xs: 1.5, sm: 2 },
+                    borderRadius: 3,
+                    bgcolor: "#fff",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                    cursor: "pointer",
+                    transition: "0.3s ease",
+                    "&:hover": {
+                      transform: { sm: "translateY(-3px)" },
+                      boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+                    },
                   }}
-                />
-
-                {/* Title and Category */}
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  flexWrap="wrap"
-                  sx={{ gap: 0.5 }}
+                  onClick={() => onSelectEvent(event)}
                 >
-                  <Typography
-                    variant="subtitle1"
-                    fontWeight={700}
+                  {/* Colored Strip */}
+                  <Box
                     sx={{
-                      color,
-                      textTransform: "capitalize",
-                      fontSize: { xs: "0.95rem", sm: "1rem" },
+                      height: 6,
+                      width: "100%",
+                      borderRadius: "8px 8px 0 0",
+                      backgroundColor: color,
+                      mb: 1,
                     }}
-                  >
-                    {event.title}
-                  </Typography>
+                  />
 
+                  {/* Title and Category */}
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    flexWrap="wrap"
+                    sx={{ gap: 0.5 }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={700}
+                      sx={{
+                        color,
+                        textTransform: "capitalize",
+                        fontSize: { xs: "0.95rem", sm: "1rem" },
+                      }}
+                    >
+                      {event.title}
+                    </Typography>
+
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        backgroundColor: `${color}22`,
+                        color,
+                        px: 1,
+                        py: 0.3,
+                        borderRadius: 1,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {event.category}
+                    </Typography>
+                  </Box>
+
+                  {/* Date */}
                   <Typography
                     variant="caption"
                     sx={{
-                      backgroundColor: `${color}22`,
-                      color,
-                      px: 1,
-                      py: 0.3,
-                      borderRadius: 1,
-                      fontWeight: 600,
+                      color: "#64748b",
+                      fontSize: { xs: "0.75rem", sm: "0.8rem" },
                     }}
                   >
-                    {event.category}
+                    {event.start?.toDateString()} - {event.end?.toDateString()}
                   </Typography>
+
+                  {/* Description */}
+                  {event.description && (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        mt: 0.5,
+                        color: "#475569",
+                        fontStyle: "italic",
+                        lineHeight: 1.4,
+                        fontSize: { xs: "0.85rem", sm: "0.9rem" },
+                      }}
+                    >
+                      “{event.description}”
+                    </Typography>
+                  )}
                 </Box>
-
-                {/* Date */}
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: "#64748b",
-                    fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                  }}
-                >
-                  {event.start?.toDateString()} - {event.end?.toDateString()}
-                </Typography>
-
-                {/* Description */}
-                {event.description && (
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      mt: 0.5,
-                      color: "#475569",
-                      fontStyle: "italic",
-                      lineHeight: 1.4,
-                      fontSize: { xs: "0.85rem", sm: "0.9rem" },
-                    }}
-                  >
-                    “{event.description}”
-                  </Typography>
-                )}
-              </Box>
-            );
-          })}
-        </Box>
-      ) : (
-        /* Fallback No Event */
-        <Box
-          sx={{
-            p: { xs: 2.5, sm: 3 },
-            mt: 2,
-            borderRadius: 3,
-            bgcolor: "#f9fafb",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "inset 0 0 8px rgba(0,0,0,0.05)",
-            textAlign: "center",
-          }}
-        >
+              );
+            })}
+          </Box>
+        ) : (
+          /* Fallback No Event */
           <Box
             sx={{
-              width: 60,
-              height: 60,
-              borderRadius: "50%",
-              background: "linear-gradient(135deg, #cbd5e1, #e2e8f0)",
+              p: { xs: 2.5, sm: 3 },
+              mt: 2,
+              borderRadius: 3,
+              bgcolor: "#f9fafb",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              mb: 1.5,
+              boxShadow: "inset 0 0 8px rgba(0,0,0,0.05)",
+              textAlign: "center",
             }}
           >
-            <Typography fontSize={28} sx={{ color: "#475569" }}>
-              <Calendar/>
+            <Box
+              sx={{
+                width: 60,
+                height: 60,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #cbd5e1, #e2e8f0)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 1.5,
+              }}
+            >
+              <Typography fontSize={28} sx={{ color: "#475569" }}>
+                <Calendar />
+              </Typography>
+            </Box>
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              sx={{ color: "#334155", fontSize: { xs: "1rem", sm: "1.1rem" } }}
+            >
+              No events for today
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#64748b",
+                mt: 0.5,
+                maxWidth: "280px",
+                fontSize: { xs: "0.85rem", sm: "0.9rem" },
+              }}
+            >
+              Relax and enjoy your day — no scheduled activities.
             </Typography>
           </Box>
-          <Typography
-            variant="subtitle1"
-            fontWeight={600}
-            sx={{ color: "#334155", fontSize: { xs: "1rem", sm: "1.1rem" } }}
-          >
-            No events for today
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              color: "#64748b",
-              mt: 0.5,
-              maxWidth: "280px",
-              fontSize: { xs: "0.85rem", sm: "0.9rem" },
-            }}
-          >
-            Relax and enjoy your day — no scheduled activities.
-          </Typography>
-        </Box>
-      )}
-    </>
-  );
-}
-
+        )}
+      </>
+    );
+  }
 
   // --- DESKTOP VIEW ---
   return (

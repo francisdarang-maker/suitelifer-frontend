@@ -618,158 +618,174 @@ const ShoppingCart = ({
 
               {/* Cart Items */}
               {uniqueCart.map((item) => (
-                  <div
-                    key={item.cart_item_id}
-                    className="cart-item bg-white rounded-2xl border border-gray-200 p-4 mb-4 shadow-sm hover:shadow-md transition-shadow duration-300"
-                  >
-                    <div className="flex flex-col sm:flex-row items-start gap-4">
-                      
-                      {/* Selection + Image */}
-                      <div className="flex items-start gap-3 w-full sm:w-auto">
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.has(item.cart_item_id)}
-                          onChange={() => handleItemSelect(item.cart_item_id)}
-                          className="mt-1 rounded border-gray-300 text-[#0097b2] focus:ring-[#0097b2]"
-                        />
+                <div
+                  key={item.cart_item_id}
+                  className="cart-item bg-white rounded-2xl border border-gray-200 p-4 mb-4 shadow-sm hover:shadow-md transition-shadow duration-300"
+                >
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
+                    {/* Selection + Image */}
+                    <div className="flex items-start gap-3 w-full sm:w-auto">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.has(item.cart_item_id)}
+                        onChange={() => handleItemSelect(item.cart_item_id)}
+                        className="mt-1 rounded border-gray-300 text-[#0097b2] focus:ring-[#0097b2]"
+                      />
 
-                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center">
-                          {(() => {
-                            let imageUrl = null;
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center">
+                        {(() => {
+                          let imageUrl = null;
 
-                            if (item.product_images?.length > 0) {
-                              const primaryImage =
-                                item.product_images.find((img) => img.is_primary) ||
-                                item.product_images[0];
-                              imageUrl =
-                                primaryImage.thumbnail_url || primaryImage.image_url;
-                            } else if (item.images?.length > 0) {
-                              const primaryImage =
-                                item.images.find((img) => img.is_primary) ||
-                                item.images[0];
-                              imageUrl =
-                                primaryImage.thumbnail_url ||
-                                primaryImage.image_url ||
-                                primaryImage.url;
-                            } else if (item.image_url) {
-                              imageUrl = item.image_url;
+                          if (item.product_images?.length > 0) {
+                            const primaryImage =
+                              item.product_images.find(
+                                (img) => img.is_primary
+                              ) || item.product_images[0];
+                            imageUrl =
+                              primaryImage.thumbnail_url ||
+                              primaryImage.image_url;
+                          } else if (item.images?.length > 0) {
+                            const primaryImage =
+                              item.images.find((img) => img.is_primary) ||
+                              item.images[0];
+                            imageUrl =
+                              primaryImage.thumbnail_url ||
+                              primaryImage.image_url ||
+                              primaryImage.url;
+                          } else if (item.image_url) {
+                            imageUrl = item.image_url;
+                          }
+
+                          return imageUrl ? (
+                            <img
+                              src={imageUrl}
+                              alt={item.product_name}
+                              className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
+                            />
+                          ) : (
+                            <ShoppingBagIcon className="h-8 w-8 text-gray-400" />
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    {/* Product Details */}
+                    <div className="flex-1 w-full space-y-2">
+                      {/* Product Name */}
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 leading-tight">
+                          {item.product_name}
+                        </h3>
+                        <button
+                          onClick={() => handleRemoveItem(item.cart_item_id)}
+                          disabled={
+                            itemLoadingStates[item.cart_item_id] === "removing"
+                          }
+                          className="text-red-500 hover:text-red-700 transition-colors p-1 rounded"
+                          title="Remove item"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+
+                      {/* Price + Quantity */}
+                      <div className="flex flex-wrap items-center justify-between text-sm text-gray-600">
+                        <span className="font-medium text-[#0097b2]">
+                          {item.price_points || item.points_cost || item.price}{" "}
+                          pts each
+                        </span>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.cart_item_id,
+                                item.quantity - 1
+                              )
                             }
-
-                            return imageUrl ? (
-                              <img
-                                src={imageUrl}
-                                alt={item.product_name}
-                                className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
-                              />
-                            ) : (
-                              <ShoppingBagIcon className="h-8 w-8 text-gray-400" />
-                            );
-                          })()}
+                            disabled={
+                              itemLoadingStates[item.cart_item_id] ===
+                              "updating"
+                            }
+                            className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center font-bold hover:bg-gray-200 transition disabled:opacity-50"
+                          >
+                            -
+                          </button>
+                          <span className="text-sm font-semibold w-6 text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.cart_item_id,
+                                item.quantity + 1
+                              )
+                            }
+                            disabled={
+                              itemLoadingStates[item.cart_item_id] ===
+                              "updating"
+                            }
+                            className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center font-bold hover:bg-gray-200 transition disabled:opacity-50"
+                          >
+                            +
+                          </button>
                         </div>
                       </div>
 
-                      {/* Product Details */}
-                      <div className="flex-1 w-full space-y-2">
-                        {/* Product Name */}
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 leading-tight">
-                            {item.product_name}
-                          </h3>
-                          <button
-                            onClick={() => handleRemoveItem(item.cart_item_id)}
-                            disabled={itemLoadingStates[item.cart_item_id] === "removing"}
-                            className="text-red-500 hover:text-red-700 transition-colors p-1 rounded"
-                            title="Remove item"
-                          >
-                            <TrashIcon className="h-5 w-5" />
-                          </button>
-                        </div>
-
-                        {/* Price + Quantity */}
-                        <div className="flex flex-wrap items-center justify-between text-sm text-gray-600">
-                          <span className="font-medium text-[#0097b2]">
-                            {item.price_points || item.points_cost || item.price} pts each
-                          </span>
-
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() =>
-                                handleUpdateQuantity(item.cart_item_id, item.quantity - 1)
-                              }
-                              disabled={itemLoadingStates[item.cart_item_id] === "updating"}
-                              className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center font-bold hover:bg-gray-200 transition disabled:opacity-50"
+                      {/* Variations */}
+                      <div className="flex flex-wrap gap-2">
+                        {item.variations?.length > 0 ? (
+                          item.variations.map((v, i) => (
+                            <span
+                              key={i}
+                              className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-200"
                             >
-                              -
-                            </button>
-                            <span className="text-sm font-semibold w-6 text-center">
-                              {item.quantity}
+                              {v.type_name ? `${v.type_name}: ` : ""}
+                              {v.option_label || v.option_value}
                             </span>
-                            <button
-                              onClick={() =>
-                                handleUpdateQuantity(item.cart_item_id, item.quantity + 1)
-                              }
-                              disabled={itemLoadingStates[item.cart_item_id] === "updating"}
-                              className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center font-bold hover:bg-gray-200 transition disabled:opacity-50"
-                            >
-                              +
-                            </button>
+                          ))
+                        ) : (
+                          <span className="text-xs px-2 py-1 bg-gray-50 text-gray-500 rounded-full border border-gray-200">
+                            Standard
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Subtotal */}
+                      <div className="flex items-center justify-between border-t border-gray-100 pt-3 mt-2">
+                        <span className="flex items-center gap-1 text-gray-600 text-sm">
+                          <HeartIcon className="h-4 w-4 text-red-500" />
+                          <span>
+                            Subtotal:{" "}
+                            <span className="font-semibold text-[#0097b2]">
+                              {(item.price_points ||
+                                item.points_cost ||
+                                item.price) * item.quantity}{" "}
+                              heartbits
+                            </span>
+                          </span>
+                        </span>
+
+                        {itemLoadingStates[item.cart_item_id] && (
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#0097b2]"></div>
+                            {itemLoadingStates[item.cart_item_id] === "updating"
+                              ? "Updating..."
+                              : "Updated"}
                           </div>
-                        </div>
-
-                        {/* Variations */}
-                        <div className="flex flex-wrap gap-2">
-                          {item.variations?.length > 0 ? (
-                            item.variations.map((v, i) => (
-                              <span
-                                key={i}
-                                className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-200"
-                              >
-                                {v.type_name ? `${v.type_name}: ` : ""}
-                                {v.option_label || v.option_value}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-xs px-2 py-1 bg-gray-50 text-gray-500 rounded-full border border-gray-200">
-                              Standard
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Subtotal */}
-                        <div className="flex items-center justify-between border-t border-gray-100 pt-3 mt-2">
-                          <span className="flex items-center gap-1 text-gray-600 text-sm">
-                            <HeartIcon className="h-4 w-4 text-red-500" />
-                            <span>
-                              Subtotal:{" "}
-                              <span className="font-semibold text-[#0097b2]">
-                                {(item.price_points || item.points_cost || item.price) *
-                                  item.quantity}{" "}
-                                heartbits
-                              </span>
-                            </span>
-                          </span>
-
-                          {itemLoadingStates[item.cart_item_id] && (
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#0097b2]"></div>
-                              {itemLoadingStates[item.cart_item_id] === "updating"
-                                ? "Updating..."
-                                : "Updated"}
-                            </div>
-                          )}
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                ))}
-
+                </div>
+              ))}
             </div>
           )}
         </div>
 
         {/* Cart Footer */}
         {uniqueCart.length > 0 && (
-          <div className="cart-footer border-t border-gray-200 p-3 sm:p-4 pb-6 sm:pb-8">
+          <div className="cart-footer border-t border-gray-200 p-3 sm:p-4 pb-6 sm:pb-8 mb-10">
             {/* Selected Items Summary */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
               <div className="flex items-center gap-2">
@@ -819,32 +835,33 @@ const ShoppingCart = ({
             )}
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-              <button
-                onClick={handleClearCart}
-                disabled={isUpdating}
-                className="w-full sm:flex-1 px-3 sm:px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm"
-              >
-                {isUpdating ? "Clearing..." : "Clear Cart"}
-              </button>
-
-              <button
-                onClick={handleCheckout}
-                disabled={!canCheckout() || isCheckingOut}
-                className="w-full sm:flex-1 px-3 sm:px-4 py-2 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
-              >
-                {isCheckingOut ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <CheckIcon className="h-4 w-4" />
-                    Checkout ({selectedItemsCount})
-                  </>
-                )}
-              </button>
+            <div className="fixed bottom-0 left-0 w-full bg-white px-4 py-3 shadow-md z-50">
+              <div className="max-w-screen-lg mx-auto flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <button
+                  onClick={handleClearCart}
+                  disabled={isUpdating}
+                  className="w-full sm:flex-1 px-3 sm:px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm"
+                >
+                  {isUpdating ? "Clearing..." : "Clear Cart"}
+                </button>
+                <button
+                  onClick={handleCheckout}
+                  disabled={!canCheckout() || isCheckingOut}
+                  className="w-full sm:flex-1 px-3 sm:px-4 py-2 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
+                >
+                  {isCheckingOut ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CheckIcon className="h-4 w-4" />
+                      Checkout ({selectedItemsCount})
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         )}
