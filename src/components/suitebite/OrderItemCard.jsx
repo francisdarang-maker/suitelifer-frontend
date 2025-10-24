@@ -9,33 +9,37 @@ import { SwatchIcon, PhotoIcon } from '@heroicons/react/24/outline';
  * - Selected variations (size, color, design, etc.)
  * - Quantity and pricing
  * - Visual variation indicators
+ * 
+ * Fully responsive for mobile, tablet, and desktop.
  */
 const OrderItemCard = ({ item, showImages = true }) => {
-  // Group variations by type for better display
-  const groupedVariations = item.variations?.reduce((acc, variation) => {
-    if (!acc[variation.type_name]) {
-      acc[variation.type_name] = [];
-    }
-    acc[variation.type_name].push(variation);
-    return acc;
-  }, {}) || {};
+  const groupedVariations =
+    item.variations?.reduce((acc, variation) => {
+      if (!acc[variation.type_name]) {
+        acc[variation.type_name] = [];
+      }
+      acc[variation.type_name].push(variation);
+      return acc;
+    }, {}) || {};
 
-  const primaryImage = item.product_images?.find(img => img.is_primary) || item.product_images?.[0];
+  const primaryImage =
+    item.product_images?.find((img) => img.is_primary) ||
+    item.product_images?.[0];
 
   return (
-    <div className="order-item-card bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-      <div className="flex gap-4">
+    <div className="order-item-card bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow w-full">
+      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
         {/* Product Image */}
         {showImages && (
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 self-center sm:self-start">
             {primaryImage ? (
               <img
                 src={primaryImage.image_url}
                 alt={primaryImage.alt_text || item.product_name}
-                className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                className="w-20 h-20 sm:w-16 sm:h-16 object-cover rounded-lg border border-gray-200"
               />
             ) : (
-              <div className="w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+              <div className="w-20 h-20 sm:w-16 sm:h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
                 <PhotoIcon className="h-6 w-6 text-gray-400" />
               </div>
             )}
@@ -44,19 +48,20 @@ const OrderItemCard = ({ item, showImages = true }) => {
 
         {/* Product Details */}
         <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h4 className="text-base font-medium text-gray-900 truncate">
+          {/* Header: Name + Price */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
+            <div className="min-w-0">
+              <h4 className="text-base sm:text-lg font-medium text-gray-900 truncate">
                 {item.product_name}
               </h4>
               {item.product_category && (
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 mt-1 truncate">
                   Category: {item.product_category}
                 </p>
               )}
             </div>
-            <div className="text-right flex-shrink-0 ml-4">
-              <p className="text-base font-medium text-gray-900">
+            <div className="text-left sm:text-right">
+              <p className="text-base sm:text-lg font-medium text-gray-900">
                 {item.quantity}x {item.price_points} pts
               </p>
               <p className="text-sm text-gray-500">
@@ -65,17 +70,23 @@ const OrderItemCard = ({ item, showImages = true }) => {
             </div>
           </div>
 
-          {/* Variations Display */}
+          {/* Variations */}
           {Object.keys(groupedVariations).length > 0 && (
             <div className="mt-3">
               <div className="flex items-center gap-1 mb-2">
                 <SwatchIcon className="h-4 w-4 text-gray-400" />
-                <span className="text-sm font-medium text-gray-600">Variations:</span>
+                <span className="text-sm font-medium text-gray-600">
+                  Variations:
+                </span>
               </div>
+
               <div className="space-y-2">
                 {Object.entries(groupedVariations).map(([typeName, variations]) => (
-                  <div key={typeName} className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500 capitalize min-w-[60px]">
+                  <div
+                    key={typeName}
+                    className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2"
+                  >
+                    <span className="text-sm text-gray-500 capitalize sm:min-w-[60px]">
                       {variations[0]?.type_label || typeName}:
                     </span>
                     <div className="flex flex-wrap gap-2">
@@ -91,7 +102,7 @@ const OrderItemCard = ({ item, showImages = true }) => {
                               title={`Color: ${variation.option_label}`}
                             />
                           )}
-                          <span className="text-gray-700">
+                          <span className="text-gray-700 truncate">
                             {variation.option_label}
                           </span>
                         </div>
@@ -103,9 +114,9 @@ const OrderItemCard = ({ item, showImages = true }) => {
             </div>
           )}
 
-          {/* Product Description (truncated) */}
+          {/* Description */}
           {item.product_description && (
-            <p className="text-xs text-gray-500 mt-2 line-clamp-2">
+            <p className="text-xs text-gray-500 mt-3 line-clamp-3 sm:line-clamp-2">
               {item.product_description}
             </p>
           )}

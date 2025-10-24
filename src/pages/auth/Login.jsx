@@ -48,7 +48,7 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
       setLoading(true);
       // const recaptchaToken = await executeRecaptcha("login");
       //TODO: check first if exists in HRIS
-      console.log("nakapasok hereee ");
+      // console.log("nakapasok hereee ");
 
       // const { token } = await loginUser({ email, password });
       // localStorage.setItem("hris-token", token);

@@ -54,6 +54,35 @@ const CheerPage = () => {
   const [editCommentText, setEditCommentText] = useState("");
   const [confirmingDelete, setConfirmingDelete] = useState(null);
 
+  const groupCheersBySenderAndTime = (cheers) => {
+    if (!Array.isArray(cheers)) return [];
+
+    const grouped = new Map();
+
+    cheers.forEach((cheer) => {
+      // Create a key based on sender ID and created time (rounded to nearest minute)
+      const createdAt = new Date(cheer.createdAt);
+      const timeKey = Math.floor(createdAt.getTime() / 60000); // Group by minute
+      const key = `${cheer.fromUser?._id || cheer.from_user_id}-${timeKey}`;
+
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          ...cheer,
+          recipients: [cheer.toUser],
+          totalPoints: cheer.points,
+          cheer_ids: [cheer.cheer_id],
+        });
+      } else {
+        const existing = grouped.get(key);
+        existing.recipients.push(cheer.toUser);
+        existing.totalPoints += cheer.points;
+        existing.cheer_ids.push(cheer.cheer_id);
+      }
+    });
+
+    return Array.from(grouped.values());
+  };
+
   useEffect(() => {
     setAllCheers([]);
     setCurrentPage(1);
@@ -167,29 +196,13 @@ const CheerPage = () => {
       toast.error("Failed to update heart");
     },
   });
-
   const commentMutation = useMutation({
     mutationFn: ({ cheerId, comment }) =>
       pointsSystemApi.addCheerComment(cheerId, comment),
-    onSuccess: (data, variables) => {
+    onSuccess: async (data, variables) => {
       setCommentText("");
-      setCheerComments((prev) => {
-        const newComments = new Map(prev);
-        const existing = newComments.get(variables.cheerId);
-        const existingArray = Array.isArray(existing) ? existing : [];
-        const newComment = {
-          _id: data.id || data._id,
-          comment: data.comment,
-          fromUser: {
-            _id: user.id,
-            name: `${user.first_name} ${user.last_name}`,
-            avatar: user?.profile_pic || defaultAvatar,
-          },
-          createdAt: data.created_at || data.createdAt,
-        };
-        newComments.set(variables.cheerId, [newComment, ...existingArray]);
-        return newComments;
-      });
+      // Immediately reload comments from server to get fresh data
+      await fetchComments(variables.cheerId, false);
       queryClient.invalidateQueries(["cheer-feed"]);
       refetchCheerFeed();
       toast.success("Comment added!");
@@ -221,24 +234,27 @@ const CheerPage = () => {
     },
     onError: () => toast.error("Failed to update comment"),
   });
-
-  const deleteCommentMutation = useMutation({
+  
+const deleteCommentMutation = useMutation({
     mutationFn: ({ cheerId, commentId }) =>
       pointsSystemApi.deleteCheerComment(cheerId, commentId),
-    onSuccess: (_, variables) => {
-      setCheerComments((prev) => {
-        const newMap = new Map(prev);
-        const data = newMap.get(variables.cheerId);
-        if (data && Array.isArray(data.comments)) {
-          data.comments = data.comments.filter(
-            (c) => c._id !== variables.commentId
-          );
-        }
-        return newMap;
-      });
+    onSuccess: async (_, variables) => {
+      setLoadingComments(true);
+      
+      // First invalidate queries to trigger refetch
+      await queryClient.invalidateQueries(["cheer-feed"]);
+      await refetchCheerFeed();
+      
+      // Then reload comments for the specific cheer
+      await fetchComments(variables.cheerId, false);
+      
+      setLoadingComments(false);
       toast.success("Comment deleted!");
     },
-    onError: () => toast.error("Failed to delete comment"),
+    onError: () => {
+      setLoadingComments(false);
+      toast.error("Failed to delete comment");
+    },
   });
 
   useEffect(() => {
@@ -374,35 +390,53 @@ const CheerPage = () => {
     }
   };
 
+  const MAX_RECIPIENTS = 5;
+
   const handleUserSelect = (user) => {
+    setSelectedUsers((prev) => {
+      if (prev.length >= MAX_RECIPIENTS) return prev; // 🔒 Prevent adding more
+      return [...prev, user];
+    });
     setCheerText("");
-    setSelectedUsers((prev) => [...prev, user]);
     setShowUserDropdown(false);
   };
+
+  const [isSending, setIsSending] = useState(false);
 
   const handleCheerSubmit = (e) => {
     e.preventDefault();
     if (isSubmitting) return;
+
+    setIsSending(true); // start spinner
+
+    // ✅ VALIDATION
     if (selectedUsers.length === 0) {
       toast.error("Please select at least one recipient");
+      setIsSending(false);
       return;
     }
+
     if (!messageText.trim()) {
       toast.error("Please enter a message for your cheer");
+      setIsSending(false);
       return;
     }
+
     const totalHeartbitsNeeded = cheerPoints * selectedUsers.length;
     if (totalHeartbitsNeeded > availableHeartbits) {
       toast.error(
         `Not enough heartbits available. You need ${totalHeartbitsNeeded} heartbits but you only have ${availableHeartbits} remaining.`
       );
+      setIsSending(false);
       return;
     }
+
     setIsSubmitting(true);
 
     const sendCheersSequentially = async () => {
       let successCount = 0;
       let errorCount = 0;
+
       for (const user of selectedUsers) {
         try {
           const cheerData = {
@@ -416,6 +450,7 @@ const CheerPage = () => {
           errorCount++;
         }
       }
+
       if (errorCount === 0) {
         toast.success(`Cheers sent to ${successCount} recipients! 🎉`);
         setSelectedUsers([]);
@@ -443,6 +478,7 @@ const CheerPage = () => {
       })
       .finally(() => {
         setIsSubmitting(false);
+        setIsSending(false); // 👈 THIS IS CRITICAL
       });
   };
 
@@ -502,6 +538,7 @@ const CheerPage = () => {
   const pageStartIndex = (currentPage - 1) * itemsPerPage;
   const pageEndIndex = pageStartIndex + itemsPerPage;
   const feed = allData.slice(pageStartIndex, pageEndIndex);
+  const groupedFeed = groupCheersBySenderAndTime(feed);
 
   const totalItems = allData.length || 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
@@ -542,7 +579,7 @@ const CheerPage = () => {
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200"
                         >
                           <img
-                            src={user.avatar ||defaultAvatar}
+                            src={user.avatar || defaultAvatar}
                             alt={user.name}
                             className="w-5 h-5 rounded-full"
                           />
@@ -563,8 +600,7 @@ const CheerPage = () => {
                     </div>
                   </div>
                 )}
-
-                {/* Search */}
+                {/* Search Peers */}
                 <div className="relative" ref={dropdownRef}>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Search Peers
@@ -573,10 +609,22 @@ const CheerPage = () => {
                     type="text"
                     value={cheerText}
                     onChange={handleCheerTextChange}
-                    placeholder="Type a name..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder={
+                      selectedUsers.length >= MAX_RECIPIENTS
+                        ? `Limit reached (${MAX_RECIPIENTS} people)`
+                        : "Type a name..."
+                    }
+                    disabled={selectedUsers.length >= MAX_RECIPIENTS} // ✅ Disable when full
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                      selectedUsers.length >= MAX_RECIPIENTS
+                        ? "bg-gray-100 cursor-not-allowed opacity-70"
+                        : ""
+                    }`}
                   />
+
+                  {/* Dropdown (only shows if under limit) */}
                   {showUserDropdown &&
+                    selectedUsers.length < MAX_RECIPIENTS &&
                     Array.isArray(searchResults) &&
                     searchResults.length > 0 && (
                       <div className="absolute z-20 w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
@@ -596,9 +644,7 @@ const CheerPage = () => {
                               className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
                             >
                               <img
-                                src={
-                                  result.avatar || defaultAvatar
-                                }
+                                src={result.avatar || defaultAvatar}
                                 alt={result.name}
                                 className="w-10 h-10 rounded-full"
                               />
@@ -614,8 +660,15 @@ const CheerPage = () => {
                           ))}
                       </div>
                     )}
-                </div>
 
+                  {/* Notice when limit reached */}
+                  {selectedUsers.length >= MAX_RECIPIENTS && (
+                    <p className="text-xs text-red-500 mt-2">
+                      You can only send Heartbits to up to {MAX_RECIPIENTS}{" "}
+                      people at a time.
+                    </p>
+                  )}
+                </div>
                 {/* Message */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -631,7 +684,6 @@ const CheerPage = () => {
                     required
                   />
                 </div>
-
                 {/* Points Slider */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
@@ -655,8 +707,6 @@ const CheerPage = () => {
                     <span>Max: {Math.min(100, availableHeartbits)}</span>
                   </div>
                 </div>
-
-                {/* Submit */}
                 <button
                   type="submit"
                   disabled={
@@ -665,11 +715,12 @@ const CheerPage = () => {
                     selectedUsers.length === 0 ||
                     !messageText.trim() ||
                     bulkCheerMutation.isLoading ||
-                    cheerPoints > availableHeartbits
+                    cheerPoints > availableHeartbits ||
+                    isSending
                   }
-                  className="w-full bg-primary text-white py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-primary text-white py-2.5 px-4 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
-                  {bulkCheerMutation.isLoading ? (
+                  {isSending || bulkCheerMutation.isLoading ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                       <span>Sending...</span>
@@ -773,10 +824,7 @@ const CheerPage = () => {
                       {currentUserLeaderboard.rank}
                     </div>
                     <img
-                      src={
-                        currentUserLeaderboard.info?.avatar ||
-                        defaultAvatar
-                      }
+                      src={currentUserLeaderboard.info?.avatar || defaultAvatar}
                       alt={currentUserLeaderboard.info?.name}
                       className="w-8 h-8 rounded-full"
                     />
@@ -897,67 +945,83 @@ const CheerPage = () => {
               </div>
 
               {/* Feed Content */}
-              <div className="max-h-[1108px] overflow-y-auto p-4">
+              <div className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-180px)] lg:max-h-[1108px] overflow-y-auto p-2 sm:p-3 md:p-4">
                 {feedLoading ? (
-                  <div className="text-center py-10">
-                    <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-300 border-t-blue-600 mx-auto mb-3"></div>
-                    <p className="text-sm text-gray-500">Loading cheers...</p>
+                  <div className="text-center py-8 sm:py-10">
+                    <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-2 border-gray-300 border-t-blue-600 mx-auto mb-2 sm:mb-3"></div>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      Loading cheers...
+                    </p>
                   </div>
-                ) : feed.length > 0 ? (
-                  <div className="space-y-2.5">
-                    {feed.map((cheer) => (
+                ) : groupedFeed.length > 0 ? (
+                  <div className="space-y-2 sm:space-y-2.5 md:space-y-3">
+                    {groupedFeed.map((cheer) => (
                       <div
-                        key={cheer.cheer_id}
-                        className="border border-gray-200 rounded-lg p-3.5 hover:shadow-md transition-shadow"
+                        key={cheer.cheer_ids.join("-")}
+                        className="border border-gray-200 rounded-lg p-2.5 sm:p-3 md:p-3.5 hover:shadow-md transition-shadow"
                       >
-                        <div className="flex gap-3">
+                        <div className="flex gap-2 sm:gap-3">
                           <img
-                            src={
-                              cheer.fromUser?.avatar ||
-                             defaultAvatar
-                            }
+                            src={cheer.fromUser?.avatar || defaultAvatar}
                             alt={cheer.fromUser?.name}
-                            className="w-10 h-10 rounded-full flex-shrink-0"
+                            className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex-shrink-0"
                           />
 
                           <div className="flex-1 min-w-0">
                             {/* Header */}
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <span
-                                className="font-semibold text-sm text-gray-900 hover:text-blue-600 cursor-pointer"
-                                title={cheer.fromUser?.name}
-                              >
-                                {cheer.fromUser?.name}
-                              </span>
-                              <span className="text-gray-500 text-xs">
-                                cheered
-                              </span>
-                              <span
-                                className="font-semibold text-sm text-gray-900 hover:text-blue-600 cursor-pointer"
-                                title={cheer.toUser?.name}
-                              >
-                                {cheer.toUser?.name}
-                              </span>
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-bold flex-shrink-0">
-                                +{cheer.points}
-                                <HeartIconSolid className="w-3 h-3 text-red-500" />
-                              </span>
-                              <span className="ml-auto text-xs text-gray-400 flex-shrink-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
+                              <div className="text-xs sm:text-sm md:text-base text-gray-900 leading-snug flex-1">
+                                <span
+                                  className="font-semibold cursor-pointer"
+                                  title={cheer.fromUser?.name}
+                                >
+                                  {cheer.fromUser?.name}
+                                </span>{" "}
+                                <span className="text-gray-500">cheered</span>{" "}
+                                {cheer.recipients
+                                  .slice(0, 5)
+                                  .map((recipient, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="font-semibold text-primary"
+                                      title={recipient?.name}
+                                    >
+                                      {recipient?.name}
+                                      {idx <
+                                        Math.min(
+                                          4,
+                                          cheer.recipients.length - 1
+                                        ) && ","}{" "}
+                                    </span>
+                                  ))}
+                                {cheer.recipients.length > 5 && (
+                                  <span className="text-gray-600 font-medium">
+                                    and {cheer.recipients.length - 5}{" "}
+                                    {cheer.recipients.length - 5 === 1
+                                      ? "other"
+                                      : "others"}
+                                  </span>
+                                )}{" "}
+                                <span className="inline-flex items-center gap-0.5 px-1.5 sm:px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-[10px] sm:text-xs font-bold ml-1 align-middle">
+                                  +{cheer.totalPoints}
+                                  <HeartIconSolid className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-red-500" />
+                                </span>
+                              </div>
+
+                              <span className="text-[10px] sm:text-xs text-gray-400 flex-shrink-0 sm:ml-auto">
                                 {formatTimeAgo(cheer.createdAt)}
                               </span>
                             </div>
 
                             {/* Message */}
                             {cheer.message && (
-                              <div className="w-full p-2 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary">
+                              <div className="w-full p-2 sm:p-2.5 md:p-3 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary mb-2 sm:mb-3">
                                 {(() => {
-                                  // Detect GIF/image URLs in the message
                                   const urlRegex =
                                     /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
                                   const parts = cheer.message.split(urlRegex);
 
                                   return parts.map((part, index) => {
-                                    // Check if this part is a URL
                                     if (urlRegex.test(part)) {
                                       return (
                                         <div key={index} className="my-2">
@@ -965,9 +1029,8 @@ const CheerPage = () => {
                                             src={part}
                                             alt="Shared content"
                                             className="max-w-full h-auto rounded-lg border border-gray-200 shadow-sm"
-                                            style={{ maxHeight: "250px" }}
+                                            style={{ maxHeight: "200px" }}
                                             onError={(e) => {
-                                              // If image fails to load, show the URL instead
                                               e.target.style.display = "none";
                                               e.target.nextSibling.style.display =
                                                 "block";
@@ -977,7 +1040,7 @@ const CheerPage = () => {
                                             href={part}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-xs text-blue-600 hover:text-blue-700 underline break-all"
+                                            className="text-[10px] sm:text-xs text-blue-600 hover:text-blue-700 underline break-all"
                                             style={{ display: "none" }}
                                           >
                                             {part}
@@ -985,11 +1048,10 @@ const CheerPage = () => {
                                         </div>
                                       );
                                     }
-                                    // Regular text
                                     return part ? (
                                       <p
                                         key={index}
-                                        className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
+                                        className="text-xs sm:text-sm md:text-base text-gray-700 leading-relaxed whitespace-pre-wrap break-words"
                                       >
                                         {part}
                                       </p>
@@ -999,23 +1061,23 @@ const CheerPage = () => {
                               </div>
                             )}
 
-                            {/* Actions */}
-                            <div className="flex items-center gap-2">
+                            {/* Actions - Using first cheer_id for interactions */}
+                            <div className="flex items-center gap-1.5 sm:gap-2 mb-2">
                               <button
                                 onClick={() =>
                                   likeMutation.mutate(cheer.cheer_id)
                                 }
                                 disabled={likeMutation.isLoading}
-                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                                className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-colors touch-manipulation ${
                                   likedCheers.has(cheer.cheer_id)
                                     ? "bg-red-50 text-red-600"
-                                    : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                    : "bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
                                 }`}
                               >
                                 {likedCheers.has(cheer.cheer_id) ? (
-                                  <HeartIconSolid className="w-4 h-4" />
+                                  <HeartIconSolid className="w-3 h-3 sm:w-4 sm:h-4" />
                                 ) : (
-                                  <HeartIcon className="w-4 h-4" />
+                                  <HeartIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                                 )}
                                 <span>
                                   {cheer.heartCount || cheer.likeCount || 0}
@@ -1026,22 +1088,21 @@ const CheerPage = () => {
                                 onClick={() =>
                                   handleCommentClick(cheer.cheer_id)
                                 }
-                                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                                className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-colors touch-manipulation ${
                                   commentingCheer === cheer.cheer_id
                                     ? "bg-green-50 text-green-600"
-                                    : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                    : "bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200"
                                 }`}
                               >
-                                <ChatBubbleLeftEllipsisIcon className="w-4 h-4" />
+                                <ChatBubbleLeftEllipsisIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                                 <span>{cheer.commentCount || 0}</span>
                               </button>
                             </div>
 
-                            {/* Comments */}
+                            {/* Comments section remains the same */}
                             {commentingCheer === cheer.cheer_id && (
-                              <div className="mt-3 pt-3 border-t border-gray-100">
-                                {/* Add Comment */}
-                                <div className="flex gap-2 mb-3">
+                              <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-100">
+                                <div className="flex gap-1.5 sm:gap-2 mb-2 sm:mb-3">
                                   <input
                                     type="text"
                                     value={commentText}
@@ -1049,7 +1110,7 @@ const CheerPage = () => {
                                       setCommentText(e.target.value)
                                     }
                                     placeholder="Write a comment..."
-                                    className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     onKeyPress={(e) => {
                                       if (
                                         e.key === "Enter" &&
@@ -1075,23 +1136,25 @@ const CheerPage = () => {
                                       !commentText.trim() ||
                                       commentMutation.isLoading
                                     }
-                                    className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                                    className="px-2 sm:px-3 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg text-[10px] sm:text-xs font-medium hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
                                   >
                                     Post
                                   </button>
                                 </div>
 
-                                {/* Comments List */}
-                                <div className="space-y-2">
+                                {/* Rest of comments section stays the same */}
+                                <div className="space-y-1.5 sm:space-y-2">
                                   {loadingComments ? (
-                                    <div className="flex justify-center py-3">
-                                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-300 border-t-blue-600"></div>
+                                    <div className="flex justify-center py-2 sm:py-3">
+                                      <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-2 border-gray-300 border-t-blue-600"></div>
                                     </div>
                                   ) : (
                                     (() => {
                                       const commentData = cheerComments.get(
                                         cheer.cheer_id
-                                      ) || { comments: [] };
+                                      ) || {
+                                        comments: [],
+                                      };
                                       const comments = commentData.comments;
                                       if (
                                         Array.isArray(comments) &&
@@ -1123,30 +1186,30 @@ const CheerPage = () => {
                                               return (
                                                 <div
                                                   key={commentKey}
-                                                  className="group bg-gray-50 rounded-lg p-2.5 hover:bg-gray-100 transition-colors duration-200"
+                                                  className="group bg-gray-50 rounded-lg p-2 sm:p-2.5 hover:bg-gray-100 transition-colors duration-200"
                                                 >
-                                                  <div className="flex gap-2">
+                                                  <div className="flex gap-2 sm:gap-3">
                                                     <img
                                                       src={
                                                         comment.fromUser
                                                           ?.avatar ||
-                                                      defaultAvatar
+                                                        defaultAvatar
                                                       }
                                                       alt={
                                                         comment.fromUser
                                                           ?.name || "User"
                                                       }
-                                                      className="w-7 h-7 rounded-full flex-shrink-0"
+                                                      className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex-shrink-0"
                                                     />
                                                     <div className="flex-1 min-w-0">
-                                                      <div className="flex items-center justify-between mb-1">
-                                                        <div className="flex items-center gap-2">
-                                                          <span className="font-medium text-xs text-gray-900">
+                                                      <div className="flex items-start sm:items-center justify-between mb-1 gap-2">
+                                                        <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 min-w-0">
+                                                          <span className="font-medium text-xs sm:text-sm text-gray-900 truncate">
                                                             {comment.fromUser
                                                               ?.name ||
                                                               "Anonymous"}
                                                           </span>
-                                                          <span className="text-xs text-gray-400">
+                                                          <span className="text-[10px] sm:text-xs text-gray-400 flex-shrink-0">
                                                             {formatTimeAgo(
                                                               comment.createdAt
                                                             )}
@@ -1154,9 +1217,9 @@ const CheerPage = () => {
                                                         </div>
                                                         {isOwnComment &&
                                                           !isEditing && (
-                                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <div className="flex gap-0.5 sm:gap-1 flex-shrink-0">
                                                               <button
-                                                                className="p-1 hover:bg-amber-100 rounded transition-colors"
+                                                                className="p-1 sm:p-1.5 rounded hover:bg-amber-50 transition-colors"
                                                                 onClick={() => {
                                                                   setEditingComment(
                                                                     {
@@ -1173,7 +1236,7 @@ const CheerPage = () => {
                                                                 title="Edit comment"
                                                               >
                                                                 <svg
-                                                                  className="w-3.5 h-3.5 text-amber-600"
+                                                                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-amber-600"
                                                                   fill="none"
                                                                   stroke="currentColor"
                                                                   viewBox="0 0 24 24"
@@ -1188,8 +1251,9 @@ const CheerPage = () => {
                                                                   />
                                                                 </svg>
                                                               </button>
+
                                                               <button
-                                                                className="p-1 hover:bg-red-100 rounded transition-colors"
+                                                                className="p-1 sm:p-1.5 rounded hover:bg-red-50 transition-colors"
                                                                 onClick={() =>
                                                                   setConfirmingDelete(
                                                                     {
@@ -1203,7 +1267,7 @@ const CheerPage = () => {
                                                                 title="Delete comment"
                                                               >
                                                                 <svg
-                                                                  className="w-3.5 h-3.5 text-red-600"
+                                                                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-red-600"
                                                                   fill="none"
                                                                   stroke="currentColor"
                                                                   viewBox="0 0 24 24"
@@ -1233,7 +1297,7 @@ const CheerPage = () => {
                                                                 e.target.value
                                                               )
                                                             }
-                                                            className="w-full px-2.5 py-2 text-xs border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                                            className="w-full px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                                             rows="2"
                                                             disabled={
                                                               editCommentMutation.isLoading
@@ -1241,7 +1305,7 @@ const CheerPage = () => {
                                                           />
                                                           <div className="flex gap-2">
                                                             <button
-                                                              className="flex-1 px-2.5 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                                                              className="flex-1 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                                                               disabled={
                                                                 editCommentMutation.isLoading ||
                                                                 !editCommentText.trim()
@@ -1264,7 +1328,7 @@ const CheerPage = () => {
                                                                 : "Save"}
                                                             </button>
                                                             <button
-                                                              className="flex-1 px-2.5 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-400 transition-colors"
+                                                              className="flex-1 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-gray-300 text-gray-700 rounded-lg text-xs sm:text-sm font-medium hover:bg-gray-400 active:bg-gray-500 transition-colors touch-manipulation"
                                                               onClick={() => {
                                                                 setEditingComment(
                                                                   null
@@ -1279,21 +1343,21 @@ const CheerPage = () => {
                                                           </div>
                                                         </div>
                                                       ) : (
-                                                        <p className="text-xs text-gray-700 leading-relaxed">
+                                                        <p className="text-xs sm:text-sm text-gray-700 leading-relaxed break-words">
                                                           {comment.comment}
                                                         </p>
                                                       )}
 
                                                       {isDeleting && (
-                                                        <div className="mt-2 p-2 bg-red-50 rounded-lg border border-red-200">
-                                                          <p className="text-xs text-red-800 font-medium mb-2">
+                                                        <div className="mt-2 p-2 sm:p-3 bg-red-50 rounded-lg border border-red-200">
+                                                          <p className="text-xs sm:text-sm text-red-800 font-medium mb-2">
                                                             Are you sure you
                                                             want to delete this
                                                             comment?
                                                           </p>
                                                           <div className="flex gap-2">
                                                             <button
-                                                              className="flex-1 px-2.5 py-1.5 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 transition-colors"
+                                                              className="flex-1 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-red-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-red-700 active:bg-red-800 transition-colors touch-manipulation"
                                                               onClick={() => {
                                                                 deleteCommentMutation.mutate(
                                                                   {
@@ -1311,7 +1375,7 @@ const CheerPage = () => {
                                                               Delete
                                                             </button>
                                                             <button
-                                                              className="flex-1 px-2.5 py-1.5 bg-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-400 transition-colors"
+                                                              className="flex-1 px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 bg-gray-300 text-gray-700 rounded-lg text-xs sm:text-sm font-medium hover:bg-gray-400 active:bg-gray-500 transition-colors touch-manipulation"
                                                               onClick={() =>
                                                                 setConfirmingDelete(
                                                                   null
@@ -1330,7 +1394,7 @@ const CheerPage = () => {
                                             })}
                                             {commentData.hasMore && (
                                               <button
-                                                className="w-full py-2 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                className="w-full py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-blue-600 hover:bg-blue-50 active:bg-blue-100 rounded-lg transition-colors touch-manipulation"
                                                 onClick={() =>
                                                   fetchComments(
                                                     cheer.cheer_id,
@@ -1345,7 +1409,7 @@ const CheerPage = () => {
                                         );
                                       } else {
                                         return (
-                                          <p className="text-xs text-gray-500 text-center py-2">
+                                          <p className="text-xs sm:text-sm text-gray-500 text-center py-2">
                                             No comments yet
                                           </p>
                                         );
@@ -1361,12 +1425,12 @@ const CheerPage = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12">
-                    <HeartIcon className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                    <h3 className="text-base font-medium text-gray-900 mb-1">
+                  <div className="text-center py-8 sm:py-10 md:py-12">
+                    <HeartIcon className="w-8 h-8 sm:w-10 sm:h-10 text-gray-300 mx-auto mb-2" />
+                    <h3 className="text-sm sm:text-base font-medium text-gray-900 mb-1">
                       No cheers yet
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-gray-500">
                       Be the first to spread positivity! 🌟
                     </p>
                   </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { suitebiteAPI } from "../../../utils/suitebiteAPI";
 import { formatTimeAgo, formatDate } from "../../../utils/dateHelpers";
 import { downloadReceiptPDF } from "../../../utils/pdfReceipt";
@@ -22,6 +22,8 @@ import {
   UserIcon,
   ArrowDownTrayIcon,
   TrashIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -75,6 +77,8 @@ const OrderManagement = () => {
   // Confirmation modals state
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
+  const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
   const [pendingAction, setPendingAction] = useState({
     type: "",
     orderId: null,
@@ -83,6 +87,28 @@ const OrderManagement = () => {
   // Cache state
   const [lastLoadTime, setLastLoadTime] = useState(0);
   const [lastFilters, setLastFilters] = useState({});
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Add this helper variable
+  const hasActiveFilters =
+    searchTerm ||
+    statusFilter !== "all" ||
+    sortBy !== "ordered_at" ||
+    sortOrder !== "desc";
+
+  const [showLeftScroll, setShowLeftScroll] = useState(false);
+  const [showRightScroll, setShowRightScroll] = useState(true);
+  const statsScrollRef = useRef(null);
+
+  // Add this function to handle scroll indicators:
+  const handleStatsScroll = (e) => {
+    const element = e.target;
+    const scrollLeft = element.scrollLeft;
+    const maxScroll = element.scrollWidth - element.clientWidth;
+
+    setShowLeftScroll(scrollLeft > 10);
+    setShowRightScroll(scrollLeft < maxScroll - 10);
+  };
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
@@ -283,7 +309,18 @@ const OrderManagement = () => {
     }
   };
 
-  const handleApproveOrder = async (orderId) => {
+  const handleApproveOrder = (orderId) => {
+    setPendingAction({ type: "approve", orderId });
+    setShowApproveConfirm(true);
+  };
+
+  const confirmApproveOrder = async () => {
+    const { orderId } = pendingAction;
+
+    // Close modal immediately for better UX
+    setShowApproveConfirm(false);
+    setPendingAction({ type: "", orderId: null });
+
     try {
       setApprovingOrders((prev) => new Set(prev).add(orderId));
 
@@ -309,7 +346,18 @@ const OrderManagement = () => {
     }
   };
 
-  const handleCompleteOrder = async (orderId) => {
+  const handleCompleteOrder = (orderId) => {
+    setPendingAction({ type: "complete", orderId });
+    setShowCompleteConfirm(true);
+  };
+
+  const confirmCompleteOrder = async () => {
+    const { orderId } = pendingAction;
+
+    // Close modal immediately for better UX
+    setShowCompleteConfirm(false);
+    setPendingAction({ type: "", orderId: null });
+
     try {
       setCompletingOrders((prev) => new Set(prev).add(orderId));
 
@@ -849,180 +897,382 @@ const OrderManagement = () => {
         </div>
       )}
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mb-6 ">
-        <div className="bg-white rounded-lg shadow-sm  p-2 sm:p-3 md:p-4 border  border-gray-200 hover:border-gray-400 transition-all">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm md:text-base font-medium  text-gray-600 truncate">
-                Total Orders
-              </p>
-              <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
-                {orders.length}
-              </p>
+      {/* Stats Cards - Horizontal Scroll on Mobile, Grid on Desktop */}
+      <div className="mb-6">
+        {/* Mobile: Horizontal scroll with indicators */}
+        <div className="lg:hidden relative">
+          {/* Left Scroll Indicator */}
+          {showLeftScroll && (
+            <div className="absolute left-0 top-0 bottom-2 w-12 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none flex items-center">
+              <div className="ml-2 bg-white rounded-full shadow-lg p-1">
+                <svg
+                  className="w-4 h-4 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </div>
             </div>
-            <div className="p-1 sm:p-2 sm:ml-2 md:hidden  xl:inline-block bg-gray-100 rounded-lg flex-shrink-0 ml-1 ">
-              <ShoppingBagIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-6 md:w-6 text-gray-600" />
+          )}
+
+          {/* Right Scroll Indicator */}
+          {showRightScroll && (
+            <div className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none flex items-center justify-end">
+              <div className="mr-2 bg-white rounded-full shadow-lg p-1">
+                <svg
+                  className="w-4 h-4 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </div>
+            </div>
+          )}
+
+          {/* Scrollable Container */}
+          <div
+            ref={statsScrollRef}
+            onScroll={handleStatsScroll}
+            className="overflow-x-auto pb-2 -mx-4 px-4 scroll-smooth"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            <style>{`
+        .overflow-x-auto::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+
+            <div className="flex gap-3 min-w-max">
+              {/* Total Orders */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:border-gray-400 transition-all p-3 min-w-[140px]">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-gray-600">
+                      Total Orders
+                    </p>
+                    <div className="p-1.5 bg-gray-100 rounded-lg">
+                      <ShoppingBagIcon className="h-4 w-4 text-gray-600" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {orders.length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Pending */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:border-yellow-400 transition-all p-3 min-w-[140px]">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-gray-600">Pending</p>
+                    <div className="p-1.5 bg-yellow-100 rounded-lg">
+                      <ClockIcon className="h-4 w-4 text-yellow-600" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {orders.filter((o) => o.status === "pending").length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Processing */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:border-blue-500 transition-all p-3 min-w-[140px]">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-gray-600">
+                      Processing
+                    </p>
+                    <div className="p-1.5 bg-blue-100 rounded-lg">
+                      <ArrowPathIcon className="h-4 w-4 text-blue-600" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {orders.filter((o) => o.status === "processing").length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Completed */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:border-green-500 transition-all p-3 min-w-[140px]">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-gray-600">
+                      Completed
+                    </p>
+                    <div className="p-1.5 bg-green-100 rounded-lg">
+                      <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-green-600">
+                    {orders.filter((o) => o.status === "completed").length}
+                  </p>
+                </div>
+              </div>
+
+              {/* Cancelled */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:border-red-500 transition-all p-3 min-w-[140px]">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-gray-600">
+                      Cancelled
+                    </p>
+                    <div className="p-1.5 bg-red-100 rounded-lg">
+                      <XCircleIcon className="h-4 w-4 text-red-600" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-red-600">
+                    {orders.filter((o) => o.status === "cancelled").length}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-3 md:p-4 hover:border-yellow-400 transition-all">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm md:text-base font-medium text-gray-600 truncate">
-                Pending
-              </p>
-              <p className="text-lg sm:text-xl md:text-2xl font-bold text-yellow-600">
-                {orders.filter((o) => o.status === "pending").length}
-              </p>
-            </div>
-            <div className="p-1 sm:p-2 sm:ml-2 md:hidden  xl:inline-block bg-yellow-100 rounded-lg flex-shrink-0 ml-1 ">
-              <ClockIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-6 md:w-6 text-yellow-600" />
-            </div>
+
+          {/* Dot Indicators */}
+          <div className="flex justify-center gap-1.5 mt-2">
+            <div
+              className={`h-1.5 rounded-full transition-all ${
+                showLeftScroll ? "w-1.5 bg-gray-300" : "w-6 bg-[#0097b2]"
+              }`}
+            ></div>
+            <div
+              className={`h-1.5 w-1.5 rounded-full transition-all ${
+                showLeftScroll && showRightScroll
+                  ? "bg-[#0097b2]"
+                  : "bg-gray-300"
+              }`}
+            ></div>
+            <div
+              className={`h-1.5 rounded-full transition-all ${
+                showRightScroll ? "w-1.5 bg-gray-300" : "w-6 bg-[#0097b2]"
+              }`}
+            ></div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border  border-gray-200 p-2 sm:p-3 md:p-4 hover:border-blue-500 transition-all">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm md:text-base font-medium text-gray-600 truncate">
-                Processing
-              </p>
-              <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
-                {orders.filter((o) => o.status === "processing").length}
-              </p>
-            </div>
-            <div className="p-1 sm:p-2 sm:ml-2 md:hidden  xl:inline-block bg-blue-100 rounded-lg flex-shrink-0 ml-1 ">
-              <ArrowPathIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-6 md:w-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border   border-gray-200 p-2 sm:p-3 md:p-4 hover:border-green-500 transition-all">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm md:text-base font-medium text-gray-600 truncate">
-                Completed
-              </p>
-              <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-600">
-                {orders.filter((o) => o.status === "completed").length}
-              </p>
-            </div>
-            <div className="p-1 sm:p-2 sm:ml-2 md:hidden xl:inline-block bg-green-100 rounded-lg flex-shrink-0 ml-1 ">
-              <CheckCircleIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-6 md:w-6 text-green-600" />
+
+        {/* Desktop: Grid layout (your existing layout) */}
+        <div className="hidden lg:grid grid-cols-5 gap-4">
+          <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:border-gray-400 transition-all">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-medium text-gray-600 truncate">
+                  Total Orders
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {orders.length}
+                </p>
+              </div>
+              <div className="p-2 bg-gray-100 rounded-lg flex-shrink-0 ml-2">
+                <ShoppingBagIcon className="h-6 w-6 text-gray-600" />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border   border-gray-200 p-2 sm:p-3 md:p-4 hover:border-red-500 transition-all ">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm md:text-base font-medium text-gray-600 truncate">
-                Cancelled
-              </p>
-              <p className="text-lg sm:text-xl md:text-2xl font-bold text-red-600">
-                {orders.filter((o) => o.status === "cancelled").length}
-              </p>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:border-yellow-400 transition-all">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-medium text-gray-600 truncate">
+                  Pending
+                </p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {orders.filter((o) => o.status === "pending").length}
+                </p>
+              </div>
+              <div className="p-2 bg-yellow-100 rounded-lg flex-shrink-0 ml-2">
+                <ClockIcon className="h-6 w-6 text-yellow-600" />
+              </div>
             </div>
-            <div className="p-1 sm:p-2 sm:ml-2 md:hidden xl:inline-block bg-red-100 rounded-lg flex-shrink-0 ml-1 ">
-              <XCircleIcon className="h-3 w-3 sm:h-4 sm:w-4 md:h-6 md:w-6 text-red-600" />
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:border-blue-500 transition-all">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-medium text-gray-600 truncate">
+                  Processing
+                </p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {orders.filter((o) => o.status === "processing").length}
+                </p>
+              </div>
+              <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0 ml-2">
+                <ArrowPathIcon className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:border-green-500 transition-all">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-medium text-gray-600 truncate">
+                  Completed
+                </p>
+                <p className="text-2xl font-bold text-green-600">
+                  {orders.filter((o) => o.status === "completed").length}
+                </p>
+              </div>
+              <div className="p-2 bg-green-100 rounded-lg flex-shrink-0 ml-2">
+                <CheckCircleIcon className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:border-red-500 transition-all">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-base font-medium text-gray-600 truncate">
+                  Cancelled
+                </p>
+                <p className="text-2xl font-bold text-red-600">
+                  {orders.filter((o) => o.status === "cancelled").length}
+                </p>
+              </div>
+              <div className="p-2 bg-red-100 rounded-lg flex-shrink-0 ml-2">
+                <XCircleIcon className="h-6 w-6 text-red-600" />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filters and Export */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2 sm:gap-3 mb-6 bg-white rounded-lg shadow-sm border   border-gray-200 p-3 sm:p-4">
-        {/* Filters */}
-        <div className="flex flex-wrap gap-2 flex-1 min-w-0">
-          {/* Search */}
-          <div className="flex-1 min-w-[180px] sm:min-w-[200px]">
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-              Search
-            </label>
-            <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search orders..."
-                className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm md:text-base focus:outline-none  focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-              />
+      <div className="mb-6">
+        {/* Mobile Filter Toggle Button */}
+        <div className="lg:hidden mb-3">
+          <button
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-lg shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <FunnelIcon className="h-5 w-5 text-gray-600" />
+              <span className="font-medium text-gray-900 text-sm">
+                Filters & Search
+              </span>
+              {hasActiveFilters && (
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                  Active
+                </span>
+              )}
             </div>
-          </div>
-          {/* Status Filter */}
-          <div className="min-w-[100px] sm:min-w-[120px] md:min-w-[140px] ">
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="  sm:px-3 sm:py-2 py-1.5 sm:text-sm md:text-base border w-full   border-gray-300 rounded-lg text-xs  focus:outline-none  focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-            >
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="processing">Processing</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-          {/* Sort By */}
-          <div className="min-w-[90px] sm:min-w-[100px] md:min-w-[110px]">
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-              Sort By
-            </label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm md:text-base focus:outline-none  focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-            >
-              <option value="ordered_at">Date</option>
-              <option value="order_id">Order ID</option>
-              <option value="customer">Customer</option>
-              <option value="status">Status</option>
-              <option value="total_points">Points</option>
-            </select>
-          </div>
-          {/* Sort Order */}
-          <div className="min-w-[80px] sm:min-w-[90px] md:min-w-[95px]">
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-              Order
-            </label>
-            <select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm md:text-base focus:outline-none  focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-            >
-              <option value="desc">Newest</option>
-              <option value="asc">Oldest</option>
-            </select>
-          </div>
-          {/* Reset Filters */}
-          {(searchTerm ||
-            statusFilter !== "all" ||
-            sortBy !== "ordered_at" ||
-            sortOrder !== "desc") && (
-            <div className="flex items-end">
-              <button
-                onClick={resetFilters}
-                className="px-2 sm:px-3 py-1.5 sm:py-2 text-gray-600 hover:text-gray-800 text-xs sm:text-sm md:text-base font-medium whitespace-nowrap"
-              >
-                Reset
-              </button>
-            </div>
-          )}
+            {isFiltersOpen ? (
+              <ChevronUpIcon className="h-5 w-5 text-gray-600" />
+            ) : (
+              <ChevronDownIcon className="h-5 w-5 text-gray-600" />
+            )}
+          </button>
         </div>
 
-        {/* Export Button aligned with filters */}
-        {/* <div className="flex-shrink-0 self-stretch flex items-end">
-         */}
-        <div className="flex-shrink-0 flex items-start">
-          <button
-            className="w-full sm:w-auto h-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] font-semibold shadow text-xs sm:text-sm md:text-base whitespace-nowrap"
-            onClick={() => setShowExportModal(true)}
-          >
-            <span className="hidden md:inline">Print/Export Orders</span>
-            <span className="md:hidden">Export</span>
-          </button>
+        {/* Filters Container */}
+        <div
+          className={`
+          bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4
+          transition-all duration-300 ease-in-out overflow-hidden
+          ${
+            isFiltersOpen
+              ? "max-h-[800px] opacity-100"
+              : "max-h-0 opacity-0 p-0 border-0 lg:max-h-none lg:opacity-100 lg:p-4 lg:border"
+          }
+        `}
+        >
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2 sm:gap-3">
+            {/* Filters */}
+            <div className="flex flex-wrap gap-2 flex-1 min-w-0">
+              {/* Search */}
+              <div className="flex-1 min-w-[180px] sm:min-w-[200px]">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Search
+                </label>
+                <div className="relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search orders..."
+                    className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+                  />
+                </div>
+              </div>
+              {/* Status Filter */}
+              <div className="min-w-[100px] sm:min-w-[120px] md:min-w-[140px]">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Status
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="sm:px-3 sm:py-2 py-1.5 sm:text-sm md:text-base border w-full border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              {/* Sort By */}
+              <div className="min-w-[90px] sm:min-w-[100px] md:min-w-[110px]">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Sort By
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+                >
+                  <option value="ordered_at">Date</option>
+                  <option value="order_id">Order ID</option>
+                  <option value="customer">Customer</option>
+                  <option value="status">Status</option>
+                  <option value="total_points">Points</option>
+                </select>
+              </div>
+              {/* Sort Order */}
+              <div className="min-w-[80px] sm:min-w-[90px] md:min-w-[95px]">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  Order
+                </label>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+                >
+                  <option value="desc">Newest</option>
+                  <option value="asc">Oldest</option>
+                </select>
+              </div>
+              {/* Reset Filters */}
+              {hasActiveFilters && (
+                <div className="flex items-end">
+                  <button
+                    onClick={resetFilters}
+                    className="px-2 sm:px-3 py-1.5 sm:py-2 text-gray-600 hover:text-gray-800 text-xs sm:text-sm md:text-base font-medium whitespace-nowrap"
+                  >
+                    Reset
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Export Button aligned with filters */}
+            <div className="flex-shrink-0 flex items-start">
+              <button
+                className="w-full sm:w-auto h-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] font-semibold shadow text-xs sm:text-sm md:text-base whitespace-nowrap"
+                onClick={() => setShowExportModal(true)}
+              >
+                <span className="hidden md:inline">Print/Export Orders</span>
+                <span className="md:hidden">Export</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1030,7 +1280,7 @@ const OrderManagement = () => {
       <div className="orders-list-container max-h-[60vh] overflow-y-auto rounded-lg  bg-white">
         <div className="orders-list pb-16">
           {loading ? (
-            <Loading/>
+            <Loading />
           ) : filteredAndSortedOrders.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
               <ShoppingBagIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -1088,14 +1338,14 @@ const OrderManagement = () => {
               {filteredAndSortedOrders.map((order, idx) => (
                 <div
                   key={order.order_id}
-                  className={`order-card bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow${
+                  className={`order-card bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow${
                     idx === filteredAndSortedOrders.length - 1 ? " mb-10" : ""
                   }`}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-0">
                     {/* Order Info */}
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2 sm:gap-3 mb-3">
                         {/* Selection Checkbox */}
                         {canDeleteOrder(order) && (
                           <input
@@ -1106,24 +1356,28 @@ const OrderManagement = () => {
                           />
                         )}
 
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          {getStatusIcon(order.status)}
-                          <span className={getStatusBadge(order.status)}>
-                            {order.status.charAt(0).toUpperCase() +
-                              order.status.slice(1)}
-                          </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              {getStatusIcon(order.status)}
+                              <span className={getStatusBadge(order.status)}>
+                                {order.status.charAt(0).toUpperCase() +
+                                  order.status.slice(1)}
+                              </span>
+                            </div>
+                            <span className="text-xs sm:text-sm md:text-base text-gray-500 min-w-0">
+                              Order #{order.order_id}
+                            </span>
+                          </div>
+
+                          <p className="text-xs sm:text-sm md:text-base text-gray-600 mb-2">
+                            {getStatusDescription(order.status)}
+                          </p>
                         </div>
-                        <span className="text-sm sm:text-base text-gray-500 min-w-0">
-                          Order #{order.order_id}
-                        </span>
                       </div>
 
-                      <p className="text-sm sm:text-base text-gray-600 mb-2">
-                        {getStatusDescription(order.status)}
-                      </p>
-
                       {/* Customer Info */}
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm sm:text-base text-gray-500 mb-3">
+                      <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm md:text-base text-gray-500 mb-3">
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <UserIcon className="h-4 w-4 flex-shrink-0" />
                           <span className="truncate">
@@ -1154,17 +1408,17 @@ const OrderManagement = () => {
                       {/* Order Items Preview */}
                       {order.orderItems && order.orderItems.length > 0 && (
                         <div className="mb-3">
-                          <div className="text-sm text-gray-500 mb-2">
+                          <div className="text-xs sm:text-sm text-gray-500 mb-2">
                             Items:
                           </div>
                           <div className="space-y-1">
                             {order.orderItems.slice(0, 2).map((item, index) => (
                               <div
                                 key={index}
-                                className="flex items-center gap-2 text-base"
+                                className="flex items-center gap-2 text-sm sm:text-base"
                               >
                                 <div className="w-4 h-4 bg-gray-200 rounded-sm flex-shrink-0"></div>
-                                <span className="text-gray-700 truncate">
+                                <span className="text-gray-700 break-words min-w-0">
                                   {item.quantity}x {item.product_name}
                                   {item.variations &&
                                     item.variations.length > 0 && (
@@ -1184,7 +1438,7 @@ const OrderManagement = () => {
                               </div>
                             ))}
                             {order.orderItems.length > 2 && (
-                              <div className="text-sm text-gray-500">
+                              <div className="text-xs sm:text-sm text-gray-500">
                                 +{order.orderItems.length - 2} more items
                               </div>
                             )}
@@ -1194,12 +1448,11 @@ const OrderManagement = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-1 ml-4">
-                      {/* 👁 View Order */}
+                    <div className="flex sm:items-center gap-1 justify-end sm:ml-4 border-t sm:border-t-0 pt-3 sm:pt-0">
                       <button
                         onClick={() => handleOrderDetails(order.order_id)}
                         disabled={loadingOrderDetails}
-                        className="p-2 text-blue-400 hover:text-blue-200 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-blue-400 hover:text-blue-200 hover:bg-blue-50 rounded-lg transition-colors touch-manipulation"
                         title="View order details"
                       >
                         <EyeIcon className="h-5 w-5" />
@@ -1224,7 +1477,7 @@ const OrderManagement = () => {
                         <button
                           onClick={() => handleCancelOrder(order.order_id)}
                           disabled={cancellingOrders.has(order.order_id)}
-                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors touch-manipulation"
                           title="Cancel order"
                         >
                           {cancellingOrders.has(order.order_id) ? (
@@ -1235,11 +1488,26 @@ const OrderManagement = () => {
                         </button>
                       )}
 
+                      {canApproveOrder(order) && (
+                        <button
+                          onClick={() => handleApproveOrder(order.order_id)}
+                          disabled={approvingOrders.has(order.order_id)}
+                          className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors touch-manipulation"
+                          title="Approve order"
+                        >
+                          {approvingOrders.has(order.order_id) ? (
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
+                          ) : (
+                            <CheckIcon className="h-5 w-5" />
+                          )}
+                        </button>
+                      )}
+
                       {canCompleteOrder(order) && (
                         <button
                           onClick={() => handleCompleteOrder(order.order_id)}
                           disabled={completingOrders.has(order.order_id)}
-                          className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors touch-manipulation"
                           title="Complete order"
                         >
                           {completingOrders.has(order.order_id) ? (
@@ -1254,7 +1522,7 @@ const OrderManagement = () => {
                         <button
                           onClick={() => handleDeleteOrder(order.order_id)}
                           disabled={deletingOrders.has(order.order_id)}
-                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors touch-manipulation"
                           title="Delete order"
                         >
                           {deletingOrders.has(order.order_id) ? (
@@ -1270,13 +1538,13 @@ const OrderManagement = () => {
 
                   {/* Status Timeline */}
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 overflow-x-auto pb-1">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <CheckIcon className="h-3 w-3 text-green-500" />
                         <span>Ordered {formatTimeAgo(order.ordered_at)}</span>
                       </div>
                       {order.processed_at && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <CheckIcon className="h-3 w-3 text-blue-500" />
                           <span>
                             Approved {formatTimeAgo(order.processed_at)}
@@ -1284,7 +1552,7 @@ const OrderManagement = () => {
                         </div>
                       )}
                       {order.completed_at && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <CheckIcon className="h-3 w-3 text-green-500" />
                           <span>
                             Completed {formatTimeAgo(order.completed_at)}
@@ -1292,7 +1560,7 @@ const OrderManagement = () => {
                         </div>
                       )}
                       {order.status === "cancelled" && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <XCircleIcon className="h-3 w-3 text-red-500" />
                           <span>Cancelled</span>
                         </div>
@@ -1409,7 +1677,7 @@ const OrderManagement = () => {
         message="Are you sure you want to cancel this order? This action cannot be undone."
         confirmText="Cancel Order"
         cancelText="Keep Order"
-        confirmColor="blue"
+        confirmColor="red"
       />
 
       {/* Delete Order Confirmation Modal */}
@@ -1422,6 +1690,30 @@ const OrderManagement = () => {
         confirmText="Delete Order"
         cancelText="Keep Order"
         confirmColor="red"
+      />
+
+      {/* Approve Order Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showApproveConfirm}
+        onClose={() => setShowApproveConfirm(false)}
+        onConfirm={confirmApproveOrder}
+        title="Approve Order"
+        message="Are you sure you want to approve this order? The order will move to processing status."
+        confirmText="Approve Order"
+        cancelText="Cancel"
+        confirmColor="green"
+      />
+
+      {/* Complete Order Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showCompleteConfirm}
+        onClose={() => setShowCompleteConfirm(false)}
+        onConfirm={confirmCompleteOrder}
+        title="Complete Order"
+        message="Are you sure you want to mark this order as completed? This indicates the order has been fulfilled."
+        confirmText="Complete Order"
+        cancelText="Cancel"
+        confirmColor="blue"
       />
 
       {/* Order Details Modal */}
@@ -1640,6 +1932,12 @@ const ConfirmationModal = ({
 }) => {
   if (!isOpen) return null;
 
+  const colorClasses = {
+    red: "bg-red-600 hover:bg-red-700",
+    blue: "bg-blue-600 hover:bg-blue-700",
+    green: "bg-green-600 hover:bg-green-700",
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur">
       <div className="bg-white rounded-lg max-w-md w-full shadow-xl">
@@ -1660,9 +1958,7 @@ const ConfirmationModal = ({
           <button
             onClick={onConfirm}
             className={`px-4 py-2 text-white rounded-lg transition-colors text-sm font-medium ${
-              confirmColor === "red"
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-blue-600 hover:bg-blue-700"
+              colorClasses[confirmColor] || colorClasses.red
             }`}
           >
             {confirmText || "Confirm"}
