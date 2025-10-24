@@ -16,6 +16,8 @@ import {
   PlusIcon,
   MinusIcon,
   PencilIcon,
+  ChevronDoubleDownIcon,
+  ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import { useStore } from "../../../store/authStore";
 import defaultAvatar from "../../../assets/images/defaultAvatar.svg";
@@ -42,6 +44,7 @@ const UserHeartbitsManagement = () => {
   });
   const [bulkAmount, setBulkAmount] = useState("");
   const [bulkReason, setBulkReason] = useState("");
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
 
   useEffect(() => {
@@ -92,8 +95,9 @@ const UserHeartbitsManagement = () => {
       setLoading(true);
       const response = await pointsSystemApi.getAllUserPoints();
 
+      console.log(response.data)
+
       if (response.success) {
-        // Transform the data to match the expected format
 
         const transformedUsers = response.data.map((user) => ({
           user_id: user.user_id,
@@ -102,7 +106,7 @@ const UserHeartbitsManagement = () => {
             ? user.userName.split().slice(1).join(" ")
             : "",
           user_email: user.email,
-          avatar: user.avatar, // Now available from backend
+          avatar: user.avatar,
           heartbits_balance: user.available_points || 0,
           total_heartbits_earned: user.total_earned || 0,
           total_heartbits_spent: user.total_spent || 0,
@@ -132,7 +136,7 @@ const UserHeartbitsManagement = () => {
 
   const handleUpdateUserHeartbits = async (userId, updates, reason = "") => {
     try {
-      // Format reason to match peer cheer style: 'Received X points from cheer'
+
       const amount = updates.balance || 0;
       const adminReason = `Received ${amount} points from cheer`;
       if (updates.balance !== undefined) {
@@ -490,171 +494,175 @@ const UserHeartbitsManagement = () => {
 
       {/* Concise Search and Filter Controls */}
 
-      <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/60 mt-0 mb-0">
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Search Section - Enhanced Modern Design */}
-          <div className="relative group flex-1 min-w-[280px] max-w-md">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative">
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center">
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 group-focus-within:text-[#0097b2] transition-all duration-300 group-focus-within:scale-110" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search users by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-12 py-3.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
-            placeholder:text-gray-400 placeholder:font-normal
-            focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white 
+     <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-xl border border-white/60 mb-4">
+      {/* Header / Collapse Toggle (visible only on mobile) */}
+      <div className="flex justify-between items-center md:hidden">
+        <h2 className="text-base font-semibold text-gray-800">Filters</h2>
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="flex items-center gap-2 text-sm text-[#0097b2] font-semibold hover:text-[#007c97] transition"
+        >
+          <FunnelIcon className="w-5 h-5" />
+          {isCollapsed ? "Show" : "Hide"}
+        </button>
+      </div>
+
+      {/* Filters Wrapper */}
+<div className="bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/60">
+      {/* Search Section (Always Visible) */}
+      <div className="relative group mb-4">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center">
+            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 group-focus-within:text-[#0097b2] transition-all duration-300" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-12 py-3.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
+              placeholder:text-gray-400 placeholder:font-normal
+              focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white 
+              hover:border-gray-300 hover:shadow-lg
+              transition-all duration-300"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-full transition-all duration-200"
+            >
+              <XMarkIcon className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Chevron Toggle for Filters */}
+      <button
+        className="w-full flex items-center justify-between md:hidden px-4 py-3 bg-white/70 border-2 border-gray-200 rounded-2xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all duration-300"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <span>Filters</span>
+        {isCollapsed ? (
+          <ChevronDoubleDownIcon className="w-5 h-5 text-gray-500" />
+        ) : (
+          <ChevronUpIcon className="w-5 h-5 text-[#0097b2]" />
+        )}
+      </button>
+
+      {/* Filters Container */}
+      <div
+        className={`${
+          isCollapsed ? "hidden md:flex" : "flex"
+        } flex-wrap items-center gap-4 mt-4 md:mt-0 transition-all duration-500`}
+      >
+        {/* Sort Dropdown */}
+        <div className="relative group w-full sm:w-auto">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full appearance-none pl-5 pr-12 py-3.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
+            focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
+            text-sm font-semibold text-gray-700 cursor-pointer
             hover:border-gray-300 hover:shadow-lg
             transition-all duration-300"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-full transition-all duration-200 group/clear"
-                >
-                  <XMarkIcon className="h-4 w-4 text-gray-400 group-hover/clear:text-gray-600" />
-                </button>
-              )}
-              {!searchTerm && (
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex gap-1">
-                  {/* <kbd className="px-2 py-0.5 text-xs font-semibold text-gray-500 bg-gray-100 border border-gray-200 rounded"></kbd> */}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Sort Dropdown - Glassmorphic */}
-          <div className="relative group">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none pl-5 pr-12 py-3.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
-          focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
-          text-sm font-semibold text-gray-700 cursor-pointer
-          hover:border-gray-300 hover:shadow-lg
-          transition-all duration-300"
-              style={{ minWidth: "170px" }}
+          >
+            <option value="name">Sort by Name</option>
+            <option value="points">Sort by Points</option>
+          </select>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg
+              className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <option value="name">Sort by Name</option>
-              <option value="points">Sort by Points</option>
-            </select>
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2.5}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
           </div>
+        </div>
 
-          {/* Sort Order Toggle - Premium Pill */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="sortOrder" className="sr-only">
-              Sort Order
-            </label>
-            <button
-              id="sortOrder"
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="group px-5 py-3.5 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl 
+        {/* Sort Order Toggle */}
+        <button
+          id="sortOrder"
+          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+          className="w-full sm:w-auto px-5 py-3.5 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl 
           text-sm font-semibold text-gray-700 
           hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg hover:shadow-[#0097b2]/10
           transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 
           active:scale-95"
-              style={{ minWidth: "150px" }}
-              title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <span className="group-hover:text-[#0097b2] transition-colors">
-                  {sortOrder === "asc" ? "Ascending" : "Descending"}
-                </span>
-                {sortOrder === "desc" ? (
-                  <ArrowDownIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:translate-y-0.5" />
-                ) : (
-                  <ArrowUpIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:-translate-y-0.5" />
-                )}
-              </div>
-            </button>
-          </div>
-
-          {/* Select All - Modern Toggle */}
-          <button
-            onClick={selectAllUsers}
-            className={`group px-5 py-3.5 rounded-2xl text-sm font-bold flex items-center gap-3
-        transition-all duration-300 active:scale-95 border-2
-        ${
-          selectedUsers.length === filteredUsers.length
-            ? "bg-gradient-to-br from-[#0097b2] to-[#0097b2]/80 text-white shadow-xl shadow-[#0097b2]/30 hover:shadow-2xl hover:shadow-[#0097b2]/40 border-transparent"
-            : "border-gray-200 bg-white/90 text-gray-700 hover:bg-gradient-to-br hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg"
-        }
-      `}
-          >
-            <div
-              className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all
-        ${
-          selectedUsers.length === filteredUsers.length
-            ? "bg-white/20"
-            : "bg-gray-100 border-2 border-gray-300 group-hover:border-[#0097b2]/50 group-hover:bg-[#0097b2]/5"
-        }`}
-            >
-              <CheckIcon
-                className={`w-4 h-4 font-bold ${
-                  selectedUsers.length === filteredUsers.length
-                    ? "text-white"
-                    : "text-transparent"
-                }`}
-              />
-            </div>
-            {selectedUsers.length === filteredUsers.length
-              ? "Deselect All"
-              : "Select All"}
-          </button>
-
-          {/* Reset Button - Subtle Alert Style */}
-          {showResetButton && (
-            <button
-              onClick={resetFilters}
-              className="px-5 py-3.5 bg-gradient-to-br from-rose-50 to-red-50 border-2 border-rose-200 rounded-2xl 
-          hover:from-rose-100 hover:to-red-100 hover:border-rose-300 hover:shadow-lg hover:shadow-rose-200/50
-          text-sm font-bold text-rose-700 
-          transition-all duration-300 active:scale-95
-          focus:outline-none focus:ring-4 focus:ring-rose-500/20"
-            >
-              Reset
-            </button>
-          )}
-
-          {/* Global Limit - Premium Badge */}
-          <button
-            onClick={() => setShowGlobalLimitModal(true)}
-            className="px-5 py-3.5 bg-primary text-white rounded-2xl 
-        hover:from-purple-600 hover:via-purple-700 hover:to-indigo-700 
-        hover:shadow-xl 
-        text-sm font-bold flex items-center gap-3
-        transition-all duration-300 active:scale-95
-        focus:outline-none focus:ring-4 focus:ring-purple-500/30"
-          >
-            <CogIcon className="w-5 h-5" />
-            <span className="flex items-center gap-2">
-              Global Limit:
-              <span className="px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-lg font-extrabold">
-                {globalLimit}
-              </span>
+        >
+          <div className="flex items-center justify-between gap-3">
+            <span className="group-hover:text-[#0097b2] transition-colors">
+              {sortOrder === "asc" ? "Ascending" : "Descending"}
             </span>
-          </button>
-        </div>
-      </div>
+            {sortOrder === "desc" ? (
+              <ArrowDownIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2]" />
+            ) : (
+              <ArrowUpIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2]" />
+            )}
+          </div>
+        </button>
 
+        {/* Select All */}
+        <button
+          onClick={selectAllUsers}
+          className={`w-full sm:w-auto group px-5 py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-3
+          transition-all duration-300 active:scale-95 border-2
+          ${
+            selectedUsers.length === filteredUsers.length
+              ? "bg-gradient-to-br from-[#0097b2] to-[#0097b2]/80 text-white shadow-xl shadow-[#0097b2]/30 hover:shadow-2xl border-transparent"
+              : "border-gray-200 bg-white/90 text-gray-700 hover:bg-gradient-to-br hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg"
+          }`}
+        >
+          <CheckIcon
+            className={`w-4 h-4 ${
+              selectedUsers.length === filteredUsers.length
+                ? "text-white"
+                : "text-transparent"
+            }`}
+          />
+          {selectedUsers.length === filteredUsers.length
+            ? "Deselect All"
+            : "Select All"}
+        </button>
+
+        {/* Reset */}
+        {showResetButton && (
+          <button
+            onClick={resetFilters}
+            className="w-full sm:w-auto px-5 py-3.5 bg-gradient-to-br from-rose-50 to-red-50 border-2 border-rose-200 rounded-2xl 
+            hover:from-rose-100 hover:to-red-100 hover:border-rose-300 hover:shadow-lg hover:shadow-rose-200/50
+            text-sm font-bold text-rose-700 transition-all duration-300 active:scale-95"
+          >
+            Reset
+          </button>
+        )}
+
+        {/* Global Limit */}
+        <button
+          onClick={() => setShowGlobalLimitModal(true)}
+          className="w-full sm:w-auto px-5 py-3.5 bg-[#0097b2] text-white rounded-2xl 
+          hover:shadow-xl text-sm font-bold flex items-center justify-center gap-3
+          transition-all duration-300 active:scale-95 focus:outline-none focus:ring-4 focus:ring-[#0097b2]/30"
+        >
+          <CogIcon className="w-5 h-5" />
+          <span className="flex items-center gap-2">
+            Global Limit:
+            <span className="px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-lg font-extrabold">
+              {globalLimit}
+            </span>
+          </span>
+        </button>
+      </div>
+    </div>
+    </div>
       {/* Results Summary & Bulk Actions */}
 
       <div className="mt-1 pt-1">
@@ -666,6 +674,24 @@ const UserHeartbitsManagement = () => {
           )}
         </div>
       </div>
+
+        {selectedUsers.length > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-3 mt-3 mb-3 text-sm text-gray-600 w-full">
+            {/* <span className="text-[#0097b2] font-medium">
+              {selectedUsers.length} selected
+            </span> */}
+            <div className="flex-1 flex justify-end">
+              <button
+                onClick={() => setShowBulkUpdateModal(true)}
+                className="px-6 py-3 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 text-base font-bold transition-all duration-200 flex items-center gap-3"
+                style={{ minWidth: "220px" }}
+              >
+                <HeartIcon className="w-6 h-6" />
+                Give to Selected ({selectedUsers.length})
+              </button>
+            </div>
+          </div>
+        )}
 
       {/* Users Grid - Responsive */}
 
@@ -695,6 +721,7 @@ const UserHeartbitsManagement = () => {
               const isSelected = selectedUsers.includes(user.user_id);
               const isActive = user.isActive === 1 || user.isActive === true
               return (
+                isActive &&
                 <div
                   key={user.user_id}
                   className={`
@@ -706,7 +733,7 @@ const UserHeartbitsManagement = () => {
                         ? "border-primary/60 ring-2 ring-primary/20 bg-primary/5"
                         : "border-gray-200 hover:border-primary/30"
                     }
-                    ${!isActive ? "opacity-50 grayscale cursor-not-allowed hover:shadow-none hover:border-gray-200" : ""}
+                   
                   `}
                   onClick={() => {
                     if (isActive) toggleUserSelection(user.user_id);
@@ -764,23 +791,6 @@ const UserHeartbitsManagement = () => {
                       </p>
                       <p className="text-sm text-gray-500">{getRoleLabel(user.user_type)}</p>
 
-                      {/* Active Pill */}
-                      <div
-                        className={`flex items-center gap-1 px-2 py-0.5 mt-2 rounded-full text-xs font-medium w-fit
-                          ${
-                            isActive
-                              ? "bg-green-50 border border-green-300 text-green-700"
-                              : "bg-gray-100 border border-gray-300 text-gray-600"
-                          }
-                        `}
-                      >
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            isActive ? "bg-green-500" : "bg-gray-400"
-                          }`}
-                        ></span>
-                        {isActive ? "Active" : "Inactive"}
-                      </div>
                     </div>
                   </div>
 
@@ -794,28 +804,12 @@ const UserHeartbitsManagement = () => {
                   </div>
                 </div>
               );
+            
 
 
             })
           )}
         </div>
-        {selectedUsers.length > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 mt-3 mb-3 text-sm text-gray-600 w-full">
-            <span className="text-[#0097b2] font-medium">
-              {selectedUsers.length} selected
-            </span>
-            <div className="flex-1 flex justify-end">
-              <button
-                onClick={() => setShowBulkUpdateModal(true)}
-                className="px-6 py-3 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 text-base font-bold transition-all duration-200 flex items-center gap-3"
-                style={{ minWidth: "220px" }}
-              >
-                <HeartIcon className="w-6 h-6" />
-                Give to Selected ({selectedUsers.length})
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Modals */}
