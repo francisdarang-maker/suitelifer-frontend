@@ -1576,7 +1576,7 @@ const OrderManagement = () => {
 
       {/* Export Modal */}
       {showExportModal && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur">
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold mb-4">Export Orders</h3>
 
@@ -1733,8 +1733,8 @@ const OrderManagement = () => {
 // Order Details Modal Component
 const OrderDetailsModal = ({ order, onClose }) => {
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 mb-30 ">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl ">
         {/* Modal Header */}
         <div className="bg-[#0097b2] text-white p-4">
           <div className="flex items-center justify-between">
@@ -1774,7 +1774,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
             </div>
           </div>
           {/* Order Timeline */}
-          <div className="mb-4">
+          <div className="mb-4 ">
             <div className="flex items-center justify-between gap-4 relative px-2">
               {/* Horizontal line */}
               <div

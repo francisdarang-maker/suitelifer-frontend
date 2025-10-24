@@ -1,11 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
-import { XMarkIcon, HeartIcon, ShoppingBagIcon, ShoppingCartIcon, EyeIcon } from '@heroicons/react/24/outline';
-import useCategoryStore from '../../store/stores/categoryStore';
-import ProductImageCarousel from './ProductImageCarousel';
-
+import { useState, useEffect, useRef } from "react";
+import {
+  XMarkIcon,
+  HeartIcon,
+  ShoppingBagIcon,
+  ShoppingCartIcon,
+  EyeIcon,
+} from "@heroicons/react/24/outline";
+import useCategoryStore from "../../store/stores/categoryStore";
+import ProductImageCarousel from "./ProductImageCarousel";
+import { toast } from "react-hot-toast";
 /**
  * ProductDetailModal Component - Enhanced Product Detail View
- * 
+ *
  * Shows detailed product information with variation selection, quantity, and purchase options.
  * Features include:
  * - Large product image display
@@ -14,7 +20,7 @@ import ProductImageCarousel from './ProductImageCarousel';
  * - Quantity selection with price calculation
  * - Add to cart and buy now functionality
  * - Responsive design
- * 
+ *
  * @param {Object} product - Product data object with variations
  * @param {boolean} isOpen - Modal open state
  * @param {Function} onClose - Callback to close modal
@@ -25,30 +31,32 @@ import ProductImageCarousel from './ProductImageCarousel';
  * @param {number} initialQuantity - Initial quantity (default: 1)
  * @param {Object} initialSelectedOptions - Initial selected options
  */
-const ProductDetailModal = ({ 
-  product, 
-  isOpen, 
-  onClose, 
-  onAddToCart, 
-  onBuyNow, 
-  userHeartbits, 
-  mode = 'buy-now',
-  initialQuantity = 1, 
-  initialSelectedOptions 
+const ProductDetailModal = ({
+  product,
+  isOpen,
+  onClose,
+  onAddToCart,
+  onBuyNow,
+  userHeartbits,
+  mode = "buy-now",
+  initialQuantity = 1,
+  initialSelectedOptions,
 }) => {
   // Local state for cart interaction
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
   const [quantity, setQuantity] = useState(initialQuantity);
-  
+
   // Variation selection state
   const [selectedVariation, setSelectedVariation] = useState(null);
-  const [selectedOptions, setSelectedOptions] = useState(initialSelectedOptions || {});
+  const [selectedOptions, setSelectedOptions] = useState(
+    initialSelectedOptions || {}
+  );
   const [availableVariations, setAvailableVariations] = useState([]);
   const [variationTypes, setVariationTypes] = useState([]);
 
   // Add state for in-modal error message
-  const [modalError, setModalError] = useState('');
+  const [modalError, setModalError] = useState("");
   // Ref for focus trap
   const modalRef = useRef(null);
   const firstButtonRef = useRef(null);
@@ -60,11 +68,11 @@ const ProductDetailModal = ({
   useEffect(() => {
     if (product.variations && product.variations.length > 0) {
       setAvailableVariations(product.variations);
-      
+
       // Extract unique variation types from the product's variations
       const types = new Set();
-      product.variations.forEach(variation => {
-        variation.options?.forEach(option => {
+      product.variations.forEach((variation) => {
+        variation.options?.forEach((option) => {
           types.add(option.type_name);
         });
       });
@@ -91,16 +99,19 @@ const ProductDetailModal = ({
       setSelectedOptions(initialSelectedOptions || {});
       setIsAddingToCart(false);
       setIsBuying(false);
-      setModalError(''); // Clear error on modal open
+      setModalError(""); // Clear error on modal open
     }
   }, [isOpen, initialQuantity, initialSelectedOptions, mode]);
 
   // Update selected variation when options change
   useEffect(() => {
-    if (availableVariations.length > 0 && Object.keys(selectedOptions).length > 0) {
-      const matchingVariation = availableVariations.find(variation => {
-        return variation.options?.every(option => 
-          selectedOptions[option.type_name] === option.option_id
+    if (
+      availableVariations.length > 0 &&
+      Object.keys(selectedOptions).length > 0
+    ) {
+      const matchingVariation = availableVariations.find((variation) => {
+        return variation.options?.every(
+          (option) => selectedOptions[option.type_name] === option.option_id
         );
       });
       setSelectedVariation(matchingVariation || null);
@@ -120,12 +131,14 @@ const ProductDetailModal = ({
       }, 0);
       // Add keydown listener for ESC and tab trap
       const handleKeyDown = (e) => {
-        if (e.key === 'Escape') {
+        if (e.key === "Escape") {
           onClose();
         }
         // Focus trap
-        if (e.key === 'Tab' && modalRef.current) {
-          const focusableEls = modalRef.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (e.key === "Tab" && modalRef.current) {
+          const focusableEls = modalRef.current.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
           const firstEl = focusableEls[0];
           const lastEl = focusableEls[focusableEls.length - 1];
           if (e.shiftKey) {
@@ -141,8 +154,8 @@ const ProductDetailModal = ({
           }
         }
       };
-      document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
     }
   }, [isOpen, onClose]);
 
@@ -150,13 +163,13 @@ const ProductDetailModal = ({
    * Handles variation option selection
    */
   const handleOptionSelect = (typeName, optionId) => {
-    setSelectedOptions(prev => ({
+    setSelectedOptions((prev) => ({
       ...prev,
-      [typeName]: optionId
+      [typeName]: optionId,
     }));
 
-    console.log("Option Id",optionId)
-    console.log("Type Name",typeName)
+    console.log("Option Id", optionId);
+    console.log("Type Name", typeName);
   };
 
   /**
@@ -164,19 +177,21 @@ const ProductDetailModal = ({
    */
   const getAvailableOptions = (typeName) => {
     const options = new Set();
-    availableVariations.forEach(variation => {
-      variation.options?.forEach(option => {
+    availableVariations.forEach((variation) => {
+      variation.options?.forEach((option) => {
         if (option.type_name === typeName) {
-          options.add(JSON.stringify({
-            id: option.option_id,
-            value: option.option_value,
-            label: option.option_label,
-            hexColor: option.hex_color
-          }));
+          options.add(
+            JSON.stringify({
+              id: option.option_id,
+              value: option.option_value,
+              label: option.option_label,
+              hexColor: option.hex_color,
+            })
+          );
         }
       });
     });
-    return Array.from(options).map(opt => JSON.parse(opt));
+    return Array.from(options).map((opt) => JSON.parse(opt));
   };
 
   /**
@@ -191,78 +206,153 @@ const ProductDetailModal = ({
   /**
    * Handles confirming the order with selected quantity and variation
    */
+  // const handleAddToCartFromModal = async () => {
+  //   if (isAddingToCart) return;
+  //   setModalError("");
+  //   // Ensure variation selection if required
+  //   if (availableVariations.length > 0 && variationTypes.length > 0) {
+  //     const allTypesSelected = variationTypes.every(
+  //       (type) => selectedOptions[type]
+  //     );
+  //     if (!allTypesSelected) {
+  //       setModalError(
+  //         "Please select all product options before adding to cart."
+  //       );
+  //       return;
+  //     }
+  //   }
+
+  //   try {
+  //     setIsAddingToCart(true);
+
+  //     // Prepare variation data in the new format
+  //     const variations = Object.entries(selectedOptions)
+  //       .map(([typeName, optionId]) => {
+  //         const option = availableVariations
+  //           .flatMap((v) => v.options || [])
+  //           .find(
+  //             (opt) => opt.option_id === optionId && opt.type_name === typeName
+  //           );
+
+  //         const variation = {
+  //           variation_type_id: option?.variation_type_id,
+  //           option_id: optionId,
+  //         };
+
+  //         return variation;
+  //       })
+  //       .filter((v) => v.variation_type_id && v.option_id);
+
+  //     await onAddToCart(product.product_id, quantity, null, variations);
+  //     onClose(); // Close modal after adding to cart
+  //   } catch (error) {
+  //     setModalError("Failed to add to cart.");
+  //   } finally {
+  //     setIsAddingToCart(false);
+  //   }
+  // };
   const handleAddToCartFromModal = async () => {
     if (isAddingToCart) return;
-    setModalError('');
+
+    // Clear any previous error
+    setModalError("");
+
     // Ensure variation selection if required
     if (availableVariations.length > 0 && variationTypes.length > 0) {
-      const allTypesSelected = variationTypes.every(type => selectedOptions[type]);
+      const allTypesSelected = variationTypes.every(
+        (type) => selectedOptions[type]
+      );
       if (!allTypesSelected) {
-        setModalError('Please select all product options before adding to cart.');
+        toast.error(
+          "Please select all product options before adding to cart.",
+          {
+            position: "top-center",
+            style: {
+              fontSize: "0.875rem",
+              padding: "0.75rem 1rem",
+              maxWidth: "90vw",
+            },
+          }
+        );
         return;
       }
     }
 
     try {
       setIsAddingToCart(true);
-      
-      // Prepare variation data in the new format
-      const variations = Object.entries(selectedOptions).map(([typeName, optionId]) => {
-        const option = availableVariations
-          .flatMap(v => v.options || [])
-          .find(opt => opt.option_id === optionId && opt.type_name === typeName);
-        
-        const variation = {
-          variation_type_id: option?.variation_type_id,
-          option_id: optionId
-        };
-        
-        return variation;
-      }).filter(v => v.variation_type_id && v.option_id);
+
+      const variations = Object.entries(selectedOptions)
+        .map(([typeName, optionId]) => {
+          const option = availableVariations
+            .flatMap((v) => v.options || [])
+            .find(
+              (opt) => opt.option_id === optionId && opt.type_name === typeName
+            );
+
+          return {
+            variation_type_id: option?.variation_type_id,
+            option_id: optionId,
+          };
+        })
+        .filter((v) => v.variation_type_id && v.option_id);
 
       await onAddToCart(product.product_id, quantity, null, variations);
       onClose(); // Close modal after adding to cart
     } catch (error) {
-      setModalError('Failed to add to cart.');
+      toast.error("Failed to add to cart.", {
+        position: "top-center",
+        style: {
+          fontSize: "0.875rem",
+          padding: "0.75rem 1rem",
+          maxWidth: "90vw",
+        },
+      });
     } finally {
       setIsAddingToCart(false);
     }
   };
-
   /**
    * Handles direct purchase (buy now) from modal
    */
   const handleBuyNowFromModal = async () => {
     if (isBuying) return;
-    setModalError('');
+    setModalError("");
     // Ensure variation selection if required
     if (availableVariations.length > 0 && variationTypes.length > 0) {
-      const allTypesSelected = variationTypes.every(type => selectedOptions[type]);
+      const allTypesSelected = variationTypes.every(
+        (type) => selectedOptions[type]
+      );
       if (!allTypesSelected) {
-        setModalError('Please select all product options before confirming order.');
+        setModalError(
+          "Please select all product options before confirming order."
+        );
         return;
       }
     }
 
     try {
       setIsBuying(true);
-      
+
       // Prepare variation data in the new format
-      const variations = Object.entries(selectedOptions).map(([typeName, optionId]) => {
-        const option = availableVariations
-          .flatMap(v => v.options || [])
-          .find(opt => opt.option_id === optionId && opt.type_name === typeName);
-        
-        return {
-          variation_type_id: option?.variation_type_id,
-          option_id: optionId
-        };
-      }).filter(v => v.variation_type_id && v.option_id);
+      const variations = Object.entries(selectedOptions)
+        .map(([typeName, optionId]) => {
+          const option = availableVariations
+            .flatMap((v) => v.options || [])
+            .find(
+              (opt) => opt.option_id === optionId && opt.type_name === typeName
+            );
+
+          return {
+            variation_type_id: option?.variation_type_id,
+            option_id: optionId,
+          };
+        })
+        .filter((v) => v.variation_type_id && v.option_id);
 
       await onBuyNow(product.product_id, quantity, null, variations);
       onClose(); // Close modal after purchase
     } catch (error) {
-      setModalError('Failed to process buy now.');
+      setModalError("Failed to process buy now.");
     } finally {
       setIsBuying(false);
     }
@@ -285,8 +375,13 @@ const ProductDetailModal = ({
   // Helper to format labels
   const formatLabel = (label) =>
     label
-      ? label.replace(/_/g, ' ').replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-      : '';
+      ? label
+          .replace(/_/g, " ")
+          .replace(
+            /\w\S*/g,
+            (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+          )
+      : "";
 
   if (!isOpen) return null;
 
@@ -457,4 +552,4 @@ const ProductDetailModal = ({
   );
 };
 
-export default ProductDetailModal; 
+export default ProductDetailModal;

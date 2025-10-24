@@ -1,9 +1,9 @@
-import React from 'react';
-import { SwatchIcon, PhotoIcon } from '@heroicons/react/24/outline';
+import React from "react";
+import { SwatchIcon, PhotoIcon } from "@heroicons/react/24/outline";
 
 /**
  * OrderItemCard Component
- * 
+ *
  * Displays detailed order item information including:
  * - Product details with images
  * - Selected variations (size, color, design, etc.)
@@ -31,7 +31,7 @@ const OrderItemCard = ({ item, showImages = true }) => {
       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
         {/* Product Image */}
         {showImages && (
-          <div className="flex-shrink-0 self-center sm:self-start">
+          <div className="flex-shrink-0 hidden sm:flex">
             {primaryImage ? (
               <img
                 src={primaryImage.image_url}
@@ -48,23 +48,26 @@ const OrderItemCard = ({ item, showImages = true }) => {
 
         {/* Product Details */}
         <div className="flex-1 min-w-0">
-          {/* Header: Name + Price */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-2 gap-2">
-            <div className="min-w-0">
-              <h4 className="text-base sm:text-lg font-medium text-gray-900 truncate">
+          <div className="flex justify-between items-start mb-2">
+            <div>
+              <div
+                className={`text-base font-medium text-gray-900 mt-4 ${
+                  item.product_name.length > 10 ? "line-clamp-2" : ""
+                }`}
+              >
                 {item.product_name}
-              </h4>
+              </div>
               {item.product_category && (
-                <p className="text-sm text-gray-500 mt-1 truncate">
+                <p className="text-xs text-gray-500 mt-1">
                   Category: {item.product_category}
                 </p>
               )}
             </div>
-            <div className="text-left sm:text-right">
-              <p className="text-base sm:text-lg font-medium text-gray-900">
+            <div className="text-right flex-shrink-0 ml-4 mt-4">
+              <p className="text-sm font-medium text-gray-900">
                 {item.quantity}x {item.price_points} pts
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs text-gray-500">
                 Total: {item.quantity * item.price_points} pts
               </p>
             </div>
@@ -81,35 +84,34 @@ const OrderItemCard = ({ item, showImages = true }) => {
               </div>
 
               <div className="space-y-2">
-                {Object.entries(groupedVariations).map(([typeName, variations]) => (
-                  <div
-                    key={typeName}
-                    className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2"
-                  >
-                    <span className="text-sm text-gray-500 capitalize sm:min-w-[60px]">
-                      {variations[0]?.type_label || typeName}:
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {variations.map((variation, index) => (
-                        <div
-                          key={`${variation.option_id}-${index}`}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-sm"
-                        >
-                          {variation.hex_color && (
-                            <div
-                              className="w-3 h-3 rounded-full border border-gray-300 flex-shrink-0"
-                              style={{ backgroundColor: variation.hex_color }}
-                              title={`Color: ${variation.option_label}`}
-                            />
-                          )}
-                          <span className="text-gray-700 truncate">
-                            {variation.option_label}
-                          </span>
-                        </div>
-                      ))}
+                {Object.entries(groupedVariations).map(
+                  ([typeName, variations]) => (
+                    <div key={typeName} className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500 capitalize min-w-[60px]">
+                        {variations[0]?.type_label || typeName}:
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {variations.map((variation, index) => (
+                          <div
+                            key={`${variation.option_id}-${index}`}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-sm"
+                          >
+                            {variation.hex_color && (
+                              <div
+                                className="w-3 h-3 rounded-full border border-gray-300 flex-shrink-0"
+                                style={{ backgroundColor: variation.hex_color }}
+                                title={`Color: ${variation.option_label}`}
+                              />
+                            )}
+                            <span className="text-gray-700">
+                              {variation.option_label}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             </div>
           )}

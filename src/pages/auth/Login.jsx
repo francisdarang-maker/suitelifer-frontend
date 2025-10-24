@@ -49,10 +49,14 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
       // const recaptchaToken = await executeRecaptcha("login");
       //TODO: check first if exists in HRIS
       // console.log("nakapasok hereee ");
+      // console.log("nakapasok hereee ");
 
       // const { token } = await loginUser({ email, password });
       // localStorage.setItem("hris-token", token);
+      // const { token } = await loginUser({ email, password });
+      // localStorage.setItem("hris-token", token);
 
+      // console.log("hris-token: ", token);
       // console.log("hris-token: ", token);
 
       //then proceed if yes...
@@ -62,14 +66,14 @@ const LoginForm = ({ email, password, setEmail, setPassword }) => {
           // recaptchaToken,
         });
 
-        const user = await getUserFromCookie();
-        if (response.data.accessToken) {
-          // Store token in localStorage for Suitebite API compatibility
-          localStorage.setItem("token", response.data.accessToken);
-          console.log("tokeeeen: ", response.data.accessToken);
-          toast.success(`Welcome back ${user?.first_name || ""}!`, {
-            icon: <CheckCircleIcon className="w-5 h-5 text-primary" />,
-          });
+      const user = await getUserFromCookie();
+      if (response.data.accessToken) {
+        // Store token in localStorage for Suitebite API compatibility
+        localStorage.setItem("token", response.data.accessToken);
+        console.log("tokeeeen: ", response.data.accessToken);
+        toast.success(`Welcome back ${user?.first_name || ""}!`, {
+          icon: <CheckCircleIcon className="w-5 h-5 text-primary" />,
+        });
 
           navigate("/app/blogs-feed");
         } else if (response.data.recaptchaError) {
@@ -227,43 +231,40 @@ const Login = () => {
 
   return (
     // <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE}>
-      <div
-        id="vanta-bg"
-        className="dark max-h-screen bg-primary overflow-y-auto"
-      >
-        {/* <ModalResetPassword
+    <div id="vanta-bg" className="dark max-h-screen bg-primary overflow-y-auto">
+      {/* <ModalResetPassword
           isOpen={isResetModal}
           handleClose={handleResetPasswordBtn}
         /> */}
-        <div className="flex flex-col items-center justify-center h-screen">
-          <div
-            className="w-full max-w-md space-y-6 p-10 rounded-2xl shadow-xl border border-white/20 bg-white/10 backdrop-blur-md mx-auto"
-            style={{ width: "min(90%, 600px)" }}
-          >
-            <div className="flex justify-center">
-              <img
-                src={fullsuiteLogo}
-                alt="Logo"
-                className="h-15 cursor-pointer"
-                onClick={() => navigate("/")}
-              />
-            </div>
-            <div className="flex flex-col items-center  mb-10">
-              <p className=" text-lg  text-white">
-                Welcome,{" "}
-                <span className="font-avenir-roman-oblique">Suitelifer!</span>
-              </p>
-              <p className="text-sm  text-white/50">Enter to empower.</p>
-            </div>
-            <LoginForm
-              email={email}
-              password={password}
-              setEmail={setEmail}
-              setPassword={setPassword}
+      <div className="flex flex-col items-center justify-center h-screen">
+        <div
+          className="w-full max-w-md space-y-6 p-10 rounded-2xl shadow-xl border border-white/20 bg-white/10 backdrop-blur-md mx-auto"
+          style={{ width: "min(90%, 600px)" }}
+        >
+          <div className="flex justify-center">
+            <img
+              src={fullsuiteLogo}
+              alt="Logo"
+              className="h-15 cursor-pointer"
+              onClick={() => navigate("/")}
             />
           </div>
+          <div className="flex flex-col items-center  mb-10">
+            <p className=" text-lg  text-white">
+              Welcome,{" "}
+              <span className="font-avenir-roman-oblique">Suitelifer!</span>
+            </p>
+            <p className="text-sm  text-white/50">Enter to empower.</p>
+          </div>
+          <LoginForm
+            email={email}
+            password={password}
+            setEmail={setEmail}
+            setPassword={setPassword}
+          />
         </div>
       </div>
+    </div>
     // </GoogleReCaptchaProvider>
   );
 };

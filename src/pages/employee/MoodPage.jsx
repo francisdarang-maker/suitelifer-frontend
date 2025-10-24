@@ -23,6 +23,7 @@ ChartJS.register(
 import { useStore } from "../../store/authStore";
 import moodApi from "../../utils/moodApi";
 import Loading from "../../components/loader/Loading";
+import { toast } from "react-hot-toast";
 
 const MoodPage = () => {
   const user = useStore((state) => state.user);
@@ -35,6 +36,38 @@ const MoodPage = () => {
   const [moodStats, setMoodStats] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  useEffect(() => {
+    if (showSuccessMessage) {
+      toast.custom((t) => (
+        <div
+          className={`${
+            t.visible ? "animate-enter" : "animate-leave"
+          } max-w-md w-full bg-white shadow-lg rounded-xl pointer-events-auto flex items-center gap-3 px-4 py-3 border border-green-300`}
+        >
+          <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+            <svg
+              className="h-6 w-6 text-white"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          <div>
+            <p className="font-semibold text-green-900">Mood Submitted!</p>
+            <p className="text-sm text-green-700">
+              Your mood has been logged successfully 🎉
+            </p>
+          </div>
+        </div>
+      ));
+    }
+  }, [showSuccessMessage]);
 
   useEffect(() => {
     fetchAllData();
@@ -259,7 +292,7 @@ const MoodPage = () => {
       <div className="min-h-screen bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Success Message */}
-          {showSuccessMessage && (
+          {/* {showSuccessMessage && (
             <div className="mb-6 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 shadow-sm">
               <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
                 <svg
@@ -274,14 +307,8 @@ const MoodPage = () => {
                   />
                 </svg>
               </div>
-              <div>
-                <p className="font-semibold text-green-900">Mood Submitted!</p>
-                <p className="text-sm text-green-700">
-                  Your mood has been logged successfully 🎉
-                </p>
-              </div>
             </div>
-          )}
+          )} */}
 
           <div className="grid grid-cols-1  xl:grid-cols-3 gap-6">
             {/* LEFT COLUMN - Mood Input & Quick Stats */}
@@ -673,7 +700,7 @@ const MoodPage = () => {
                             </div>
                             <button
                               onClick={() => handleDeleteMood(mood.id)}
-                              className="flex-shrink-0 p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                              className="flex-shrink-0 p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors opacity-0 opacity-100"
                               title="Delete entry"
                             >
                               <svg
