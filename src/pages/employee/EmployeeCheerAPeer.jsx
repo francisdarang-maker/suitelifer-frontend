@@ -196,29 +196,13 @@ const CheerPage = () => {
       toast.error("Failed to update heart");
     },
   });
-
   const commentMutation = useMutation({
     mutationFn: ({ cheerId, comment }) =>
       pointsSystemApi.addCheerComment(cheerId, comment),
-    onSuccess: (data, variables) => {
+    onSuccess: async (data, variables) => {
       setCommentText("");
-      setCheerComments((prev) => {
-        const newComments = new Map(prev);
-        const existing = newComments.get(variables.cheerId);
-        const existingArray = Array.isArray(existing) ? existing : [];
-        const newComment = {
-          _id: data.id || data._id,
-          comment: data.comment,
-          fromUser: {
-            _id: user.id,
-            name: `${user.first_name} ${user.last_name}`,
-            avatar: user?.profile_pic || defaultAvatar,
-          },
-          createdAt: data.created_at || data.createdAt,
-        };
-        newComments.set(variables.cheerId, [newComment, ...existingArray]);
-        return newComments;
-      });
+      // Immediately reload comments from server to get fresh data
+      await fetchComments(variables.cheerId, false);
       queryClient.invalidateQueries(["cheer-feed"]);
       refetchCheerFeed();
       toast.success("Comment added!");
@@ -250,24 +234,27 @@ const CheerPage = () => {
     },
     onError: () => toast.error("Failed to update comment"),
   });
-
-  const deleteCommentMutation = useMutation({
+  
+const deleteCommentMutation = useMutation({
     mutationFn: ({ cheerId, commentId }) =>
       pointsSystemApi.deleteCheerComment(cheerId, commentId),
-    onSuccess: (_, variables) => {
-      setCheerComments((prev) => {
-        const newMap = new Map(prev);
-        const data = newMap.get(variables.cheerId);
-        if (data && Array.isArray(data.comments)) {
-          data.comments = data.comments.filter(
-            (c) => c._id !== variables.commentId
-          );
-        }
-        return newMap;
-      });
+    onSuccess: async (_, variables) => {
+      setLoadingComments(true);
+      
+      // First invalidate queries to trigger refetch
+      await queryClient.invalidateQueries(["cheer-feed"]);
+      await refetchCheerFeed();
+      
+      // Then reload comments for the specific cheer
+      await fetchComments(variables.cheerId, false);
+      
+      setLoadingComments(false);
       toast.success("Comment deleted!");
     },
-    onError: () => toast.error("Failed to delete comment"),
+    onError: () => {
+      setLoadingComments(false);
+      toast.error("Failed to delete comment");
+    },
   });
 
   useEffect(() => {
@@ -416,85 +403,84 @@ const CheerPage = () => {
 
   const [isSending, setIsSending] = useState(false);
 
-const handleCheerSubmit = (e) => {
-  e.preventDefault();
-  if (isSubmitting) return;
+  const handleCheerSubmit = (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
 
-  setIsSending(true); // start spinner
+    setIsSending(true); // start spinner
 
-  // ✅ VALIDATION
-  if (selectedUsers.length === 0) {
-    toast.error("Please select at least one recipient");
-    setIsSending(false);
-    return;
-  }
+    // ✅ VALIDATION
+    if (selectedUsers.length === 0) {
+      toast.error("Please select at least one recipient");
+      setIsSending(false);
+      return;
+    }
 
-  if (!messageText.trim()) {
-    toast.error("Please enter a message for your cheer");
-    setIsSending(false);
-    return;
-  }
+    if (!messageText.trim()) {
+      toast.error("Please enter a message for your cheer");
+      setIsSending(false);
+      return;
+    }
 
-  const totalHeartbitsNeeded = cheerPoints * selectedUsers.length;
-  if (totalHeartbitsNeeded > availableHeartbits) {
-    toast.error(
-      `Not enough heartbits available. You need ${totalHeartbitsNeeded} heartbits but you only have ${availableHeartbits} remaining.`
-    );
-    setIsSending(false);
-    return;
-  }
+    const totalHeartbitsNeeded = cheerPoints * selectedUsers.length;
+    if (totalHeartbitsNeeded > availableHeartbits) {
+      toast.error(
+        `Not enough heartbits available. You need ${totalHeartbitsNeeded} heartbits but you only have ${availableHeartbits} remaining.`
+      );
+      setIsSending(false);
+      return;
+    }
 
-  setIsSubmitting(true);
+    setIsSubmitting(true);
 
-  const sendCheersSequentially = async () => {
-    let successCount = 0;
-    let errorCount = 0;
+    const sendCheersSequentially = async () => {
+      let successCount = 0;
+      let errorCount = 0;
 
-    for (const user of selectedUsers) {
-      try {
-        const cheerData = {
-          recipientId: user.user_id,
-          amount: cheerPoints,
-          message: messageText.trim(),
-        };
-        await bulkCheerMutation.mutateAsync(cheerData);
-        successCount++;
-      } catch (error) {
-        errorCount++;
+      for (const user of selectedUsers) {
+        try {
+          const cheerData = {
+            recipientId: user.user_id,
+            amount: cheerPoints,
+            message: messageText.trim(),
+          };
+          await bulkCheerMutation.mutateAsync(cheerData);
+          successCount++;
+        } catch (error) {
+          errorCount++;
+        }
       }
-    }
 
-    if (errorCount === 0) {
-      toast.success(`Cheers sent to ${successCount} recipients! 🎉`);
-      setSelectedUsers([]);
-      setCheerText("");
-      setMessageText("");
-      setCheerPoints(1);
-      queryClient.invalidateQueries(["points"]);
-      queryClient.invalidateQueries(["cheer-feed"]);
-      queryClient.invalidateQueries(["leaderboard"]);
-      setAllCheers([]);
-    } else if (successCount > 0) {
-      toast.warning(`Sent ${successCount} cheers, but ${errorCount} failed.`);
-    } else {
-      toast.error("Failed to send any cheers. Please try again.");
-    }
+      if (errorCount === 0) {
+        toast.success(`Cheers sent to ${successCount} recipients! 🎉`);
+        setSelectedUsers([]);
+        setCheerText("");
+        setMessageText("");
+        setCheerPoints(1);
+        queryClient.invalidateQueries(["points"]);
+        queryClient.invalidateQueries(["cheer-feed"]);
+        queryClient.invalidateQueries(["leaderboard"]);
+        setAllCheers([]);
+      } else if (successCount > 0) {
+        toast.warning(`Sent ${successCount} cheers, but ${errorCount} failed.`);
+      } else {
+        toast.error("Failed to send any cheers. Please try again.");
+      }
+    };
+
+    sendCheersSequentially()
+      .catch((error) => {
+        const backendMsg =
+          error?.response?.data?.message ||
+          error?.message ||
+          "Failed to send cheers";
+        toast.error(backendMsg);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        setIsSending(false); // 👈 THIS IS CRITICAL
+      });
   };
-
-  sendCheersSequentially()
-    .catch((error) => {
-      const backendMsg =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to send cheers";
-      toast.error(backendMsg);
-    })
-    .finally(() => {
-      setIsSubmitting(false);
-      setIsSending(false); // 👈 THIS IS CRITICAL
-    });
-};
-
 
   const formatTimeAgo = (date) => {
     try {

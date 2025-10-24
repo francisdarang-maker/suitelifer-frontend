@@ -16,6 +16,55 @@ import {
 } from "@heroicons/react/24/outline";
 import Loading from "../../loader/Loading";
 
+const renderMessageWithMedia = (message) => {
+  if (!message) return null;
+
+  // Regex to match image URLs (jpg, jpeg, png, gif, webp)
+  const urlRegex =
+    /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
+  const parts = message.split(urlRegex);
+
+  return parts.map((part, index) => {
+    // Check if this part is an image URL
+    if (urlRegex.test(part)) {
+      return (
+        <div key={index} className="my-2">
+          <img
+            src={part}
+            alt="Shared content"
+            className="max-w-full h-auto rounded-lg border border-gray-200 shadow-sm"
+            style={{ maxHeight: "300px" }}
+            onError={(e) => {
+              // If image fails to load, show the URL as a link instead
+              e.target.style.display = "none";
+              e.target.nextSibling.style.display = "block";
+            }}
+          />
+          <a
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-blue-600 hover:text-blue-700 underline break-all"
+            style={{ display: "none" }}
+          >
+            {part}
+          </a>
+        </div>
+      );
+    }
+
+    // Return text part with preserved whitespace
+    return part ? (
+      <p
+        key={index}
+        className="text-gray-900 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere"
+      >
+        {part}
+      </p>
+    ) : null;
+  });
+};
+
 const CheerPostsManagement = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,8 +81,11 @@ const CheerPostsManagement = () => {
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmPostId, setConfirmPostId] = useState(null);
   const [confirmPostData, setConfirmPostData] = useState(null);
+  
 
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
+
 
   // Group cheers by sender and time (within same minute)
   const groupCheersBySenderAndTime = (cheers) => {
@@ -449,96 +501,137 @@ const CheerPostsManagement = () => {
         </div>
       </div>
 
-      {/* Search and Filter Controls */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search Posts
-            </label>
-            <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by post content, author name, recipient, or post ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 hover:text-gray-600"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              )}
-            </div>
-          </div>
+<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+  <div className="flex flex-col gap-6">
+    {/* Mobile Filter Toggle Button - Only visible on small screens */}
+    <button
+      onClick={() => setFiltersExpanded(!filtersExpanded)}
+      className="lg:hidden w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+    >
+      <div className="flex items-center gap-2">
+        <FunnelIcon className="h-5 w-5 text-gray-600" />
+        <span className="text-sm font-medium text-gray-700">
+          {searchTerm || filter !== 'all' || sortBy !== 'date' 
+            ? 'Filters Active' 
+            : 'Search & Filter'}
+        </span>
+        {(searchTerm || filter !== 'all' || sortBy !== 'date') && (
+          <span className="ml-1 px-2 py-0.5 bg-[#0097b2] text-white text-xs rounded-full">
+            Active
+          </span>
+        )}
+      </div>
+      <svg
+        className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
+          filtersExpanded ? 'rotate-180' : ''
+        }`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M19 9l-7 7-7-7"
+        />
+      </svg>
+    </button>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <FunnelIcon className="w-4 h-4" />
-                Filter
-              </label>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
-              >
-                <option value="all">All Posts</option>
-                <option value="active">Active Posts</option>
-                <option value="hidden">Hidden Posts</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700">
-                Sort by
-              </label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
-              >
-                <option value="date">Date</option>
-                <option value="heartbits">Heartbits</option>
-                <option value="author">Author</option>
-                <option value="likes">Likes</option>
-                <option value="comments">Comments</option>
-              </select>
-            </div>
-
+    {/* Main Content Container - Collapsible on mobile */}
+    <div className={`flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 transition-all duration-300 ${
+      filtersExpanded ? 'block' : 'hidden lg:flex'
+    }`}>
+      {/* Search Input */}
+      <div className="flex-1">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Search Posts
+        </label>
+        <div className="relative">
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search by post content, author name, recipient, or post ID..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
+          />
+          {searchTerm && (
             <button
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-              title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
+              onClick={() => setSearchTerm("")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 hover:text-gray-600"
             >
-              <div className="flex items-center justify-between">
-                <span>{sortOrder === "asc" ? "Ascending" : "Descending"}</span>
-                {sortOrder === "desc" ? (
-                  <ArrowDownIcon className="w-5 h-5 text-gray-500" />
-                ) : (
-                  <ArrowUpIcon className="w-5 h-5 text-gray-500" />
-                )}
-              </div>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
-          </div>
+          )}
         </div>
       </div>
+
+      {/* Filter and Sort Controls */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
+        <div className="flex flex-col gap-2 w-full sm:w-auto">
+          <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+            <FunnelIcon className="w-4 h-4" />
+            Filter
+          </label>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
+          >
+            <option value="all">All Posts</option>
+            <option value="active">Active Posts</option>
+            <option value="hidden">Hidden Posts</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-2 w-full sm:w-auto">
+          <label className="text-sm font-medium text-gray-700">
+            Sort by
+          </label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
+          >
+            <option value="date">Date</option>
+            <option value="heartbits">Heartbits</option>
+            <option value="author">Author</option>
+            <option value="likes">Likes</option>
+            <option value="comments">Comments</option>
+          </select>
+        </div>
+
+        <button
+          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+          className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-base hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+          title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
+        >
+          <div className="flex items-center justify-between">
+            <span>{sortOrder === "asc" ? "Ascending" : "Descending"}</span>
+            {sortOrder === "desc" ? (
+              <ArrowDownIcon className="w-5 h-5 text-gray-500" />
+            ) : (
+              <ArrowUpIcon className="w-5 h-5 text-gray-500" />
+            )}
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Error Display */}
       {error && (
@@ -729,11 +822,37 @@ const CheerPostsManagement = () => {
                     {confirmPostData.recipients?.length > 3 &&
                       ` and ${confirmPostData.recipients.length - 3} more`}
                   </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Message:</span> "
-                    {confirmPostData.post_body?.substring(0, 100)}
-                    {confirmPostData.post_body?.length > 100 ? "..." : ""}"
-                  </p>
+                  <div className="text-sm text-gray-700">
+                    <span className="font-medium block mb-1">Message:</span>
+                    <div className="bg-white p-2 rounded border border-gray-200 max-h-40 overflow-y-auto">
+                      {(() => {
+                        const message = confirmPostData.post_body;
+                        if (!message)
+                          return (
+                            <span className="text-gray-500 italic">
+                              No message
+                            </span>
+                          );
+
+                        // Check if message contains image URL
+                        const urlRegex =
+                          /(https?:\/\/[^\s]+\.(?:gif|jpg|jpeg|png|webp)(?:\?[^\s]*)?)/gi;
+                        const hasMedia = urlRegex.test(message);
+
+                        if (hasMedia) {
+                          return renderMessageWithMedia(message);
+                        }
+
+                        // Show truncated text if no media
+                        return (
+                          <span>
+                            "{message.substring(0, 150)}
+                            {message.length > 150 ? "..." : ""}"
+                          </span>
+                        );
+                      })()}
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -901,7 +1020,7 @@ const PostCard = ({
                 {/* Recipients */}
                 <div className="flex flex-wrap items-center gap-2 p-2 bg-gray-50 rounded-lg w-full">
                   <span className="text-sm font-medium text-gray-500">To:</span>
-                  <span className="text-sm font-semibold text-gray-900 break-words">
+                  <span className="text-sm font-semibold text-primary break-words">
                     {post.recipients.slice(0, 3).map((recipient, idx) => (
                       <span key={idx}>
                         {recipient.first_name} {recipient.last_name}
@@ -937,8 +1056,8 @@ const PostCard = ({
                 </div>
 
                 {/* Post Body */}
-                <div className="text-gray-900 mb-3 p-3 bg-gray-50 rounded-lg border-l-4 border-[#0097b2] break-words whitespace-pre-wrap overflow-wrap-anywhere">
-                  {post.post_body}
+                <div className="mb-3 p-3 bg-gray-50 rounded-lg border-l-4 border-[#0097b2]">
+                  {renderMessageWithMedia(post.post_body)}
                 </div>
 
                 {/* Post Image */}
