@@ -30,6 +30,7 @@ const PointsDashboard = () => {
   const [cheerMessage, setCheerMessage] = useState("");
   const [moderationNotification, setModerationNotification] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedTransactions, setExpandedTransactions] = useState(new Set());
   const itemsPerPage = 30;
 
   // Utility Functions
@@ -55,6 +56,10 @@ const PointsDashboard = () => {
   };
 
   const getUserAvatar = (transaction) => {
+    // For bulk cheers, get the sender's avatar (the one who sent it)
+    if (transaction.isBulkCheer && transaction.type === "given") {
+      return user?.avatar || defaultAvatar; // Current user is the sender
+    }
     return transaction.related_user_avatar || defaultAvatar;
   };
 
@@ -115,8 +120,55 @@ const PointsDashboard = () => {
     });
   }, []);
 
+  // Helper function to group bulk cheers
+  const groupBulkCheers = useCallback((transactions) => {
+    if (!Array.isArray(transactions)) return [];
+    
+    const grouped = new Map();
+    const nonCheerTransactions = [];
+
+    transactions.forEach((transaction) => {
+      // Group both "received" and "given" type transactions
+      if ((transaction.type === "received" || transaction.type === "given") && transaction.message) {
+        const createdAt = new Date(transaction.created_at || transaction.createdAt);
+        const timeKey = Math.floor(createdAt.getTime() / 60000); // Group by minute
+        
+        // For "given", group by current user (sender), for "received" group by sender
+        const groupKey = transaction.type === "given" 
+          ? `${user.id}-${timeKey}-${transaction.message}-given`
+          : `${transaction.fromUserId}-${timeKey}-${transaction.message}-received`;
+
+        if (!grouped.has(groupKey)) {
+          grouped.set(groupKey, {
+            ...transaction,
+            recipients: [transaction.related_user || "Unknown"],
+            totalAmount: transaction.amount,
+            transaction_ids: [transaction.transactionId || transaction.transaction_id],
+            isBulkCheer: false,
+          });
+        } else {
+          const existing = grouped.get(groupKey);
+          existing.recipients.push(transaction.related_user || "Unknown");
+          existing.totalAmount += transaction.amount;
+          existing.transaction_ids.push(transaction.transactionId || transaction.transaction_id);
+          existing.isBulkCheer = true;
+        }
+      } else {
+        // Keep non-cheer transactions as-is
+        nonCheerTransactions.push(transaction);
+      }
+    });
+
+    // Combine grouped and non-grouped transactions
+    const groupedArray = Array.from(grouped.values());
+    return [...groupedArray, ...nonCheerTransactions].sort((a, b) => {
+      const dateA = new Date(a.created_at || a.createdAt);
+      const dateB = new Date(b.created_at || b.createdAt);
+      return dateB - dateA; // Most recent first
+    });
+  }, [user.id]);
+
   // Queries
-  //
   const {
     data: pointsData,
     isLoading: pointsLoading,
@@ -249,7 +301,7 @@ const PointsDashboard = () => {
   }
 
   // Data Processing
-  const filteredTransactions =
+  const rawFilteredTransactions =
     historyData?.data?.filter((transaction) => {
       if (transaction.type === "moderation") return false;
       if (transaction.type === "given")
@@ -262,6 +314,8 @@ const PointsDashboard = () => {
         return transaction.toUserId === user.id;
       return true;
     }) || [];
+
+  const filteredTransactions = groupBulkCheers(rawFilteredTransactions);
 
   const totalItems = historyData?.pagination?.total || 0;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -277,7 +331,23 @@ const PointsDashboard = () => {
 
     let displayDescription = transaction.description;
 
-    if (
+    // Handle bulk cheer display for GIVEN transactions
+    if (transaction.isBulkCheer && transaction.type === "given") {
+      const recipientCount = transaction.recipients.length;
+      displayDescription = `Cheered ${recipientCount} ${recipientCount === 1 ? 'person' : 'people'}`;
+    }
+    // Handle bulk cheer display for RECEIVED transactions
+    else if (transaction.isBulkCheer && transaction.type === "received") {
+      const sender = transaction.related_user || "Someone";
+      const recipientCount = transaction.recipients.length;
+      
+      if (recipientCount > 1) {
+        displayDescription = `${sender} cheered you and ${recipientCount - 1} ${recipientCount - 1 === 1 ? 'other' : 'others'}`;
+      } else {
+        displayDescription = `Received ${transaction.amount} heartbits from ${sender}`;
+      }
+    } 
+    else if (
       transaction.type === "received" &&
       displayDescription?.includes("points")
     ) {
@@ -294,11 +364,11 @@ const PointsDashboard = () => {
       );
     }
 
-    if (transaction.type === "given" && !displayDescription) {
+    if (transaction.type === "given" && !displayDescription && !transaction.isBulkCheer) {
       displayDescription = `Cheered ${transaction.amount} heartbits`;
     }
 
-    if (transaction.type === "received" && !displayDescription) {
+    if (transaction.type === "received" && !displayDescription && !transaction.isBulkCheer) {
       displayDescription = `Received ${transaction.amount} heartbits`;
     }
 
@@ -388,7 +458,6 @@ const PointsDashboard = () => {
             title="Balance"
             value={pointsData?.data?.currentBalance || 0}
             label="Points"
-            // icon={<StarIconSolid />}
             icon={<StarIconSolid />}
             gradient="from-blue-50 to-blue-100"
             iconBg="bg-blue-500"
@@ -451,13 +520,15 @@ const PointsDashboard = () => {
               <div className="space-y-2.5">
                 {filteredTransactions.map((transaction, index) => (
                   <TransactionCard
-                    key={index}
+                    key={transaction.transaction_ids ? transaction.transaction_ids.join('-') : index}
                     transaction={transaction}
                     display={getTransactionDisplay(transaction)}
                     getUserAvatar={getUserAvatar}
                     formatTimeAgo={formatTimeAgo}
                     renderMessageWithMedia={renderMessageWithMedia}
                     logoFs={logoFs}
+                    expandedTransactions={expandedTransactions}
+                    setExpandedTransactions={setExpandedTransactions}
                   />
                 ))}
               </div>
@@ -608,80 +679,165 @@ const TransactionCard = ({
   formatTimeAgo,
   renderMessageWithMedia,
   logoFs,
+  expandedTransactions,
+  setExpandedTransactions,
 }) => {
   const { displayDescription, isNegative, isAdminTransaction, senderLabel } =
     display;
 
+  const transactionKey = transaction.transaction_ids 
+    ? transaction.transaction_ids.join('-') 
+    : transaction.transactionId || transaction.transaction_id;
+  
+  const isExpanded = expandedTransactions.has(transactionKey);
+
+  const toggleExpanded = () => {
+    setExpandedTransactions((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(transactionKey)) {
+        newSet.delete(transactionKey);
+      } else {
+        newSet.add(transactionKey);
+      }
+      return newSet;
+    });
+  };
+
   return (
-    <div className="border border-gray-200 rounded-lg p-3.5 hover:shadow-md transition-shadow">
-      <div className="flex gap-3">
+    <div className="border border-gray-200 rounded-lg p-2.5 sm:p-3.5 hover:shadow-md transition-shadow">
+      <div className="flex gap-2 sm:gap-3">
         <div className="flex-shrink-0">
           {isAdminTransaction ? (
             <div className="relative">
               <img
                 src={logoFs}
                 alt="Admin"
-                className="w-10 h-10 rounded-full object-cover border-2 border-blue-500"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-blue-500"
               />
-              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
-                <span className="text-white text-[9px] font-bold">A</span>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                <span className="text-white text-[8px] sm:text-[9px] font-bold">A</span>
               </div>
             </div>
-          ) : transaction.related_user ? (
+          ) : transaction.related_user || transaction.isBulkCheer ? (
             <img
               src={getUserAvatar(transaction)}
-              alt={transaction.related_user}
-              className="w-10 h-10 rounded-full object-cover"
+              alt={transaction.related_user || "User"}
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-              <StarIconSolid className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+              <StarIconSolid className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
           )}
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1.5">
+          <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-1 sm:mb-1.5">
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-gray-900 truncate">
+              <p className="font-semibold text-xs sm:text-sm text-gray-900 break-words leading-snug">
                 {displayDescription ||
                   transaction.type.replace("_", " ").toUpperCase()}
               </p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <ClockIcon className="w-3 h-3 text-gray-400" />
-                <span className="text-xs text-gray-500">
-                  {formatTimeAgo(
-                    transaction.createdAt || transaction.created_at
-                  )}
-                </span>
-                {transaction.related_user && !isAdminTransaction && (
+              <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-1">
+                <div className="flex items-center gap-1">
+                  <ClockIcon className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                  <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
+                    {formatTimeAgo(
+                      transaction.createdAt || transaction.created_at
+                    )}
+                  </span>
+                </div>
+                {transaction.isBulkCheer && transaction.type === "given" && transaction.recipients.length > 0 && (
                   <>
-                    <span className="text-xs text-gray-400">•</span>
-                    <span className="text-xs text-gray-600">
+                    <span className="text-[10px] sm:text-xs text-gray-400">•</span>
+                    <span className="text-[10px] sm:text-xs text-gray-600">
+                      to{' '}
+                      <span className="font-semibold text-primary">
+                        {transaction.recipients.length} {transaction.recipients.length === 1 ? 'person' : 'people'}
+                      </span>
+                    </span>
+                  </>
+                )}
+                {transaction.isBulkCheer && transaction.type === "received" && (
+                  <>
+                    <span className="text-[10px] sm:text-xs text-gray-400">•</span>
+                    <span className="text-[10px] sm:text-xs text-gray-600 break-words">
+                      from{' '}
+                      <span className="font-semibold text-primary">
+                        {transaction.related_user || "Someone"}
+                      </span>
+                    </span>
+                  </>
+                )}
+                {!transaction.isBulkCheer && transaction.related_user && !isAdminTransaction && (
+                  <>
+                    <span className="text-[10px] sm:text-xs text-gray-400">•</span>
+                    <span className="text-[10px] sm:text-xs text-gray-600 break-words">
                       {transaction.type === "given" ? "to" : "from"}{" "}
-                      {senderLabel}
+                      <span className="font-semibold text-primary">
+                        {senderLabel}
+                      </span>
                     </span>
                   </>
                 )}
                 {isAdminTransaction && (
                   <>
-                    <span className="text-xs text-gray-400">•</span>
-                    <span className="text-xs font-medium text-blue-600">
+                    <span className="text-[10px] sm:text-xs text-gray-400">•</span>
+                    <span className="text-[10px] sm:text-xs font-medium text-blue-600">
                       from Admin
                     </span>
                   </>
                 )}
               </div>
+
+              {/* Show recipient list for bulk cheers */}
+              {transaction.isBulkCheer && transaction.type === "given" && transaction.recipients.length > 0 && (
+                <div className="mt-1.5 sm:mt-2">
+                  <div className="w-full p-1.5 sm:p-2 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary">
+                    <p className="text-[10px] sm:text-xs text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
+                      <span className="font-semibold text-primary">Cheered to: </span>
+                      {transaction.recipients.slice(0, isExpanded ? transaction.recipients.length : 2).map((name, idx, arr) => (
+                        <span key={idx}>
+                          {name}
+                          {idx < arr.length - 1 && ', '}
+                        </span>
+                      ))}
+                      {!isExpanded && transaction.recipients.length > 2 && (
+                        <>
+                          {' and '}
+                          <button
+                            onClick={toggleExpanded}
+                            className="inline-block text-primary hover:text-primary/80 font-semibold underline transition-colors touch-manipulation"
+                          >
+                            {transaction.recipients.length - 2} {transaction.recipients.length - 2 === 1 ? 'other' : 'others'}
+                          </button>
+                        </>
+                      )}
+                      {isExpanded && transaction.recipients.length > 2 && (
+                        <>
+                          {'. '}
+                          <button
+                            onClick={toggleExpanded}
+                            className="inline-block text-primary hover:text-primary/80 font-semibold underline transition-colors touch-manipulation"
+                          >
+                            Show less
+                          </button>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
             <span
-              className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-bold ${
+              className={`flex-shrink-0 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold ${
                 isNegative
                   ? "bg-red-100 text-red-700"
                   : "bg-green-100 text-green-700"
               }`}
             >
               {isNegative ? "-" : "+"}
-              {transaction.amount}
+              {transaction.isBulkCheer ? transaction.totalAmount : transaction.amount}
               {["received", "given"].includes(transaction.type)
                 ? " bits"
                 : " pts"}
@@ -691,7 +847,7 @@ const TransactionCard = ({
           {(isAdminTransaction ||
             (["received", "given"].includes(transaction.type) &&
               transaction.message)) && (
-            <div className="mt-2">
+            <div className="mt-1.5 sm:mt-2">
               {renderMessageWithMedia(transaction.message)}
             </div>
           )}
