@@ -47,11 +47,19 @@ const UserHeartbitsManagement = () => {
   const [bulkReason, setBulkReason] = useState("");
   const [isCollapsed, setIsCollapsed] = useState(true);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     loadUsersWithHeartbits();
     loadGlobalLimit();
   }, []);
+
+   useEffect(() => {
+    setCurrentPage(1); // reset page on filter/search change
+  }, [searchTerm, sortBy, sortOrder]);
+
+
 
   const loadGlobalLimit = async () => {
     try {
@@ -60,16 +68,13 @@ const UserHeartbitsManagement = () => {
         const globalLimit = response.config.global_monthly_limit?.value || 1000;
         setGlobalLimit(globalLimit);
       } else {
-        // Fallback to default if no config found
         setGlobalLimit(1000);
       }
     } catch (error) {
       console.error("Error loading global limit:", error);
-      // Fallback to default
       setGlobalLimit(1000);
     }
   };
-  //
   const defaultValues = {
     selectedUsers: [],
     searchTerm: "",
@@ -81,15 +86,6 @@ const UserHeartbitsManagement = () => {
     searchTerm !== defaultValues.searchTerm ||
     sortBy !== defaultValues.sortBy ||
     sortOrder !== defaultValues.sortOrder;
-  //
-
-  // const showNotification = (type, message) => {
-  //   setNotification({ show: true, type, message });
-  //   setTimeout(
-  //     () => setNotification({ show: false, type: "", message: "" }),
-  //     5000
-  //   );
-  // };
 
   const loadUsersWithHeartbits = async () => {
     try {
@@ -293,6 +289,16 @@ const UserHeartbitsManagement = () => {
         setIsLoading(false);
       }
     };
+
+      // Pagination logic
+  const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
+  const indexOfLastUser = currentPage * itemsPerPage;
+  const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+  const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
 
     const hasChanges = heartbitsToGive > 0 && reason.trim();
 
@@ -687,128 +693,177 @@ const UserHeartbitsManagement = () => {
 
       {/* Users Grid - Responsive */}
 
-      <div className="bg-gray-10 rounded-lg">
-        <div
-          className="users-table-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4"
-          style={{
-            overflowY: "auto",
-            background: "",
-            borderRadius: "1rem",
-          }}
-        >
-          {sortedUsers.length === 0 ? (
-            <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 text-center text-gray-500 py-12">
-              <UserGroupIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-lg font-medium text-gray-900 mb-2">
-                No users found
-              </p>
-              <p className="text-sm">
-                {searchTerm
-                  ? "Try adjusting your search criteria."
-                  : "No users are currently registered in the system."}
-              </p>
-            </div>
-          ) : (
-            sortedUsers.map((user) => {
-              const isSelected = selectedUsers.includes(user.user_id);
-              const isActive = user.isActive === 1 || user.isActive === true;
-              return (
-                isActive &&
+        <div className="bg-gray-10 rounded-lg">
+          {/* === PAGINATION SETUP === */}
+          {(() => {
+            const itemsPerPage = 13; // number of cards per page (adjust as needed)
+            const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
+
+            const [currentPage, setCurrentPage] = React.useState(1);
+
+            const indexOfLastUser = currentPage * itemsPerPage;
+            const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+            const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+            const goToPage = (page) => {
+              if (page >= 1 && page <= totalPages) {
+                setCurrentPage(page);
+                // optional: scroll to top on page change
+                document.querySelector(".users-table-container")?.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            };
+
+            return (
+              <>
+                {/* === USERS GRID === */}
                 <div
-                  key={user.user_id}
-                  className={`
-                    relative group rounded-2xl border bg-white/80 backdrop-blur-sm 
-                    shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer
-                    flex flex-col p-4 sm:p-5
-                    ${
-                      isSelected
-                        ? "border-primary/60 ring-2 ring-primary/20 bg-primary/5"
-                        : "border-gray-200 hover:border-primary/30"
-                    }
-                   
-                  `}
-                  onClick={() => {
-                    if (isActive) toggleUserSelection(user.user_id);
+                  className="users-table-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4"
+                  style={{
+                    overflowY: "auto",
+                    borderRadius: "1rem",
                   }}
                 >
-                  {/* ✅ Checkbox / Selection Indicator */}
-                  <div className="absolute top-3 right-3">
-                    <span
-                      className={`
-                        w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2
-                        ${
-                          isSelected
-                            ? "border-primary bg-primary text-white shadow-md"
-                            : "border-gray-300 bg-white text-transparent"
-                        }
-                        transition-all duration-200
-                      `}
-                    >
-                      {isSelected && (
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="3"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                    </span>
-                  </div>
-
-                  {/* 🧍 User Info Section */}
-                  <div className="flex items-center gap-4">
-                    {/* Avatar */}
-                    <div className="relative">
-                      <img
-                        src={user.avatar || defaultAvatar}
-                        alt={`${user.first_name || ""} ${
-                          user.last_name || ""
-                        }`.trim()}
-                        className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-100"
-                      />
-                      {/* Status Indicator */}
-                      <span
-                        className={`
-                          absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white
-                          ${isActive ? "bg-green-500" : "bg-gray-400"}
-                        `}
-                      />
-                    </div>
-
-                    {/* Name and Role */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900 text-base truncate">
-                        {`${user.first_name || ""} ${user.last_name || ""}`.trim()}
+                  {sortedUsers.length === 0 ? (
+                    <div className="col-span-full text-center text-gray-500 py-12">
+                      <UserGroupIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                      <p className="text-lg font-medium text-gray-900 mb-2">No users found</p>
+                      <p className="text-sm">
+                        {searchTerm
+                          ? "Try adjusting your search criteria."
+                          : "No users are currently registered in the system."}
                       </p>
-                      <p className="text-sm text-gray-500">{getRoleLabel(user.user_type)}</p>
-
                     </div>
-                  </div>
+                  ) : (
+                    currentUsers.map((user) => {
+                      const isSelected = selectedUsers.includes(user.user_id);
+                      const isActive = user.isActive === 1 || user.isActive === true;
+                      return (
+                        isActive && (
+                          <div
+                            key={user.user_id}
+                            className={`
+                              relative group rounded-2xl border bg-white/80 backdrop-blur-sm 
+                              shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer
+                              flex flex-col p-4 sm:p-5
+                              ${
+                                isSelected
+                                  ? "border-primary/60 ring-2 ring-primary/20 bg-primary/5"
+                                  : "border-gray-200 hover:border-primary/30"
+                              }
+                            `}
+                            onClick={() => {
+                              if (isActive) toggleUserSelection(user.user_id);
+                            }}
+                          >
+                            {/* ✅ Checkbox */}
+                            <div className="absolute top-3 right-3">
+                              <span
+                                className={`
+                                  w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2
+                                  ${
+                                    isSelected
+                                      ? "border-primary bg-primary text-white shadow-md"
+                                      : "border-gray-300 bg-white text-transparent"
+                                  }
+                                  transition-all duration-200
+                                `}
+                              >
+                                {isSelected && (
+                                  <svg
+                                    className="w-3.5 h-3.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M5 13l4 4L19 7"
+                                    />
+                                  </svg>
+                                )}
+                              </span>
+                            </div>
 
-                  {/* ❤️ Heartbits Row */}
-                  <div className="flex items-center gap-2 mt-4 text-sm text-gray-600">
-                    <HeartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-pink-400" />
-                    <span className="font-semibold text-[#0097b2] text-base">
-                      {user.heartbits_balance || 0}
-                    </span>
-                    <span className="text-xs text-gray-500">Heartbits</span>
-                  </div>
+                            {/* 🧍 User Info */}
+                            <div className="flex items-center gap-4">
+                              <div className="relative">
+                                <img
+                                  src={user.avatar || defaultAvatar}
+                                  alt={`${user.first_name || ""} ${user.last_name || ""}`.trim()}
+                                  className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-100"
+                                />
+                                <span
+                                  className={`
+                                    absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white
+                                    ${isActive ? "bg-green-500" : "bg-gray-400"}
+                                  `}
+                                />
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-gray-900 text-base truncate">
+                                  {`${user.first_name || ""} ${user.last_name || ""}`.trim()}
+                                </p>
+                                <p className="text-sm text-gray-500">{getRoleLabel(user.user_type)}</p>
+                              </div>
+                            </div>
+
+                            {/* ❤️ Heartbits */}
+                            <div className="flex items-center gap-2 mt-4 text-sm text-gray-600">
+                              <HeartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-pink-400" />
+                              <span className="font-semibold text-[#0097b2] text-base">
+                                {user.heartbits_balance || 0}
+                              </span>
+                              <span className="text-xs text-gray-500">Heartbits</span>
+                            </div>
+                          </div>
+                        )
+                      );
+                    })
+                  )}
                 </div>
-              );
-            
 
+                {/* === PAGINATION CONTROLS === */}
+                {sortedUsers.length > itemsPerPage && (
+                  <div className="flex justify-center items-center gap-2 mt-5 flex-wrap">
+                    <button
+                      onClick={() => goToPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1 border rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50"
+                    >
+                      Previous
+                    </button>
 
-            })
-          )}
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => goToPage(i + 1)}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                          currentPage === i + 1
+                            ? "bg-[#0097b2] text-white shadow"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+
+                    <button
+                      onClick={() => goToPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-1 border rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
-      </div>
+
 
       {/* Modals */}
       {selectedUser && (
