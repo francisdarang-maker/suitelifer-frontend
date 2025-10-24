@@ -20,6 +20,7 @@ import {
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import Loading from "../../components/loader/Loading";
+import toast from "react-hot-toast";
 
 const SuitebiteShop = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -82,13 +83,13 @@ const SuitebiteShop = () => {
     fetchVariationData();
   }, []);
 
-  const showNotification = (type, message) => {
-    setNotification({ show: true, type, message });
-    setTimeout(
-      () => setNotification({ show: false, type: "", message: "" }),
-      5000
-    );
-  };
+  // const showNotification = (type, message) => {
+  //   setNotification({ show: true, type, message });
+  //   setTimeout(
+  //     () => setNotification({ show: false, type: "", message: "" }),
+  //     5000
+  //   );
+  // };
 
   const loadShopData = async () => {
     try {
@@ -122,7 +123,7 @@ const SuitebiteShop = () => {
         setProducts(mappedProducts);
         syncCategoriesFromProducts(mappedProducts);
       } else {
-        showNotification("error", "Failed to load products");
+        toast.error("Failed to load products");
         console.error("❌ Products response failed:", productsResponse);
       }
 
@@ -157,12 +158,12 @@ const SuitebiteShop = () => {
         setUserHeartbits(heartbits);
       } else {
         console.error("❌ Heartbits response failed:", heartbitsResponse);
-        showNotification("error", "Failed to load heartbits balance");
+        toast.error("Failed to load heartbits balance");
         setUserHeartbits(0);
       }
     } catch (error) {
       console.error("Error loading shop data:", error);
-      showNotification("error", "Failed to load shop data");
+      toast.error("Failed to load shop data");
       setProducts([]);
       setCart([]);
       setUserHeartbits(0);
@@ -242,17 +243,16 @@ const SuitebiteShop = () => {
       const response = await suitebiteAPI.addToCart(cartData);
 
       if (response.success) {
-        showNotification("success", "Item added to cart! 🛒");
+        toast.success("Item added to cart! 🛒");
         await updateCartAndHeartbits();
       } else {
-        showNotification(
-          "error",
+        toast.error(
           response.message || "Failed to add item to cart"
         );
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      showNotification("error", "Failed to add item to cart");
+      toast.error("Failed to add item to cart");
     }
   };
 
@@ -275,16 +275,15 @@ const SuitebiteShop = () => {
               : item
           )
         );
-        showNotification("success", "Quantity updated!");
+        toast.success("Quantity updated!");
       } else {
-        showNotification(
-          "error",
+        toast.error(
           response.message || "Failed to update quantity"
         );
       }
     } catch (error) {
       console.error("Error updating quantity:", error);
-      showNotification("error", "Failed to update quantity");
+      toast.error("Failed to update quantity");
     }
   };
 
@@ -296,13 +295,13 @@ const SuitebiteShop = () => {
         setCart((prevCart) =>
           prevCart.filter((item) => item.cart_item_id !== itemId)
         );
-        showNotification("success", "Item removed from cart");
+        toast.success("Item removed from cart");
       } else {
-        showNotification("error", response.message || "Failed to remove item");
+        toast.error(response.message || "Failed to remove item");
       }
     } catch (error) {
       console.error("Error removing item:", error);
-      showNotification("error", "Failed to remove item");
+      toast.error("Failed to remove item");
     }
   };
 
@@ -316,12 +315,11 @@ const SuitebiteShop = () => {
       if (response.success) {
         await updateCartAndHeartbits();
 
-        showNotification(
-          "success",
+        toast.success(
           "Order placed successfully! Awaiting admin approval. 🎉"
         );
       } else {
-        showNotification("error", response.message || "Checkout failed");
+        toast.error(response.message || "Checkout failed");
       }
     } catch (error) {
       console.error("Error during checkout:", error);
@@ -329,9 +327,9 @@ const SuitebiteShop = () => {
       console.error("Error status:", error.response?.status);
 
       if (error.response?.data?.message) {
-        showNotification("error", error.response.data.message);
+        toast.error(error.response.data.message);
       } else {
-        showNotification("error", "Checkout failed. Please try again.");
+        toast.error("Checkout failed. Please try again.");
       }
     }
   };
@@ -386,11 +384,11 @@ const SuitebiteShop = () => {
         }
         setModalInitialSelectedOptions(initialOptions);
       } else {
-        showNotification("error", "Product not found");
+        toast.error("Product not found");
       }
     } catch (error) {
       console.error("Error fetching product for modal:", error);
-      showNotification("error", "Failed to load product details");
+      toast.error("Failed to load product details");
     }
   };
 
@@ -844,18 +842,17 @@ const transformCurrentBalance = (currentBalance) => {
               const response = await suitebiteAPI.checkout(orderData);
 
               if (response.success) {
-                showNotification("success", "Order placed successfully!");
+                toast.success("Order placed successfully!");
                 setIsModalOpen(false);
                 await updateHeartbitsOnly();
               } else {
-                showNotification(
-                  "error",
+                toast.error(
                   response.message || "Failed to place order"
                 );
               }
             } catch (error) {
               console.error("Error with buy now:", error);
-              showNotification("error", "Buy now failed. Please try again.");
+              toast.error("Buy now failed. Please try again.");
             }
           }}
           userHeartbits={userHeartbits}

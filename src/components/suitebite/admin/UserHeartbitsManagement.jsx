@@ -22,6 +22,7 @@ import {
 import { useStore } from "../../../store/authStore";
 import defaultAvatar from "../../../assets/images/defaultAvatar.svg";
 import Loading from "../../loader/Loading";
+import toast from "react-hot-toast";
 
 const UserHeartbitsManagement = () => {
   const currentUser = useStore((state) => state.user);
@@ -82,13 +83,13 @@ const UserHeartbitsManagement = () => {
     sortOrder !== defaultValues.sortOrder;
   //
 
-  const showNotification = (type, message) => {
-    setNotification({ show: true, type, message });
-    setTimeout(
-      () => setNotification({ show: false, type: "", message: "" }),
-      5000
-    );
-  };
+  // const showNotification = (type, message) => {
+  //   setNotification({ show: true, type, message });
+  //   setTimeout(
+  //     () => setNotification({ show: false, type: "", message: "" }),
+  //     5000
+  //   );
+  // };
 
   const loadUsersWithHeartbits = async () => {
     try {
@@ -118,15 +119,13 @@ const UserHeartbitsManagement = () => {
         }));
         setUsers(transformedUsers);
       } else {
-        showNotification(
-          "error",
+        toast.error(
           "Failed to load users data. Please try again."
         );
       }
     } catch (error) {
       console.error("Error loading users:", error);
-      showNotification(
-        "error",
+      toast.error(
         "Failed to load users data. Please check your connection and try again."
       );
     } finally {
@@ -151,14 +150,12 @@ const UserHeartbitsManagement = () => {
       }
       loadUsersWithHeartbits();
       setSelectedUser(null);
-      showNotification(
-        "success",
+      toast.success(
         `Successfully gave ${updates.balance} heartbits to user!`
       );
     } catch (error) {
       console.error("Error updating heartbits:", error);
-      showNotification(
-        "error",
+      toast.error(
         "Failed to give heartbits. Please check your connection and try again."
       );
     }
@@ -175,8 +172,7 @@ const UserHeartbitsManagement = () => {
 
       if (response.success) {
         setGlobalLimit(newLimit);
-        showNotification(
-          "success",
+        toast.success(
           `Global monthly limit updated to ${newLimit} heartbits successfully!`
         );
       } else {
@@ -184,8 +180,7 @@ const UserHeartbitsManagement = () => {
       }
     } catch (error) {
       console.error("Error updating global limit:", error);
-      showNotification(
-        "error",
+      toast.error(
         "Failed to update global limit. Please try again."
       );
     }
@@ -207,20 +202,17 @@ const UserHeartbitsManagement = () => {
       setSelectedUsers([]);
 
       if (failCount === 0) {
-        showNotification(
-          "success",
+        toast.success(
           `Successfully gave ${amount} heartbits to ${successCount} selected users!`
         );
       } else {
-        showNotification(
-          "warning",
+        toast.error(
           `Partial success: ${successCount} users updated, ${failCount} failed.`
         );
       }
     } catch (error) {
       console.error("Error with bulk heartbits update:", error);
-      showNotification(
-        "error",
+      toast.error(
         "Failed to give heartbits to selected users. Please try again."
       );
     }

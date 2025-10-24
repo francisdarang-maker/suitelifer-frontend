@@ -26,6 +26,7 @@ import {
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Loading from "../../loader/Loading";
+import toast from "react-hot-toast";
 
 /**
  * OrderManagement Component - Admin Order Management
@@ -82,6 +83,10 @@ const OrderManagement = () => {
   // Cache state
   const [lastLoadTime, setLastLoadTime] = useState(0);
   const [lastFilters, setLastFilters] = useState({});
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [isApproving, setIsApproving] = useState(false);
+
 
   useEffect(() => {
     // Only load orders if we don't have any or if filters have changed
@@ -99,13 +104,13 @@ const OrderManagement = () => {
     }
   }, [statusFilter, dateRange]);
 
-  const showNotification = (type, message) => {
-    setNotification({ show: true, type, message });
-    setTimeout(
-      () => setNotification({ show: false, type: "", message: "" }),
-      4000
-    );
-  };
+  // const showNotification = (type, message) => {
+  //   setNotification({ show: true, type, message });
+  //   setTimeout(
+  //     () => setNotification({ show: false, type: "", message: "" }),
+  //     4000
+  //   );
+  // };
 
   // Function to refresh orders (e.g., after status changes)
   const refreshOrders = async () => {
@@ -144,12 +149,12 @@ const OrderManagement = () => {
         setOrders(mappedOrders);
         setLastLoadTime(Date.now()); // Update cache time
       } else {
-        showNotification("error", "Failed to load orders");
+        toast.error("Failed to load orders");
         console.error("❌ Orders response failed:", response);
       }
     } catch (error) {
       console.error("Error loading orders:", error);
-      showNotification("error", "Failed to load orders");
+      toast.error("Failed to load orders");
     } finally {
       setLoading(false);
     }
@@ -184,7 +189,7 @@ const OrderManagement = () => {
 
   const handleBulkDelete = async () => {
     if (selectedOrders.size === 0) {
-      showNotification("error", "No orders selected for deletion");
+      toast.error("No orders selected for deletion");
       return;
     }
 
@@ -202,8 +207,7 @@ const OrderManagement = () => {
       const orderIds = nonDeletableOrders
         .map((order) => order.order_id)
         .join(", ");
-      showNotification(
-        "error",
+      toast.error(
         `Orders ${orderIds} cannot be deleted (only cancelled or completed orders can be deleted)`
       );
       return;
@@ -241,20 +245,19 @@ const OrderManagement = () => {
       }
 
       if (successCount > 0) {
-        showNotification(
-          "success",
+        toast.success(
           `Successfully deleted ${successCount} order(s)`
         );
         if (errorCount > 0) {
-          showNotification("error", `Failed to delete ${errorCount} order(s)`);
+          toast.error(`Failed to delete ${errorCount} order(s)`);
         }
         await refreshOrders(); // Use optimized refresh
       } else {
-        showNotification("error", "Failed to delete any orders");
+        toast.error("Failed to delete any orders");
       }
     } catch (error) {
       console.error("Bulk delete error:", error);
-      showNotification("error", "Failed to perform bulk delete operation");
+      toast.error("Failed to perform bulk delete operation");
     } finally {
       setBulkDeleting(false);
       setSelectedOrders(new Set());
@@ -270,11 +273,11 @@ const OrderManagement = () => {
         setSelectedOrder(response.data); // API returns data not order
         setShowOrderDetails(true);
       } else {
-        showNotification("error", "Failed to load order details");
+        toast.error("Failed to load order details");
       }
     } catch (error) {
       console.error("Error loading order details:", error);
-      showNotification("error", "Failed to load order details");
+      toast.error("Failed to load order details");
     } finally {
       setLoadingOrderDetails(false);
     }
@@ -287,17 +290,16 @@ const OrderManagement = () => {
       const response = await suitebiteAPI.approveOrder(orderId);
 
       if (response.success) {
-        showNotification("success", "Order approved successfully!");
+        toast.success("Order approved successfully!");
         await refreshOrders(); // Use optimized refresh
       } else {
-        showNotification(
-          "error",
+        toast.error(
           response.message || "Failed to approve order"
         );
       }
     } catch (error) {
       console.error("Error approving order:", error);
-      showNotification("error", "Failed to approve order");
+      toast.error("Failed to approve order");
     } finally {
       setApprovingOrders((prev) => {
         const newSet = new Set(prev);
@@ -314,17 +316,16 @@ const OrderManagement = () => {
       const response = await suitebiteAPI.completeOrder(orderId);
 
       if (response.success) {
-        showNotification("success", "Order completed successfully!");
+        toast.success("Order completed successfully!");
         await refreshOrders(); // Use optimized refresh
       } else {
-        showNotification(
-          "error",
+        toast.error(
           response.message || "Failed to complete order"
         );
       }
     } catch (error) {
       console.error("Error completing order:", error);
-      showNotification("error", "Failed to complete order");
+      toast.error("Failed to complete order");
     } finally {
       setCompletingOrders((prev) => {
         const newSet = new Set(prev);
@@ -360,14 +361,14 @@ const OrderManagement = () => {
       );
 
       if (response.success) {
-        showNotification("success", "Order cancelled successfully!");
+        toast.success("Order cancelled successfully!");
         await refreshOrders(); // Use optimized refresh
       } else {
-        showNotification("error", response.message || "Failed to cancel order");
+        toast.error(response.message || "Failed to cancel order");
       }
     } catch (error) {
       console.error("Error cancelling order:", error);
-      showNotification("error", "Failed to cancel order");
+      toast.error("Failed to cancel order");
     } finally {
       setCancellingOrders((prev) => {
         const newSet = new Set(prev);
@@ -394,14 +395,14 @@ const OrderManagement = () => {
       ); // isFromUserPanel = false for admin panel
 
       if (response.success) {
-        showNotification("success", "Order deleted successfully!");
+        toast.success("Order deleted successfully!");
         await refreshOrders(); // Use optimized refresh
       } else {
-        showNotification("error", response.message || "Failed to delete order");
+        toast.error(response.message || "Failed to delete order");
       }
     } catch (error) {
       console.error("Error deleting order:", error);
-      showNotification("error", "Failed to delete order");
+      toast.error("Failed to delete order");
     } finally {
       setDeletingOrders((prev) => {
         const newSet = new Set(prev);
@@ -821,8 +822,7 @@ const OrderManagement = () => {
     }
 
     setShowExportModal(false);
-    showNotification(
-      "success",
+    toast.success(
       `Exported ${ordersToExport.length} orders successfully!`
     );
   };
@@ -1195,6 +1195,7 @@ const OrderManagement = () => {
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-1 ml-4">
+                      {/* 👁 View Order */}
                       <button
                         onClick={() => handleOrderDetails(order.order_id)}
                         disabled={loadingOrderDetails}
@@ -1206,7 +1207,7 @@ const OrderManagement = () => {
 
                       {canApproveOrder(order) && (
                         <button
-                          onClick={() => handleApproveOrder(order.order_id)}
+                          onClick={()=> handleApproveOrder(order.order_id)}
                           disabled={approvingOrders.has(order.order_id)}
                           className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
                           title="Approve order"
@@ -1264,6 +1265,7 @@ const OrderManagement = () => {
                         </button>
                       )}
                     </div>
+
                   </div>
 
                   {/* Status Timeline */}

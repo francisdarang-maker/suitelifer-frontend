@@ -37,14 +37,8 @@ export default function EventFilter({
         {Object.entries(eventColors).map(([key, value]) => (
           <div
             key={key}
-            draggable={enableDragDrop}
-            onDragStart={() => enableDragDrop && onDragStart(key)}
-            onDragEnd={() => enableDragDrop && onDragEnd()}
             className={`
               relative group cursor-pointer
-              ${enableDragDrop ? "hover:scale-[1.02] active:scale-95" : ""}
-              ${draggedCategory === key ? "scale-105 ring-4 ring-blue-400" : ""}
-              transition-all duration-300
             `}
           >
             <button
@@ -66,13 +60,6 @@ export default function EventFilter({
               }
             >
               <span>{value.label}</span>
-              {enableDragDrop && (
-                <Plus
-                  className={`w-4 h-4 transition-transform ${
-                    draggedCategory === key ? "rotate-45" : ""
-                  }`}
-                />
-              )}
             </button>
           </div>
         ))}

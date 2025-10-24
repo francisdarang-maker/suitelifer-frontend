@@ -88,7 +88,8 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
     setIsFullImages((prev) => !prev);
   };
 
-  const handleHeartClick = async () => {
+  const handleHeartClick = async (e) => {
+    e.stopPropagation();
     if (!blog?.eblogId) return;
 
     const newState = !isHeart;
@@ -101,10 +102,11 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
     try {
       await api.post(`/api/${blog.eblogId}/like`);
     } catch (err) {
+
       console.error("Error toggling like:", err);
-      // Rollback on error
       setIsHeart(previousState);
       setLikeCount(previousCount);
+      
     }
   };
 

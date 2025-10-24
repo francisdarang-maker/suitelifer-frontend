@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import useIsMobile from "../../utils/useIsMobile";
 import ProductDetailModal from "./ProductDetailModal";
+import toast from "react-hot-toast";
 
 /**
  * ShoppingCart Component - Enhanced with Real-Time Updates
@@ -150,13 +151,13 @@ const ShoppingCart = ({
     return selectedItems.size > 0 && realTimeHeartbits >= selectedItemsTotal;
   };
 
-  const showNotification = (type, message) => {
-    setNotification({ show: true, type, message });
-    setTimeout(
-      () => setNotification({ show: false, type: "", message: "" }),
-      3000
-    );
-  };
+  // const showNotification = (type, message) => {
+  //   setNotification({ show: true, type, message });
+  //   setTimeout(
+  //     () => setNotification({ show: false, type: "", message: "" }),
+  //     3000
+  //   );
+  // };
 
   const setItemLoadingState = (itemId, state) => {
     setItemLoadingStates((prev) => ({ ...prev, [itemId]: state }));
@@ -201,14 +202,13 @@ const ShoppingCart = ({
 
       // Clear selected items after successful checkout
       setSelectedItems(new Set());
-      showNotification(
-        "success",
+      toast.success(
         "Order placed successfully! Awaiting admin approval. 🎉"
       );
     } catch (error) {
       // Revert optimistic update on error
       setRealTimeHeartbits(userHeartbits);
-      showNotification("error", "Checkout failed. Please try again.");
+      toast.error("Checkout failed. Please try again.");
     } finally {
       setIsCheckingOut(false);
     }
@@ -229,13 +229,13 @@ const ShoppingCart = ({
 
       if (response.success) {
         onUpdateCart();
-        showNotification("success", "Quantity updated");
+        toast.success("Quantity updated");
       } else {
-        showNotification("error", "Failed to update quantity");
+        toast.error("Failed to update quantity");
       }
     } catch (error) {
       console.error("Error updating quantity:", error);
-      showNotification("error", "Failed to update quantity");
+      toast.error("Failed to update quantity");
     } finally {
       setItemLoadingState(itemId, null);
     }
@@ -259,13 +259,13 @@ const ShoppingCart = ({
 
       if (response.success) {
         onUpdateCart();
-        showNotification("success", "Item removed from cart");
+        toast.success("Item removed from cart");
       } else {
-        showNotification("error", "Failed to remove item");
+        toast.error("Failed to remove item");
       }
     } catch (error) {
       console.error("Error removing item:", error);
-      showNotification("error", "Failed to remove item");
+      toast.error("Failed to remove item");
     } finally {
       setItemLoadingState(itemId, null);
     }
@@ -282,13 +282,13 @@ const ShoppingCart = ({
       if (response.success) {
         onUpdateCart();
         setSelectedItems(new Set());
-        showNotification("success", "Cart cleared");
+        toast.success("Cart cleared");
       } else {
-        showNotification("error", "Failed to clear cart");
+        toast.error("Failed to clear cart");
       }
     } catch (error) {
       console.error("Error clearing cart:", error);
-      showNotification("error", "Failed to clear cart");
+      toast.error("Failed to clear cart");
     } finally {
       setIsUpdating(false);
       setShowClearCartConfirm(false);
@@ -335,7 +335,7 @@ const ShoppingCart = ({
       }
     } catch (error) {
       console.error("Error starting inline edit:", error);
-      showNotification("error", "Failed to load product variations");
+      toast.error("Failed to load product variations");
     } finally {
       setItemLoadingState(item.cart_item_id, null);
     }
@@ -390,14 +390,14 @@ const ShoppingCart = ({
       );
       if (res.success) {
         onUpdateCart();
-        showNotification("success", "Variations updated successfully");
+        toast.success("Variations updated successfully");
         cancelInlineEdit();
       } else {
-        showNotification("error", "Failed to update variations");
+        toast.error("Failed to update variations");
       }
     } catch (error) {
       console.error("Error saving inline edit:", error);
-      showNotification("error", "Failed to update variations");
+      toast.error("Failed to update variations");
     } finally {
       setItemLoadingState(item.cart_item_id, null);
     }
@@ -479,9 +479,9 @@ const ShoppingCart = ({
         const response = await suitebiteAPI.addToCart(cartData);
         if (response.success) {
           onUpdateCart();
-          showNotification("success", "Item added to cart! 🛒");
+          toast.success("Item added to cart! 🛒");
         } else {
-          showNotification("error", "Failed to add item to cart");
+          toast.error("Failed to add item to cart");
         }
         return;
       }
@@ -517,14 +517,14 @@ const ShoppingCart = ({
       );
       if (res.success) {
         onUpdateCart();
-        showNotification("success", "Cart item updated successfully");
+        toast.success("Cart item updated successfully");
       } else {
-        showNotification("error", "Failed to update cart item");
+        toast.error("Failed to update cart item");
       }
     } catch (err) {
       console.error("Error in handleSaveCartEdit:", err);
       const action = cartItemToEdit ? "update" : "add";
-      showNotification("error", `Failed to ${action} cart item`);
+      toast.error(`Failed to ${action} cart item`);
     } finally {
       // Always clear modal states when the function completes
       setCartItemToEdit(null);

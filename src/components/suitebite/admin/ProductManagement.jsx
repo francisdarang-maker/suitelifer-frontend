@@ -8,10 +8,12 @@ import {
   PencilIcon,
   TrashIcon,
   ExclamationTriangleIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import useCategoryStore from "../../../store/stores/categoryStore";
 import AddProductForm from "./AddProductForm";
 import Loading from "../../loader/Loading";
+import toast from "react-hot-toast";
 
 /**
  * ProductManagement Component - Enhanced with Variations Support
@@ -39,6 +41,7 @@ const ProductManagement = () => {
     type: "",
     message: "",
   });
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   // Enhanced category store with color coding
   const {
@@ -90,7 +93,7 @@ const ProductManagement = () => {
       }
     } catch (error) {
       console.error("Error loading products:", error);
-      showNotification("error", "Failed to load products");
+      toast.error("Failed to load products");
     } finally {
       setLoading(false);
     }
@@ -107,13 +110,13 @@ const ProductManagement = () => {
     }
   };
 
-  const showNotification = (type, message) => {
-    setNotification({ show: true, type, message });
-    setTimeout(
-      () => setNotification({ show: false, type: "", message: "" }),
-      4000
-    );
-  };
+  // const showNotification = (type, message) => {
+  //   setNotification({ show: true, type, message });
+  //   setTimeout(
+  //     () => setNotification({ show: false, type: "", message: "" }),
+  //     4000
+  //   );
+  // };
 
   const handleAddProduct = () => {
     setModalMode("add");
@@ -131,7 +134,7 @@ const ProductManagement = () => {
     e.preventDefault();
 
     if (!formData.name || !formData.price_points || !formData.category) {
-      showNotification("error", "Please fill in all required fields");
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -155,8 +158,7 @@ const ProductManagement = () => {
       }
 
       if (response.success) {
-        showNotification(
-          "success",
+        toast.success(
           `Product ${modalMode === "add" ? "created" : "updated"} successfully!`
         );
         setShowModal(false);
@@ -171,11 +173,11 @@ const ProductManagement = () => {
         setImagePreview("");
         await loadProducts();
       } else {
-        showNotification("error", response.message || "Failed to save product");
+        toast.error(response.message || "Failed to save product");
       }
     } catch (error) {
       console.error("Error saving product:", error);
-      showNotification("error", "Failed to save product");
+      toast.error("Failed to save product");
     }
   };
 
@@ -191,19 +193,18 @@ const ProductManagement = () => {
       setDeletingProduct(true);
       const response = await suitebiteAPI.deleteProduct(pendingDeleteProduct);
       if (response.success) {
-        showNotification("success", "Product deleted successfully!");
+        toast.success("Product deleted successfully!");
         setShowDeleteConfirm(false);
         setPendingDeleteProduct(null);
         await loadProducts();
       } else {
-        showNotification(
-          "error",
+        toast.error(
           response.message || "Failed to delete product"
         );
       }
     } catch (error) {
       console.error("Error deleting product:", error);
-      showNotification("error", "Failed to delete product");
+      toast.error("Failed to delete product");
     } finally {
       setDeletingProduct(false);
     }
@@ -231,17 +232,16 @@ const ProductManagement = () => {
       try {
         const response = await addCategory(categoryName.trim());
         if (response.success) {
-          showNotification("success", "Category added successfully!");
+          toast.success("Category added successfully!");
           await loadProducts(); // Refresh to sync categories
         } else {
-          showNotification(
-            "error",
+          toast.error(
             response.message || "Failed to add category"
           );
         }
       } catch (error) {
         console.error("Error adding category:", error);
-        showNotification("error", "Failed to add category");
+        toast.error("Failed to add category");
       }
     }
   };
@@ -366,40 +366,59 @@ const ProductManagement = () => {
       )}
 
       {/* Filters and Search - Modernized */}
-      <div className="filters-section sticky top-0 z-10 bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl shadow-lg border border-white/60 pb-6 px-6 pt-5 mb-4">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-          {/* Search - Enhanced */}
-          <div className="search-field">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative">
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-[#0097b2] transition-all duration-300 group-focus-within:scale-110" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
-                placeholder:text-gray-400 placeholder:font-normal
-                focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white 
-                hover:border-gray-300 hover:shadow-lg
-                transition-all duration-300"
-                />
-              </div>
-            </div>
+<div className="filters-section sticky top-0 z-10 bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl shadow-lg border border-white/60 pb-4 px-6 pt-5 mb-4">
+      {/* Header Row with Search + Chevron (mobile) */}
+      <div className="flex items-center justify-between gap-3 mb-4 md:mb-0">
+        {/* Search - Always visible */}
+        <div className="flex-1 relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative">
+            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-[#0097b2] transition-all duration-300 group-focus-within:scale-110" />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-11 pr-4 py-2.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
+              placeholder:text-gray-400 placeholder:font-normal
+              focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white 
+              hover:border-gray-300 hover:shadow-lg
+              transition-all duration-300"
+            />
           </div>
+        </div>
 
-          {/* Category Filter - Glassmorphic */}
+        {/* Chevron Toggle (mobile only) */}
+        <button
+          onClick={() => setIsCollapsed((prev) => !prev)}
+          className="ml-2 flex items-center justify-center p-2 rounded-xl border border-gray-200 bg-white/70 shadow-sm hover:bg-white md:hidden transition-all duration-300"
+        >
+          <ChevronDownIcon
+            className={`h-5 w-5 text-gray-600 transition-transform duration-300 ${
+              !isCollapsed ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+      </div>
+
+      {/* Collapsible Filters */}
+      <div
+        className={`overflow-hidden transition-all duration-500 ease-in-out ${
+          isCollapsed ? "max-h-0 opacity-0" : "max-h-[600px] opacity-100"
+        } md:max-h-none md:opacity-100`}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end mt-2">
+          {/* Category Filter */}
           <div className="category-filter">
             <div className="relative group">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full appearance-none px-4 pr-10 py-2.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
-              focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
-              text-sm font-semibold text-gray-700 cursor-pointer
-              hover:border-gray-300 hover:shadow-lg
-              transition-all duration-300"
+                focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
+                text-sm font-semibold text-gray-700 cursor-pointer
+                hover:border-gray-300 hover:shadow-lg
+                transition-all duration-300"
               >
                 {categories.map(renderCategoryOption)}
               </select>
@@ -421,17 +440,17 @@ const ProductManagement = () => {
             </div>
           </div>
 
-          {/* Sort By - Glassmorphic */}
+          {/* Sort By */}
           <div className="sort-field">
             <div className="relative group">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="w-full appearance-none px-4 pr-10 py-2.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
-              focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
-              text-sm font-semibold text-gray-700 cursor-pointer
-              hover:border-gray-300 hover:shadow-lg
-              transition-all duration-300"
+                focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
+                text-sm font-semibold text-gray-700 cursor-pointer
+                hover:border-gray-300 hover:shadow-lg
+                transition-all duration-300"
               >
                 <option key="name" value="name">
                   Sort by Name
@@ -461,16 +480,20 @@ const ProductManagement = () => {
             </div>
           </div>
 
-          {/* Sort Order - Premium Pill */}
+          {/* Sort Order */}
           <div className="sort-order">
             <button
-              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+              onClick={() =>
+                setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+              }
               className="group w-full px-4 py-2.5 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl 
-            text-sm font-semibold text-gray-700 
-            hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg hover:shadow-[#0097b2]/10
-            transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 
-            active:scale-95"
-              title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
+              text-sm font-semibold text-gray-700 
+              hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg hover:shadow-[#0097b2]/10
+              transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 
+              active:scale-95"
+              title={`Sort ${
+                sortOrder === "asc" ? "Descending" : "Ascending"
+              }`}
             >
               <div className="flex items-center justify-between">
                 <span className="group-hover:text-[#0097b2] transition-colors">
@@ -485,15 +508,15 @@ const ProductManagement = () => {
             </button>
           </div>
 
-          {/* Add Product Button - Enhanced */}
-          <div className=" ">
+          {/* Add Product Button */}
+          <div>
             <button
               onClick={handleAddProduct}
               className="group flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-2xl 
-            bg-gradient-to-br from-[#0097b2] to-[#0097b2]/80 text-white font-bold text-sm
-            hover:from-[#007a8e] hover:to-[#007a8e]/80 hover:shadow-xl hover:shadow-[#0097b2]/30
-            transition-all duration-300 active:scale-95
-            focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20"
+              bg-gradient-to-br from-[#0097b2] to-[#0097b2]/80 text-white font-bold text-sm
+              hover:from-[#007a8e] hover:to-[#007a8e]/80 hover:shadow-xl hover:shadow-[#0097b2]/30
+              transition-all duration-300 active:scale-95
+              focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20"
             >
               <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/20">
                 <PlusIcon className="h-4 w-4" />
@@ -503,6 +526,7 @@ const ProductManagement = () => {
           </div>
         </div>
       </div>
+    </div>
 
       {/* Products Table */}
       <div className="products-table-container max-h-[80vh] overflow-hidden rounded-lg mx-6 ">
@@ -604,8 +628,7 @@ const ProductManagement = () => {
           <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <AddProductForm
               onProductAdded={async (product) => {
-                showNotification(
-                  "success",
+                toast.success(
                   `Product ${
                     modalMode === "add" ? "created" : "updated"
                   } successfully!`

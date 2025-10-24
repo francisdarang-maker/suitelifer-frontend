@@ -4,7 +4,8 @@ import Loader from '../../components/loader/Loading'
 import { useState, useEffect } from "react";
 import api from "../../utils/axios";
 import { RefreshCcw } from "lucide-react";
-import BlogDeleteDialog from "../../components/blog/admin/BlogDeleteDialog";
+import CreatePostCard from "../../components/suitebite/admin/CreatePostCard";
+
 
 const EmployeeMyBlogs = () => {
 
@@ -18,11 +19,10 @@ const fetchEmployeeBlogs = async () => {
     const response = await api.get(`api/employee-blog`);
     const blogs = response.data;
 
-    // Detect proper date field dynamically (fallback to created_at)
     const sortedBlogs = [...blogs].sort((a, b) => {
       const dateA = new Date(a.createdAt || a.created_at || a.date_created || 0);
       const dateB = new Date(b.createdAt || b.created_at || b.date_created || 0);
-      return dateB - dateA; // latest first
+      return dateB - dateA; 
     });
 
     setMyBlogs(sortedBlogs);
@@ -48,6 +48,8 @@ useEffect( () => {
           {isLoading && (
               <Loader/>
             )}
+            <CreatePostCard fetchEmployeeBlogs={fetchEmployeeBlogs}/>
+            {/* <CreatePostCard/> */}
             {myBlogs.length > 0 ? (
               myBlogs.map((blog, index) => (
                 <div key={index} className="mb-5">

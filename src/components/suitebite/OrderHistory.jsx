@@ -21,6 +21,7 @@ import {
   TrashIcon,
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
+import toast from "react-hot-toast";
 
 /**
  * OrderHistory Component - Enhanced with Advanced Features
@@ -77,13 +78,13 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
     }
   }, []);
 
-  const showNotification = (type, message) => {
-    setNotification({ show: true, type, message });
-    setTimeout(
-      () => setNotification({ show: false, type: "", message: "" }),
-      4000
-    );
-  };
+  // const showNotification = (type, message) => {
+  //   setNotification({ show: true, type, message });
+  //   setTimeout(
+  //     () => setNotification({ show: false, type: "", message: "" }),
+  //     4000
+  //   );
+  // };
 
   // Function to refresh order history when needed (e.g., after order actions)
   const refreshOrderHistory = async () => {
@@ -115,7 +116,7 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
       }
     } catch (error) {
       console.error("Error loading order history:", error);
-      showNotification("error", "Failed to load order history");
+      toast.error("Failed to load order history");
     } finally {
       setLoading(false);
     }
@@ -130,11 +131,11 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
         setSelectedOrder(response.data); // Note: API returns data not order
         setShowOrderDetails(true);
       } else {
-        showNotification("error", "Failed to load order details");
+        toast.error("Failed to load order details");
       }
     } catch (error) {
       console.error("Error loading order details:", error);
-      showNotification("error", "Failed to load order details");
+      toast.error("Failed to load order details");
     } finally {
       setLoadingOrderDetails(false);
     }
@@ -194,14 +195,14 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
           );
         }
 
-        showNotification("success", "Order cancelled successfully");
+        toast.success("Order cancelled successfully");
         await refreshOrderHistory(); // Refresh the list
       } else {
-        showNotification("error", response.message || "Failed to cancel order");
+        toast.error(response.message || "Failed to cancel order");
       }
     } catch (error) {
       console.error("Error cancelling order:", error);
-      showNotification("error", "Failed to cancel order");
+      toast.error("Failed to cancel order");
     } finally {
       setCancellingOrders((prev) => {
         const newSet = new Set(prev);
@@ -293,18 +294,17 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
           console.error("Error refreshing cart after reorder:", error);
         }
 
-        showNotification(
-          "success",
+        toast.success(
           `${successCount} items added to cart! ${
             failCount > 0 ? `(${failCount} items failed)` : ""
           }`
         );
       } else {
-        showNotification("error", "Failed to add items to cart");
+        toast.error("Failed to add items to cart");
       }
     } catch (error) {
       console.error("Error reordering:", error);
-      showNotification("error", "Failed to reorder items");
+      toast.error("Failed to reorder items");
     } finally {
       setReorderingItems((prev) => {
         const newSet = new Set(prev);
@@ -368,14 +368,14 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
           );
         }
 
-        showNotification("success", "Order deleted successfully!");
+        toast.success("Order deleted successfully!");
         await refreshOrderHistory(); // Refresh the list
       } else {
-        showNotification("error", response.message || "Failed to delete order");
+        toast.error(response.message || "Failed to delete order");
       }
     } catch (error) {
       console.error("Error deleting order:", error);
-      showNotification("error", "Failed to delete order");
+      toast.error("Failed to delete order");
     } finally {
       setDeletingOrders((prev) => {
         const newSet = new Set(prev);

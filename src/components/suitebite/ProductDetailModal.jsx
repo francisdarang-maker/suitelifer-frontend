@@ -291,253 +291,169 @@ const ProductDetailModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur  z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto outline-none" ref={modalRef} tabIndex={-1}>
-        {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-gray-900">Product Details</h2>
-            {mode === 'edit' && (
-              <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
-                Editing Cart Item
-              </span>
+    <div
+  className="fixed inset-0 bg-black/40 backdrop-blur z-50 flex items-center justify-center p-2 sm:p-4"
+  role="dialog"
+  aria-modal="true"
+>
+  <div
+    className="bg-white rounded-xl w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl max-h-[90vh] overflow-y-auto outline-none"
+    ref={modalRef}
+    tabIndex={-1}
+  >
+    {/* Header */}
+    <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Product Details</h2>
+        {mode === "edit" && (
+          <span className="text-xs sm:text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+            Editing Cart Item
+          </span>
+        )}
+      </div>
+      <button
+        onClick={onClose}
+        className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+        ref={firstButtonRef}
+        aria-label="Close modal"
+      >
+        <XMarkIcon className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
+      </button>
+    </div>
+
+    {/* Content */}
+    <div className="p-4 sm:p-6">
+      {modalError && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-300" role="alert">
+          {modalError}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        {/* Image Section */}
+        <div className="product-image-section">
+          <div className="relative h-64 sm:h-80 md:h-96 rounded-lg overflow-hidden">
+            {(() => {
+              const imagesToPass =
+                Array.isArray(product.images) && product.images.length > 0
+                  ? product.images
+                  : Array.isArray(product.product_images) && product.product_images.length > 0
+                  ? product.product_images
+                  : product.image_url
+                  ? [{ image_url: product.image_url, alt_text: product.name }]
+                  : [];
+              return (
+                <ProductImageCarousel
+                  images={imagesToPass}
+                  productName={product.name}
+                  className="w-full h-full"
+                />
+              );
+            })()}
+
+            {product.category && (
+              <div className="absolute top-3 left-3 z-10">
+                <span
+                  className="px-2 py-1 rounded-full text-xs sm:text-sm font-semibold shadow-sm border border-white border-opacity-20"
+                  style={{
+                    backgroundColor: categoryColor,
+                    color: "white",
+                    textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  {product.category}
+                </span>
+              </div>
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-            ref={firstButtonRef}
-            aria-label="Close modal"
-          >
-            <XMarkIcon className="h-6 w-6 text-gray-500" />
-          </button>
         </div>
 
-        {/* Modal Content */}
-        <div className="p-6">
-          {modalError && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-300" role="alert">
-              {modalError}
+        {/* Info Section */}
+        <div className="product-info-section">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
+            {product.name}
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 leading-relaxed">
+            {product.description || "Premium quality product curated for your needs."}
+          </p>
+
+          {/* Price */}
+          <div className="mb-4 sm:mb-6">
+            <span className="text-2xl sm:text-4xl font-bold text-[#0097b2] flex items-center gap-2">
+              {finalPrice}
+              <HeartIcon className="h-5 w-5 sm:h-8 sm:w-8 text-red-500" />
+            </span>
+          </div>
+
+          {/* Quantity */}
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Quantity:
+            </label>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-full flex items-center justify-center font-semibold hover:bg-gray-300 transition-colors"
+              >
+                -
+              </button>
+              <span className="text-lg sm:text-2xl font-semibold text-gray-900 min-w-[2rem] text-center">
+                {quantity}
+              </span>
+              <button
+                onClick={() => setQuantity(quantity + 1)}
+                className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-full flex items-center justify-center font-semibold hover:bg-gray-300 transition-colors"
+              >
+                +
+              </button>
             </div>
-          )}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Product Image Section */}
-            <div className="product-image-section">
-              <div className="relative h-96 rounded-lg overflow-hidden">
-                {(() => {
-                  // Always prefer the full images array from backend
-                  const imagesToPass =
-                    Array.isArray(product.images) && product.images.length > 0
-                      ? product.images
-                      : Array.isArray(product.product_images) && product.product_images.length > 0
-                        ? product.product_images
-                        : product.image_url
-                          ? [{ image_url: product.image_url, alt_text: product.name }]
-                          : [];
-                  return (
-                    <ProductImageCarousel 
-                      images={imagesToPass}
-                      productName={product.name}
-                      className="w-full h-full"
-                    />
-                  );
-                })()}
-                
-                {/* Category Badge */}
-                {product.category && (
-                  <div className="absolute top-4 left-4 z-10">{/* Increased z-index to show above carousel */}
-                    <span 
-                      className="category-badge px-3 py-1 rounded-full text-sm font-semibold shadow-sm border border-white border-opacity-20"
-                      style={{ 
-                        backgroundColor: categoryColor,
-                        color: 'white',
-                        textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                      }}
-                    >
-                      {product.category}
-                    </span>
-                  </div>
-                )}
-              </div>
+          </div>
+
+          {/* Total */}
+          <div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
+            <div className="flex items-center justify-between">
+              <span className="text-sm sm:text-lg text-gray-600">Total for {quantity}:</span>
+              <span className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                {totalCost}
+                <HeartIcon className="h-5 w-5 sm:h-6 sm:w-6 text-red-500" />
+              </span>
             </div>
+            <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-500">
+              Your balance: {userHeartbits} heartbits
+            </div>
+          </div>
 
-            {/* Product Information Section */}
-            <div className="product-info-section">
-              {/* Product Name */}
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {product.name}
-              </h1>
-              
-              {/* Product Description */}
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                {product.description || 'Premium quality product curated for your needs.'}
-              </p>
-
-              {/* Price Display */}
-              <div className="price-section mb-6">
-                <div className="flex items-center gap-3">
-                  <span className="text-4xl font-bold text-[#0097b2] flex items-center gap-2">
-                    {finalPrice}
-                    <HeartIcon className="h-8 w-8 text-red-500" />
-                  </span>
-                </div>
-              </div>
-
-              {/* Product Variations Selection */}
-              {availableVariations.length > 0 && (
-                <div className="variations-section mb-6 p-4 bg-gray-50 rounded-lg border">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Options:</h3>
-                  
-                  {variationTypes.map(typeName => (
-                    <div key={typeName} className="variation-type mb-4 last:mb-0">
-                      <label className="block text-sm font-medium text-gray-700 mb-3 capitalize">
-                        {formatLabel(typeName)}:
-                      </label>
-                      <div className="flex flex-wrap gap-3">
-                        {getAvailableOptions(typeName).map(option => (
-                          <button
-                            key={option.id}
-                            onClick={() => handleOptionSelect(typeName, option.id)}
-                            className={`option-button px-4 py-2 rounded-lg text-sm font-medium border transition-all duration-200 ${
-                              selectedOptions[typeName] === option.id
-                                ? 'bg-blue-500 text-white border-blue-500 shadow-sm'
-                                : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300 hover:bg-blue-50'
-                            }`}
-                            style={typeName === 'color' && option.hexColor ? {
-                              backgroundColor: selectedOptions[typeName] === option.id ? undefined : option.hexColor,
-                              color: selectedOptions[typeName] === option.id ? undefined : (option.hexColor === '#FFFFFF' ? '#000' : '#fff'),
-                              borderColor: selectedOptions[typeName] === option.id ? undefined : option.hexColor
-                            } : {}}
-                          >
-                            {typeName === 'color' ? (
-                              <div className="flex items-center gap-2">
-                                <div 
-                                  className="w-4 h-4 rounded-full border border-gray-300"
-                                  style={{ backgroundColor: option.hexColor }}
-                                />
-                                <span>{option.label}</span>
-                              </div>
-                            ) : (
-                              option.label
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Selected Variation Info */}
-                  {selectedVariation && (
-                    <div className="selected-variation-info mt-4 p-3 bg-blue-50 rounded border border-blue-200">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-medium text-blue-800">Selected Options:</span>
-                        <span className="text-blue-600">
-                          {selectedVariation.options?.map(opt => opt.option_label).join(' + ')}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+          {/* Buttons */}
+          <div className="space-y-2 sm:space-y-3">
+            <button
+              onClick={handleBuyNowFromModal}
+              disabled={!canAfford || isBuying || isAddingToCart}
+              className="w-full bg-[#0097b2] text-white py-3 sm:py-4 px-4 rounded-lg font-semibold hover:bg-[#007a8e] transition-all flex items-center justify-center gap-2 text-sm sm:text-lg disabled:opacity-50"
+            >
+              {isBuying ? (
+                <>
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Processing...</span>
+                </>
+              ) : !canAfford ? (
+                <>
+                  <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span>Need {totalCost - userHeartbits} more</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBagIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span>Confirm Order</span>
+                </>
               )}
-
-              {/* Quantity Selection */}
-              <div className="quantity-section mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Quantity:
-                </label>
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => {
-                      const newQuantity = Math.max(1, quantity - 1);
-                      console.log('🔢 Decreasing quantity from', quantity, 'to', newQuantity);
-                      setQuantity(newQuantity);
-                    }}
-                    className="quantity-btn w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-semibold hover:bg-gray-300 transition-colors duration-200"
-                  >
-                    -
-                  </button>
-                  <span className="quantity-display text-2xl font-semibold text-gray-900 min-w-[3rem] text-center">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => {
-                      const newQuantity = quantity + 1;
-                      console.log('🔢 Increasing quantity from', quantity, 'to', newQuantity);
-                      setQuantity(newQuantity);
-                    }}
-                    className="quantity-btn w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-semibold hover:bg-gray-300 transition-colors duration-200"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* Total Cost Display */}
-              <div className="total-cost-display bg-gray-50 p-4 rounded-lg mb-6">
-                <div className="flex items-center justify-between">
-                  <span className="text-lg text-gray-600">Total for {quantity}:</span>
-                  <span className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    {totalCost}
-                    <HeartIcon className="h-6 w-6 text-red-500" />
-                  </span>
-                </div>
-                <div className="mt-2 text-sm text-gray-500">
-                  Your balance: {userHeartbits} heartbits
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="action-buttons">
-                {(mode === 'buy-now' || mode === 'details') ? (
-                  /* Confirm Order Button for Buy Now mode */
-                  <button
-                    onClick={handleBuyNowFromModal}
-                    disabled={!canAfford || isBuying || isAddingToCart}
-                    className="confirm-order-btn w-full bg-[#0097b2] text-white py-4 px-6 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-                  >
-                    {isBuying ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Processing...</span>
-                      </>
-                    ) : !canAfford ? (
-                      <>
-                        <HeartIcon className="h-5 w-5" />
-                        <span>Need {totalCost - userHeartbits} more heartbits</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingBagIcon className="h-5 w-5" />
-                        <span>Confirm Order</span>
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  /* Add to Cart Button for Add to Cart mode */
-                  <button
-                    onClick={handleAddToCartFromModal}
-                    disabled={isBuying || isAddingToCart}
-                    className="add-to-cart-btn w-full bg-[#0097b2] text-white py-4 px-6 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-                  >
-                    {isAddingToCart ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>{mode === 'edit' ? 'Updating...' : 'Adding...'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShoppingCartIcon className="h-5 w-5" />
-                        <span>{mode === 'edit' ? 'Update Cart Item' : 'Add to Cart'}</span>
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-            </div>
+            </button>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
   );
 };
 
