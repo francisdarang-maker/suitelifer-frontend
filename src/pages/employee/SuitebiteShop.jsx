@@ -561,15 +561,15 @@ const SuitebiteShop = () => {
             <div className="flex items-center ml-auto">
               {(activeTab === "products" || activeTab === "cart") && (
                 <div
-                  className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-0 rounded-xl 
+                  className="flex items-center gap-2 px-2 py-4 sm:px-4 sm:py-0 rounded-xl 
                             bg-gradient-to-r from-red-100 to-red-200 
                             border border-red-300 text-red-800 font-semibold 
-                            text-sm sm:text-base shadow-sm hover:shadow-md 
-                            transition-all duration-300 ease-in-out"
+                            sm:text-xs sm:text-base shadow-sm hover:shadow-md 
+                            transition-all duration-300 ease-in-out sm:h-10 sm:w-[100%] h-2"
                 >
-                  <h4 className="text-2xl hidden sm:inline">Heartbits</h4>
+                  <div className=" inline text-sm">Heartbits</div>
 
-                  <span className="tracking-wide drop-shadow-sm">
+                  <span className="tracking-wide drop-shadow-sm text-sm">
                     {transformCurrentBalance(currentBalance)}
                   </span>
                   <svg
@@ -740,7 +740,7 @@ const SuitebiteShop = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5  gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3  xl:grid-cols-5  gap-4">
                     {filteredAndSortedProducts.map((product) => {
                       const productWithImages = {
                         ...product,

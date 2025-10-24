@@ -43,7 +43,6 @@ const UserHeartbitsManagement = () => {
   const [bulkAmount, setBulkAmount] = useState("");
   const [bulkReason, setBulkReason] = useState("");
 
-
   useEffect(() => {
     loadUsersWithHeartbits();
     loadGlobalLimit();
@@ -110,7 +109,7 @@ const UserHeartbitsManagement = () => {
           monthly_cheer_used: user.monthly_cheer_used || 0,
           last_monthly_reset: user.last_monthly_reset,
           user_type: user.user_type ? user.user_type.toLowerCase() : "employee",
-          isActive: user.isActive
+          isActive: user.isActive,
         }));
         setUsers(transformedUsers);
       } else {
@@ -300,8 +299,8 @@ const UserHeartbitsManagement = () => {
 
     const hasChanges = heartbitsToGive > 0 && reason.trim();
 
-    if(isLoading){
-      return <Loading/>
+    if (isLoading) {
+      return <Loading />;
     }
 
     return (
@@ -693,7 +692,7 @@ const UserHeartbitsManagement = () => {
           ) : (
             sortedUsers.map((user) => {
               const isSelected = selectedUsers.includes(user.user_id);
-              const isActive = user.isActive === 1 || user.isActive === true
+              const isActive = user.isActive === 1 || user.isActive === true;
               return (
                 <div
                   key={user.user_id}
@@ -706,7 +705,11 @@ const UserHeartbitsManagement = () => {
                         ? "border-primary/60 ring-2 ring-primary/20 bg-primary/5"
                         : "border-gray-200 hover:border-primary/30"
                     }
-                    ${!isActive ? "opacity-50 grayscale cursor-not-allowed hover:shadow-none hover:border-gray-200" : ""}
+                    ${
+                      !isActive
+                        ? "opacity-50 grayscale cursor-not-allowed hover:shadow-none hover:border-gray-200"
+                        : ""
+                    }
                   `}
                   onClick={() => {
                     if (isActive) toggleUserSelection(user.user_id);
@@ -733,7 +736,11 @@ const UserHeartbitsManagement = () => {
                           strokeWidth="3"
                           viewBox="0 0 24 24"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       )}
                     </span>
@@ -745,7 +752,9 @@ const UserHeartbitsManagement = () => {
                     <div className="relative">
                       <img
                         src={user.avatar || defaultAvatar}
-                        alt={`${user.first_name || ""} ${user.last_name || ""}`.trim()}
+                        alt={`${user.first_name || ""} ${
+                          user.last_name || ""
+                        }`.trim()}
                         className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-100"
                       />
                       {/* Status Indicator */}
@@ -760,9 +769,13 @@ const UserHeartbitsManagement = () => {
                     {/* Name and Role */}
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 text-base truncate">
-                        {`${user.first_name || ""} ${user.last_name || ""}`.trim()}
+                        {`${user.first_name || ""} ${
+                          user.last_name || ""
+                        }`.trim()}
                       </p>
-                      <p className="text-sm text-gray-500">{getRoleLabel(user.user_type)}</p>
+                      <p className="text-sm text-gray-500">
+                        {getRoleLabel(user.user_type)}
+                      </p>
 
                       {/* Active Pill */}
                       <div
@@ -794,8 +807,6 @@ const UserHeartbitsManagement = () => {
                   </div>
                 </div>
               );
-
-
             })
           )}
         </div>
@@ -876,80 +887,79 @@ const UserHeartbitsManagement = () => {
 
       {/* Bulk Update Modal */}
       {showBulkUpdateModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur">
-    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        Give Heartbits to Selected Users
-      </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Give Heartbits to Selected Users
+            </h3>
 
-      {/* Track input states */}
-      <div className="mb-4">
-        <label
-          htmlFor="bulk-amount"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Amount to Give
-        </label>
-        <input
-          id="bulk-amount"
-          type="number"
-          min="1"
-          value={bulkAmount}
-          onChange={(e) => setBulkAmount(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-          placeholder="Enter amount"
-        />
-      </div>
+            {/* Track input states */}
+            <div className="mb-4">
+              <label
+                htmlFor="bulk-amount"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Amount to Give
+              </label>
+              <input
+                id="bulk-amount"
+                type="number"
+                min="1"
+                value={bulkAmount}
+                onChange={(e) => setBulkAmount(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent focus:outline-none"
+                placeholder="Enter amount"
+              />
+            </div>
 
-      <div className="mb-4">
-        <label
-          htmlFor="bulk-reason"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Reason
-        </label>
-        <textarea
-          id="bulk-reason"
-          rows="3"
-          value={bulkReason}
-          onChange={(e) => setBulkReason(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-          placeholder="Explain why you're giving heartbits..."
-        />
-      </div>
+            <div className="mb-4">
+              <label
+                htmlFor="bulk-reason"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Reason
+              </label>
+              <textarea
+                id="bulk-reason"
+                rows="3"
+                value={bulkReason}
+                onChange={(e) => setBulkReason(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent focus:outline-none"
+                placeholder="Explain why you're giving heartbits..."
+              />
+            </div>
 
-      <div className="flex gap-3">
-        <button
-          onClick={() => setShowBulkUpdateModal(false)}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-        >
-          Cancel
-        </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowBulkUpdateModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
 
-        <button
-          disabled={!bulkAmount || !bulkReason}
-          onClick={() => {
-            const amount = parseInt(bulkAmount);
-            if (amount && bulkReason) {
-              handleBulkGiveHeartbits(amount, bulkReason);
-              setShowBulkUpdateModal(false);
-              setBulkAmount("");
-              setBulkReason("");
-            }
-          }}
-          className={`flex-1 px-4 py-2 rounded-lg text-white transition ${
-            !bulkAmount || !bulkReason
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-[#0097b2] hover:bg-[#007a8e]"
-          }`}
-        >
-          Give Heartbits
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+              <button
+                disabled={!bulkAmount || !bulkReason}
+                onClick={() => {
+                  const amount = parseInt(bulkAmount);
+                  if (amount && bulkReason) {
+                    handleBulkGiveHeartbits(amount, bulkReason);
+                    setShowBulkUpdateModal(false);
+                    setBulkAmount("");
+                    setBulkReason("");
+                  }
+                }}
+                className={`flex-1 px-4 py-2 rounded-lg text-white transition ${
+                  !bulkAmount || !bulkReason
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-[#0097b2] hover:bg-[#007a8e]"
+                }`}
+              >
+                Give Heartbits
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -184,31 +184,62 @@ const ShoppingCart = ({
     setSelectedItems(newSelected);
   };
 
+  // const handleCheckout = async () => {
+  //   if (!canCheckout() || isCheckingOut) return;
+
+  //   try {
+  //     setIsCheckingOut(true);
+
+  //     // Update real-time heartbits optimistically
+  //     setRealTimeHeartbits((prev) => Math.max(0, prev - selectedItemsTotal));
+
+  //     // Filter cart to only selected items
+  //     const selectedCartItems = uniqueCart.filter((item) =>
+  //       selectedItems.has(item.cart_item_id)
+  //     );
+  //     await onCheckout(selectedCartItems);
+
+  //     // Clear selected items after successful checkout
+  //     setSelectedItems(new Set());
+  //     showNotification(
+  //       "success",
+  //       "Order placed successfully! Awaiting admin approval. 🎉"
+  //     );
+  //   } catch (error) {
+  //     // Revert optimistic update on error
+  //     setRealTimeHeartbits(userHeartbits);
+  //     showNotification("error", "Checkout failed. Please try again.");
+  //   } finally {
+  //     setIsCheckingOut(false);
+  //   }
+  // };
   const handleCheckout = async () => {
     if (!canCheckout() || isCheckingOut) return;
 
     try {
       setIsCheckingOut(true);
 
-      // Update real-time heartbits optimistically
+      // Optimistic heartbits update
       setRealTimeHeartbits((prev) => Math.max(0, prev - selectedItemsTotal));
 
-      // Filter cart to only selected items
       const selectedCartItems = uniqueCart.filter((item) =>
         selectedItems.has(item.cart_item_id)
       );
+
       await onCheckout(selectedCartItems);
 
-      // Clear selected items after successful checkout
       setSelectedItems(new Set());
-      showNotification(
-        "success",
-        "Order placed successfully! Awaiting admin approval. 🎉"
-      );
+
+      toast.success("Order placed successfully! Awaiting admin approval 🎉", {
+        // style: {
+        //   fontSize: "0.875rem", // text-sm
+        //   padding: "0.75rem 1rem", // tighter spacing
+        //   maxWidth: "90vw",
+        // },
+      });
     } catch (error) {
-      // Revert optimistic update on error
       setRealTimeHeartbits(userHeartbits);
-      showNotification("error", "Checkout failed. Please try again.");
+      toast.error("Checkout failed. Please try again.");
     } finally {
       setIsCheckingOut(false);
     }
@@ -565,8 +596,8 @@ const ShoppingCart = ({
         {/* Cart Header */}
         <div className="cart-header flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-2 sm:gap-3">
-            <ShoppingBagIcon className="h-5 w-5 sm:h-6 sm:w-6 text-[#0097b2]" />
-            <span className="font-bold text-lg sm:text-xl text-gray-900">
+            <ShoppingBagIcon className="h-5 w-5 sm:h-6 sm:w-6 text-[#0097b2] hidden sm:flex" />
+            <span className="font-bold text-lg sm:text-xl text-gray-900 ">
               Shopping Cart
             </span>
             <span className="ml-1 sm:ml-2 text-sm sm:text-base font-medium text-gray-500">
@@ -835,19 +866,20 @@ const ShoppingCart = ({
             )}
 
             {/* Action Buttons */}
-            <div className="fixed bottom-0 left-0 w-full bg-white px-4 py-3 shadow-md z-50">
+            <div className="fixed bottom-0 left-0 w-full bg-white px-10 py-3 shadow-md z-50 lg:px-0 lg:py-3  lg:bottom-10 lg:left-65 lg:w-[40%] lg:bg-transparent lg:shadow-none xl:w-[55%] xl:left-70 2xl:static 2xl:left-0 2xl:w-full">
               <div className="max-w-screen-lg mx-auto flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={handleClearCart}
                   disabled={isUpdating}
-                  className="w-full sm:flex-1 px-3 sm:px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm"
+                  className="w-full sm:flex-1 px-3 sm:px-4 py-2 sm:mb-5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm"
                 >
                   {isUpdating ? "Clearing..." : "Clear Cart"}
                 </button>
                 <button
                   onClick={handleCheckout}
                   disabled={!canCheckout() || isCheckingOut}
-                  className="w-full sm:flex-1 px-3 sm:px-4 py-2 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
+                  // className="w-full sm:flex-1 px-3 sm:px-4 py-2 mb-5 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
+                  className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition"
                 >
                   {isCheckingOut ? (
                     <>

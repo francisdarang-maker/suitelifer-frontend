@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import useCategoryStore from "../../store/stores/categoryStore";
 import ProductImageCarousel from "./ProductImageCarousel";
-
+import { toast } from "react-hot-toast";
 /**
  * ProductDetailModal Component - Enhanced Product Detail View
  *
@@ -206,17 +206,73 @@ const ProductDetailModal = ({
   /**
    * Handles confirming the order with selected quantity and variation
    */
+  // const handleAddToCartFromModal = async () => {
+  //   if (isAddingToCart) return;
+  //   setModalError("");
+  //   // Ensure variation selection if required
+  //   if (availableVariations.length > 0 && variationTypes.length > 0) {
+  //     const allTypesSelected = variationTypes.every(
+  //       (type) => selectedOptions[type]
+  //     );
+  //     if (!allTypesSelected) {
+  //       setModalError(
+  //         "Please select all product options before adding to cart."
+  //       );
+  //       return;
+  //     }
+  //   }
+
+  //   try {
+  //     setIsAddingToCart(true);
+
+  //     // Prepare variation data in the new format
+  //     const variations = Object.entries(selectedOptions)
+  //       .map(([typeName, optionId]) => {
+  //         const option = availableVariations
+  //           .flatMap((v) => v.options || [])
+  //           .find(
+  //             (opt) => opt.option_id === optionId && opt.type_name === typeName
+  //           );
+
+  //         const variation = {
+  //           variation_type_id: option?.variation_type_id,
+  //           option_id: optionId,
+  //         };
+
+  //         return variation;
+  //       })
+  //       .filter((v) => v.variation_type_id && v.option_id);
+
+  //     await onAddToCart(product.product_id, quantity, null, variations);
+  //     onClose(); // Close modal after adding to cart
+  //   } catch (error) {
+  //     setModalError("Failed to add to cart.");
+  //   } finally {
+  //     setIsAddingToCart(false);
+  //   }
+  // };
   const handleAddToCartFromModal = async () => {
     if (isAddingToCart) return;
+
+    // Clear any previous error
     setModalError("");
+
     // Ensure variation selection if required
     if (availableVariations.length > 0 && variationTypes.length > 0) {
       const allTypesSelected = variationTypes.every(
         (type) => selectedOptions[type]
       );
       if (!allTypesSelected) {
-        setModalError(
-          "Please select all product options before adding to cart."
+        toast.error(
+          "Please select all product options before adding to cart.",
+          {
+            position: "top-center",
+            style: {
+              fontSize: "0.875rem",
+              padding: "0.75rem 1rem",
+              maxWidth: "90vw",
+            },
+          }
         );
         return;
       }
@@ -225,7 +281,6 @@ const ProductDetailModal = ({
     try {
       setIsAddingToCart(true);
 
-      // Prepare variation data in the new format
       const variations = Object.entries(selectedOptions)
         .map(([typeName, optionId]) => {
           const option = availableVariations
@@ -234,24 +289,28 @@ const ProductDetailModal = ({
               (opt) => opt.option_id === optionId && opt.type_name === typeName
             );
 
-          const variation = {
+          return {
             variation_type_id: option?.variation_type_id,
             option_id: optionId,
           };
-
-          return variation;
         })
         .filter((v) => v.variation_type_id && v.option_id);
 
       await onAddToCart(product.product_id, quantity, null, variations);
       onClose(); // Close modal after adding to cart
     } catch (error) {
-      setModalError("Failed to add to cart.");
+      toast.error("Failed to add to cart.", {
+        position: "top-center",
+        style: {
+          fontSize: "0.875rem",
+          padding: "0.75rem 1rem",
+          maxWidth: "90vw",
+        },
+      });
     } finally {
       setIsAddingToCart(false);
     }
   };
-
   /**
    * Handles direct purchase (buy now) from modal
    */
@@ -585,7 +644,7 @@ const ProductDetailModal = ({
                   <button
                     onClick={handleBuyNowFromModal}
                     disabled={!canAfford || isBuying || isAddingToCart}
-                    className="confirm-order-btn w-full bg-[#0097b2] text-white py-4 px-6 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                    className="confirm-order-btn w-full bg-[#0097b2] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
                   >
                     {isBuying ? (
                       <>

@@ -701,7 +701,7 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
       </div>
 
       {/* Orders List */}
-      <div className="orders-list-container flex-1 overflow-y-auto">
+      <div className="orders-list-container flex-1 overflow-y-auto ">
         <div className="orders-list">
           {loading ? (
             <div className="text-center py-16">
@@ -1003,10 +1003,10 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
 // Order Details Modal Component
 const OrderDetailsModal = ({ order, onClose }) => {
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[70vh] flex flex-col shadow-2xl sm:max-h-[80vh]">
         {/* Modal Header */}
-        <div className="bg-[#0097b2] text-white p-6">
+        <div className="bg-[#0097b2] text-white px-6 py-3 shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold">Order Details</h2>
@@ -1022,7 +1022,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
         </div>
 
         {/* Modal Content */}
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto flex-1">
           {/* Order Status */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
@@ -1058,10 +1058,10 @@ const OrderDetailsModal = ({ order, onClose }) => {
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
               Order Timeline
             </h3>
-            <div className="flex items-center justify-between gap-4 relative px-2">
+            <div className="flex items-center justify-between gap-2 relative px-2">
               {/* Horizontal line */}
               <div
-                className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 z-0"
+                className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 z-0 "
                 style={{ transform: "translateY(-50%)" }}
               ></div>
               {/* Timeline steps */}
@@ -1148,17 +1148,6 @@ const OrderDetailsModal = ({ order, onClose }) => {
           </div>
 
           {/* Order Summary */}
-          <div className="border-t border-gray-200 pt-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-semibold text-gray-900">Total</span>
-              <div className="flex items-center gap-2">
-                <HeartIcon className="h-5 w-5 text-red-500" />
-                <span className="text-xl font-bold text-[#0097b2]">
-                  {order.total_points} heartbits
-                </span>
-              </div>
-            </div>
-          </div>
 
           {/* Notes */}
           {order.notes && (
@@ -1175,23 +1164,35 @@ const OrderDetailsModal = ({ order, onClose }) => {
         </div>
 
         {/* Modal Footer */}
-        <div className="border-t border-gray-200 p-6">
+        <div className="border-t border-gray-200 pt-4 mx-5">
+          <div className="flex items-center justify-between sm:justify-between sm:gap-4 sm:mx-1 ">
+            <span className="text-xl font-semibold text-gray-900">Total</span>
+            <div className="flex items-center gap-2">
+              <HeartIcon className="h-5 w-5 text-red-500" />
+              <span className="text-xl font-bold text-[#0097b2]">
+                {order.total_points} heartbits
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="border-t-0 border-gray-200  px-6 pb-6 pt-4 shrink-0 ">
           <div className="flex justify-between items-center">
             {/* Receipt Actions */}
             <div className="flex gap-2">
               <button
                 onClick={() => downloadReceiptPDF(order)}
-                className="flex items-center gap-2 px-4 py-2 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition-colors"
+                className="flex items-center gap-2 px-2 py-1 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition-colors sm:px-4 sm:py-2 "
               >
-                <ArrowDownTrayIcon className="h-4 w-4" />
-                Download Receipt
+                <ArrowDownTrayIcon className="h-4 w-4 hidden sm:inline" />
+                <span>Download</span>
+                <span>Receipt</span>
               </button>
             </div>
 
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-3 py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors sm:px-4 sm:py-2 "
             >
               Close
             </button>
