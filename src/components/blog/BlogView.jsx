@@ -33,10 +33,36 @@ const BlogView = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [onComment, onCommentChange] = useState("");
   const [isSubmitComment, setIsSubmitComment] = useState(false);
-  const [sortOrder, setSortOrder] = useState("newest"); 
+  const [sortOrder, setSortOrder] = useState("newest");
   const [currentUserId, setCurrentUserId] = useState(null);
-  const [isMobile, setIsMobile] = useState(false); 
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Parse title to extract feeling - same function as in BlogCard
+  const parseTitleAndFeeling = (title) => {
+    if (!title) return { cleanTitle: "", feeling: null };
+
+    // Check if title contains feeling pattern: "Title - (feeling happy 😊)"
+    const feelingMatch = title.match(/^(.+?)\s*-\s*\(feeling\s+(.+?)\)$/i);
+
+    if (feelingMatch) {
+      return {
+        cleanTitle: feelingMatch[1].trim(),
+        feeling: feelingMatch[2].trim(),
+      };
+    }
+
+    // Alternative pattern: "Title - Feeling excited"
+    const feelingMatch2 = title.match(/^(.+?)\s*-\s*Feeling\s+(.+?)$/i);
+
+    if (feelingMatch2) {
+      return {
+        cleanTitle: feelingMatch2[1].trim(),
+        feeling: feelingMatch2[2].trim(),
+      };
+    }
+
+    return { cleanTitle: title, feeling: null };
+  };
 
   const fetchBlog = async () => {
     setIsLoading(true);
@@ -50,8 +76,6 @@ const BlogView = () => {
       setIsLoading(false);
     }
   };
-
-  
 
   const handleHeartClick = async () => {
     const newState = !isHeart;
@@ -235,7 +259,7 @@ const BlogView = () => {
   }, [blog?.eblogId]);
 
   useEffect(() => {
-    const checkScreenSize = () => setIsMobile(window.innerWidth < 640); 
+    const checkScreenSize = () => setIsMobile(window.innerWidth < 640);
     checkScreenSize();
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
@@ -243,6 +267,8 @@ const BlogView = () => {
 
   if (isLoading || !blog) return <Loader />;
 
+  // Parse the title to extract feeling
+  const { cleanTitle, feeling } = parseTitleAndFeeling(blog?.title);
   const isOwner = currentUserId === blog.userId;
 
   return (
@@ -263,17 +289,21 @@ const BlogView = () => {
         {/* Author Info */}
         <div className="p-4 flex items-center gap-3">
           <img
-            src={
-              blog.userPic ||
-              defaultAvatar
-            }
+            src={blog.userPic || defaultAvatar}
             alt={blog.firstName}
             className="w-12 h-12 object-cover rounded-full ring-2 ring-gray-100"
           />
           <div className="flex-1">
-            <p className="font-semibold text-gray-900">
-              {blog.firstName} {blog.lastName}
-            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="font-semibold text-gray-900">
+                {blog.firstName} {blog.lastName}
+              </p>
+              {feeling && (
+                <span className="text-sm text-gray-600">
+                  — is feeling <span className="font-semibold">{feeling}</span>
+                </span>
+              )}
+            </div>
             <span className="text-xs text-gray-500">{blog.date}</span>
           </div>
         </div>
@@ -289,7 +319,7 @@ const BlogView = () => {
         <div className="p-6">
           <h1
             className="text-2xl font-bold text-gray-900 mb-4"
-            dangerouslySetInnerHTML={{ __html: blog.title }}
+            dangerouslySetInnerHTML={{ __html: cleanTitle }}
           />
           <div
             className="text-gray-700 leading-relaxed whitespace-pre-wrap"
@@ -331,7 +361,9 @@ const BlogView = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all text-gray-600"
           >
             <MessageCircle className="w-6 h-6" />
-            <span className=" hidden sm:inline text-sm font-semibold">Comment</span>
+            <span className=" hidden sm:inline text-sm font-semibold">
+              Comment
+            </span>
           </button>
 
           <button
@@ -339,98 +371,98 @@ const BlogView = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all text-gray-600"
           >
             <Share2 className="w-6 h-6" />
-            <span className="hidden sm:inline text-sm font-semibold">Share</span>
+            <span className="hidden sm:inline text-sm font-semibold">
+              Share
+            </span>
           </button>
         </div>
 
-
-
-    <div className="p-3 sm:p-4 flex items-start gap-3 bg-gray-50 rounded-b-lg">
-      {/* Avatar */}
-      <img
-        src={blog.userPic || defaultAvatar}
-        alt="Your avatar"
-        className="w-9 h-9 sm:w-10 sm:h-10 object-cover rounded-full ring-2 ring-gray-100 flex-shrink-0"
-      />
-
-      {/* Comment Section */}
-      <div className="flex-1 relative flex flex-col sm:flex-row sm:items-center gap-2">
-        {/* Textarea */}
-        <div
-          className="
-            flex items-end w-full 
-            bg-white border border-gray-300 
-            rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent
-          "
-        >
-          <textarea
-            id="comment-input"
-            value={onComment}
-            disabled={isSubmitComment}
-            className="
-              flex-1 px-3 py-2.5 
-              rounded-lg focus:outline-none
-              resize-none text-sm sm:text-base
-              bg-transparent
-            "
-            placeholder="Write a comment..."
-            onChange={(e) => onCommentChange(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleCommentSubmit();
-              }
-            }}
-            rows={1}
-            style={{ minHeight: "44px", maxHeight: "120px" }}
+        {/* Comment Input Section */}
+        <div className="p-3 sm:p-4 flex items-start gap-3 bg-gray-50 rounded-b-lg">
+          {/* Avatar */}
+          <img
+            src={blog.userPic || defaultAvatar}
+            alt="Your avatar"
+            className="w-9 h-9 sm:w-10 sm:h-10 object-cover rounded-full ring-2 ring-gray-100 flex-shrink-0"
           />
 
-          {/* Send icon (inside input for mobile) */}
-          {isMobile && (
-            <button
-              onClick={handleCommentSubmit}
-              disabled={isSubmitComment || !onComment.trim()}
+          {/* Comment Section */}
+          <div className="flex-1 relative flex flex-col sm:flex-row sm:items-center gap-2">
+            {/* Textarea */}
+            <div
               className="
-                p-2 m-1
-                bg-primary text-white 
-                 transition-all 
-                disabled:cursor-not-allowed
-                bg-white
-                flex items-center justify-center
+                flex items-end w-full 
+                bg-white border border-gray-300 
+                rounded-lg focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent
               "
             >
-              {isSubmitComment ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Send className="w-4 h-4 text-primary" />
+              <textarea
+                id="comment-input"
+                value={onComment}
+                disabled={isSubmitComment}
+                className="
+                  flex-1 px-3 py-2.5 
+                  rounded-lg focus:outline-none
+                  resize-none text-sm sm:text-base
+                  bg-transparent
+                "
+                placeholder="Write a comment..."
+                onChange={(e) => onCommentChange(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleCommentSubmit();
+                  }
+                }}
+                rows={1}
+                style={{ minHeight: "44px", maxHeight: "120px" }}
+              />
+
+              {/* Send icon (inside input for mobile) */}
+              {isMobile && (
+                <button
+                  onClick={handleCommentSubmit}
+                  disabled={isSubmitComment || !onComment.trim()}
+                  className="
+                    p-2 m-1
+                    bg-primary text-white 
+                    transition-all 
+                    disabled:cursor-not-allowed
+                    bg-white
+                    flex items-center justify-center
+                  "
+                >
+                  {isSubmitComment ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4 text-primary" />
+                  )}
+                </button>
               )}
-            </button>
-          )}
-        </div>
+            </div>
 
-        {/* Desktop Send Button */}
-        {!isMobile && (
-          <button
-            onClick={handleCommentSubmit}
-            disabled={isSubmitComment || !onComment.trim()}
-            className="
-              px-4 py-3 
-              bg-primary text-white 
-              rounded-lg hover:bg-primary/90 transition-all 
-              disabled:bg-gray-300 disabled:cursor-not-allowed 
-              flex items-center justify-center
-            "
-          >
-            {isSubmitComment ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
+            {/* Desktop Send Button */}
+            {!isMobile && (
+              <button
+                onClick={handleCommentSubmit}
+                disabled={isSubmitComment || !onComment.trim()}
+                className="
+                  px-4 py-3 
+                  bg-primary text-white 
+                  rounded-lg hover:bg-primary/90 transition-all 
+                  disabled:bg-gray-300 disabled:cursor-not-allowed 
+                  flex items-center justify-center
+                "
+              >
+                {isSubmitComment ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
+              </button>
             )}
-          </button>
-        )}
-      </div>
-    </div>
-
+          </div>
+        </div>
       </div>
 
       {/* Comments Section */}

@@ -86,6 +86,9 @@ const SpotifyEpisodes = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
 
+  // NEW: Mobile actions collapse state
+  const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
+
   // Use filter hook
   const { filteredEpisodes, stats } = useEpisodeFilters(
     episodes,
@@ -540,7 +543,7 @@ const SpotifyEpisodes = () => {
   const emptyStateContent = getEmptyStateContent();
 
   return (
-    <div className="w-full space-y-6 mb-20">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 mb-20">
       {/* Toast Notification */}
       <ToastNotification
         open={toast.open}
@@ -566,61 +569,89 @@ const SpotifyEpisodes = () => {
       {/* Statistics Cards */}
       <StatisticsSection stats={stats} />
 
-      {/* Search and Actions Bar - Enhanced */}
-      {/* Search and Actions Bar - Enhanced */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex-1 min-w-0">
-          <SearchAndActionsBar
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onSearchClear={clearSearch}
-            sortOrder={sortOrder}
-            onSortToggle={toggleSort}
-            onAddClick={openAddModal}
-            filterType={embedTypeFilter}
-          />
-        </div>
+      {/* Search and Actions Bar - Responsive with Collapsible Actions */}
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="flex-1 min-w-0 w-full sm:w-auto">
+            <SearchAndActionsBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onSearchClear={clearSearch}
+              sortOrder={sortOrder}
+              onSortToggle={toggleSort}
+              onAddClick={openAddModal}
+              filterType={embedTypeFilter}
+            />
+          </div>
 
-        {/* NEW: Additional action buttons */}
-        <button
-          onClick={() => setBatchImportOpen(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-        >
-          Batch Import
-        </button>
-
-        <div className="relative group">
+          {/* Mobile: Toggle button for actions */}
           <button
-            onClick={exportToCSV}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+            onClick={() => setMobileActionsOpen(!mobileActionsOpen)}
+            className="sm:hidden px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center justify-center gap-2"
           >
-            Export
+            <span>Actions</span>
+            <svg
+              className={`w-4 h-4 transition-transform ${
+                mobileActionsOpen ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
           </button>
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+
+          {/* Desktop: Always visible action buttons */}
+          <div className="hidden sm:flex gap-2">
             <button
-              onClick={exportToCSV}
-              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 rounded-t-lg"
+              onClick={() => setBatchImportOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
             >
-              Export as CSV
+              Batch Import
             </button>
+
+            <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
+
             <button
-              onClick={exportToJSON}
-              className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 rounded-b-lg"
+              onClick={() => setShowShortcuts(true)}
+              className="px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm"
+              title="Keyboard shortcuts (Ctrl+/)"
             >
-              Export as JSON
+              ⌘/?
             </button>
           </div>
         </div>
 
-        <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
+        {/* Mobile: Collapsible action buttons */}
+        {mobileActionsOpen && (
+          <div className="sm:hidden grid grid-cols-2 gap-2 animate-slideDown">
+            <button
+              onClick={() => {
+                setBatchImportOpen(true);
+                setMobileActionsOpen(false);
+              }}
+              className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              Batch Import
+            </button>
 
-        <button
-          onClick={() => setShowShortcuts(true)}
-          className="px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm"
-          title="Keyboard shortcuts (Ctrl+/)"
-        >
-          ⌘/?
-        </button>
+            <button
+              onClick={() => {
+                setShowShortcuts(true);
+                setMobileActionsOpen(false);
+              }}
+              className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
+            >
+              Shortcuts
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Active Filters */}
@@ -630,7 +661,7 @@ const SpotifyEpisodes = () => {
         onClearAll={clearAllFilters}
       />
 
-      {/* NEW: Bulk Actions Bar */}
+      {/* Bulk Actions Bar - Responsive */}
       {selectedEpisodes.length > 0 && (
         <BulkActionsBar
           selectedCount={selectedEpisodes.length}
@@ -638,7 +669,6 @@ const SpotifyEpisodes = () => {
           onSelectAll={toggleSelectAll}
           onClearSelection={clearSelection}
           onBulkDelete={handleBulkDeleteClick}
-          onBulkExport={exportToCSV}
         />
       )}
 
@@ -654,14 +684,14 @@ const SpotifyEpisodes = () => {
         filterType={embedTypeFilter}
       />
 
-      {/* NEW: Batch Import Modal */}
+      {/* Batch Import Modal */}
       <BatchImportModal
         open={batchImportOpen}
         onClose={() => setBatchImportOpen(false)}
         onImport={handleBatchImport}
       />
 
-      {/* Filter Buttons */}
+      {/* Filter Buttons - Responsive */}
       <FilterButtons
         buttons={[
           { label: "All" },
@@ -698,21 +728,20 @@ const SpotifyEpisodes = () => {
         />
       )}
 
-      {/* Episodes List - Enhanced with selection and view modes */}
+      {/* Episodes List - Responsive with selection and view modes */}
       {!isLoading && filteredEpisodes.length > 0 && (
         <>
-          <div className={viewMode === "compact" ? "space-y-2" : "space-y-6"}>
+          <div
+            className={
+              viewMode === "compact" ? "space-y-2" : "space-y-4 sm:space-y-6"
+            }
+          >
             {paginatedEpisodes.map((episode) => (
-              <div key={episode.episodeId} className="flex items-start gap-3">
-                {/* Selection checkbox */}
-                <input
-                  type="checkbox"
-                  checked={selectedEpisodes.includes(episode.episodeId)}
-                  onChange={() => toggleSelectEpisode(episode.episodeId)}
-                  className="mt-4 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-
-                <div className="flex-1">
+              <div
+                key={episode.episodeId}
+                className="flex items-start gap-2 sm:gap-3"
+              >
+                <div className="flex-1 min-w-0">
                   <EpisodeCard
                     episode={episode}
                     onPreview={openPreviewModal}
@@ -726,7 +755,7 @@ const SpotifyEpisodes = () => {
             ))}
           </div>
 
-          {/* NEW: Pagination */}
+          {/* Pagination - Responsive */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -758,7 +787,7 @@ const SpotifyEpisodes = () => {
         variant="danger"
       />
 
-      {/* NEW: Bulk Delete Confirmation Dialog */}
+      {/* Bulk Delete Confirmation Dialog */}
       <ConfirmationDialog
         open={bulkDeleteConfirmOpen}
         onClose={() => setBulkDeleteConfirmOpen(false)}
@@ -770,6 +799,29 @@ const SpotifyEpisodes = () => {
         icon={<ExclamationTriangleIcon className="h-12 w-12 text-red-700" />}
         variant="danger"
       />
+
+      <style jsx>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slideDown {
+          animation: slideDown 0.2s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

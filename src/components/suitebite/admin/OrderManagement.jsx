@@ -902,7 +902,7 @@ const OrderManagement = () => {
         {/* Mobile: Horizontal scroll with indicators */}
         <div className="lg:hidden relative">
           {/* Left Scroll Indicator */}
-          {showLeftScroll && (
+          {/* {showLeftScroll && (
             <div className="absolute left-0 top-0 bottom-2 w-12 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none flex items-center">
               <div className="ml-2 bg-white rounded-full shadow-lg p-1">
                 <svg
@@ -920,10 +920,10 @@ const OrderManagement = () => {
                 </svg>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Right Scroll Indicator */}
-          {showRightScroll && (
+          {/* {showRightScroll && (
             <div className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none flex items-center justify-end">
               <div className="mr-2 bg-white rounded-full shadow-lg p-1">
                 <svg
@@ -941,13 +941,13 @@ const OrderManagement = () => {
                 </svg>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Scrollable Container */}
           <div
             ref={statsScrollRef}
             onScroll={handleStatsScroll}
-            className="overflow-x-auto pb-2 -mx-4 px-4 scroll-smooth"
+            className="overflow-x-auto pb-2 px-4 scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             <style>{`
@@ -1457,21 +1457,6 @@ const OrderManagement = () => {
                       >
                         <EyeIcon className="h-5 w-5" />
                       </button>
-
-                      {canApproveOrder(order) && (
-                        <button
-                          onClick={()=> handleApproveOrder(order.order_id)}
-                          disabled={approvingOrders.has(order.order_id)}
-                          className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
-                          title="Approve order"
-                        >
-                          {approvingOrders.has(order.order_id) ? (
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
-                          ) : (
-                            <CheckIcon className="h-5 w-5" />
-                          )}
-                        </button>
-                      )}
 
                       {canCancelOrder(order) && (
                         <button

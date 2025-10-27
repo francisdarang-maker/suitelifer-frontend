@@ -212,19 +212,21 @@ const CreatePostCard = ({ fetchEmployeeBlogs }) => {
 
             {/* Content */}
             <div className="px-4 pt-3 pb-2 max-h-[400px] overflow-y-auto">
+              {/* Title Input - Larger and more prominent */}
               <input
                 type="text"
-                placeholder="Add a title"
+                placeholder="Add a title (required)"
                 value={title}
                 required
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full text-base font-medium text-gray-800 placeholder-gray-400 border-none outline-none mb-2"
+                className="w-full text-xl font-bold text-gray-900 placeholder-gray-500 border-none outline-none mb-3 focus:ring-0"
               />
 
+              {/* Description Textarea - Smaller than title */}
               <textarea
                 ref={textareaRef}
-                className="w-full resize-none text-gray-800 placeholder-gray-400 border-none outline-none text-2xl"
-                placeholder="What's on your mind?"
+                className="w-full resize-none text-gray-800 placeholder-gray-400 border-none outline-none text-base leading-relaxed"
+                placeholder="What's on your mind? (required)"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}

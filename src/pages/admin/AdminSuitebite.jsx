@@ -139,7 +139,7 @@ const AdminSuitebite = () => {
             {" "}
             {/* No margin */}
             <div className="flex items-center justify-between">
-              <div className="flex gap-5">
+              <div className="flex gap-4">
                 {tabs.map((tab) => {
                   const IconComponent = tab.icon;
                   return (

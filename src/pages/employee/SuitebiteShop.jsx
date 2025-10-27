@@ -565,6 +565,7 @@ const SuitebiteShop = () => {
                             sm:text-xs sm:text-base shadow-sm hover:shadow-md 
                             transition-all duration-300 ease-in-out sm:h-10 sm:w-[100%] h-2"
                 >
+
                   <div className=" inline text-sm">Heartbits</div>
 
                   <span className="tracking-wide drop-shadow-sm text-sm">
