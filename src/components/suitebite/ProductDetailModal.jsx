@@ -203,54 +203,6 @@ const ProductDetailModal = ({
     return basePrice + adjustment;
   };
 
-  /**
-   * Handles confirming the order with selected quantity and variation
-   */
-  // const handleAddToCartFromModal = async () => {
-  //   if (isAddingToCart) return;
-  //   setModalError("");
-  //   // Ensure variation selection if required
-  //   if (availableVariations.length > 0 && variationTypes.length > 0) {
-  //     const allTypesSelected = variationTypes.every(
-  //       (type) => selectedOptions[type]
-  //     );
-  //     if (!allTypesSelected) {
-  //       setModalError(
-  //         "Please select all product options before adding to cart."
-  //       );
-  //       return;
-  //     }
-  //   }
-
-  //   try {
-  //     setIsAddingToCart(true);
-
-  //     // Prepare variation data in the new format
-  //     const variations = Object.entries(selectedOptions)
-  //       .map(([typeName, optionId]) => {
-  //         const option = availableVariations
-  //           .flatMap((v) => v.options || [])
-  //           .find(
-  //             (opt) => opt.option_id === optionId && opt.type_name === typeName
-  //           );
-
-  //         const variation = {
-  //           variation_type_id: option?.variation_type_id,
-  //           option_id: optionId,
-  //         };
-
-  //         return variation;
-  //       })
-  //       .filter((v) => v.variation_type_id && v.option_id);
-
-  //     await onAddToCart(product.product_id, quantity, null, variations);
-  //     onClose(); // Close modal after adding to cart
-  //   } catch (error) {
-  //     setModalError("Failed to add to cart.");
-  //   } finally {
-  //     setIsAddingToCart(false);
-  //   }
-  // };
   const handleAddToCartFromModal = async () => {
     if (isAddingToCart) return;
 
@@ -385,6 +337,10 @@ const ProductDetailModal = ({
 
   if (!isOpen) return null;
 
+  const isVariationComplete = variationTypes.every(
+    (type) => selectedOptions[type]
+  );
+
   return (
     <div
       className="fixed inset-0 bg-black/40 backdrop-blur  z-50 flex items-center justify-center p-4 "
@@ -429,7 +385,7 @@ const ProductDetailModal = ({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* Product Image Section */}
             <div className="product-image-section">
-              <div className="relative  object-cover h-[200px] rounded-lg overflow-hidden">
+              <div className="relative  object-cover sm:h-[100%] h-[200px] md:h-[180px] lg:h-[100%] rounded-lg overflow-hidden">
                 {(() => {
                   // Always prefer the full images array from backend
                   const imagesToPass =
@@ -667,10 +623,15 @@ const ProductDetailModal = ({
                   </button>
                 ) : (
                   /* Add to Cart Button for Add to Cart mode */
+
                   <button
                     onClick={handleAddToCartFromModal}
                     disabled={isBuying || isAddingToCart}
-                    className="add-to-cart-btn w-full bg-[#0097b2] text-white py-3 px-5 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                    className={`add-to-cart-btn w-full py-3 px-5 rounded-lg font-semibold flex items-center justify-center gap-3 text-lg transition-colors duration-200 ${
+                      isVariationComplete
+                        ? "bg-[#0097b2] text-white hover:bg-[#007a8e]"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    } ${isBuying || isAddingToCart ? "opacity-50" : ""}`}
                   >
                     {isAddingToCart ? (
                       <>

@@ -66,6 +66,8 @@ const ShoppingCart = ({
 
   // Clear cart confirmation modal state
   const [showClearCartConfirm, setShowClearCartConfirm] = useState(false);
+  // Checkout confirmation modal state
+  const [showCheckoutConfirm, setShowCheckoutConfirm] = useState(false);
 
   // Filter out duplicate cart items by cart_item_id - MOVED UP to avoid circular dependency
   const uniqueCart = [];
@@ -231,11 +233,11 @@ const ShoppingCart = ({
       setSelectedItems(new Set());
 
       toast.success("Order placed successfully! Awaiting admin approval 🎉", {
-        // style: {
-        //   fontSize: "0.875rem", // text-sm
-        //   padding: "0.75rem 1rem", // tighter spacing
-        //   maxWidth: "90vw",
-        // },
+        style: {
+          fontSize: "0.875rem",
+          padding: "0.75rem 1rem",
+          maxWidth: "90px",
+        },
       });
     } catch (error) {
       setRealTimeHeartbits(userHeartbits);
@@ -866,7 +868,7 @@ const ShoppingCart = ({
             )}
 
             {/* Action Buttons */}
-            <div className="fixed bottom-0 left-0 w-full bg-white px-10 py-3 shadow-md z-50 lg:px-0 lg:py-3  lg:bottom-10 lg:left-65 lg:w-[40%] lg:bg-transparent lg:shadow-none xl:w-[55%] xl:left-70 2xl:static 2xl:left-0 2xl:w-full">
+            {/* <div className="fixed bottom-0 left-0 w-full bg-white px-10 py-3 shadow-md z-50 lg:px-0 lg:py-3  lg:bottom-10 lg:left-65 lg:w-[40%] lg:bg-transparent lg:shadow-none xl:w-[55%] xl:left-70 2xl:static 2xl:left-0 2xl:w-full">
               <div className="max-w-screen-lg mx-auto flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={handleClearCart}
@@ -879,7 +881,7 @@ const ShoppingCart = ({
                   onClick={handleCheckout}
                   disabled={!canCheckout() || isCheckingOut}
                   // className="w-full sm:flex-1 px-3 sm:px-4 py-2 mb-5 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm"
-                  className="w-full sm:w-auto px-4 py-2 text-sm sm:text-base bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition"
+                  className="w-full sm:w-auto px-4 py-2 sm:py-0 text-sm sm:text-base bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition"
                 >
                   {isCheckingOut ? (
                     <>
@@ -887,10 +889,41 @@ const ShoppingCart = ({
                       Processing...
                     </>
                   ) : (
-                    <>
+                    <div className="flex justify-center gap-2 sm:justify-normal sm:gap-0 ">
                       <CheckIcon className="h-4 w-4" />
                       Checkout ({selectedItemsCount})
-                    </>
+                    </div>
+                  )}
+                </button>
+              </div>
+            </div> */}
+            <div className="fixed bottom-0 left-0 w-full bg-white px-10 py-3 shadow-md z-50 lg:px-0 lg:py-3 lg:bottom-10 lg:left-65 lg:w-[40%] lg:bg-transparent lg:shadow-none xl:w-[55%] xl:left-70 2xl:static 2xl:left-0 2xl:w-full">
+              <div className="max-w-screen-lg mx-auto flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <button
+                  onClick={handleClearCart}
+                  disabled={isUpdating}
+                  className="w-full sm:flex-1 px-3 sm:px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm"
+                >
+                  {isUpdating ? "Clearing..." : "Clear Cart"}
+                </button>
+
+                <button
+                  // onClick={handleCheckout}
+
+                  onClick={() => setShowCheckoutConfirm(true)}
+                  disabled={!canCheckout() || isCheckingOut}
+                  className="w-full sm:flex-1 px-4 py-2 text-sm sm:text-base bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition disabled:opacity-50"
+                >
+                  {isCheckingOut ? (
+                    <div className="flex justify-center gap-2 items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Processing...
+                    </div>
+                  ) : (
+                    <div className="flex justify-center gap-2 items-center">
+                      <CheckIcon className="h-4 w-4" />
+                      Checkout ({selectedItemsCount})
+                    </div>
                   )}
                 </button>
               </div>
@@ -940,6 +973,21 @@ const ShoppingCart = ({
         confirmText="Clear Cart"
         cancelText="Cancel"
         confirmColor="red"
+      />
+      <ConfirmationModal
+        isOpen={showCheckoutConfirm}
+        onClose={() => setShowCheckoutConfirm(false)}
+        onConfirm={() => {
+          setShowCheckoutConfirm(false);
+          handleCheckout();
+        }}
+        title="Confirm Checkout"
+        message={`Are you sure you want to checkout ${selectedItemsCount} item${
+          selectedItemsCount !== 1 ? "s" : ""
+        }? This will deduct ${selectedItemsTotal} heartbits from your balance.`}
+        confirmText="Confirm Checkout"
+        cancelText="Cancel"
+        confirmColor="blue"
       />
     </>
   );
