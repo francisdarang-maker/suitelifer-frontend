@@ -45,8 +45,6 @@ const EmployeeEvents = () => {
 
   return (
     <div className="bg-white p-4">
-     
-
       <div className="rounded-md lg:p-4">
         <EventCalendar
           events={events}
@@ -61,6 +59,12 @@ const EmployeeEvents = () => {
       <Modal
         open={isEventDetailsModalOpen}
         onClose={() => setIsEventDetailsModalOpen(false)}
+        BackdropProps={{
+          sx: {
+            backdropFilter: "blur(6px)",
+            backgroundColor: "rgba(0, 0, 0, 0.3)",
+          },
+        }}
       >
         <Box
           sx={detailsModalStyle(
@@ -300,13 +304,7 @@ const headerStyle = {
   borderTopLeftRadius: "8px",
   borderTopRightRadius: "8px",
   mt: 0,
-};
-
-const contentStyle = {
-  px: { xs: 3, sm: 4 },
-  py: 3,
-  overflowY: "auto",
-  flexGrow: 1,
+  flexShrink: 0,
 };
 
 const footerStyle = {
@@ -315,6 +313,14 @@ const footerStyle = {
   borderTop: "1px solid #e5e7eb",
   display: "flex",
   justifyContent: "flex-end",
+  flexShrink: 0,
+};
+
+const contentStyle = {
+  px: { xs: 3, sm: 4 },
+  py: 3,
+  overflowY: "auto",
+  flexGrow: 1,
 };
 
 export default EmployeeEvents;

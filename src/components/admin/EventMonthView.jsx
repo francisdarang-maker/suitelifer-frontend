@@ -65,7 +65,7 @@ function EventMonthView({
     const isCurrentDay = isToday(date);
     const isPastDay = isPast(date);
     const isExpanded = expanded.has(dateStr);
-    const visibleEvents = isExpanded ? dayEvents : dayEvents.slice(0, 2);
+    const visibleEvents = isExpanded ? dayEvents : dayEvents.slice(0, 1);
 
     days.push(
       <div
@@ -114,7 +114,7 @@ function EventMonthView({
             />
           ))}
 
-          {dayEvents.length > 2 && (
+          {dayEvents.length > 1 && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -122,7 +122,7 @@ function EventMonthView({
               }}
               className="text-[10px] sm:text-xs text-cyan-600 hover:text-cyan-800 font-semibold hover:underline transition-colors text-left"
             >
-              {isExpanded ? "Show less" : `+${dayEvents.length - 2} more`}
+              {isExpanded ? "Show less" : `+${dayEvents.length - 1} more`}
             </button>
           )}
         </div>
@@ -418,7 +418,6 @@ function EventMonthView({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                mb: 1.5,
               }}
             >
               <Typography fontSize={28} sx={{ color: "#475569" }}>
@@ -437,6 +436,7 @@ function EventMonthView({
               sx={{
                 color: "#64748b",
                 mt: 0.5,
+
                 maxWidth: "280px",
                 fontSize: { xs: "0.85rem", sm: "0.9rem" },
               }}

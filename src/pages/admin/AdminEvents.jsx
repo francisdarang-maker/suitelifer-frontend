@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Modal, TextField, Typography, Box } from "@mui/material";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import EventCalendar from "../../components/admin/EventCalendar";
@@ -195,7 +195,7 @@ const AdminEvents = () => {
   };
 
   return (
-    <div className="bg-white p-2">
+    <div className="bg-white p-2 ">
       <div className="flex justify-end gap-2 me-8">
         <ContentButtons
           icon={<PlusCircleIcon className="size-5" />}
@@ -204,8 +204,8 @@ const AdminEvents = () => {
         />
       </div>
 
-      <div className="flex gap-8 mt-4 h-full">
-        <div className="bg-white border-gray-200 rounded-md p-4 w-full">
+      <div className="flex gap-8 mt-4 min-h-0 flex-grow">
+        <div className="bg-white border-gray-200 rounded-md p-4 w-full overflow-y-auto max-h-[calc(100vh-8rem)]">
           <EventCalendar
             events={events}
             onSelectSlot={handleSelectSlot}
@@ -257,7 +257,16 @@ const AddEditEventModal = ({
   if (!open) return null;
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      BackdropProps={{
+        sx: {
+          backdropFilter: "blur(6px)",
+          backgroundColor: "rgba(0, 0, 0, 0.3)",
+        },
+      }}
+    >
       <Box sx={modalStyle}>
         {/* Header */}
         <div className="relative px-6 pt-6 pb-5 bg-gradient-to-br from-cyan-50 via-white to-blue-50 border-b border-gray-100">
@@ -281,9 +290,9 @@ const AddEditEventModal = ({
           </button>
 
           <div className="space-y-1">
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+            <div className="text-2xl font-bold text-gray-900 tracking-tight">
               {isEditing ? "Edit Event" : "Create New Event"}
-            </h2>
+            </div>
             <p className="text-gray-500 text-xs">
               {isEditing
                 ? "Update your event details"
@@ -293,7 +302,7 @@ const AddEditEventModal = ({
         </div>
 
         {/* Content - Compact Grid Layout */}
-        <div className="px-6 py-5">
+        <div className="px-6 py-5 overflow-y-auto flex-grow ">
           <div className="grid grid-cols-2 gap-4">
             {/* Category - Full Width */}
             <div className="col-span-2 space-y-1.5">
@@ -547,7 +556,16 @@ const EventDetailsModal = ({ open, onClose, event, onEdit, onDelete }) => {
   if (!event) return null;
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      BackdropProps={{
+        sx: {
+          backdropFilter: "blur(6px)",
+          backgroundColor: "rgba(0, 0, 0, 0.3)",
+        },
+      }}
+    >
       <Box sx={modalStyle}>
         {/* Header */}
         <div className="relative px-6 pt-6 pb-5 bg-gradient-to-br from-cyan-50 via-white to-blue-50 border-b border-gray-100">
@@ -571,9 +589,9 @@ const EventDetailsModal = ({ open, onClose, event, onEdit, onDelete }) => {
           </button>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight pr-8">
+            <div className="text-2xl font-bold text-gray-900 tracking-tight pr-8">
               {event.title}
-            </h2>
+            </div>
             <div
               className="inline-block px-3 py-1 rounded-lg text-xs font-semibold text-white"
               style={{
@@ -586,7 +604,7 @@ const EventDetailsModal = ({ open, onClose, event, onEdit, onDelete }) => {
         </div>
 
         {/* Content */}
-        <div className="px-6 py-5">
+        <div className="px-6 py-5 overflow-y-auto flex-grow">
           <div className="space-y-5">
             {/* Schedule */}
             <div className="space-y-2">
@@ -695,23 +713,23 @@ const EventDetailsModal = ({ open, onClose, event, onEdit, onDelete }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+        <div className="px-3 py-2 sm:px-6 sm:py-4 bg-gray-50 border-t border-gray-100 flex-shrink-0 ">
           <div className="flex flex-col sm:flex-row gap-3 justify-end">
-            <button
+            {/* <button
               onClick={onClose}
               className="px-5 py-2.5 text-sm text-gray-700 font-semibold bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all shadow-sm"
             >
               Close
-            </button>
+            </button> */}
             <button
               onClick={onEdit}
-              className="px-5 py-2.5 text-sm bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold rounded-lg hover:from-cyan-700 hover:to-cyan-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+              className="px-2 py-1.5 sm:px-5 sm:py-2.5 text-sm bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-semibold rounded-lg hover:from-cyan-700 hover:to-cyan-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
             >
               Edit Event
             </button>
             <button
               onClick={onDelete}
-              className="px-5 py-2.5 text-sm bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
+              className="px-2 py-1.5 sm:px-5 sm:py-2.5  text-sm bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
             >
               Delete
             </button>
@@ -762,7 +780,7 @@ const modalStyle = {
   borderRadius: 2,
   boxShadow:
     "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-  width: { xs: "95%", sm: "90%", md: "500px" },
+  width: { xs: "85%", sm: "90%", md: "500px" },
   maxWidth: "500px",
   maxHeight: { xs: "90vh", sm: "85vh" },
   overflowY: "auto",     

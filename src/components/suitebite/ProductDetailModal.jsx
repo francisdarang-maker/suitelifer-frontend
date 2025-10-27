@@ -203,54 +203,6 @@ const ProductDetailModal = ({
     return basePrice + adjustment;
   };
 
-  /**
-   * Handles confirming the order with selected quantity and variation
-   */
-  // const handleAddToCartFromModal = async () => {
-  //   if (isAddingToCart) return;
-  //   setModalError("");
-  //   // Ensure variation selection if required
-  //   if (availableVariations.length > 0 && variationTypes.length > 0) {
-  //     const allTypesSelected = variationTypes.every(
-  //       (type) => selectedOptions[type]
-  //     );
-  //     if (!allTypesSelected) {
-  //       setModalError(
-  //         "Please select all product options before adding to cart."
-  //       );
-  //       return;
-  //     }
-  //   }
-
-  //   try {
-  //     setIsAddingToCart(true);
-
-  //     // Prepare variation data in the new format
-  //     const variations = Object.entries(selectedOptions)
-  //       .map(([typeName, optionId]) => {
-  //         const option = availableVariations
-  //           .flatMap((v) => v.options || [])
-  //           .find(
-  //             (opt) => opt.option_id === optionId && opt.type_name === typeName
-  //           );
-
-  //         const variation = {
-  //           variation_type_id: option?.variation_type_id,
-  //           option_id: optionId,
-  //         };
-
-  //         return variation;
-  //       })
-  //       .filter((v) => v.variation_type_id && v.option_id);
-
-  //     await onAddToCart(product.product_id, quantity, null, variations);
-  //     onClose(); // Close modal after adding to cart
-  //   } catch (error) {
-  //     setModalError("Failed to add to cart.");
-  //   } finally {
-  //     setIsAddingToCart(false);
-  //   }
-  // };
   const handleAddToCartFromModal = async () => {
     if (isAddingToCart) return;
 
@@ -385,6 +337,10 @@ const ProductDetailModal = ({
 
   if (!isOpen) return null;
 
+  const isVariationComplete = variationTypes.every(
+    (type) => selectedOptions[type]
+  );
+
   return (
     <div
   className="fixed inset-0 bg-black/40 backdrop-blur z-50 flex items-center justify-center p-2 sm:p-4"
@@ -518,37 +474,69 @@ const ProductDetailModal = ({
             </div>
           </div>
 
-          {/* Buttons */}
-          <div className="space-y-2 sm:space-y-3">
-            <button
-              onClick={handleBuyNowFromModal}
-              disabled={!canAfford || isBuying || isAddingToCart}
-              className="w-full bg-[#0097b2] text-white py-3 sm:py-4 px-4 rounded-lg font-semibold hover:bg-[#007a8e] transition-all flex items-center justify-center gap-2 text-sm sm:text-lg disabled:opacity-50"
-            >
-              {isBuying ? (
-                <>
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Processing...</span>
-                </>
-              ) : !canAfford ? (
-                <>
-                  <HeartIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span>Need {totalCost - userHeartbits} more</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingBagIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span>Confirm Order</span>
-                </>
-              )}
-            </button>
+              {/* Action Buttons */}
+              <div className="action-buttons">
+                {mode === "buy-now" || mode === "details" ? (
+                  /* Confirm Order Button for Buy Now mode */
+                  <button
+                    onClick={handleBuyNowFromModal}
+                    disabled={!canAfford || isBuying || isAddingToCart}
+                    className="confirm-order-btn w-full bg-[#0097b2] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                  >
+                    {isBuying ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Processing...</span>
+                      </>
+                    ) : !canAfford ? (
+                      <>
+                        <HeartIcon className="h-5 w-5" />
+                        <span>
+                          Need {totalCost - userHeartbits} more heartbits
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBagIcon className="h-5 w-5" />
+                        <span>Confirm Order</span>
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  /* Add to Cart Button for Add to Cart mode */
+
+                  <button
+                    onClick={handleAddToCartFromModal}
+                    disabled={isBuying || isAddingToCart}
+                    className={`add-to-cart-btn w-full py-3 px-5 rounded-lg font-semibold flex items-center justify-center gap-3 text-lg transition-colors duration-200 ${
+                      isVariationComplete
+                        ? "bg-[#0097b2] text-white hover:bg-[#007a8e]"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    } ${isBuying || isAddingToCart ? "opacity-50" : ""}`}
+                  >
+                    {isAddingToCart ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>
+                          {mode === "edit" ? "Updating..." : "Adding..."}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCartIcon className="h-5 w-5" />
+                        <span>
+                          {mode === "edit" ? "Update Cart Item" : "Add to Cart"}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
-
   );
 };
 
