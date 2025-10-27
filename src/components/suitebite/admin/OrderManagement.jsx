@@ -1458,21 +1458,6 @@ const OrderManagement = () => {
                         <EyeIcon className="h-5 w-5" />
                       </button>
 
-                      {canApproveOrder(order) && (
-                        <button
-                          onClick={()=> handleApproveOrder(order.order_id)}
-                          disabled={approvingOrders.has(order.order_id)}
-                          className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
-                          title="Approve order"
-                        >
-                          {approvingOrders.has(order.order_id) ? (
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600"></div>
-                          ) : (
-                            <CheckIcon className="h-5 w-5" />
-                          )}
-                        </button>
-                      )}
-
                       {canCancelOrder(order) && (
                         <button
                           onClick={() => handleCancelOrder(order.order_id)}

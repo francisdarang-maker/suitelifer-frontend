@@ -13,9 +13,6 @@ import {
   HeartIcon,
   ArrowDownIcon,
   ArrowUpIcon,
-  PlusIcon,
-  MinusIcon,
-  PencilIcon,
   ChevronDoubleDownIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
@@ -56,7 +53,7 @@ const UserHeartbitsManagement = () => {
   }, []);
 
    useEffect(() => {
-    setCurrentPage(1); // reset page on filter/search change
+    setCurrentPage(1);
   }, [searchTerm, sortBy, sortOrder]);
 
 
@@ -291,14 +288,6 @@ const UserHeartbitsManagement = () => {
     };
 
       // Pagination logic
-  const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
-  const indexOfLastUser = currentPage * itemsPerPage;
-  const indexOfFirstUser = indexOfLastUser - itemsPerPage;
-  const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
-
-  const goToPage = (page) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
-  };
 
     const hasChanges = heartbitsToGive > 0 && reason.trim();
 
@@ -661,7 +650,6 @@ const UserHeartbitsManagement = () => {
       </div>
     </div>
     </div>
-      {/* Results Summary & Bulk Actions */}
 
       <div className="mt-1 pt-1">
         <div className="w-full text-center py-4 text-lg font-medium text-gray-700">
@@ -675,9 +663,6 @@ const UserHeartbitsManagement = () => {
 
         {selectedUsers.length > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 mt-3 mb-3 text-sm text-gray-600 w-full">
-            {/* <span className="text-[#0097b2] font-medium">
-              {selectedUsers.length} selected
-            </span> */}
             <div className="flex-1 flex justify-end">
               <button
                 onClick={() => setShowBulkUpdateModal(true)}
@@ -691,12 +676,9 @@ const UserHeartbitsManagement = () => {
           </div>
         )}
 
-      {/* Users Grid - Responsive */}
-
         <div className="bg-gray-10 rounded-lg">
-          {/* === PAGINATION SETUP === */}
           {(() => {
-            const itemsPerPage = 13; // number of cards per page (adjust as needed)
+            const itemsPerPage = 13; 
             const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
 
             const [currentPage, setCurrentPage] = React.useState(1);
@@ -708,14 +690,12 @@ const UserHeartbitsManagement = () => {
             const goToPage = (page) => {
               if (page >= 1 && page <= totalPages) {
                 setCurrentPage(page);
-                // optional: scroll to top on page change
                 document.querySelector(".users-table-container")?.scrollTo({ top: 0, behavior: "smooth" });
               }
             };
 
             return (
               <>
-                {/* === USERS GRID === */}
                 <div
                   className="users-table-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4"
                   style={{
@@ -826,36 +806,67 @@ const UserHeartbitsManagement = () => {
                 </div>
 
                 {/* === PAGINATION CONTROLS === */}
+                {/* === PAGINATION CONTROLS === */}
                 {sortedUsers.length > itemsPerPage && (
-                  <div className="flex justify-center items-center gap-2 mt-5 flex-wrap">
+                  <div className="flex justify-center items-center gap-1 mt-6 mb-2">
                     <button
                       onClick={() => goToPage(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="px-3 py-1 border rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50"
+                      className="p-2 rounded-lg text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors duration-200"
+                      aria-label="Previous page"
                     >
-                      Previous
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                      </svg>
                     </button>
 
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => goToPage(i + 1)}
-                        className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                          currentPage === i + 1
-                            ? "bg-[#0097b2] text-white shadow"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
+                    <div className="flex gap-1 mx-2">
+                      {Array.from({ length: totalPages }, (_, i) => {
+                        const page = i + 1;
+                        const isCurrentPage = currentPage === page;
+                        const showPage = 
+                          page === 1 || 
+                          page === totalPages || 
+                          (page >= currentPage - 1 && page <= currentPage + 1);
+                        
+                        if (!showPage) {
+                          if (page === currentPage - 2 || page === currentPage + 2) {
+                            return (
+                              <span key={i} className="px-2 py-2 text-gray-400">
+                                ⋯
+                              </span>
+                            );
+                          }
+                          return null;
+                        }
+
+                        return (
+                          <button
+                            key={i}
+                            onClick={() => goToPage(page)}
+                            className={`
+                              min-w-[2.5rem] h-10 rounded-lg text-sm font-medium transition-all duration-200
+                              ${isCurrentPage
+                                ? "bg-[#0097b2] text-white shadow-md shadow-[#0097b2]/25 scale-105"
+                                : "text-gray-700 hover:bg-gray-100 hover:text-[#0097b2]"
+                              }
+                            `}
+                          >
+                            {page}
+                          </button>
+                        );
+                      })}
+                    </div>
 
                     <button
                       onClick={() => goToPage(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="px-3 py-1 border rounded-lg text-sm font-medium disabled:opacity-40 hover:bg-gray-50"
+                      className="p-2 rounded-lg text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors duration-200"
+                      aria-label="Next page"
                     >
-                      Next
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
                     </button>
                   </div>
                 )}
