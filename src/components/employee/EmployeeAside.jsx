@@ -150,16 +150,16 @@ const EmployeeAside = () => {
   if (hideCalendarforAdmin) return null;
 
   return (
-    <aside className="w-64 xl:w-72 h-screen bg-white border-l border-white flex flex-col overflow-hidden">
+    <aside className="w-64 xl:w-72 h-screen bg-white flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="px-4 py-3 bg-white border-b border-white shadow-sm">
+      {/* <div className="px-4 py-3 bg-white border-b border-white shadow-sm">
         <h2 className="text-lg font-bold text-gray-800 tracking-tight">
           Events
         </h2>
-      </div>
+      </div> */}
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-3">
+      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-3 ">
         {/* Calendar */}
         <Calendar
           eventDates={eventDates}

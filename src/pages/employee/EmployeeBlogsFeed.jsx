@@ -114,7 +114,9 @@ const lastBlogRef = useCallback(
               <Loader />
               </div>
             )}
-           <div
+           {
+            weeklyEvents.length > 0 && ( 
+              <div
               className="bg-primary rounded-md p-3 flex justify-between mb-5 lg:hidden"
               onClick={handleEventClick}
             >
@@ -129,9 +131,14 @@ const lastBlogRef = useCallback(
                 <ChevronRightIcon className="w-3 h-3 text-white" />
               </div>
             </div>
+            )
+           }
 
           {/* Create Post Section - Facebook Style */}
-          <CreatePostCard fetchEmployeeBlogs={fetchEmployeeBlogs}/>
+          {
+            
+            <CreatePostCard fetchEmployeeBlogs={fetchEmployeeBlogs}/>
+          }
 
           {/* Feed */}
           <main>
