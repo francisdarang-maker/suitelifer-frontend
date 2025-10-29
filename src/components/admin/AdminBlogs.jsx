@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FileText, CircleAlert, NotebookPen } from "lucide-react";
+import { FileText } from "lucide-react";
 import api from "../../utils/axios";
 import BlogContentCard from "../blog/admin/BlogContentCard";
 import Loading from "../loader/Loading";

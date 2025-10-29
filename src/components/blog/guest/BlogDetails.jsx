@@ -62,9 +62,23 @@ export default function BlogDetails() {
 
       {/* Content */}
       <div
-        className="prose prose-slate max-w-none text-justify text-gray-700 leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: blogItem.article }}
-      />
+  className="
+    text-gray-800
+    leading-relaxed
+    space-y-4
+    [&_p]:mb-4
+    [&_ul]:list-disc [&_ul]:pl-6
+    [&_ol]:list-decimal [&_ol]:pl-6
+    [&_li]:mb-1
+    [&_strong]:font-semibold
+    [&_em]:italic
+    [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mt-8 [&_h1]:mb-4
+    [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:mt-6 [&_h2]:mb-3
+    [&_img]:rounded-xl [&_img]:shadow-md [&_img]:my-6
+    [&_a]:text-primary [&_a]:underline [&_a:hover]:opacity-80
+  "
+  dangerouslySetInnerHTML={{ __html: blogItem.article }}
+  />
     </div>
   );
 }
