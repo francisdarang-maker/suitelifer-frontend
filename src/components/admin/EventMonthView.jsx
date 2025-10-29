@@ -135,7 +135,7 @@ function EventMonthView({
     const selectedEvents = getEventsForDate(selectedDate);
 
     return (
-      <>
+      <div className="overflow-y-autop py-1">
         <Typography
           sx={{
             fontWeight: "bold",
@@ -278,10 +278,12 @@ function EventMonthView({
         {selectedEvents.length > 0 ? (
           <Box
             sx={{
+              maxHeight: "15vh",
               display: "grid",
               gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
               gap: 2,
               mt: 2,
+              mb: 10,
             }}
           >
             {selectedEvents.map((event, idx) => {
@@ -299,6 +301,9 @@ function EventMonthView({
                 <Box
                   key={idx}
                   sx={{
+                    height: 150,
+                    minHeight: 150,
+                    maxHeight: 150,
                     backdropFilter: "blur(600px)",
                     WebkitBackdropFilter: "blur(6px)",
                     display: "flex",
@@ -310,6 +315,7 @@ function EventMonthView({
                     boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
                     cursor: "pointer",
                     transition: "0.3s ease",
+                    overflow: "hidden",
                     "&:hover": {
                       transform: { sm: "translateY(-3px)" },
                       boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
@@ -375,15 +381,20 @@ function EventMonthView({
                   </Typography>
 
                   {/* Description */}
+
                   {event.description && (
                     <Typography
                       variant="body2"
                       sx={{
-                        mt: 0.5,
                         color: "#475569",
                         fontStyle: "italic",
                         lineHeight: 1.4,
                         fontSize: { xs: "0.85rem", sm: "0.9rem" },
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 5,
+                        WebkitBoxOrient: "vertical",
                       }}
                     >
                       “{event.description}”
@@ -398,7 +409,7 @@ function EventMonthView({
           <Box
             sx={{
               p: { xs: 2.5, sm: 3 },
-              mt: 2,
+
               borderRadius: 3,
               bgcolor: "#f9fafb",
               display: "flex",
@@ -435,7 +446,6 @@ function EventMonthView({
               variant="body2"
               sx={{
                 color: "#64748b",
-                mt: 0.5,
 
                 maxWidth: "280px",
                 fontSize: { xs: "0.85rem", sm: "0.9rem" },
@@ -445,7 +455,7 @@ function EventMonthView({
             </Typography>
           </Box>
         )}
-      </>
+      </div>
     );
   }
 

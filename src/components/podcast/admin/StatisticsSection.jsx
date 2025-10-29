@@ -2,13 +2,13 @@ import React from "react";
 import StatsCard from "./StatsCard";
 
 const StatisticsSection = ({ stats }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 px-4">
+  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 px-4">
     <StatsCard
       label="Total Items"
       value={stats.total}
       icon={
         <svg
-          className="w-6 h-6 text-white"
+          className="w-6 h-6 text-white  "
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -23,7 +23,7 @@ const StatisticsSection = ({ stats }) => (
       }
       color="bg-primary"
     />
-    
+
     <StatsCard
       label="Episodes"
       value={stats.episodes}
@@ -44,7 +44,7 @@ const StatisticsSection = ({ stats }) => (
       }
       color="bg-green-500"
     />
-    
+
     <StatsCard
       label="Playlists"
       value={stats.playlists}

@@ -749,10 +749,10 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
                   ></div>
 
                   <div className="p-3 sm:p-6">
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-2">
                       {/* Order Header */}
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center gap-3 mb-1">
                           <div className="flex items-center gap-2">
                             {getStatusIcon(order.status)}
                             <span className={getStatusBadge(order.status)}>
@@ -1004,12 +1004,14 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
 const OrderDetailsModal = ({ order, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[70vh] flex flex-col shadow-2xl sm:max-h-[80vh]">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[70vh] flex flex-col shadow-2xl sm:max-h-[80vh] lg:max-w-[90vh] xl:max-w-[60vh] xl:max-h-[100vh] 2xl:max-w-[60%] 2xl:max-h-[90vh]">
         {/* Modal Header */}
-        <div className="bg-[#0097b2] text-white px-6 py-3 shrink-0">
+        <div className="bg-[#0097b2] text-white px-6 py-3 shrink-0 2xl:py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold">Order Details</h2>
+              <div className="text-xl font-semibold 2xl:text-4xl">
+                Order Details
+              </div>
               <p className="text-base opacity-90">Order #{order.order_id}</p>
             </div>
             <button
@@ -1027,7 +1029,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
               <div
-                className={`inline-flex items-center px-3 py-1 rounded-full text-base font-medium ${
+                className={`inline-flex items-center  py-1 px-2 rounded-full text-base font-medium 2xl:text-2xl ${
                   order.status === "pending"
                     ? "bg-yellow-100 text-yellow-800"
                     : order.status === "processing"
@@ -1042,7 +1044,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </div>
             </div>
-            <p className="text-base text-gray-600">
+            <p className="text-base text-gray-600 2xl:text-xl">
               {order.status === "pending" &&
                 "Your order is awaiting admin approval. You can cancel it anytime."}
               {order.status === "processing" &&
@@ -1055,36 +1057,36 @@ const OrderDetailsModal = ({ order, onClose }) => {
 
           {/* Order Timeline */}
           <div className="mb-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+            <div className="text-xl font-semibold text-gray-900 mb-3 2xl:text-2xl">
               Order Timeline
-            </h3>
-            <div className="flex items-center justify-between gap-2 relative px-2">
+            </div>
+            <div className="flex items-center justify-center gap-2 relative  w-full ">
               {/* Horizontal line */}
               <div
                 className="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-200 z-0 "
                 style={{ transform: "translateY(-50%)" }}
               ></div>
               {/* Timeline steps */}
-              <div className="flex flex-1 items-center justify-between z-10">
+              <div className="flex flex-1 items-center justify-between gap-2 z-10">
                 {/* Placed */}
                 <div className="flex flex-col items-center min-w-[80px]">
-                  <div className="w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow flex items-center justify-center">
-                    <CheckIcon className="h-3 w-3 text-white" />
+                  <div className="w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow flex items-center justify-center 2xl:h-8 2xl:w-8 ">
+                    <CheckIcon className="h-3 w-3 text-white 2xl:h-6 2xl:w-6" />
                   </div>
-                  <span className="text-sm font-medium text-gray-900 mt-2">
+                  <span className="text-sm font-medium text-gray-900 mt-2 2xl:text-xl">
                     Placed
                   </span>
-                  <span className="text-[10px] text-gray-500">
+                  <span className="text-[10px] text-gray-500 2xl:text-xl">
                     {formatDate(order.ordered_at)}
                   </span>
                 </div>
                 {/* Approved */}
                 {order.processed_at && (
                   <div className="flex flex-col items-center min-w-[80px]">
-                    <div className="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow flex items-center justify-center">
-                      <CheckIcon className="h-3 w-3 text-white" />
+                    <div className="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow flex items-center justify-center 2xl:h-8 2xl:w-8">
+                      <CheckIcon className="h-3 w-3 text-white  2xl:h-5 2xl:w-5" />
                     </div>
-                    <span className="text-sm font-medium text-gray-900 mt-2">
+                    <span className="text-sm font-medium text-gray-900 mt-2 2xl:text-xl">
                       Approved
                     </span>
                     <span className="text-[10px] text-gray-500">
@@ -1096,9 +1098,9 @@ const OrderDetailsModal = ({ order, onClose }) => {
                 {order.completed_at && (
                   <div className="flex flex-col items-center min-w-[80px]">
                     <div className="w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow flex items-center justify-center">
-                      <CheckIcon className="h-3 w-3 text-white" />
+                      <CheckIcon className="h-3 w-3 text-white  2xl:h-5 2xl:w-5" />
                     </div>
-                    <span className="text-sm font-medium text-gray-900 mt-2">
+                    <span className="text-sm font-medium text-gray-900 mt-2 2xl:text-xl">
                       Completed
                     </span>
                     <span className="text-[10px] text-gray-500">
@@ -1109,13 +1111,13 @@ const OrderDetailsModal = ({ order, onClose }) => {
                 {/* Cancelled */}
                 {order.status === "cancelled" && (
                   <div className="flex flex-col items-center min-w-[80px]">
-                    <div className="w-5 h-5 bg-red-500 rounded-full border-2 border-white shadow flex items-center justify-center">
-                      <XMarkIcon className="h-3 w-3 text-white" />
+                    <div className="w-5 h-5 bg-red-500 rounded-full border-2 border-white shadow flex items-center justify-center 2xl:h-8 2xl:w-8">
+                      <XMarkIcon className="h-3 w-3 text-white  2xl:h-5 2xl:w-5" />
                     </div>
-                    <span className="text-sm font-medium text-gray-900 mt-2">
+                    <span className="text-sm font-medium text-gray-900 mt-2 2xl:text-xl">
                       Cancelled
                     </span>
-                    <span className="text-[10px] text-gray-500">
+                    <span className="text-[10px] text-gray-500 2xl:text-xl">
                       Order was cancelled
                     </span>
                   </div>
@@ -1126,10 +1128,10 @@ const OrderDetailsModal = ({ order, onClose }) => {
 
           {/* Order Items */}
           <div className="mb-6">
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">
+            <div className="text-xl font-semibold text-gray-900 mb-3 2xl:text-2xl">
               Order Items
-            </h3>
-            <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
+            </div>
+            <div className="space-y-3 max-h-64 overflow-y-auto pr-2 ">
               {order.orderItems &&
                 order.orderItems.map((item, index) => (
                   <OrderItemCard
@@ -1139,8 +1141,8 @@ const OrderDetailsModal = ({ order, onClose }) => {
                   />
                 ))}
               {(!order.orderItems || order.orderItems.length === 0) && (
-                <div className="text-center py-8 text-gray-500">
-                  <ShoppingBagIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <div className="text-center py-8 text-gray-500 2xl:h-8 2xl:w-8">
+                  <ShoppingBagIcon className="h-12 w-12 mx-auto mb-4 text-gray-300 " />
                   <p>No items found in this order</p>
                 </div>
               )}
@@ -1153,7 +1155,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
           {order.notes && (
             <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="flex items-center gap-2 mb-1">
-                <ExclamationTriangleIcon className="h-4 w-4 text-yellow-600" />
+                <ExclamationTriangleIcon className="h-4 w-4 text-yellow-600 2xl:h-8 2xl:w-8" />
                 <span className="text-base font-medium text-yellow-800">
                   Notes
                 </span>
@@ -1166,10 +1168,12 @@ const OrderDetailsModal = ({ order, onClose }) => {
         {/* Modal Footer */}
         <div className="border-t border-gray-200 pt-4 mx-5">
           <div className="flex items-center justify-between sm:justify-between sm:gap-4 sm:mx-1 ">
-            <span className="text-xl font-semibold text-gray-900">Total</span>
+            <span className="text-xl font-semibold text-gray-900 2xl:text-2xl">
+              Total
+            </span>
             <div className="flex items-center gap-2">
-              <HeartIcon className="h-5 w-5 text-red-500" />
-              <span className="text-xl font-bold text-[#0097b2]">
+              <HeartIcon className="h-5 w-5 text-red-500 2xl:h-7 2xl:w-7" />
+              <span className="text-xl font-bold text-[#0097b2] 2xl:text-2xl">
                 {order.total_points} heartbits
               </span>
             </div>
@@ -1183,16 +1187,16 @@ const OrderDetailsModal = ({ order, onClose }) => {
                 onClick={() => downloadReceiptPDF(order)}
                 className="flex items-center gap-2 px-2 py-1 bg-[#0097b2] text-white rounded-lg hover:bg-[#007a8e] transition-colors sm:px-4 sm:py-2 "
               >
-                <ArrowDownTrayIcon className="h-4 w-4 hidden sm:inline" />
-                <span>Download</span>
-                <span>Receipt</span>
+                <ArrowDownTrayIcon className="h-4 w-4 hidden sm:inline 2xl:h-7 2xl:w-7" />
+                <span className="2xl:text-2xl">Download</span>
+                <span className="2xl:text-2xl">Receipt</span>
               </button>
             </div>
 
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="px-3 py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors sm:px-4 sm:py-2 "
+              className="px-3 py-1 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors sm:px-4 sm:py-2 2xl:text-2xl"
             >
               Close
             </button>

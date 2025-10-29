@@ -92,7 +92,14 @@ function AdminBlogs() {
     }
   }
 
-  const handleEditBlog = async (title, article, section, newImage, oldUrl, blogId) => {
+  const handleEditBlog = async (
+    title,
+    article,
+    section,
+    newImage,
+    oldUrl,
+    blogId
+  ) => {
     if (!title || !article) return;
 
     try {
@@ -121,7 +128,7 @@ function AdminBlogs() {
       fetchBlogs();
     } catch (error) {
       console.error("Failed to edit blog:", error);
-    } 
+    }
   };
 
   const handleDeleteBlog = async (blogId, imageUrl) => {
@@ -154,7 +161,6 @@ function AdminBlogs() {
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-7xl mx-auto">
-       
         {/* Stats */}
         <div className="grid md:grid-cols-3 gap-6 mb-8 ">
           <BlogStatsCards blogs={blogs} />
@@ -169,9 +175,7 @@ function AdminBlogs() {
         />
 
         {/* Add Form */}
-        {showAddForm && (
-          <BlogAddForm onSubmit={handleAddBlog} blogs={blogs} />
-        )}
+        {showAddForm && <BlogAddForm onSubmit={handleAddBlog} blogs={blogs} />}
 
         {/* Edit Dialog */}
         {isEditing && editBlog && (
@@ -216,7 +220,7 @@ function AdminBlogs() {
           </div>
         ) : paginatedBlogs.length > 0 && !showAddForm ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
               {paginatedBlogs.map((blog) => (
                 <BlogContentCard
                   key={blog.blogId}
@@ -270,9 +274,7 @@ function AdminBlogs() {
             <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <p className="text-slate-600 text-lg">No blogs found</p>
           </div>
-        )
-      : null
-      }
+        ) : null}
       </div>
     </div>
   );

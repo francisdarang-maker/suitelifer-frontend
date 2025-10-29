@@ -13,6 +13,7 @@ import {
   ChatBubbleLeftRightIcon,
   QueueListIcon,
   HeartIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import Loading from "../../loader/Loading";
 
@@ -81,11 +82,9 @@ const CheerPostsManagement = () => {
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmPostId, setConfirmPostId] = useState(null);
   const [confirmPostData, setConfirmPostData] = useState(null);
-  
 
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
-
 
   // Group cheers by sender and time (within same minute)
   const groupCheersBySenderAndTime = (cheers) => {
@@ -501,137 +500,147 @@ const CheerPostsManagement = () => {
         </div>
       </div>
 
-<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-  <div className="flex flex-col gap-6">
-    {/* Mobile Filter Toggle Button - Only visible on small screens */}
-    <button
-      onClick={() => setFiltersExpanded(!filtersExpanded)}
-      className="lg:hidden w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-    >
-      <div className="flex items-center gap-2">
-        <FunnelIcon className="h-5 w-5 text-gray-600" />
-        <span className="text-sm font-medium text-gray-700">
-          {searchTerm || filter !== 'all' || sortBy !== 'date' 
-            ? 'Filters Active' 
-            : 'Search & Filter'}
-        </span>
-        {(searchTerm || filter !== 'all' || sortBy !== 'date') && (
-          <span className="ml-1 px-2 py-0.5 bg-[#0097b2] text-white text-xs rounded-full">
-            Active
-          </span>
-        )}
-      </div>
-      <svg
-        className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
-          filtersExpanded ? 'rotate-180' : ''
-        }`}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M19 9l-7 7-7-7"
-        />
-      </svg>
-    </button>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex flex-col gap-6">
+          {/* Search Input - Always visible */}
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Search Posts
+            </label>
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by post content, author name, recipient, or post ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 hover:text-gray-600"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
 
-    {/* Main Content Container - Collapsible on mobile */}
-    <div className={`flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 transition-all duration-300 ${
-      filtersExpanded ? 'block' : 'hidden lg:flex'
-    }`}>
-      {/* Search Input */}
-      <div className="flex-1">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Search Posts
-        </label>
-        <div className="relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search by post content, author name, recipient, or post ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm("")}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 hover:text-gray-600"
+          {/* Toggle Button - Always visible */}
+          <button
+            onClick={() => setFiltersExpanded(!filtersExpanded)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+          >
+            <div className="flex items-center gap-2">
+              <FunnelIcon className="h-5 w-5 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">
+                {searchTerm || filter !== "all" || sortBy !== "date"
+                  ? "Filters Active"
+                  : "Filter"}
+              </span>
+              {(searchTerm || filter !== "all" || sortBy !== "date") && (
+                <span className="ml-1 px-2 py-0.5 bg-[#0097b2] text-white text-xs rounded-full">
+                  Active
+                </span>
+              )}
+            </div>
+            <svg
+              className={`w-5 h-5 text-gray-600 transition-transform duration-200 ${
+                filtersExpanded ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          {/* Filter and Sort Controls - Collapsible */}
+          {filtersExpanded && (
+            <div className="flex flex-col xl:flex-row lg:items-start xl:items-end lg:justify-between gap-6 transition-all duration-300">
+              <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-start sm:items-end lg:items-start xl:items-end gap-4 w-full">
+                {/* Filter */}
+                <div className="flex flex-col gap-2 w-full sm:w-auto">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    {" "}
+                    Sort by
+                  </label>
+                  <select
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
+                  >
+                    <option value="all">All Posts</option>
+                    <option value="active">Active Posts</option>
+                    <option value="hidden">Hidden Posts</option>
+                  </select>
+                </div>
+
+                {/* Sort */}
+                <div className="flex flex-col gap-2 w-full sm:w-auto">
+                  <label className="text-sm font-medium text-gray-700"></label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
+                  >
+                    <option value="date">Date</option>
+                    <option value="heartbits">Heartbits</option>
+                    <option value="author">Author</option>
+                    <option value="likes">Likes</option>
+                    <option value="comments">Comments</option>
+                  </select>
+                </div>
+
+                {/* Sort Order */}
+                <button
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
+                  className="w-full sm:w-auto px-3 py-1 border border-gray-300 rounded-lg text-base hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
+                  title={`Sort ${
+                    sortOrder === "asc" ? (
+                      <span className="text-sm">Descending</span>
+                    ) : (
+                      <span className="text-sm">Ascending</span>
+                    )
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>
+                      {sortOrder === "asc" ? "Ascending" : "Descending"}
+                    </span>
+                    {sortOrder === "desc" ? (
+                      <ArrowDownIcon className="w-5 h-5 text-gray-500" />
+                    ) : (
+                      <ArrowUpIcon className="w-5 h-5 text-gray-500" />
+                    )}
+                  </div>
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
-
-      {/* Filter and Sort Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4">
-        <div className="flex flex-col gap-2 w-full sm:w-auto">
-          <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-            <FunnelIcon className="w-4 h-4" />
-            Filter
-          </label>
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
-          >
-            <option value="all">All Posts</option>
-            <option value="active">Active Posts</option>
-            <option value="hidden">Hidden Posts</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-2 w-full sm:w-auto">
-          <label className="text-sm font-medium text-gray-700">
-            Sort by
-          </label>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0097b2] focus:border-transparent text-sm transition-all duration-200 hover:border-gray-400"
-          >
-            <option value="date">Date</option>
-            <option value="heartbits">Heartbits</option>
-            <option value="author">Author</option>
-            <option value="likes">Likes</option>
-            <option value="comments">Comments</option>
-          </select>
-        </div>
-
-        <button
-          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-          className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-base hover:bg-gray-50 transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#0097b2] focus:border-transparent"
-          title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
-        >
-          <div className="flex items-center justify-between">
-            <span>{sortOrder === "asc" ? "Ascending" : "Descending"}</span>
-            {sortOrder === "desc" ? (
-              <ArrowDownIcon className="w-5 h-5 text-gray-500" />
-            ) : (
-              <ArrowUpIcon className="w-5 h-5 text-gray-500" />
-            )}
-          </div>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
       {/* Error Display */}
       {error && (
@@ -962,12 +971,13 @@ const PostCard = ({
 
   return (
     <div className="post-card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:border-gray-300">
-      <div className="post-main p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="post-main p-2 sm:p-6">
+        <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row items-start sm:items-center justify-between gap-6">
           {/* Author Info */}
-          <div className="author-section flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
+
+          <div className="author-section flex flex-col  items-start sm:items-center sm:flex-row lg:flex-col lg:items-start xl:items-center xl:flex-row gap-4 w-full">
             {/* Author Info & Post */}
-            <div className="flex flex-col flex-1 gap-4">
+            <div className="flex flex-col flex-1 gap-4 lg:w-full">
               {/* Author Section */}
               <div className="author-section flex flex-row items-center gap-4 w-full">
                 {/* Avatar */}
@@ -994,7 +1004,6 @@ const PostCard = ({
                     ).toUpperCase()}
                   </div>
                 </div>
-
                 {/* Name & Status Badge */}
                 <div className="author-info flex items-center gap-2 min-w-0">
                   <div className="text-sm font-semibold text-gray-900 truncate">
@@ -1014,7 +1023,6 @@ const PostCard = ({
                   </span>
                 </div>
               </div>
-
               {/* Post Content */}
               <div className="post-details flex flex-col gap-3">
                 {/* Recipients */}
@@ -1054,12 +1062,10 @@ const PostCard = ({
                     {formatTimeAgo(post.posted_at)}
                   </span>
                 </div>
-
                 {/* Post Body */}
                 <div className="mb-3 p-3 bg-gray-50 rounded-lg border-l-4 border-[#0097b2]">
                   {renderMessageWithMedia(post.post_body)}
                 </div>
-
                 {/* Post Image */}
                 {post.image_url && (
                   <div className="mb-3">
@@ -1070,9 +1076,8 @@ const PostCard = ({
                     />
                   </div>
                 )}
-
                 {/* Engagement Stats */}
-                <div className="engagement-stats flex items-center gap-4 mb-4 py-3 px-3 rounded-lg flex-wrap">
+                <div className="engagement-stats flex items-center gap-4 mb-4 py-3 px-3 lg:px-0 rounded-lg flex-wrap">
                   {/* Likes */}
                   <div className="stat-item flex items-center gap-2 px-3 py-1 bg-white rounded-full shadow-sm">
                     <HeartIcon
@@ -1083,7 +1088,6 @@ const PostCard = ({
                       {post.totalLikes || 0}
                     </span>
                   </div>
-
                   {/* Comments */}
                   <div className="stat-item flex items-center gap-2 px-3 py-1 bg-white rounded-full shadow-sm">
                     <svg
@@ -1103,7 +1107,6 @@ const PostCard = ({
                       {post.totalComments || 0}
                     </span>
                   </div>
-
                   {/* View/Hide Details */}
                   {(post.totalLikes > 0 || post.totalComments > 0) && (
                     <button
@@ -1131,9 +1134,8 @@ const PostCard = ({
                 </div>
               </div>
             </div>
-
             {/* Right Section: Stats & Action Buttons */}
-            <div className="post-stats flex-shrink-0 w-full sm:w-48 flex flex-col gap-3 mt-4 sm:mt-0">
+            <div className="post-stats flex-shrink-0 w-full sm:w-48 lg:w-full xl:w-48 flex flex-col gap-3 mt-4 sm:mt-0">
               {/* Stats */}
               <div className="stats-container p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center justify-start gap-2 mb-2">
@@ -1156,7 +1158,6 @@ const PostCard = ({
                   {post.cheer_ids.length === 1 ? "post" : "posts"}
                 </div>
               </div>
-
               {/* Action Buttons */}
               <div className="action-buttons flex flex-col gap-2">
                 {post.is_hidden ? (

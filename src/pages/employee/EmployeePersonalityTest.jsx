@@ -29,7 +29,7 @@ const EmployeePersonalityTest = () => {
     return (
       <div className="grid place-content-center h-full">
         <div className="flex gap-4 flex-col items-center">
-          <div className="w-[20vw] -mt-50">
+          <div className="w-[50vw] -mt-50 lg:w-[30vw]">
             <img
               className=""
               src={Empty}
@@ -40,8 +40,8 @@ const EmployeePersonalityTest = () => {
             Oops, <span className="text-black">Empty for Now!</span>
           </p>
           <p className="text-center text-gray-600 text-[12px] md:text-[14px] lg:text-base">
-            It looks like no personality tests have been added yet. <br /> Please check
-            back soon or contact your administrator for updates.
+            It looks like no personality tests have been added yet. <br />{" "}
+            Please check back soon or contact your administrator for updates.
           </p>
         </div>
       </div>

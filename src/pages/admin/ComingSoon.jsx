@@ -5,7 +5,7 @@ const ComingSoon = () => {
   return (
     <div className="grid place-content-center h-full">
       <div className="flex gap-4 flex-col items-center">
-        <div className="w-[25vw] -mt-50">
+        <div className="w-[90vw] -mt-50 sm:w-[70vw] md:w-[50vw] lg:w-[40vw]">
           <img
             className=""
             src={UnderConstruction}
@@ -15,7 +15,7 @@ const ComingSoon = () => {
         <p className="text-lg md:text-xl lg:text-3xl font-avenir-black mb-5 lg:mb-0">
           Coming Soon!
         </p>
-        <p className="text-gray-600 text-[12px] md:text-[14px] lg:text-base">
+        <p className="text-gray-600 text-[13px] md:text-[20px] lg:text-base">
           Still working on this one. Hang in there — it’s coming together
           nicely.
         </p>

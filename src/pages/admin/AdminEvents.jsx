@@ -195,7 +195,7 @@ const AdminEvents = () => {
   };
 
   return (
-    <div className="bg-white p-2 ">
+    <div className="bg-white p-1 ">
       <div className="flex justify-end gap-2 me-8">
         <ContentButtons
           icon={<PlusCircleIcon className="size-5" />}
@@ -204,7 +204,7 @@ const AdminEvents = () => {
         />
       </div>
 
-      <div className="flex gap-8 mt-4 min-h-0 flex-grow">
+      <div className="flex gap-8  min-h-0 flex-grow">
         <div className="bg-white border-gray-200 rounded-md p-4 w-full overflow-y-auto max-h-[calc(100vh-8rem)]">
           <EventCalendar
             events={events}
@@ -783,8 +783,8 @@ const modalStyle = {
   width: { xs: "85%", sm: "90%", md: "500px" },
   maxWidth: "500px",
   maxHeight: { xs: "90vh", sm: "85vh" },
-  overflowY: "auto",     
-  overflowX: "hidden", 
+  overflowY: "auto",
+  overflowX: "hidden",
   display: "flex",
   flexDirection: "column",
 };

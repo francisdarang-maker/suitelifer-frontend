@@ -138,8 +138,8 @@ const AdminSuitebite = () => {
           <div className="admin-nav-tabs bg-gray-50 rounded-lg p-1">
             {" "}
             {/* No margin */}
-            <div className="flex items-center justify-between">
-              <div className="flex gap-4">
+            <div className="flex items-center justify-">
+              <div className="flex gap-2 sm:gap-4 lg:gap-0">
                 {tabs.map((tab) => {
                   const IconComponent = tab.icon;
                   return (
@@ -152,8 +152,8 @@ const AdminSuitebite = () => {
                       }`}
                       onClick={() => handleTabChange(tab.id)}
                     >
-                      <IconComponent className="h-5 w-5" />
-                      <span className="hidden sm:inline tab-label pl-3">
+                      <IconComponent className="h-5 w-5 flex lg:hidden" />
+                      <span className="hidden sm:inline tab-label pl-3 lg:pl-0">
                         {tab.label}
                       </span>
                     </button>

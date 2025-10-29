@@ -275,8 +275,16 @@ const ProductDetailModal = ({
         (type) => selectedOptions[type]
       );
       if (!allTypesSelected) {
-        setModalError(
-          "Please select all product options before confirming order."
+        toast.error(
+          "Please select all product options before adding to cart.",
+          {
+            position: "top-center",
+            style: {
+              fontSize: "0.875rem",
+              padding: "0.75rem 1rem",
+              maxWidth: "90vw",
+            },
+          }
         );
         return;
       }
@@ -344,6 +352,7 @@ const ProductDetailModal = ({
   return (
     <div
   className="fixed inset-0 bg-black/40 backdrop-blur z-50 flex items-center justify-center p-2 sm:p-4"
+      onClick={onClose}
   role="dialog"
   aria-modal="true"
 >
@@ -478,10 +487,29 @@ const ProductDetailModal = ({
               <div className="action-buttons">
                 {mode === "buy-now" || mode === "details" ? (
                   /* Confirm Order Button for Buy Now mode */
+                
                   <button
-                    onClick={handleBuyNowFromModal}
-                    disabled={!canAfford || isBuying || isAddingToCart}
-                    className="confirm-order-btn w-full bg-[#0097b2] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#007a8e] transition-colors duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                    onClick={() => {
+                      if (!isVariationComplete) {
+                        toast.error(
+                          "Please select all required options before confirming your order."
+                        );
+                        return;
+                      }
+                      if (!canAfford) {
+                        toast.error(
+                          "You don’t have enough heartbits to complete this order."
+                        );
+                        return;
+                      }
+                      handleBuyNowFromModal();
+                    }}
+                    disabled={isBuying || isAddingToCart}
+                    className={`confirm-order-btn w-full py-2 px-4 rounded-lg font-semibold flex items-center justify-center gap-3 text-lg transition-colors duration-200 ${
+                      isVariationComplete && canAfford
+                        ? "bg-[#0097b2] text-white hover:bg-[#007a8e]"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    } ${isBuying || isAddingToCart ? "opacity-50" : ""}`}
                   >
                     {isBuying ? (
                       <>

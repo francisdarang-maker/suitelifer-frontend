@@ -9,7 +9,7 @@ import { SwatchIcon, PhotoIcon } from "@heroicons/react/24/outline";
  * - Selected variations (size, color, design, etc.)
  * - Quantity and pricing
  * - Visual variation indicators
- * 
+ *
  * Fully responsive for mobile, tablet, and desktop.
  */
 const OrderItemCard = ({ item, showImages = true }) => {
@@ -27,16 +27,16 @@ const OrderItemCard = ({ item, showImages = true }) => {
     item.product_images?.[0];
 
   return (
-    <div className="order-item-card bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow w-full">
-      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+    <div className="order-item-card bg-white border border-gray-200 rounded-lg px-2 pb-1 hover:shadow-md transition-shadow w-full">
+      <div className="flex flex-col sm:flex-row sm:items-start  gap-4 ">
         {/* Product Image */}
         {showImages && (
-          <div className="flex-shrink-0 hidden sm:flex">
+          <div className="flex-shrink-0 hidden sm:flex sm:items-center sm:justify-center">
             {primaryImage ? (
               <img
                 src={primaryImage.image_url}
                 alt={primaryImage.alt_text || item.product_name}
-                className="w-20 h-20 sm:w-16 sm:h-16 object-cover rounded-lg border border-gray-200"
+                className="w-20 h-20 sm:w-16 sm:h-16 object-cover rounded-lg border border-gray-200 2xl:w-30 2xl:h-30"
               />
             ) : (
               <div className="w-20 h-20 sm:w-16 sm:h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
@@ -51,23 +51,23 @@ const OrderItemCard = ({ item, showImages = true }) => {
           <div className="flex justify-between items-start mb-2">
             <div>
               <div
-                className={`text-base font-medium text-gray-900 mt-4 ${
+                className={`text-base font-medium text-gray-900 mt-4 2xl:text-3xl ${
                   item.product_name.length > 10 ? "line-clamp-2" : ""
                 }`}
               >
                 {item.product_name}
               </div>
               {item.product_category && (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 mt-1 2xl:text-xl">
                   Category: {item.product_category}
                 </p>
               )}
             </div>
-            <div className="text-right flex-shrink-0 ml-4 mt-4">
-              <p className="text-sm font-medium text-gray-900">
+            <div className="text-right flex-shrink-0 ml-4 mt-4 2xl:text-2xl">
+              <p className="text-sm font-medium text-gray-900 2xl:text-2xl">
                 {item.quantity}x {item.price_points} pts
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 2xl:text-2xl">
                 Total: {item.quantity * item.price_points} pts
               </p>
             </div>
@@ -77,8 +77,8 @@ const OrderItemCard = ({ item, showImages = true }) => {
           {Object.keys(groupedVariations).length > 0 && (
             <div className="mt-3">
               <div className="flex items-center gap-1 mb-2">
-                <SwatchIcon className="h-4 w-4 text-gray-400" />
-                <span className="text-sm font-medium text-gray-600">
+                <SwatchIcon className="h-4 w-4 text-gray-400 2xl:h-6 2xl:w-6" />
+                <span className="text-sm font-medium text-gray-600 2xl:text-2xl">
                   Variations:
                 </span>
               </div>
@@ -118,7 +118,7 @@ const OrderItemCard = ({ item, showImages = true }) => {
 
           {/* Description */}
           {item.product_description && (
-            <p className="text-xs text-gray-500 mt-3 line-clamp-3 sm:line-clamp-2">
+            <p className="text-xs text-gray-500 mt-3 line-clamp-3 sm:line-clamp-2 2xl:text-xl">
               {item.product_description}
             </p>
           )}

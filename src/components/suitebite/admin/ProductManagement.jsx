@@ -198,9 +198,7 @@ const ProductManagement = () => {
         setPendingDeleteProduct(null);
         await loadProducts();
       } else {
-        toast.error(
-          response.message || "Failed to delete product"
-        );
+        toast.error(response.message || "Failed to delete product");
       }
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -235,9 +233,7 @@ const ProductManagement = () => {
           toast.success("Category added successfully!");
           await loadProducts(); // Refresh to sync categories
         } else {
-          toast.error(
-            response.message || "Failed to add category"
-          );
+          toast.error(response.message || "Failed to add category");
         }
       } catch (error) {
         console.error("Error adding category:", error);
@@ -366,167 +362,167 @@ const ProductManagement = () => {
       )}
 
       {/* Filters and Search - Modernized */}
-<div className="filters-section sticky top-0 z-10 bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl shadow-lg border border-white/60 pb-4 px-6 pt-5 mb-4">
-      {/* Header Row with Search + Chevron (mobile) */}
-      <div className="flex items-center justify-between gap-3 mb-4 md:mb-0">
-        {/* Search - Always visible */}
-        <div className="flex-1 relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-[#0097b2] transition-all duration-300 group-focus-within:scale-110" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
+      <div className="filters-section sticky top-0 z-10 bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl shadow-lg border border-white/60 pb-4 px-6 pt-5 mb-4">
+        {/* Header Row with Search + Chevron (mobile) */}
+        <div className="flex items-center justify-between gap-3 mb-4 md:mb-0">
+          {/* Search - Always visible */}
+          <div className="flex-1 relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="relative">
+              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2 group-focus-within:text-[#0097b2] transition-all duration-300 group-focus-within:scale-110" />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
               placeholder:text-gray-400 placeholder:font-normal
               focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white 
               hover:border-gray-300 hover:shadow-lg
               transition-all duration-300"
-            />
+              />
+            </div>
           </div>
+
+          {/* Chevron Toggle (mobile only) */}
+          <button
+            onClick={() => setIsCollapsed((prev) => !prev)}
+            className="ml-2 flex items-center justify-center p-2 rounded-xl border border-gray-200 bg-white/70 shadow-sm hover:bg-white md:hidden transition-all duration-300"
+          >
+            <ChevronDownIcon
+              className={`h-5 w-5 text-gray-600 transition-transform duration-300 ${
+                !isCollapsed ? "rotate-180" : ""
+              }`}
+            />
+          </button>
         </div>
 
-        {/* Chevron Toggle (mobile only) */}
-        <button
-          onClick={() => setIsCollapsed((prev) => !prev)}
-          className="ml-2 flex items-center justify-center p-2 rounded-xl border border-gray-200 bg-white/70 shadow-sm hover:bg-white md:hidden transition-all duration-300"
+        {/* Collapsible Filters */}
+        <div
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${
+            isCollapsed ? "max-h-0 opacity-0" : "max-h-[600px] opacity-100"
+          } md:max-h-none md:opacity-100`}
         >
-          <ChevronDownIcon
-            className={`h-5 w-5 text-gray-600 transition-transform duration-300 ${
-              !isCollapsed ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-      </div>
-
-      {/* Collapsible Filters */}
-      <div
-        className={`overflow-hidden transition-all duration-500 ease-in-out ${
-          isCollapsed ? "max-h-0 opacity-0" : "max-h-[600px] opacity-100"
-        } md:max-h-none md:opacity-100`}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end mt-2">
-          {/* Category Filter */}
-          <div className="category-filter">
-            <div className="relative group">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full appearance-none px-4 pr-10 py-2.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
+          <div className="grid grid-cols-1 md:grid-cols-4  md:gap-7 lg:grid-cols-2 lg:gap-4 gap-4  items-end mt-2">
+            {/* Category Filter */}
+            <div className="category-filter">
+              <div className="relative group">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full appearance-none px-4 pr-10 py-2.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
                 focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
                 text-sm font-semibold text-gray-700 cursor-pointer
                 hover:border-gray-300 hover:shadow-lg
                 transition-all duration-300"
-              >
-                {categories.map(renderCategoryOption)}
-              </select>
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.5}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                  {categories.map(renderCategoryOption)}
+                </select>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <svg
+                    className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Sort By */}
-          <div className="sort-field">
-            <div className="relative group">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full appearance-none px-4 pr-10 py-2.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
+            {/* Sort By */}
+            <div className="sort-field">
+              <div className="relative group">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full appearance-none px-4 pr-10 py-2.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
                 focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
                 text-sm font-semibold text-gray-700 cursor-pointer
                 hover:border-gray-300 hover:shadow-lg
                 transition-all duration-300"
-              >
-                <option key="name" value="name">
-                  Sort by Name
-                </option>
-                <option key="price_points" value="price_points">
-                  Sort by Price
-                </option>
-                <option key="category" value="category">
-                  Sort by Category
-                </option>
-              </select>
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.5}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+                  <option key="name" value="name">
+                    Sort by Name
+                  </option>
+                  <option key="price_points" value="price_points">
+                    Sort by Price
+                  </option>
+                  <option key="category" value="category">
+                    Sort by Category
+                  </option>
+                </select>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <svg
+                    className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Sort Order */}
-          <div className="sort-order">
-            <button
-              onClick={() =>
-                setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-              }
-              className="group w-full px-4 py-2.5 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl 
+            {/* Sort Order */}
+            <div className="sort-order">
+              <button
+                onClick={() =>
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                }
+                className="group w-full px-4 py-2.5 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl 
               text-sm font-semibold text-gray-700 
               hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg hover:shadow-[#0097b2]/10
               transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 
               active:scale-95"
-              title={`Sort ${
-                sortOrder === "asc" ? "Descending" : "Ascending"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="group-hover:text-[#0097b2] transition-colors">
-                  {sortOrder === "asc" ? "Ascending" : "Descending"}
-                </span>
-                {sortOrder === "desc" ? (
-                  <ArrowDownIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:translate-y-0.5" />
-                ) : (
-                  <ArrowUpIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:-translate-y-0.5" />
-                )}
-              </div>
-            </button>
-          </div>
+                title={`Sort ${
+                  sortOrder === "asc" ? "Descending" : "Ascending"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="group-hover:text-[#0097b2] transition-colors">
+                    {sortOrder === "asc" ? "Ascending" : "Descending"}
+                  </span>
+                  {sortOrder === "desc" ? (
+                    <ArrowDownIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:translate-y-0.5" />
+                  ) : (
+                    <ArrowUpIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-all duration-300 group-hover:-translate-y-0.5" />
+                  )}
+                </div>
+              </button>
+            </div>
 
-          {/* Add Product Button */}
-          <div>
-            <button
-              onClick={handleAddProduct}
-              className="group flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-2xl 
+            {/* Add Product Button */}
+            <div>
+              <button
+                onClick={handleAddProduct}
+                className="group flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-2xl 
               bg-gradient-to-br from-[#0097b2] to-[#0097b2]/80 text-white font-bold text-sm
               hover:from-[#007a8e] hover:to-[#007a8e]/80 hover:shadow-xl hover:shadow-[#0097b2]/30
               transition-all duration-300 active:scale-95
               focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20"
-            >
-              <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/20">
-                <PlusIcon className="h-4 w-4" />
-              </div>
-              <span>Add</span>
-            </button>
+              >
+                <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-white/20">
+                  <PlusIcon className="h-4 w-4" />
+                </div>
+                <span>Add</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
       {/* Products Table */}
       <div className="products-table-container max-h-[80vh] overflow-hidden rounded-lg mx-6 ">
@@ -540,11 +536,11 @@ const ProductManagement = () => {
                 <thead>
                   <tr className="bg-gradient-to-r from-gray-100 via-gray-50 to-blue-50/30 rounded-2xl">
                     {/* Image column – hidden on small screens */}
-                    <th className="hidden sm:w-2 sm:max-w-500px md:table-cell md:w-20 md:pr-9 xl:w-24 2xl:w-28 relative text-left pl-4 py-4 font-bold text-gray-700 text-sm uppercase tracking-wide after:absolute after:top-3 after:bottom-3 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-gray-300 after:to-transparent">
+                    <th className="hidden sm:w-2 sm:max-w-500px md:table-cell md:w-20 md:pr-9 lg:hidden xl:w-24 2xl:w-28 relative text-left pl-4 py-4 font-bold text-gray-700 text-sm uppercase tracking-wide after:absolute after:top-3 after:bottom-3 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-gray-300 after:to-transparent">
                       Image
                     </th>
                     {/* Name column */}
-                    <th className="w-40 sm:pr-100 md:w-60 md:pr-1 xl:w-[580px] 2xl:w-[600px] relative text-left pl-4 py-4 font-bold text-gray-700 text-sm uppercase tracking-wide after:absolute after:top-3 after:bottom-3 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-gray-300 after:to-transparent">
+                    <th className="w-30 sm:pr-100 md:w-60 lg:w-30 md:pr-1 xl:w-[580px] 2xl:w-[600px] relative text-left pl-4 py-4 font-bold text-gray-700 text-sm uppercase tracking-wide after:absolute after:top-3 after:bottom-3 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-gray-300 after:to-transparent">
                       Name
                     </th>
                     {/* Category column – hidden on small screens */}
@@ -570,12 +566,12 @@ const ProductManagement = () => {
                 <div
                   key={product.product_id}
                   // className="group flex items-center justify-between border border-gray-200 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-all duration-200 hover:border-[#0097b2] hover:bg-gray-50"
-                  className="group flex items-center justify-between border border-gray-300 rounded-xl p-4 bg-gray-50 hover:bg-white shadow-sm hover:shadow-md transition-all duration-200 hover:border-[#0097b2]"
+                  className="group flex items-center justify-between border border-gray-300 rounded-xl p-4 lg:px-2 lg:py-6 bg-gray-50 hover:bg-white shadow-sm hover:shadow-md transition-all duration-200 hover:border-[#0097b2]"
                 >
                   {/* Image */}
                   {product.image_url && (
                     // <div className="hidden md:flex w-15 h-15 bg-gray-100 rounded-lg items-center justify-center mr-4 shrink-0  hover:h-20 hover:w-20 group-hover:scale-105">
-                    <div className="hidden md:flex w-16 h-16 bg-white rounded-lg items-center justify-center mr-4 shrink-0 overflow-hidden transition-transform duration-300 group-hover:scale-105 shadow-sm group-hover:shadow-md ring-1 ring-gray-200">
+                    <div className="hidden md:flex lg:hidden xl:flex w-16 h-16 bg-white rounded-lg items-center justify-center mr-4 shrink-0 overflow-hidden transition-transform duration-300 group-hover:scale-105 shadow-sm group-hover:shadow-md ring-1 ring-gray-200">
                       <img
                         src={product.image_url}
                         alt={product.name}
@@ -588,13 +584,13 @@ const ProductManagement = () => {
                     <p className="font-bold font-sans text-xl text-gray-800 text-base leading-snug">
                       {product.name}
                     </p>
-                    <p className="text-sm text-gray-600 truncate mt-1 max-w-[200px]">
+                    <p className="text-sm text-gray-600 truncate mt-1 max-w-[200px] lg:hidden flex xl:flex">
                       {product.description}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-4 shrink-0">
-                    <div className="hidden md:flex md:pr-7  items-center lg:pr-5 ">
+                    <div className="hidden md:flex md:pr-7  items-center lg:pr-4 lg:ml-4 ">
                       {renderCategoryBadge(product.category)}
                       <span className="font-medium text-[#0097b2] text-sm md:pl-20 lg:pl-10 xl:pr-10 xl:pl-15 2xl:pl-25 2xl:pr-15">
                         {product.price || product.price_points || 0} pts

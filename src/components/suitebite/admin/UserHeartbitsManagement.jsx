@@ -13,7 +13,7 @@ import {
   HeartIcon,
   ArrowDownIcon,
   ArrowUpIcon,
-  ChevronDoubleDownIcon,
+  ChevronDownIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
 import { useStore } from "../../../store/authStore";
@@ -52,11 +52,9 @@ const UserHeartbitsManagement = () => {
     loadGlobalLimit();
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, sortBy, sortOrder]);
-
-
 
   const loadGlobalLimit = async () => {
     try {
@@ -89,10 +87,9 @@ const UserHeartbitsManagement = () => {
       setLoading(true);
       const response = await pointsSystemApi.getAllUserPoints();
 
-      console.log(response.data)
+      console.log(response.data);
 
       if (response.success) {
-
         const transformedUsers = response.data.map((user) => ({
           user_id: user.user_id,
           first_name: user.userName ? user.userName.split(" ")[0] : "",
@@ -112,9 +109,7 @@ const UserHeartbitsManagement = () => {
         }));
         setUsers(transformedUsers);
       } else {
-        toast.error(
-          "Failed to load users data. Please try again."
-        );
+        toast.error("Failed to load users data. Please try again.");
       }
     } catch (error) {
       console.error("Error loading users:", error);
@@ -128,7 +123,6 @@ const UserHeartbitsManagement = () => {
 
   const handleUpdateUserHeartbits = async (userId, updates, reason = "") => {
     try {
-
       const amount = updates.balance || 0;
       const adminReason = `Received ${amount} points from cheer`;
       if (updates.balance !== undefined) {
@@ -143,9 +137,7 @@ const UserHeartbitsManagement = () => {
       }
       loadUsersWithHeartbits();
       setSelectedUser(null);
-      toast.success(
-        `Successfully gave ${updates.balance} heartbits to user!`
-      );
+      toast.success(`Successfully gave ${updates.balance} heartbits to user!`);
     } catch (error) {
       console.error("Error updating heartbits:", error);
       toast.error(
@@ -173,9 +165,7 @@ const UserHeartbitsManagement = () => {
       }
     } catch (error) {
       console.error("Error updating global limit:", error);
-      toast.error(
-        "Failed to update global limit. Please try again."
-      );
+      toast.error("Failed to update global limit. Please try again.");
     }
   };
 
@@ -287,7 +277,7 @@ const UserHeartbitsManagement = () => {
       }
     };
 
-      // Pagination logic
+    // Pagination logic
 
     const hasChanges = heartbitsToGive > 0 && reason.trim();
 
@@ -481,175 +471,175 @@ const UserHeartbitsManagement = () => {
 
       {/* Concise Search and Filter Controls */}
 
-     <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-xl border border-white/60 mb-4">
-      {/* Header / Collapse Toggle (visible only on mobile) */}
-      <div className="flex justify-between items-center md:hidden">
-        <h2 className="text-base font-semibold text-gray-800">Filters</h2>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="flex items-center gap-2 text-sm text-[#0097b2] font-semibold hover:text-[#007c97] transition"
-        >
-          <FunnelIcon className="w-5 h-5" />
-          {isCollapsed ? "Show" : "Hide"}
-        </button>
-      </div>
+      <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl p-4 md:p-6 shadow-xl border border-white/60 mb-4">
+        {/* Header / Collapse Toggle (visible only on mobile) */}
+        <div className="flex justify-between items-center md:hidden">
+          <h2 className="text-base font-semibold text-gray-800">Filters</h2>
+          {/* <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="flex items-center gap-2 text-sm text-[#0097b2] font-semibold hover:text-[#007c97] transition"
+          >
+            <FunnelIcon className="w-5 h-5" />
+            {isCollapsed ? "Show" : "Hide"}
+          </button> */}
+        </div>
 
-      {/* Filters Wrapper */}
-<div className="bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/60">
-      {/* Search Section (Always Visible) */}
-      <div className="relative group mb-4">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="relative">
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 group-focus-within:text-[#0097b2] transition-all duration-300" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-12 py-3.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
+        {/* Filters Wrapper */}
+        {/* <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50/30 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/60"> */}
+        {/* Search Section (Always Visible) */}
+        <div className="relative group mb-4">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0097b2]/20 to-blue-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center">
+              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 group-focus-within:text-[#0097b2] transition-all duration-300" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-12 py-3.5 bg-white/80 border-2 border-gray-200 rounded-2xl text-sm font-medium
               placeholder:text-gray-400 placeholder:font-normal
               focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white 
               hover:border-gray-300 hover:shadow-lg
               transition-all duration-300"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-full transition-all duration-200"
-            >
-              <XMarkIcon className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-            </button>
-          )}
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 rounded-full transition-all duration-200"
+              >
+                <XMarkIcon className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Chevron Toggle for Filters */}
-      <button
-        className="w-full flex items-center justify-between md:hidden px-4 py-3 bg-white/70 border-2 border-gray-200 rounded-2xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all duration-300"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-      >
-        <span>Filters</span>
-        {isCollapsed ? (
-          <ChevronDoubleDownIcon className="w-5 h-5 text-gray-500" />
-        ) : (
-          <ChevronUpIcon className="w-5 h-5 text-[#0097b2]" />
-        )}
-      </button>
+        {/* Chevron Toggle for Filters */}
+        <button
+          className="w-full flex items-center justify-between md:hidden px-4 py-3 bg-white/70 border-2 border-gray-200 rounded-2xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all duration-300"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          <span>Filters</span>
+          {isCollapsed ? (
+            <ChevronDownIcon className="w-5 h-5 text-gray-500" />
+          ) : (
+            <ChevronUpIcon className="w-5 h-5 text-[#0097b2]" />
+          )}
+        </button>
 
-      {/* Filters Container */}
-      <div
-        className={`${
-          isCollapsed ? "hidden md:flex" : "flex"
-        } flex-wrap items-center gap-4 mt-4 md:mt-0 transition-all duration-500`}
-      >
-        {/* Sort Dropdown */}
-        <div className="relative group w-full sm:w-auto">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="w-full appearance-none pl-5 pr-12 py-3.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
+        {/* Filters Container */}
+        <div
+          className={`${
+            isCollapsed ? "hidden md:flex" : "flex"
+          } flex-wrap items-center gap-4 mt-4 md:mt-0 transition-all duration-500`}
+        >
+          {/* Sort Dropdown */}
+          <div className="relative group w-full sm:w-auto">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full appearance-none pl-5 pr-12 py-3.5 bg-white/90 backdrop-blur-sm border-2 border-gray-200 rounded-2xl 
             focus:ring-4 focus:outline-none focus:ring-[#0097b2]/20 focus:border-[#0097b2] focus:bg-white
             text-sm font-semibold text-gray-700 cursor-pointer
             hover:border-gray-300 hover:shadow-lg
             transition-all duration-300"
-          >
-            <option value="name">Sort by Name</option>
-            <option value="points">Sort by Points</option>
-          </select>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-            <svg
-              className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+              <option value="name">Sort by Name</option>
+              <option value="points">Sort by Points</option>
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg
+                className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2] transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.5}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
           </div>
-        </div>
 
-        {/* Sort Order Toggle */}
-        <button
-          id="sortOrder"
-          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-          className="w-full sm:w-auto px-5 py-3.5 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl 
+          {/* Sort Order Toggle */}
+          <button
+            id="sortOrder"
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            className="w-full sm:w-auto px-5 py-3.5 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl 
           text-sm font-semibold text-gray-700 
           hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg hover:shadow-[#0097b2]/10
           transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#0097b2]/20 
           active:scale-95"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <span className="group-hover:text-[#0097b2] transition-colors">
-              {sortOrder === "asc" ? "Ascending" : "Descending"}
-            </span>
-            {sortOrder === "desc" ? (
-              <ArrowDownIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2]" />
-            ) : (
-              <ArrowUpIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2]" />
-            )}
-          </div>
-        </button>
+          >
+            <div className="flex items-center justify-between gap-3">
+              <span className="group-hover:text-[#0097b2] transition-colors">
+                {sortOrder === "asc" ? "Ascending" : "Descending"}
+              </span>
+              {sortOrder === "desc" ? (
+                <ArrowDownIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2]" />
+              ) : (
+                <ArrowUpIcon className="w-5 h-5 text-gray-500 group-hover:text-[#0097b2]" />
+              )}
+            </div>
+          </button>
 
-        {/* Select All */}
-        <button
-          onClick={selectAllUsers}
-          className={`w-full sm:w-auto group px-5 py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-3
+          {/* Select All */}
+          <button
+            onClick={selectAllUsers}
+            className={`w-full sm:w-auto group px-5 py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-3
           transition-all duration-300 active:scale-95 border-2
           ${
             selectedUsers.length === filteredUsers.length
               ? "bg-gradient-to-br from-[#0097b2] to-[#0097b2]/80 text-white shadow-xl shadow-[#0097b2]/30 hover:shadow-2xl border-transparent"
               : "border-gray-200 bg-white/90 text-gray-700 hover:bg-gradient-to-br hover:from-[#0097b2]/5 hover:to-[#0097b2]/10 hover:border-[#0097b2]/50 hover:shadow-lg"
           }`}
-        >
-          <CheckIcon
-            className={`w-4 h-4 ${
-              selectedUsers.length === filteredUsers.length
-                ? "text-white"
-                : "text-transparent"
-            }`}
-          />
-          {selectedUsers.length === filteredUsers.length
-            ? "Deselect All"
-            : "Select All"}
-        </button>
+          >
+            <CheckIcon
+              className={`w-4 h-4  ${
+                selectedUsers.length === filteredUsers.length
+                  ? "text-black"
+                  : "text-black"
+              }`}
+            />
+            {selectedUsers.length === filteredUsers.length
+              ? "Deselect All"
+              : "Select All"}
+          </button>
 
-        {/* Reset */}
-        {showResetButton && (
-          <button
-            onClick={resetFilters}
-            className="w-full sm:w-auto px-5 py-3.5 bg-gradient-to-br from-rose-50 to-red-50 border-2 border-rose-200 rounded-2xl 
+          {/* Reset */}
+          {showResetButton && (
+            <button
+              onClick={resetFilters}
+              className="w-full sm:w-auto px-5 py-3.5 bg-gradient-to-br from-rose-50 to-red-50 border-2 border-rose-200 rounded-2xl 
             hover:from-rose-100 hover:to-red-100 hover:border-rose-300 hover:shadow-lg hover:shadow-rose-200/50
             text-sm font-bold text-rose-700 transition-all duration-300 active:scale-95"
-          >
-            Reset
-          </button>
-        )}
+            >
+              Reset
+            </button>
+          )}
 
-        {/* Global Limit */}
-        <button
-          onClick={() => setShowGlobalLimitModal(true)}
-          className="w-full sm:w-auto px-5 py-3.5 bg-[#0097b2] text-white rounded-2xl 
+          {/* Global Limit */}
+          <button
+            onClick={() => setShowGlobalLimitModal(true)}
+            className="w-full sm:w-auto px-5 py-3.5 bg-[#0097b2] text-white rounded-2xl 
           hover:shadow-xl text-sm font-bold flex items-center justify-center gap-3
           transition-all duration-300 active:scale-95 focus:outline-none focus:ring-4 focus:ring-[#0097b2]/30"
-        >
-          <CogIcon className="w-5 h-5" />
-          <span className="flex items-center gap-2">
-            Global Limit:
-            <span className="px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-lg font-extrabold">
-              {globalLimit}
+          >
+            <CogIcon className="w-5 h-5" />
+            <span className="flex items-center gap-2">
+              Global Limit:
+              <span className="px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-lg font-extrabold">
+                {globalLimit}
+              </span>
             </span>
-          </span>
-        </button>
+          </button>
+        </div>
+        {/* </div> */}
       </div>
-    </div>
-    </div>
 
       <div className="mt-1 pt-1">
         <div className="w-full text-center py-4 text-lg font-medium text-gray-700">
@@ -661,67 +651,75 @@ const UserHeartbitsManagement = () => {
         </div>
       </div>
 
-        {selectedUsers.length > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3 mt-3 mb-3 text-sm text-gray-600 w-full">
-            <div className="flex-1 flex justify-end">
-              <button
-                onClick={() => setShowBulkUpdateModal(true)}
-                className="px-6 py-3 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 text-base font-bold transition-all duration-200 flex items-center gap-3"
-                style={{ minWidth: "220px" }}
-              >
-                <HeartIcon className="w-6 h-6" />
-                Give to Selected ({selectedUsers.length})
-              </button>
-            </div>
+      {selectedUsers.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-3 mb-3 text-sm text-gray-600 w-full">
+          <div className="flex-1 flex justify-end">
+            <button
+              onClick={() => setShowBulkUpdateModal(true)}
+              className="px-6 py-3 bg-red-500 text-white rounded-xl shadow-lg hover:bg-red-600 text-base font-bold transition-all duration-200 flex items-center gap-3"
+              style={{ minWidth: "220px" }}
+            >
+              <HeartIcon className="w-6 h-6" />
+              Give to Selected ({selectedUsers.length})
+            </button>
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="bg-gray-10 rounded-lg">
-          {(() => {
-            const itemsPerPage = 13; 
-            const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
+      <div className="bg-gray-10 rounded-lg">
+        {(() => {
+          const itemsPerPage = 13;
+          const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
 
-            const [currentPage, setCurrentPage] = React.useState(1);
+          const [currentPage, setCurrentPage] = React.useState(1);
 
-            const indexOfLastUser = currentPage * itemsPerPage;
-            const indexOfFirstUser = indexOfLastUser - itemsPerPage;
-            const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
+          const indexOfLastUser = currentPage * itemsPerPage;
+          const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+          const currentUsers = sortedUsers.slice(
+            indexOfFirstUser,
+            indexOfLastUser
+          );
 
-            const goToPage = (page) => {
-              if (page >= 1 && page <= totalPages) {
-                setCurrentPage(page);
-                document.querySelector(".users-table-container")?.scrollTo({ top: 0, behavior: "smooth" });
-              }
-            };
+          const goToPage = (page) => {
+            if (page >= 1 && page <= totalPages) {
+              setCurrentPage(page);
+              document
+                .querySelector(".users-table-container")
+                ?.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          };
 
-            return (
-              <>
-                <div
-                  className="users-table-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4"
-                  style={{
-                    overflowY: "auto",
-                    borderRadius: "1rem",
-                  }}
-                >
-                  {sortedUsers.length === 0 ? (
-                    <div className="col-span-full text-center text-gray-500 py-12">
-                      <UserGroupIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                      <p className="text-lg font-medium text-gray-900 mb-2">No users found</p>
-                      <p className="text-sm">
-                        {searchTerm
-                          ? "Try adjusting your search criteria."
-                          : "No users are currently registered in the system."}
-                      </p>
-                    </div>
-                  ) : (
-                    currentUsers.map((user) => {
-                      const isSelected = selectedUsers.includes(user.user_id);
-                      const isActive = user.isActive === 1 || user.isActive === true;
-                      return (
-                        isActive && (
-                          <div
-                            key={user.user_id}
-                            className={`
+          return (
+            <>
+              <div
+                className="users-table-container grid grid-cols-1 sm:grid-cols-2  xl:grid-cols-4 gap-3 sm:gap-4 p-3 sm:p-4"
+                style={{
+                  overflowY: "auto",
+                  borderRadius: "1rem",
+                }}
+              >
+                {sortedUsers.length === 0 ? (
+                  <div className="col-span-full text-center text-gray-500 py-12">
+                    <UserGroupIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <p className="text-lg font-medium text-gray-900 mb-2">
+                      No users found
+                    </p>
+                    <p className="text-sm">
+                      {searchTerm
+                        ? "Try adjusting your search criteria."
+                        : "No users are currently registered in the system."}
+                    </p>
+                  </div>
+                ) : (
+                  currentUsers.map((user) => {
+                    const isSelected = selectedUsers.includes(user.user_id);
+                    const isActive =
+                      user.isActive === 1 || user.isActive === true;
+                    return (
+                      isActive && (
+                        <div
+                          key={user.user_id}
+                          className={`
                               relative group rounded-2xl border bg-white/80 backdrop-blur-sm 
                               shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer
                               flex flex-col p-4 sm:p-5
@@ -731,14 +729,14 @@ const UserHeartbitsManagement = () => {
                                   : "border-gray-200 hover:border-primary/30"
                               }
                             `}
-                            onClick={() => {
-                              if (isActive) toggleUserSelection(user.user_id);
-                            }}
-                          >
-                            {/* ✅ Checkbox */}
-                            <div className="absolute top-3 right-3">
-                              <span
-                                className={`
+                          onClick={() => {
+                            if (isActive) toggleUserSelection(user.user_id);
+                          }}
+                        >
+                          {/* ✅ Checkbox */}
+                          <div className="absolute top-3 right-3">
+                            <span
+                              className={`
                                   w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2
                                   ${
                                     isSelected
@@ -747,134 +745,165 @@ const UserHeartbitsManagement = () => {
                                   }
                                   transition-all duration-200
                                 `}
-                              >
-                                {isSelected && (
-                                  <svg
-                                    className="w-3.5 h-3.5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="3"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M5 13l4 4L19 7"
-                                    />
-                                  </svg>
-                                )}
-                              </span>
-                            </div>
+                            >
+                              {isSelected && (
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="3"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              )}
+                            </span>
+                          </div>
 
-                            {/* 🧍 User Info */}
-                            <div className="flex items-center gap-4">
-                              <div className="relative">
-                                <img
-                                  src={user.avatar || defaultAvatar}
-                                  alt={`${user.first_name || ""} ${user.last_name || ""}`.trim()}
-                                  className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-100"
-                                />
-                                <span
-                                  className={`
+                          {/* 🧍 User Info */}
+                          <div className="flex items-center gap-4">
+                            <div className="relative">
+                              <img
+                                src={user.avatar || defaultAvatar}
+                                alt={`${user.first_name || ""} ${
+                                  user.last_name || ""
+                                }`.trim()}
+                                className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-100"
+                              />
+                              <span
+                                className={`
                                     absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white
                                     ${isActive ? "bg-green-500" : "bg-gray-400"}
                                   `}
-                                />
-                              </div>
-
-                              <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-gray-900 text-base truncate">
-                                  {`${user.first_name || ""} ${user.last_name || ""}`.trim()}
-                                </p>
-                                <p className="text-sm text-gray-500">{getRoleLabel(user.user_type)}</p>
-                              </div>
+                              />
                             </div>
 
-                            {/* ❤️ Heartbits */}
-                            <div className="flex items-center gap-2 mt-4 text-sm text-gray-600">
-                              <HeartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-pink-400" />
-                              <span className="font-semibold text-[#0097b2] text-base">
-                                {user.heartbits_balance || 0}
-                              </span>
-                              <span className="text-xs text-gray-500">Heartbits</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-gray-900 text-base truncate">
+                                {`${user.first_name || ""} ${
+                                  user.last_name || ""
+                                }`.trim()}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {getRoleLabel(user.user_type)}
+                              </p>
                             </div>
                           </div>
-                        )
-                      );
-                    })
-                  )}
-                </div>
 
-                {/* === PAGINATION CONTROLS === */}
-                {/* === PAGINATION CONTROLS === */}
-                {sortedUsers.length > itemsPerPage && (
-                  <div className="flex justify-center items-center gap-1 mt-6 mb-2">
-                    <button
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="p-2 rounded-lg text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors duration-200"
-                      aria-label="Previous page"
+                          {/* ❤️ Heartbits */}
+                          <div className="flex items-center gap-2 mt-4 text-sm text-gray-600">
+                            <HeartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-pink-400" />
+                            <span className="font-semibold text-[#0097b2] text-base">
+                              {user.heartbits_balance || 0}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              Heartbits
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    );
+                  })
+                )}
+              </div>
+
+              {/* === PAGINATION CONTROLS === */}
+              {/* === PAGINATION CONTROLS === */}
+              {sortedUsers.length > itemsPerPage && (
+                <div className="flex justify-center items-center gap-1 mt-6 mb-2">
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors duration-200"
+                    aria-label="Previous page"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                  </button>
 
-                    <div className="flex gap-1 mx-2">
-                      {Array.from({ length: totalPages }, (_, i) => {
-                        const page = i + 1;
-                        const isCurrentPage = currentPage === page;
-                        const showPage = 
-                          page === 1 || 
-                          page === totalPages || 
-                          (page >= currentPage - 1 && page <= currentPage + 1);
-                        
-                        if (!showPage) {
-                          if (page === currentPage - 2 || page === currentPage + 2) {
-                            return (
-                              <span key={i} className="px-2 py-2 text-gray-400">
-                                ⋯
-                              </span>
-                            );
-                          }
-                          return null;
+                  <div className="flex gap-1 mx-2">
+                    {Array.from({ length: totalPages }, (_, i) => {
+                      const page = i + 1;
+                      const isCurrentPage = currentPage === page;
+                      const showPage =
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1);
+
+                      if (!showPage) {
+                        if (
+                          page === currentPage - 2 ||
+                          page === currentPage + 2
+                        ) {
+                          return (
+                            <span key={i} className="px-2 py-2 text-gray-400">
+                              ⋯
+                            </span>
+                          );
                         }
+                        return null;
+                      }
 
-                        return (
-                          <button
-                            key={i}
-                            onClick={() => goToPage(page)}
-                            className={`
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => goToPage(page)}
+                          className={`
                               min-w-[2.5rem] h-10 rounded-lg text-sm font-medium transition-all duration-200
-                              ${isCurrentPage
-                                ? "bg-[#0097b2] text-white shadow-md shadow-[#0097b2]/25 scale-105"
-                                : "text-gray-700 hover:bg-gray-100 hover:text-[#0097b2]"
+                              ${
+                                isCurrentPage
+                                  ? "bg-[#0097b2] text-white shadow-md shadow-[#0097b2]/25 scale-105"
+                                  : "text-gray-700 hover:bg-gray-100 hover:text-[#0097b2]"
                               }
                             `}
-                          >
-                            {page}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <button
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors duration-200"
-                      aria-label="Next page"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
+                        >
+                          {page}
+                        </button>
+                      );
+                    })}
                   </div>
-                )}
-              </>
-            );
-          })()}
-        </div>
 
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:bg-gray-100 transition-colors duration-200"
+                    aria-label="Next page"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </>
+          );
+        })()}
+      </div>
 
       {/* Modals */}
       {selectedUser && (

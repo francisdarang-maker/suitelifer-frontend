@@ -234,20 +234,20 @@ const CheerPage = () => {
     },
     onError: () => toast.error("Failed to update comment"),
   });
-  
-const deleteCommentMutation = useMutation({
+
+  const deleteCommentMutation = useMutation({
     mutationFn: ({ cheerId, commentId }) =>
       pointsSystemApi.deleteCheerComment(cheerId, commentId),
     onSuccess: async (_, variables) => {
       setLoadingComments(true);
-      
+
       // First invalidate queries to trigger refetch
       await queryClient.invalidateQueries(["cheer-feed"]);
       await refetchCheerFeed();
-      
+
       // Then reload comments for the specific cheer
       await fetchComments(variables.cheerId, false);
-      
+
       setLoadingComments(false);
       toast.success("Comment deleted!");
     },
@@ -553,7 +553,7 @@ const deleteCommentMutation = useMutation({
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-y-auto">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* LEFT: Send Cheer + Stats */}

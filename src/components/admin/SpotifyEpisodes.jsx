@@ -617,14 +617,6 @@ const SpotifyEpisodes = () => {
             </button>
 
             <ViewModeToggle viewMode={viewMode} onChange={setViewMode} />
-
-            <button
-              onClick={() => setShowShortcuts(true)}
-              className="px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm"
-              title="Keyboard shortcuts (Ctrl+/)"
-            >
-              ⌘/?
-            </button>
           </div>
         </div>
 

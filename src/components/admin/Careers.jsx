@@ -219,8 +219,8 @@ function Careers() {
         />
       </div>
 
-      <section className="px-[5%] flex gap-10 justify-center m-10">
-        <div className="text-center aspect-3/4 flex justify-center items-center size-[18%] bg-primary/5 border text-primary border-dashed rounded-2xl">
+      <section className="px-[5%] flex gap-10 justify-center items-center  mb-10 sm:m-10 ">
+        <div className="text-center aspect-3/4 flex justify-center items-center size-[100%] lg:size-[100%] xl:size-[18%] bg-primary/5 border text-primary border-dashed rounded-2xl ">
           {files.careersLeftImage === null ? (
             <div className="relative group w-full h-full aspect-3/4 rounded-2xl overflow-hidden">
               <div
@@ -278,7 +278,7 @@ function Careers() {
           )}
         </div>
 
-        <div className="text-center aspect-3/4 flex justify-center items-center size-[35%] bg-primary/5 border text-primary border-dashed rounded-2xl">
+        <div className="text-center aspect-3/4 flex justify-center items-center size-[100%] lg:size-[100%]  xl:size-[35%] bg-primary/5 border text-primary border-dashed rounded-2xl">
           {files.careersMainImage === null ? (
             <div className="relative group w-full h-full aspect-3/4 rounded-2xl overflow-hidden">
               <div
@@ -335,7 +335,7 @@ function Careers() {
           )}
         </div>
 
-        <div className="text-center aspect-3/4 flex justify-center items-center self-end size-[18%] bg-primary/5 border text-primary border-dashed rounded-2xl">
+        <div className="text-center aspect-3/4 flex justify-center items-center self-end size-[100%] lg:size-[100%]  xl:size-[18%] bg-primary/5 border text-primary border-dashed rounded-2xl">
           {files.careersRightImage === null ? (
             <div className="relative group w-full h-full aspect-3/4 rounded-2xl overflow-hidden">
               <div

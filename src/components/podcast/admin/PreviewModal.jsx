@@ -7,7 +7,7 @@ const PreviewModal = ({ open, onClose, episode }) => {
   if (!open || !episode) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 p-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 p-4 backdrop-blur-xl">
       <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
           <h2 className="text-2xl font-bold text-gray-900">Preview</h2>
@@ -16,8 +16,18 @@ const PreviewModal = ({ open, onClose, episode }) => {
             className="text-gray-500 hover:text-gray-700 transition-colors"
             aria-label="Close preview"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -34,19 +44,19 @@ const PreviewModal = ({ open, onClose, episode }) => {
                 {episode.embedType}
               </span>
             </InfoRow>
-            
+
             <InfoRow label="Created by:">
               <span className="text-sm font-semibold text-gray-900">
                 {episode.createdBy || "N/A"}
               </span>
             </InfoRow>
-            
+
             <InfoRow label="Date created:">
               <span className="text-sm font-semibold text-gray-900">
                 {formatTimestamp(episode.createdAt || "N/A").fullDate}
               </span>
             </InfoRow>
-            
+
             <InfoRow label="Spotify ID:">
               <span className="text-xs font-mono text-gray-700 bg-white px-2 py-1 rounded">
                 {episode.spotifyId}

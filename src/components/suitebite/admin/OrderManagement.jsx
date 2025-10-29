@@ -113,7 +113,6 @@ const OrderManagement = () => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
 
-
   useEffect(() => {
     // Only load orders if we don't have any or if filters have changed
     const currentFilters = { statusFilter, dateRange };
@@ -271,9 +270,7 @@ const OrderManagement = () => {
       }
 
       if (successCount > 0) {
-        toast.success(
-          `Successfully deleted ${successCount} order(s)`
-        );
+        toast.success(`Successfully deleted ${successCount} order(s)`);
         if (errorCount > 0) {
           toast.error(`Failed to delete ${errorCount} order(s)`);
         }
@@ -330,9 +327,7 @@ const OrderManagement = () => {
         toast.success("Order approved successfully!");
         await refreshOrders(); // Use optimized refresh
       } else {
-        toast.error(
-          response.message || "Failed to approve order"
-        );
+        toast.error(response.message || "Failed to approve order");
       }
     } catch (error) {
       console.error("Error approving order:", error);
@@ -367,9 +362,7 @@ const OrderManagement = () => {
         toast.success("Order completed successfully!");
         await refreshOrders(); // Use optimized refresh
       } else {
-        toast.error(
-          response.message || "Failed to complete order"
-        );
+        toast.error(response.message || "Failed to complete order");
       }
     } catch (error) {
       console.error("Error completing order:", error);
@@ -870,9 +863,7 @@ const OrderManagement = () => {
     }
 
     setShowExportModal(false);
-    toast.success(
-      `Exported ${ordersToExport.length} orders successfully!`
-    );
+    toast.success(`Exported ${ordersToExport.length} orders successfully!`);
   };
 
   // Get deletable orders count for select all functionality
@@ -1065,7 +1056,7 @@ const OrderManagement = () => {
         </div>
 
         {/* Desktop: Grid layout (your existing layout) */}
-        <div className="hidden lg:grid grid-cols-5 gap-4">
+        <div className="hidden lg:grid grid-cols-5 lg:grid-cols-2 xl:grid-cols-5 gap-4">
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:border-gray-400 transition-all">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
@@ -1518,7 +1509,6 @@ const OrderManagement = () => {
                         </button>
                       )}
                     </div>
-
                   </div>
 
                   {/* Status Timeline */}

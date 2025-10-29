@@ -630,7 +630,7 @@ const ShoppingCart = ({
           ) : (
             <div className="space-y-3 sm:space-y-4">
               {/* Selection Controls */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 p-3 bg-gray-50 rounded-lg">
+              <div className="flex flex-row justify-between sm:items-center sm:justify-between gap-2 sm:gap-0 p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"

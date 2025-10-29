@@ -24,7 +24,7 @@ const Button = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors disabled:cursor-not-allowed ${variants[variant]} ${className}`}
+      className={`flex flex-row items-center justify-start gap-0 lg:gap-0 px-4 py-2 rounded-lg font-medium transition-colors disabled:cursor-not-allowed ${variants[variant]} ${className}`}
       {...props}
     >
       {icon && <span className="flex-shrink-0">{icon}</span>}

@@ -514,8 +514,6 @@ function AdminNewsLetterToggle() {
         {(!selectedMonthlyIssue || selectedMonthlyIssue.month === undefined) &&
         !isOpenArticleForm ? (
           <>
-            
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
                 <div className="flex items-center justify-between">
@@ -527,7 +525,7 @@ function AdminNewsLetterToggle() {
                       {totalIssues}
                     </p>
                   </div>
-                  <div className="p-3 bg-blue-100 rounded-xl">
+                  <div className="p-3 bg-blue-100 rounded-xl lg:hidden xl:inline-flex">
                     <NewspaperIcon className="w-6 h-6 text-blue-600" />
                   </div>
                 </div>
@@ -543,7 +541,7 @@ function AdminNewsLetterToggle() {
                       {publishedIssues}
                     </p>
                   </div>
-                  <div className="p-3 bg-emerald-100 rounded-xl">
+                  <div className="p-3 bg-emerald-100 rounded-xl lg:hidden xl:inline-flex">
                     <CheckCircleIcon className="w-6 h-6 text-emerald-600" />
                   </div>
                 </div>
@@ -559,7 +557,7 @@ function AdminNewsLetterToggle() {
                       {totalArticles}
                     </p>
                   </div>
-                  <div className="p-3 bg-indigo-100 rounded-xl">
+                  <div className="p-3 bg-indigo-100 rounded-xl lg:hidden xl:inline-flex">
                     <FileText className="w-6 h-6 text-indigo-600" />
                   </div>
                 </div>
@@ -658,7 +656,7 @@ function AdminNewsLetterToggle() {
               </div>
 
               {issues.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {issues.map((issue) => (
                     <div
                       key={issue.issueId}
@@ -666,7 +664,7 @@ function AdminNewsLetterToggle() {
                         handleMonthClick(issue);
                         setPrevClickedIssue(issue);
                       }}
-                      className="group bg-white border-2 rounded-2xl p-6 cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1"
+                      className="group bg-white border-2 rounded-2xl p-6 cursor-pointer hover:shadow-xl transition-all hover:-translate-y-1 lg:p-3"
                       style={{
                         borderColor: issue.is_published
                           ? "#10b981"
@@ -675,7 +673,7 @@ function AdminNewsLetterToggle() {
                           : "#F57C00",
                       }}
                     >
-                      <div className="flex items-center gap-3 mb-4">
+                      <div className="flex flex-wrap lg:flex-col lg:gap-0 xl:flex-row items-start gap-2 mb-4 ">
                         <div
                           className="w-3 h-3 rounded-full"
                           style={{
@@ -690,11 +688,11 @@ function AdminNewsLetterToggle() {
                           {getMonthName(issue.month)}
                         </h3>
                         {issue.is_published ? (
-                          <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium">
+                          <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-medium md:ml-auto lg:mt-1 lg:ml-0 xl:ml-auto">
                             Published
                           </span>
                         ) : (
-                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-medium">
+                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-medium  md:ml-auto  lg:mt-1  lg:ml-0 xl:ml-auto">
                             Unpublished
                           </span>
                         )}
