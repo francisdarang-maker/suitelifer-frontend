@@ -121,52 +121,65 @@ const PointsDashboard = () => {
   }, []);
 
   // Helper function to group bulk cheers
-  const groupBulkCheers = useCallback((transactions) => {
-    if (!Array.isArray(transactions)) return [];
-    
-    const grouped = new Map();
-    const nonCheerTransactions = [];
+  const groupBulkCheers = useCallback(
+    (transactions) => {
+      if (!Array.isArray(transactions)) return [];
 
-    transactions.forEach((transaction) => {
-      // Group both "received" and "given" type transactions
-      if ((transaction.type === "received" || transaction.type === "given") && transaction.message) {
-        const createdAt = new Date(transaction.created_at || transaction.createdAt);
-        const timeKey = Math.floor(createdAt.getTime() / 60000); // Group by minute
-        
-        // For "given", group by current user (sender), for "received" group by sender
-        const groupKey = transaction.type === "given" 
-          ? `${user.id}-${timeKey}-${transaction.message}-given`
-          : `${transaction.fromUserId}-${timeKey}-${transaction.message}-received`;
+      const grouped = new Map();
+      const nonCheerTransactions = [];
 
-        if (!grouped.has(groupKey)) {
-          grouped.set(groupKey, {
-            ...transaction,
-            recipients: [transaction.related_user || "Unknown"],
-            totalAmount: transaction.amount,
-            transaction_ids: [transaction.transactionId || transaction.transaction_id],
-            isBulkCheer: false,
-          });
+      transactions.forEach((transaction) => {
+        // Group both "received" and "given" type transactions
+        if (
+          (transaction.type === "received" || transaction.type === "given") &&
+          transaction.message
+        ) {
+          const createdAt = new Date(
+            transaction.created_at || transaction.createdAt
+          );
+          const timeKey = Math.floor(createdAt.getTime() / 60000); // Group by minute
+
+          // For "given", group by current user (sender), for "received" group by sender
+          const groupKey =
+            transaction.type === "given"
+              ? `${user.id}-${timeKey}-${transaction.message}-given`
+              : `${transaction.fromUserId}-${timeKey}-${transaction.message}-received`;
+
+          if (!grouped.has(groupKey)) {
+            grouped.set(groupKey, {
+              ...transaction,
+              recipients: [transaction.related_user || "Unknown"],
+              totalAmount: transaction.amount,
+              transaction_ids: [
+                transaction.transactionId || transaction.transaction_id,
+              ],
+              isBulkCheer: false,
+            });
+          } else {
+            const existing = grouped.get(groupKey);
+            existing.recipients.push(transaction.related_user || "Unknown");
+            existing.totalAmount += transaction.amount;
+            existing.transaction_ids.push(
+              transaction.transactionId || transaction.transaction_id
+            );
+            existing.isBulkCheer = true;
+          }
         } else {
-          const existing = grouped.get(groupKey);
-          existing.recipients.push(transaction.related_user || "Unknown");
-          existing.totalAmount += transaction.amount;
-          existing.transaction_ids.push(transaction.transactionId || transaction.transaction_id);
-          existing.isBulkCheer = true;
+          // Keep non-cheer transactions as-is
+          nonCheerTransactions.push(transaction);
         }
-      } else {
-        // Keep non-cheer transactions as-is
-        nonCheerTransactions.push(transaction);
-      }
-    });
+      });
 
-    // Combine grouped and non-grouped transactions
-    const groupedArray = Array.from(grouped.values());
-    return [...groupedArray, ...nonCheerTransactions].sort((a, b) => {
-      const dateA = new Date(a.created_at || a.createdAt);
-      const dateB = new Date(b.created_at || b.createdAt);
-      return dateB - dateA; // Most recent first
-    });
-  }, [user.id]);
+      // Combine grouped and non-grouped transactions
+      const groupedArray = Array.from(grouped.values());
+      return [...groupedArray, ...nonCheerTransactions].sort((a, b) => {
+        const dateA = new Date(a.created_at || a.createdAt);
+        const dateB = new Date(b.created_at || b.createdAt);
+        return dateB - dateA; // Most recent first
+      });
+    },
+    [user.id]
+  );
 
   // Queries
   const {
@@ -334,20 +347,23 @@ const PointsDashboard = () => {
     // Handle bulk cheer display for GIVEN transactions
     if (transaction.isBulkCheer && transaction.type === "given") {
       const recipientCount = transaction.recipients.length;
-      displayDescription = `Cheered ${recipientCount} ${recipientCount === 1 ? 'person' : 'people'}`;
+      displayDescription = `Cheered ${recipientCount} ${
+        recipientCount === 1 ? "person" : "people"
+      }`;
     }
     // Handle bulk cheer display for RECEIVED transactions
     else if (transaction.isBulkCheer && transaction.type === "received") {
       const sender = transaction.related_user || "Someone";
       const recipientCount = transaction.recipients.length;
-      
+
       if (recipientCount > 1) {
-        displayDescription = `${sender} cheered you and ${recipientCount - 1} ${recipientCount - 1 === 1 ? 'other' : 'others'}`;
+        displayDescription = `${sender} cheered you and ${recipientCount - 1} ${
+          recipientCount - 1 === 1 ? "other" : "others"
+        }`;
       } else {
         displayDescription = `Received ${transaction.amount} heartbits from ${sender}`;
       }
-    } 
-    else if (
+    } else if (
       transaction.type === "received" &&
       displayDescription?.includes("points")
     ) {
@@ -364,11 +380,19 @@ const PointsDashboard = () => {
       );
     }
 
-    if (transaction.type === "given" && !displayDescription && !transaction.isBulkCheer) {
+    if (
+      transaction.type === "given" &&
+      !displayDescription &&
+      !transaction.isBulkCheer
+    ) {
       displayDescription = `Cheered ${transaction.amount} heartbits`;
     }
 
-    if (transaction.type === "received" && !displayDescription && !transaction.isBulkCheer) {
+    if (
+      transaction.type === "received" &&
+      !displayDescription &&
+      !transaction.isBulkCheer
+    ) {
       displayDescription = `Received ${transaction.amount} heartbits`;
     }
 
@@ -443,7 +467,7 @@ const PointsDashboard = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-4">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-4 mb-30">
         {/* Moderation Notification */}
         {moderationNotification && (
           <ModerationBanner
@@ -520,7 +544,11 @@ const PointsDashboard = () => {
               <div className="space-y-2.5">
                 {filteredTransactions.map((transaction, index) => (
                   <TransactionCard
-                    key={transaction.transaction_ids ? transaction.transaction_ids.join('-') : index}
+                    key={
+                      transaction.transaction_ids
+                        ? transaction.transaction_ids.join("-")
+                        : index
+                    }
                     transaction={transaction}
                     display={getTransactionDisplay(transaction)}
                     getUserAvatar={getUserAvatar}
@@ -685,10 +713,10 @@ const TransactionCard = ({
   const { displayDescription, isNegative, isAdminTransaction, senderLabel } =
     display;
 
-  const transactionKey = transaction.transaction_ids 
-    ? transaction.transaction_ids.join('-') 
+  const transactionKey = transaction.transaction_ids
+    ? transaction.transaction_ids.join("-")
     : transaction.transactionId || transaction.transaction_id;
-  
+
   const isExpanded = expandedTransactions.has(transactionKey);
 
   const toggleExpanded = () => {
@@ -715,7 +743,9 @@ const TransactionCard = ({
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-blue-500"
               />
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
-                <span className="text-white text-[8px] sm:text-[9px] font-bold">A</span>
+                <span className="text-white text-[8px] sm:text-[9px] font-bold">
+                  A
+                </span>
               </div>
             </div>
           ) : transaction.related_user || transaction.isBulkCheer ? (
@@ -747,42 +777,57 @@ const TransactionCard = ({
                     )}
                   </span>
                 </div>
-                {transaction.isBulkCheer && transaction.type === "given" && transaction.recipients.length > 0 && (
-                  <>
-                    <span className="text-[10px] sm:text-xs text-gray-400">•</span>
-                    <span className="text-[10px] sm:text-xs text-gray-600">
-                      to{' '}
-                      <span className="font-semibold text-primary">
-                        {transaction.recipients.length} {transaction.recipients.length === 1 ? 'person' : 'people'}
+                {transaction.isBulkCheer &&
+                  transaction.type === "given" &&
+                  transaction.recipients.length > 0 && (
+                    <>
+                      <span className="text-[10px] sm:text-xs text-gray-400">
+                        •
                       </span>
-                    </span>
-                  </>
-                )}
+                      <span className="text-[10px] sm:text-xs text-gray-600">
+                        to{" "}
+                        <span className="font-semibold text-primary">
+                          {transaction.recipients.length}{" "}
+                          {transaction.recipients.length === 1
+                            ? "person"
+                            : "people"}
+                        </span>
+                      </span>
+                    </>
+                  )}
                 {transaction.isBulkCheer && transaction.type === "received" && (
                   <>
-                    <span className="text-[10px] sm:text-xs text-gray-400">•</span>
+                    <span className="text-[10px] sm:text-xs text-gray-400">
+                      •
+                    </span>
                     <span className="text-[10px] sm:text-xs text-gray-600 break-words">
-                      from{' '}
+                      from{" "}
                       <span className="font-semibold text-primary">
                         {transaction.related_user || "Someone"}
                       </span>
                     </span>
                   </>
                 )}
-                {!transaction.isBulkCheer && transaction.related_user && !isAdminTransaction && (
-                  <>
-                    <span className="text-[10px] sm:text-xs text-gray-400">•</span>
-                    <span className="text-[10px] sm:text-xs text-gray-600 break-words">
-                      {transaction.type === "given" ? "to" : "from"}{" "}
-                      <span className="font-semibold text-primary">
-                        {senderLabel}
+                {!transaction.isBulkCheer &&
+                  transaction.related_user &&
+                  !isAdminTransaction && (
+                    <>
+                      <span className="text-[10px] sm:text-xs text-gray-400">
+                        •
                       </span>
-                    </span>
-                  </>
-                )}
+                      <span className="text-[10px] sm:text-xs text-gray-600 break-words">
+                        {transaction.type === "given" ? "to" : "from"}{" "}
+                        <span className="font-semibold text-primary">
+                          {senderLabel}
+                        </span>
+                      </span>
+                    </>
+                  )}
                 {isAdminTransaction && (
                   <>
-                    <span className="text-[10px] sm:text-xs text-gray-400">•</span>
+                    <span className="text-[10px] sm:text-xs text-gray-400">
+                      •
+                    </span>
                     <span className="text-[10px] sm:text-xs font-medium text-blue-600">
                       from Admin
                     </span>
@@ -791,43 +836,55 @@ const TransactionCard = ({
               </div>
 
               {/* Show recipient list for bulk cheers */}
-              {transaction.isBulkCheer && transaction.type === "given" && transaction.recipients.length > 0 && (
-                <div className="mt-1.5 sm:mt-2">
-                  <div className="w-full p-1.5 sm:p-2 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary">
-                    <p className="text-[10px] sm:text-xs text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
-                      <span className="font-semibold text-primary">Cheered to: </span>
-                      {transaction.recipients.slice(0, isExpanded ? transaction.recipients.length : 2).map((name, idx, arr) => (
-                        <span key={idx}>
-                          {name}
-                          {idx < arr.length - 1 && ', '}
+              {transaction.isBulkCheer &&
+                transaction.type === "given" &&
+                transaction.recipients.length > 0 && (
+                  <div className="mt-1.5 sm:mt-2">
+                    <div className="w-full p-1.5 sm:p-2 border-none rounded-md bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary">
+                      <p className="text-[10px] sm:text-xs text-gray-700 leading-relaxed whitespace-pre-wrap break-words">
+                        <span className="font-semibold text-primary">
+                          Cheered to:{" "}
                         </span>
-                      ))}
-                      {!isExpanded && transaction.recipients.length > 2 && (
-                        <>
-                          {' and '}
-                          <button
-                            onClick={toggleExpanded}
-                            className="inline-block text-primary hover:text-primary/80 font-semibold underline transition-colors touch-manipulation"
-                          >
-                            {transaction.recipients.length - 2} {transaction.recipients.length - 2 === 1 ? 'other' : 'others'}
-                          </button>
-                        </>
-                      )}
-                      {isExpanded && transaction.recipients.length > 2 && (
-                        <>
-                          {'. '}
-                          <button
-                            onClick={toggleExpanded}
-                            className="inline-block text-primary hover:text-primary/80 font-semibold underline transition-colors touch-manipulation"
-                          >
-                            Show less
-                          </button>
-                        </>
-                      )}
-                    </p>
+                        {transaction.recipients
+                          .slice(
+                            0,
+                            isExpanded ? transaction.recipients.length : 2
+                          )
+                          .map((name, idx, arr) => (
+                            <span key={idx}>
+                              {name}
+                              {idx < arr.length - 1 && ", "}
+                            </span>
+                          ))}
+                        {!isExpanded && transaction.recipients.length > 2 && (
+                          <>
+                            {" and "}
+                            <button
+                              onClick={toggleExpanded}
+                              className="inline-block text-primary hover:text-primary/80 font-semibold underline transition-colors touch-manipulation"
+                            >
+                              {transaction.recipients.length - 2}{" "}
+                              {transaction.recipients.length - 2 === 1
+                                ? "other"
+                                : "others"}
+                            </button>
+                          </>
+                        )}
+                        {isExpanded && transaction.recipients.length > 2 && (
+                          <>
+                            {". "}
+                            <button
+                              onClick={toggleExpanded}
+                              className="inline-block text-primary hover:text-primary/80 font-semibold underline transition-colors touch-manipulation"
+                            >
+                              Show less
+                            </button>
+                          </>
+                        )}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
             <span
               className={`flex-shrink-0 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold ${
@@ -837,7 +894,9 @@ const TransactionCard = ({
               }`}
             >
               {isNegative ? "-" : "+"}
-              {transaction.isBulkCheer ? transaction.totalAmount : transaction.amount}
+              {transaction.isBulkCheer
+                ? transaction.totalAmount
+                : transaction.amount}
               {["received", "given"].includes(transaction.type)
                 ? " bits"
                 : " pts"}

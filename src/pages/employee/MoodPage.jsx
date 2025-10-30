@@ -388,7 +388,7 @@ const MoodPage = () => {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Share your thoughts, feelings, or what made this moment special..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none shadow-sm"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none shadow-sm focus:outline-none"
                     rows="4"
                   />
                 </div>
@@ -650,7 +650,7 @@ const MoodPage = () => {
                   </span>
                 </div>
 
-                <div className="max-h-[690px] overflow-y-auto p-6">
+                <div className="max-h-[690px] overflow-y-auto p-6 mb-15 lg:mb-0">
                   {moodHistory.length > 0 ? (
                     <div className="space-y-3">
                       {moodHistory.slice(0, 20).map((mood) => (

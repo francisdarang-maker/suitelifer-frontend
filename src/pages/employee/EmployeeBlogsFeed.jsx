@@ -17,13 +17,17 @@ const EmployeeBlogsFeed = () => {
   const [events, setEvents] = useState([]);
   const navigate = useNavigate();
 
-  const observer = useRef()
-  
+  const observer = useRef();
+
   const fetchEmployeeBlogs = async (pageNum = 1) => {
     setIsLoading(true);
     try {
-      const { data } = await api.get(`/api/all-employee-blog?page=${pageNum}&limit=10`);
-      const sorted = data.blogs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const { data } = await api.get(
+        `/api/all-employee-blog?page=${pageNum}&limit=10`
+      );
+      const sorted = data.blogs.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
 
       if (pageNum === 1) {
         setEmployeeblogs(sorted);
@@ -37,9 +41,9 @@ const EmployeeBlogsFeed = () => {
     } finally {
       setIsLoading(false);
     }
-};
+  };
 
-const lastBlogRef = useCallback(
+  const lastBlogRef = useCallback(
     (node) => {
       if (isLoading) return;
       if (observer.current) observer.current.disconnect();
@@ -55,15 +59,14 @@ const lastBlogRef = useCallback(
     [isLoading, hasMore]
   );
 
-    useEffect(() => {
-      if (page === 1) return;
-      fetchEmployeeBlogs(page);
-    }, [page]);
+  useEffect(() => {
+    if (page === 1) return;
+    fetchEmployeeBlogs(page);
+  }, [page]);
 
-    useEffect(() => {
-      fetchEmployeeBlogs(1);
-    }, []);
-
+  useEffect(() => {
+    fetchEmployeeBlogs(1);
+  }, []);
 
   // Fetch & adjust events
   const fetchEvents = async () => {
@@ -103,27 +106,27 @@ const lastBlogRef = useCallback(
   };
 
   return (
-    <section className="min-h-screen bg-white mb-2 mt-10 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24">
+    <section className="min-h-screen bg-white mb-2 mt-10 px-4 sm:px-6 md:px-10 lg:px-10 xl:px-24">
       {id ? (
         <Outlet />
       ) : (
         <>
           {/* Info banner */}
-           {isLoading && (
-              <div className="flex justify-center mt-4">
+          {isLoading && (
+            <div className="flex justify-center mt-4">
               <Loader />
-              </div>
-            )}
-           {
-            weeklyEvents.length > 0 && ( 
-              <div
+            </div>
+          )}
+          {weeklyEvents.length > 0 && (
+            <div
               className="bg-primary rounded-md p-3 flex justify-between mb-5 lg:hidden"
               onClick={handleEventClick}
             >
               <div className="flex gap-2">
                 <TicketIcon className="w-5 h-5 text-white" />
                 <span className="text-white text-sm">
-                  {weeklyEvents.length} {weeklyEvents.length === 1 ? "event" : "events"} this week
+                  {weeklyEvents.length}{" "}
+                  {weeklyEvents.length === 1 ? "event" : "events"} this week
                 </span>
               </div>
               <div className="flex gap-1 items-center">
@@ -131,20 +134,15 @@ const lastBlogRef = useCallback(
                 <ChevronRightIcon className="w-3 h-3 text-white" />
               </div>
             </div>
-            )
-           }
+          )}
 
           {/* Create Post Section - Facebook Style */}
-          {
-            
-            <CreatePostCard fetchEmployeeBlogs={fetchEmployeeBlogs}/>
-          }
+          {<CreatePostCard fetchEmployeeBlogs={fetchEmployeeBlogs} />}
 
           {/* Feed */}
           <main>
-           
-            {eBlogs.length > 0 ? (
-                eBlogs.map((blog, index) => {
+            {eBlogs.length > 0
+              ? eBlogs.map((blog, index) => {
                   if (index === eBlogs.length - 1) {
                     return (
                       <div ref={lastBlogRef} key={index} className="mb-4">
@@ -158,8 +156,7 @@ const lastBlogRef = useCallback(
                       </div>
                     );
                   }
-                }
-                ))
+                })
               : !isLoading && (
                   <div className="flex flex-col items-center justify-center mt-20 text-center">
                     <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 max-w-sm">
@@ -181,11 +178,11 @@ const lastBlogRef = useCallback(
                   </div>
                 )}
 
-                {!hasMore && !isLoading && (
-                <div className="text-center text-gray-500 py-6">
-                  🎉 You’ve reached the end of the feed.
-                </div>
-              )}
+            {!hasMore && !isLoading && (
+              <div className="text-center text-gray-500 py-6">
+                🎉 You’ve reached the end of the feed.
+              </div>
+            )}
           </main>
         </>
       )}

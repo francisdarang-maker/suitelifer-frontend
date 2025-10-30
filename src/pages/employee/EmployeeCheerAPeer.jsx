@@ -553,9 +553,9 @@ const CheerPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white overflow-y-auto">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div className="min-h-screen bg-white overflow-y-auto ">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2 lg:mb-0 ">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 ">
           {/* LEFT: Send Cheer + Stats */}
           <div className="space-y-4 ">
             {/* Send Cheer Card */}
@@ -614,8 +614,8 @@ const CheerPage = () => {
                         ? `Limit reached (${MAX_RECIPIENTS} people)`
                         : "Type a name..."
                     }
-                    disabled={selectedUsers.length >= MAX_RECIPIENTS} // ✅ Disable when full
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm ${
+                    disabled={selectedUsers.length >= MAX_RECIPIENTS} //
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm focus:outline-none ${
                       selectedUsers.length >= MAX_RECIPIENTS
                         ? "bg-gray-100 cursor-not-allowed opacity-70"
                         : ""
@@ -679,7 +679,7 @@ const CheerPage = () => {
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     placeholder="Share why they deserve recognition..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none focus:outline-none"
                     rows="3"
                     required
                   />
@@ -1439,7 +1439,7 @@ const CheerPage = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="px-5 py-3 border-t border-gray-200">
+                <div className="px-5 py-3 border-t border-gray-200 mb-15 lg:mb-0">
                   <div className="flex items-center justify-center gap-1">
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}

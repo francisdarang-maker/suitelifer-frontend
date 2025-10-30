@@ -83,13 +83,13 @@ const SuitebiteShop = () => {
     fetchVariationData();
   }, []);
 
-  // const showNotification = (type, message) => {
-  //   setNotification({ show: true, type, message });
-  //   setTimeout(
-  //     () => setNotification({ show: false, type: "", message: "" }),
-  //     5000
-  //   );
-  // };
+  const showNotification = (type, message) => {
+    setNotification({ show: true, type, message });
+    setTimeout(
+      () => setNotification({ show: false, type: "", message: "" }),
+      5000
+    );
+  };
 
   const loadShopData = async () => {
     try {
@@ -123,7 +123,7 @@ const SuitebiteShop = () => {
         setProducts(mappedProducts);
         syncCategoriesFromProducts(mappedProducts);
       } else {
-        toast.error("Failed to load products");
+        toast.error("error", "Failed to load products");
         console.error("❌ Products response failed:", productsResponse);
       }
 
@@ -158,12 +158,12 @@ const SuitebiteShop = () => {
         setUserHeartbits(heartbits);
       } else {
         console.error("❌ Heartbits response failed:", heartbitsResponse);
-        toast.error("Failed to load heartbits balance");
+        toast.error("error", "Failed to load heartbits balance");
         setUserHeartbits(0);
       }
     } catch (error) {
       console.error("Error loading shop data:", error);
-      toast.error("Failed to load shop data");
+      toast.error("error", "Failed to load shop data");
       setProducts([]);
       setCart([]);
       setUserHeartbits(0);
@@ -243,16 +243,14 @@ const SuitebiteShop = () => {
       const response = await suitebiteAPI.addToCart(cartData);
 
       if (response.success) {
-        toast.success("Item added to cart! 🛒");
+        toast.success("success", "Item added to cart! 🛒");
         await updateCartAndHeartbits();
       } else {
-        toast.error(
-          response.message || "Failed to add item to cart"
-        );
+        toast.error("error", response.message || "Failed to add item to cart");
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Failed to add item to cart");
+      toast.error("error", "Failed to add item to cart");
     }
   };
 
@@ -275,15 +273,16 @@ const SuitebiteShop = () => {
               : item
           )
         );
-        toast.success("Quantity updated!");
+        showNotification("success", "Quantity updated!");
       } else {
-        toast.error(
+        showNotification(
+          "error",
           response.message || "Failed to update quantity"
         );
       }
     } catch (error) {
       console.error("Error updating quantity:", error);
-      toast.error("Failed to update quantity");
+      showNotification("error", "Failed to update quantity");
     }
   };
 
@@ -295,13 +294,13 @@ const SuitebiteShop = () => {
         setCart((prevCart) =>
           prevCart.filter((item) => item.cart_item_id !== itemId)
         );
-        toast.success("Item removed from cart");
+        toast.success("success", "Item removed from cart");
       } else {
-        toast.error(response.message || "Failed to remove item");
+        toast.error("error", response.message || "Failed to remove item");
       }
     } catch (error) {
       console.error("Error removing item:", error);
-      toast.error("Failed to remove item");
+      toast.error("error", "Failed to remove item");
     }
   };
 
@@ -316,10 +315,11 @@ const SuitebiteShop = () => {
         await updateCartAndHeartbits();
 
         toast.success(
+          "success",
           "Order placed successfully! Awaiting admin approval. 🎉"
         );
       } else {
-        toast.error(response.message || "Checkout failed");
+        toast.error("error", response.message || "Checkout failed");
       }
     } catch (error) {
       console.error("Error during checkout:", error);
@@ -327,9 +327,9 @@ const SuitebiteShop = () => {
       console.error("Error status:", error.response?.status);
 
       if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
+        showNotification("error", error.response.data.message);
       } else {
-        toast.error("Checkout failed. Please try again.");
+        showNotification("error", "Checkout failed. Please try again.");
       }
     }
   };
@@ -384,11 +384,11 @@ const SuitebiteShop = () => {
         }
         setModalInitialSelectedOptions(initialOptions);
       } else {
-        toast.error("Product not found");
+        toast.error("error", "Product not found");
       }
     } catch (error) {
       console.error("Error fetching product for modal:", error);
-      toast.error("Failed to load product details");
+      toast.error("error", "Failed to load product details");
     }
   };
 
@@ -565,7 +565,7 @@ const SuitebiteShop = () => {
                             sm:text-xs sm:text-base shadow-sm hover:shadow-md 
                             transition-all duration-300 ease-in-out sm:h-10 sm:w-[100%] h-2"
                 >
-                  <div className="hidden lg:inline text-sm">Heartbits</div>
+                  <div className=" inline text-sm">Heartbits</div>
 
                   <span className="tracking-wide drop-shadow-sm text-sm">
                     {transformCurrentBalance(currentBalance)}
@@ -848,17 +848,18 @@ const SuitebiteShop = () => {
               const response = await suitebiteAPI.checkout(orderData);
 
               if (response.success) {
-                toast.success("Order placed successfully!");
+                showNotification("success", "Order placed successfully!");
                 setIsModalOpen(false);
                 await updateHeartbitsOnly();
               } else {
-                toast.error(
+                showNotification(
+                  "error",
                   response.message || "Failed to place order"
                 );
               }
             } catch (error) {
               console.error("Error with buy now:", error);
-              toast.error("Buy now failed. Please try again.");
+              showNotification("error", "Buy now failed. Please try again.");
             }
           }}
           userHeartbits={userHeartbits}

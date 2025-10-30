@@ -18,7 +18,7 @@ const EventSummary = () => {
   const getCategoryColor = (category) =>
     CATEGORY_COLORS[category?.toLowerCase()] || CATEGORY_COLORS.others;
 
-  console.log(events)
+  console.log(events);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-10">
@@ -39,7 +39,7 @@ const EventSummary = () => {
       {events.length === 0 ? (
         <p className="text-gray-500 text-sm">No events scheduled this week.</p>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 mb-20">
           {events.map((event) => {
             const color = getCategoryColor(event.category);
             return (
