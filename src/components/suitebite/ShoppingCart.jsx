@@ -153,13 +153,6 @@ const ShoppingCart = ({
     return selectedItems.size > 0 && realTimeHeartbits >= selectedItemsTotal;
   };
 
-  // const showNotification = (type, message) => {
-  //   setNotification({ show: true, type, message });
-  //   setTimeout(
-  //     () => setNotification({ show: false, type: "", message: "" }),
-  //     3000
-  //   );
-  // };
 
   const setItemLoadingState = (itemId, state) => {
     setItemLoadingStates((prev) => ({ ...prev, [itemId]: state }));
@@ -187,35 +180,7 @@ const ShoppingCart = ({
     setSelectedItems(newSelected);
   };
 
-  // const handleCheckout = async () => {
-  //   if (!canCheckout() || isCheckingOut) return;
 
-  //   try {
-  //     setIsCheckingOut(true);
-
-  //     // Update real-time heartbits optimistically
-  //     setRealTimeHeartbits((prev) => Math.max(0, prev - selectedItemsTotal));
-
-  //     // Filter cart to only selected items
-  //     const selectedCartItems = uniqueCart.filter((item) =>
-  //       selectedItems.has(item.cart_item_id)
-  //     );
-  //     await onCheckout(selectedCartItems);
-
-  //     // Clear selected items after successful checkout
-  //     setSelectedItems(new Set());
-  //     showNotification(
-  //       "success",
-  //       "Order placed successfully! Awaiting admin approval. 🎉"
-  //     );
-  //   } catch (error) {
-  //     // Revert optimistic update on error
-  //     setRealTimeHeartbits(userHeartbits);
-  //     showNotification("error", "Checkout failed. Please try again.");
-  //   } finally {
-  //     setIsCheckingOut(false);
-  //   }
-  // };
   const handleCheckout = async () => {
     if (!canCheckout() || isCheckingOut) return;
 

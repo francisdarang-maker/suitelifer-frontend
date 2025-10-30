@@ -78,14 +78,6 @@ const OrderHistory = ({ onCartUpdate, onHeartbitsUpdate, onPointsUpdate }) => {
     }
   }, []);
 
-  // const showNotification = (type, message) => {
-  //   setNotification({ show: true, type, message });
-  //   setTimeout(
-  //     () => setNotification({ show: false, type: "", message: "" }),
-  //     4000
-  //   );
-  // };
-
   // Function to refresh order history when needed (e.g., after order actions)
   const refreshOrderHistory = async () => {
     setLastLoadTime(0); // Reset cache

@@ -80,9 +80,9 @@ function EventWeekView({
         {/* Week Grid - Responsive */}
         <div
           className="
-            grid grid-cols-7 divide-x divide-gray-200
+            grid grid-cols-7 lg:grid-cols-4 xl:grid-cols-7 divide-x divide-gray-200
             sm:grid-cols-7
-            [@media(max-width:768px)]:grid-cols-4
+            [@media(max-width:768px)]:grid-cols-1
             [@media(max-width:640px)]:grid-cols-3
             [@media(max-width:480px)]:grid-cols-1
             overflow-x-auto snap-x snap-mandatory scroll-smooth
@@ -217,8 +217,7 @@ function EventWeekView({
                         const eventStart = new Date(event.start);
                         const eventEnd = new Date(event.end || event.start);
                         const isCompleted = eventEnd < now;
-                        const isOngoing =
-                          eventStart <= now && eventEnd >= now;
+                        const isOngoing = eventStart <= now && eventEnd >= now;
 
                         return (
                           <div
@@ -235,8 +234,7 @@ function EventWeekView({
                               }
                             `}
                             style={{
-                              borderLeftColor:
-                                CATEGORY_COLORS[event.category],
+                              borderLeftColor: CATEGORY_COLORS[event.category],
                             }}
                           >
                             <div
@@ -273,7 +271,11 @@ function EventWeekView({
                             <h4
                               className={`
                                 text-xs font-semibold line-clamp-2 mb-1
-                                ${isCompleted ? "text-gray-500" : "text-gray-900"}
+                                ${
+                                  isCompleted
+                                    ? "text-gray-500"
+                                    : "text-gray-900"
+                                }
                               `}
                             >
                               {event.title}
@@ -283,7 +285,9 @@ function EventWeekView({
                               <span
                                 className="text-xs font-medium px-1.5 py-0.5 rounded"
                                 style={{
-                                  backgroundColor: `${CATEGORY_COLORS[event.category]}20`,
+                                  backgroundColor: `${
+                                    CATEGORY_COLORS[event.category]
+                                  }20`,
                                   color: CATEGORY_COLORS[event.category],
                                 }}
                               >

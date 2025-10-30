@@ -16,7 +16,7 @@ const Carousel = ({ images = [], isButtonOutside }) => {
   };
 
   return (
-    <div className="relative w-full mx-auto overflow-hidden flex items-center">
+    <div className="relative w-full mx-auto overflow-hidden flex items-center  ">
       {images.length > 1 && (
         <button
           type="button"
@@ -33,7 +33,7 @@ const Carousel = ({ images = [], isButtonOutside }) => {
         </button>
       )}
       <div
-        className="flex transition-transform duration-700 ease-in-out w-full"
+        className="flex transition-transform duration-700 ease-in-out w-full  sm:h-[400px]"
         style={{
           transform:
             images.length > 1 ? `translateX(-${currentIndex * 100}%)` : "none",
@@ -43,7 +43,7 @@ const Carousel = ({ images = [], isButtonOutside }) => {
           <img
             key={index}
             src={src}
-            className="w-full flex-shrink-0 rounded-lg"
+            className="w-full flex-shrink-0 rounded-sm sm:h-[100%]"
             alt={`Slide ${index + 1}`}
           />
         ))}

@@ -110,13 +110,7 @@ const ProductManagement = () => {
     }
   };
 
-  // const showNotification = (type, message) => {
-  //   setNotification({ show: true, type, message });
-  //   setTimeout(
-  //     () => setNotification({ show: false, type: "", message: "" }),
-  //     4000
-  //   );
-  // };
+ 
 
   const handleAddProduct = () => {
     setModalMode("add");

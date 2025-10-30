@@ -37,7 +37,7 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
 
     // Alternative pattern: "Title - Feeling excited"
     const feelingMatch2 = title.match(/^(.+?)\s*-\s*Feeling\s+(.+?)$/i);
-    
+
     if (feelingMatch2) {
       return {
         cleanTitle: feelingMatch2[1].trim(),
@@ -269,7 +269,7 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
     const remainingCount = imageCount - 4;
 
     return (
-      <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[400px]">
+      <div className="grid grid-cols-4 grid-rows-2 lg:grid-rows-2 lg:grid-cols-4 gap-3 h-[400px]">
         {/* First large image */}
         <div
           className="col-span-2 row-span-2 relative group overflow-hidden rounded-xl cursor-pointer"
@@ -356,12 +356,12 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
             onClick={cancelDelete}
           >
             {/* Modal */}
             <div
-              className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200"
+              className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200 "
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -435,7 +435,7 @@ const BlogCard = ({ blog, isMine = false, onDelete }) => {
       {/* Whole Card Body HERE */}
       <div
         onClick={handleCardClick}
-        className="rounded-2xl p-6 xl:p-8 flex flex-col gap-6 bg-white border border-gray-200/60 shadow-sm hover:shadow-xl hover:border-gray-300/60 transition-all duration-300 cursor-pointer relative"
+        className="rounded-2xl p-6 xl:p-8 flex flex-col gap-2 bg-white border border-gray-200/60 shadow-sm hover:shadow-xl hover:border-gray-300/60 transition-all duration-300 cursor-pointer relative"
       >
         {/* Header */}
         <section

@@ -222,7 +222,7 @@ const UserHeartbitsManagement = () => {
     setSortBy("name");
     setSortOrder("asc");
     setSelectedUsers([]);
-    // showNotification("info", "All filters and selections reset");
+    toast.info("All filters and selections reset");
   };
 
   // Simplified filtering logic

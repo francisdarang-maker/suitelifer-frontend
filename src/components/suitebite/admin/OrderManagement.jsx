@@ -129,13 +129,6 @@ const OrderManagement = () => {
     }
   }, [statusFilter, dateRange]);
 
-  // const showNotification = (type, message) => {
-  //   setNotification({ show: true, type, message });
-  //   setTimeout(
-  //     () => setNotification({ show: false, type: "", message: "" }),
-  //     4000
-  //   );
-  // };
 
   // Function to refresh orders (e.g., after status changes)
   const refreshOrders = async () => {

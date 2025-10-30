@@ -132,14 +132,14 @@ function EventAgendaView({ filteredEvents, onSelectEvent }) {
                   className="w-2 h-2 rounded-full flex-shrink-0"
                   style={{ backgroundColor: CATEGORY_COLORS[event.category] }}
                 />
-                <h4
+                <div
                   className={`
                       text-sm font-semibold truncate
                       ${isDone ? "text-gray-500" : "text-gray-900"}
                     `}
                 >
                   {event.title}
-                </h4>
+                </div>
               </div>
 
               <div className="flex items-center gap-3 text-xs text-gray-500">
@@ -379,7 +379,7 @@ function EventAgendaView({ filteredEvents, onSelectEvent }) {
         {completedEvents.length > 0 && (
           <div
             id="completed-events-section"
-            className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+            className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-20"
           >
             <div className="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -438,13 +438,13 @@ function EventAgendaView({ filteredEvents, onSelectEvent }) {
                   totalCompletedPages,
                   handleCompletedPageChange
                 )}
-                {totalCompletedPages > 1 && (
+                {/* {totalCompletedPages > 1 && (
                   <div className="mt-2 text-center text-xs text-gray-500">
                     {startIndex + 1}-
                     {Math.min(endIndex, completedEvents.length)} of{" "}
                     {completedEvents.length}
                   </div>
-                )}
+                )} */}
               </div>
             )}
           </div>

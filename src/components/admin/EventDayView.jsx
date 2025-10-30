@@ -1,21 +1,20 @@
 function EventDayView({
-  getEventsForDate, 
-  currentDate, 
-  isToday, 
+  getEventsForDate,
+  currentDate,
+  isToday,
   onSelectSlot,
-  isEmployee
+  isEmployee,
 }) {
+  const CATEGORY_COLORS = {
+    party: "#ec4899",
+    launchpod: "#3b82f6",
+    holiday: "#22c55e",
+    payroll: "#f97316",
+    others: "#0097b2",
+  };
 
-    const CATEGORY_COLORS = {
-      party: "#ec4899",
-      launchpod: "#3b82f6",
-      holiday: "#22c55e",
-      payroll: "#f97316",
-      others: "#0097b2",
-    };
-
-    const dayEvents = getEventsForDate(currentDate);
-    const isCurrentDay = isToday(currentDate);
+  const dayEvents = getEventsForDate(currentDate);
+  const isCurrentDay = isToday(currentDate);
   return (
     <>
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -102,31 +101,32 @@ function EventDayView({
               <p className="text-gray-500 text-sm mb-4">
                 No events scheduled for this day
               </p>
-              {!isEmployee && ( <button
-                onClick={() => {
-                  const start = new Date(currentDate);
-                  start.setHours(9, 0, 0, 0);
-                  const end = new Date(start.getTime() + 60 * 60 * 1000);
-                  onSelectSlot({ start, end });
-                }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white text-sm font-semibold rounded-lg hover:from-cyan-700 hover:to-cyan-800 hover:shadow-lg transition-all transform hover:scale-105"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              {!isEmployee && (
+                <button
+                  onClick={() => {
+                    const start = new Date(currentDate);
+                    start.setHours(9, 0, 0, 0);
+                    const end = new Date(start.getTime() + 60 * 60 * 1000);
+                    onSelectSlot({ start, end });
+                  }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-700 text-white text-sm font-semibold rounded-lg hover:from-cyan-700 hover:to-cyan-800 hover:shadow-lg transition-all transform hover:scale-105"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Add Event
-              </button>)}
-             
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                  Add Event
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-2">
@@ -153,7 +153,7 @@ function EventDayView({
                   `}
                   >
                     {/* Time Badge */}
-                    <div className="flex-shrink-0 text-center min-w-[60px]">
+                    <div className="flex-shrink-0 text-center my-1 min-w-[60px]">
                       <div
                         className={`
                       text-xs font-semibold
@@ -196,24 +196,24 @@ function EventDayView({
                     </div>
 
                     {/* Color Indicator */}
-                    <div
+                    {/* <div
                       className="flex-shrink-0 w-1 h-full rounded-full -ml-1"
                       style={{
                         backgroundColor: CATEGORY_COLORS[event.category],
                       }}
-                    />
+                    /> */}
 
                     {/* Event Details */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h4
+                      <div className="flex items-start justify-between gap-0 mb-1">
+                        <div
                           className={`
                         font-semibold text-sm
                         ${isCompleted ? "text-gray-500" : "text-gray-900"}
                       `}
                         >
                           {event.title}
-                        </h4>
+                        </div>
                         {isOngoing && (
                           <span className="flex-shrink-0 flex items-center gap-1 px-2 py-0.5 bg-cyan-600 text-white rounded-md text-xs font-bold">
                             <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
@@ -221,7 +221,7 @@ function EventDayView({
                           </span>
                         )}
                         {isCompleted && (
-                          <span className="flex-shrink-0 flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-md text-xs font-medium">
+                          <span className="flex-shrink-0 flex items-center gap-1 px-1 py-0.5 bg-green-100 text-green-700 rounded-md text-xs font-medium">
                             <svg
                               className="w-3 h-3"
                               fill="currentColor"
@@ -290,7 +290,7 @@ function EventDayView({
         </div>
 
         {/* Quick Add Button (when events exist) */}
-        {dayEvents.length > 0 && (
+        {dayEvents.length > 0 && !isEmployee && (
           <div className="px-5 pb-5">
             <button
               onClick={() => {
@@ -320,7 +320,7 @@ function EventDayView({
         )}
       </div>
     </>
-  )
+  );
 }
 
-export default EventDayView
+export default EventDayView;

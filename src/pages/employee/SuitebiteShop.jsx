@@ -83,14 +83,6 @@ const SuitebiteShop = () => {
     fetchVariationData();
   }, []);
 
-  const showNotification = (type, message) => {
-    setNotification({ show: true, type, message });
-    setTimeout(
-      () => setNotification({ show: false, type: "", message: "" }),
-      5000
-    );
-  };
-
   const loadShopData = async () => {
     try {
       setLoading(true);
@@ -273,16 +265,13 @@ const SuitebiteShop = () => {
               : item
           )
         );
-        showNotification("success", "Quantity updated!");
+        toast.success("Success", "Quantity updated!");
       } else {
-        showNotification(
-          "error",
-          response.message || "Failed to update quantity"
-        );
+        toast.error("Error", response.message || "Failed to update quantity");
       }
     } catch (error) {
       console.error("Error updating quantity:", error);
-      showNotification("error", "Failed to update quantity");
+      toast.error("Error", "Failed to update quantity");
     }
   };
 
@@ -315,11 +304,11 @@ const SuitebiteShop = () => {
         await updateCartAndHeartbits();
 
         toast.success(
-          "success",
+          "Success",
           "Order placed successfully! Awaiting admin approval. 🎉"
         );
       } else {
-        toast.error("error", response.message || "Checkout failed");
+        toast.error("Error", response.message || "Checkout failed");
       }
     } catch (error) {
       console.error("Error during checkout:", error);
@@ -327,9 +316,9 @@ const SuitebiteShop = () => {
       console.error("Error status:", error.response?.status);
 
       if (error.response?.data?.message) {
-        showNotification("error", error.response.data.message);
+        toast.error("Error", error.response.data.message);
       } else {
-        showNotification("error", "Checkout failed. Please try again.");
+        toast.error("Error", "Checkout failed. Please try again.");
       }
     }
   };
@@ -848,18 +837,18 @@ const SuitebiteShop = () => {
               const response = await suitebiteAPI.checkout(orderData);
 
               if (response.success) {
-                showNotification("success", "Order placed successfully!");
+                toast.success("Success", "Order placed successfully!");
                 setIsModalOpen(false);
                 await updateHeartbitsOnly();
               } else {
-                showNotification(
-                  "error",
+                toast.error(
+                  "Error",
                   response.message || "Failed to place order"
                 );
               }
             } catch (error) {
               console.error("Error with buy now:", error);
-              showNotification("error", "Buy now failed. Please try again.");
+              toast.error("Error", "Buy now failed. Please try again.");
             }
           }}
           userHeartbits={userHeartbits}

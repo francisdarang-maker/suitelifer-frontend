@@ -316,8 +316,8 @@ const BlogView = () => {
         )}
 
         {/* Blog Content */}
-        <div className="p-6">
-          <h1
+        <div className="px-6 py-3">
+          <div
             className="text-2xl font-bold text-gray-900 mb-4"
             dangerouslySetInnerHTML={{ __html: cleanTitle }}
           />
@@ -378,7 +378,7 @@ const BlogView = () => {
         </div>
 
         {/* Comment Input Section */}
-        <div className="p-3 sm:p-4 flex items-start gap-3 bg-gray-50 rounded-b-lg">
+        <div className="p-3 sm:p-4 flex items-start gap-2 bg-gray-50 rounded-b-lg">
           {/* Avatar */}
           <img
             src={blog.userPic || defaultAvatar}
@@ -468,15 +468,15 @@ const BlogView = () => {
       {/* Comments Section */}
       <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-900">
+          <div className="text-lg font-semibold text-gray-900">
             Comments ({comments.length})
-          </h2>
+          </div>
           <button
             onClick={toggleSortOrder}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-all text-sm font-medium text-primary"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-all text-sm font-medium text-primary"
           >
             <ArrowUpDown className="w-4 h-4" />
-            {sortOrder === "newest" ? "Newest first" : "Oldest first"}
+            {sortOrder === "newest" ? "Newest" : "Oldest"}
           </button>
         </div>
 
