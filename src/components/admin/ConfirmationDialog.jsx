@@ -28,6 +28,12 @@ const ConfirmationDialog = ({
         }
       }}
       disableEscapeKeyDown
+      BackdropProps={{
+        sx: {
+          backdropFilter: "blur(6px)",
+          backgroundColor: "rgba(0, 0, 0, 0.3)",
+        },
+      }}
       sx={{
         "& .MuiDialog-paper": {
           width: "400px",
@@ -46,7 +52,7 @@ const ConfirmationDialog = ({
         </div>
       </DialogContent>
 
-      <DialogActions className="">
+      <DialogActions>
         <div className="flex mr-1 mb-1 gap-2">
           <button type="button" className={cancelBtnClass} onClick={onClose}>
             {cancelLabel}
